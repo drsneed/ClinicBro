@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <title>Test Server</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
-    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/layout.css">
 </head>
 
 <body>
@@ -14,7 +13,7 @@
     <label for="nav-toggle" id="nav-toggle-label"></label>
     <nav id="nav" aria-hidden="false">
         <a class="brand" href="/">
-            <img src="/img/icon.svg" alt="Home" />
+            <img src="/icon.svg" alt="Home" />
             <span>Test Server</span>
         </a>
         <ul>
@@ -28,11 +27,7 @@
         <h1 id="header-text" tabindex="-1">Home</h1>
     </header>
     <div id="content-body">
-        <div class="wrapper">
-            <p>Welcome to my test server.<br />&ndash; DS</p>
-        </div>
-    </div>
-    
+        @partial root/content(message: .welcome_message)
+    </div>    
 </body>
-
 </html>
