@@ -1,4 +1,4 @@
 @args message: *ZmplValue
-<div class="wrapper">
+<div class="container">
     <p>{{message}}</p>
 </div>

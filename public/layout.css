@@ -66,7 +66,7 @@ header {
     width: 100%; 
     position: fixed; 
     left: 0px; 
-    background: #0f2030;
+    background: #132b3f;
     color: #e6e7e8;
     min-height: 41px;
     text-align: center;
@@ -181,7 +181,7 @@ header {
     }
 }
 
-.wrapper {
+.container {
     padding: 7px;
     border: 1px solid rgba(91,90,89,.08);
     border-radius: 3px;
@@ -212,4 +212,47 @@ header {
 .brand img,
 .brand span {
     vertical-align: middle;
+}
+
+/* .center-box {
+	height: 100%;
+	min-height: 100%;
+	min-width: 100%;
+	width: 100%;
+	flex-direction: row;
+	box-sizing: border-box;
+	display: flex;
+	place-content: center;
+	align-items: center;
+    background: #00000044;
+} */
+
+input {
+    width: 100%;
+    padding: 6px 10px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+ /* unvisited link */
+ a:link {
+    color: #1e447e;
+    font-weight: 600;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+input[type=button], input[type=submit], input[type=reset] {
+    background-color: #132b3f;
+    border: none;
+    color: white;
+    padding: 16px 32px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
+    background-color: #1b3c57;
 }
