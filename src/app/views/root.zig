@@ -35,8 +35,18 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     // Static files located in `public/` in the root of your project directory are accessible
     // from the root path (e.g. `public/jetzig.png`) is available at `/jetzig.png` and the
     // content type is inferred from the extension using MIME types.
-    try request.response.headers.append("x-example-header", "example header value");
+    //try request.response.headers.append("x-example-header", "example header value");
 
-    // Render the response and set the response code.
+    const params = try request.params();
+
+    if (params.getT(.string, "email")) |recipient| {
+        const mail = request.mail("createaccount", .{ .to = &.{recipient} });
+        try mail.deliver(.background, .{});
+
+        return request.render(.ok);
+    } else {
+        return request.render(.unprocessable_entity);
+    }
+
     return request.render(.ok);
 }
