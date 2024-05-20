@@ -21,6 +21,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var root = try data.object();
 
     // Add a string to the root object.
+    try root.put("page_title", data.string("Home"));
     try root.put("welcome_message", data.string("Welcome to my test server!<br /> - DS"));
 
     // Request params have the same type as a `data.object()` so they can be inserted them

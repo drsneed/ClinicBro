@@ -17,17 +17,18 @@
             <span>Test Server</span>
         </a>
         <ul>
-           <li><a href="#">Home<span class="nav-arrow">&rsaquo;</span></a></li>
-           <li><a href="#">Maps<span class="nav-arrow">&rsaquo;</span></a></li>
-           <li><a href="#">Sign In<span class="nav-arrow">&rsaquo;</span></a></li>
+           <li><a href="/">Home<span class="nav-arrow">&rsaquo;</span></a></li>
+           <li><a href="/login">Log In<span class="nav-arrow">&rsaquo;</span></a></li>
            <li class="nav-category">0.0.1</li>
         </ul>
     </nav>
     <header>
-        <h1 id="header-text" tabindex="-1">Home</h1>
+        <h1 id="header-text" tabindex="-1">{{.page_title}}</h1>
     </header>
-    <div id="content-body">
+    <main id="content-body">
         {{zmpl.content}}
-    </div>    
+    </main>
 </body>
 </html>
+
+        
