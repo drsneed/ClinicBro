@@ -1,6 +1,6 @@
-<div class="container">
+<div class="container lc">
     <form action="/login" method="post">
-        <input type="text" name="email" size="20" 
+        <input type="text" name="email" size="20" maxlength="255" 
             aria-label="Email"
             aria-required="true"
             autocorrect="off"

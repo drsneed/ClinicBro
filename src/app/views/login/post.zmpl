@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container lc">
     <form action="/login" method="post">
         <div class="login-error"><span>{{.error_message}}</span></div>
         <input type="text" name="email" size="20" 

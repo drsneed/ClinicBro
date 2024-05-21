@@ -40,16 +40,16 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     // content type is inferred from the extension using MIME types.
     //try request.response.headers.append("x-example-header", "example header value");
 
-    const params = try request.params();
+    // const params = try request.params();
 
-    if (params.getT(.string, "email")) |recipient| {
-        const mail = request.mail("createaccount", .{ .to = &.{recipient} });
-        try mail.deliver(.background, .{});
+    // if (params.getT(.string, "email")) |recipient| {
+    //     const mail = request.mail("createaccount", .{ .to = &.{recipient} });
+    //     try mail.deliver(.background, .{});
 
-        return request.render(.ok);
-    } else {
-        return request.render(.unprocessable_entity);
-    }
+    //     return request.render(.ok);
+    // } else {
+    //     return request.render(.unprocessable_entity);
+    // }
 
     return request.render(.ok);
 }

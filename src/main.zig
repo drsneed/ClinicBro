@@ -2,7 +2,7 @@ const std = @import("std");
 
 const jetzig = @import("jetzig");
 const zmd = @import("zmd");
-
+const zqlite = @import("zqlite");
 pub const routes = @import("routes");
 
 // Override default settings in `jetzig.config` here:
@@ -165,6 +165,31 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer std.debug.assert(gpa.deinit() == .ok);
     const allocator = gpa.allocator();
+
+    // good idea to pass EXResCode to get extended result codes (more detailed error codes)
+    const flags =  zqlite.OpenFlags.Create | zqlite.OpenFlags.EXResCode;
+    var conn = try zqlite.open("tsl.db", flags);
+    defer conn.close();
+
+    // try conn.exec("create table test (name text)", .{});
+    // try conn.exec("insert into test (name) values (?1), (?2)", .{"Leto", "Ghanima"});
+
+    {
+        if (try conn.row("select * from account order by name limit 1", .{})) |row| {
+        defer row.deinit();
+        std.debug.print("name: {s}\n", .{row.text(1)});
+        }
+    }
+
+    {
+        var rows = try conn.rows("select * from account order by name", .{});
+        defer rows.deinit();
+        while (rows.next()) |row| {
+            std.debug.print("name: {s}\n", .{row.text(1)});
+        }
+        if (rows.err) |err| return err;
+    }
+
 
     const app = try jetzig.init(allocator);
     defer app.deinit();

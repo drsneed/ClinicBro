@@ -19,10 +19,10 @@
             .url = "https://github.com/jetzig-framework/jetzig/archive/aec351664bfd65fedd282bdd117944e24ab151cd.tar.gz",
             .hash = "1220823cd081a47400076e834ef45da7a547a89872b67f9b7f0e4a4b7b34120ece21",
         },
-        .iguanas = .{
-            .url = "https://github.com/jetzig-framework/iguanas/archive/89c2abf29de0bc31054a9a6feac5a6a83bab0459.tar.gz",
-            .hash = "12202fd319a5ab4e124b00e8ddea474d07c19c4e005d77b6c29fc44860904ea01a5c",
-        },
+        .zqlite = .{
+            .url = "git+https://github.com/karlseguin/zqlite.zig#master",
+            .hash = "12205e11bd7e60af91e3fe96b7fd90c2bfd73bdae778dbee9d243a5027e06fc3c101",
+        }
     },
     .paths = .{
         // This makes *all* files, recursively, included in this package. It is generally
