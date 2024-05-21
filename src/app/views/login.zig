@@ -1,6 +1,6 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-
+const auth = @import("../auth.zig");
 pub const layout = "app";
 const log = std.log.scoped(.login);
 
@@ -13,14 +13,22 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var root = try data.object();
     //log.info("root = {}\n", .{root});
-    const logged_in: bool = false;
+    var logged_in: bool = false;
     const params = try request.params();
     if(params.getT(.string, "email")) |email| {
-        log.info("Got email: {s}\n", .{email});
+        if(params.getT(.string, "password")) |password| {
+            log.info("Attempting to authenticate account with email {s} and password {s}", .{email, password});
+            if(try auth.authenticate(request.allocator, email, password)) {
+                log.info("Authentication succeeded!", .{});
+                logged_in = true;
+            }
+            else {
+                log.info("Authentication failed :(", .{});
+            }
+
+        }
     }
-    if(params.getT(.string, "password")) |password| {
-        log.info("Got password: {s}\n", .{password});
-    }
+    
     if(logged_in) {
         if (params.get("redirect")) |location| {
             switch (location.*) {

@@ -166,33 +166,24 @@ pub fn main() !void {
     defer std.debug.assert(gpa.deinit() == .ok);
     const allocator = gpa.allocator();
 
-    // good idea to pass EXResCode to get extended result codes (more detailed error codes)
-    const flags =  zqlite.OpenFlags.Create | zqlite.OpenFlags.EXResCode;
-    var conn = try zqlite.open("tsl.db", flags);
-    defer conn.close();
-
-    // try conn.exec("create table test (name text)", .{});
-    // try conn.exec("insert into test (name) values (?1), (?2)", .{"Leto", "Ghanima"});
-
-    {
-        if (try conn.row("select * from account order by name limit 1", .{})) |row| {
-        defer row.deinit();
-        std.debug.print("name: {s}\n", .{row.text(1)});
-        }
-    }
-
-    {
-        var rows = try conn.rows("select * from account order by name", .{});
-        defer rows.deinit();
-        while (rows.next()) |row| {
-            std.debug.print("name: {s}\n", .{row.text(1)});
-        }
-        if (rows.err) |err| return err;
-    }
-
-
     const app = try jetzig.init(allocator);
     defer app.deinit();
 
     try app.start(routes, .{});
+}
+
+
+
+test "gen seeds" {
+    var myKey:[32]u8 = undefined;
+    const myPw = "dustin";
+    var ceoKey:[32]u8 = undefined;
+    const ceoPw = "ceo";
+    try std.crypto.pwhash.pbkdf2(&myKey, myPw, "dustin.sneeden@gmail.com", 
+        2171, std.crypto.auth.hmac.sha2.HmacSha256);
+    try std.crypto.pwhash.pbkdf2(&ceoKey, ceoPw, "ceo@cash4u.com", 
+        2171, std.crypto.auth.hmac.sha2.HmacSha256);
+    std.debug.print("my key: {X:0>2}\n", .{myKey});
+    std.debug.print("ceo key: {X:0>2}\n", .{ceoKey});
+    try std.testing.expect(1 > 0);
 }
