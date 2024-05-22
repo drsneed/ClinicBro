@@ -14,7 +14,7 @@
 /// ```
 const std = @import("std");
 const jetzig = @import("jetzig");
-const auth = @import("../auth.zig");
+const security = @import("../security.zig");
 /// Define any custom data fields you want to store here. Assigning to these fields in the `init`
 /// function allows you to access them in various middleware callbacks defined below, where they
 /// can also be modified.
@@ -34,22 +34,7 @@ pub fn init(request: *jetzig.http.Request) !*AuthMiddleware {
 /// request, including any other middleware in the chain.
 pub fn afterRequest(self: *AuthMiddleware, request: *jetzig.http.Request) !void {
     _ = self;
-    var root = try request.response_data.object();
-    try request.server.logger.DEBUG(
-        "[AuthMiddleware:afterRequest] setting auth links",
-        .{},
-    );
-    const session = try request.session();
-    if(try session.get("jwt")) |jwt| {
-        if(auth.validate(request.allocator, jwt.string.value)) |payload| {
-            _ = payload;
-            try root.put("auth_link", request.response_data.string("/logout"));
-            try root.put("auth_link_text", request.response_data.string("Log Out"));
-            return;
-        }
-    }
-    try root.put("auth_link", request.response_data.string("/login"));
-    try root.put("auth_link_text", request.response_data.string("Log In"));
+    try security.authorize(request);
 }
 
 /// Invoked immediately before the response renders to the client.

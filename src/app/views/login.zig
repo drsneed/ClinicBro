@@ -1,6 +1,6 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const auth = @import("../auth.zig");
+const security = @import("../security.zig");
 pub const layout = "layout";
 const log = std.log.scoped(.login);
 
@@ -17,11 +17,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     const params = try request.params();
     if(params.getT(.string, "email")) |email| {
         if(params.getT(.string, "password")) |password| {
-            log.info("Attempting to authenticate account with email {s} and password {s}", .{email, password});
-            if(try auth.authenticate(request.allocator, email, password)) |jwt| {
-                defer request.allocator.free(jwt);
-                var session = try request.session();
-                try session.put("jwt", data.string(jwt));
+            if(try security.login(request, email, password)) {
                 logged_in = true;
             }
             else {
@@ -36,16 +32,16 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
             switch (location.*) {
                 // Value is `.Null` when param is empty, e.g.:
                 // `http://localhost:8080/example?redirect`
-                .Null => return request.redirect("./", .moved_permanently),
+                .Null => return request.redirect("./", .found),
 
                 // Value is `.string` when param is present, e.g.:
                 // `http://localhost:8080/example?redirect=https://jetzig.dev/`
-                .string => |string| return request.redirect(string.value, .moved_permanently),
+                .string => |string| return request.redirect(string.value, .found),
 
-                else => return request.redirect("./", .moved_permanently),
+                else => return request.redirect("./", .found),
             }
         } else {
-            return request.redirect("./", .moved_permanently);
+            return request.redirect("./", .found);
         }
     }
     else {

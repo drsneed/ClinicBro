@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 const jetzig = @import("jetzig");
 
 pub fn build(b: *std.Build) !void {
@@ -11,13 +12,19 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-
+    var sql_path = "/home/admin/projects/testserver.live/src/sql/";
+    switch (builtin.os.tag) {
+        .windows => {
+            sql_path = "C:/Projects/testserver.live/src/sql";
+        },
+        else => {},
+    }
     const zqlite = b.dependency("zqlite", .{
         .target = target,
         .optimize = optimize,
     }).module("zqlite");
     zqlite.addCSourceFile(.{
-        .file = .{.path = "C:/Projects/testserver.live/src/sql/sqlite3.c"},
+        .file = .{.path = sql_path ++ "sqlite3.c"},
         .flags = &[_][]const u8{
             "-DSQLITE_DQS=0",
             "-DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1",
@@ -38,7 +45,7 @@ pub fn build(b: *std.Build) !void {
             "-DHAVE_USLEEP=0",
         },
     });
-    zqlite.addIncludePath(.{.path="C:/Projects/testserver.live/src/sql/"});
+    zqlite.addIncludePath(.{.path=sql_path});
     exe.linkLibC();
     exe.root_module.addImport("zqlite", zqlite);
     
