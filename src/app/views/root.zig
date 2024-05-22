@@ -1,7 +1,7 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 
-pub const layout = "app";
+pub const layout = "layout";
 
 /// `src/app/views/root.zig` represents the root URL `/`
 /// The `index` view function is invoked when when the HTTP verb is `GET`.
@@ -18,11 +18,12 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     // The first call to `data.object()` or `data.array()` sets the root response data value.
     // JSON requests return a JSON string representation of the root data value.
     // Zmpl templates can access all values in the root data value.
-    var root = try data.object();
-
+    var root = data.value.?;
     // Add a string to the root object.
     try root.put("page_title", data.string("Home"));
     try root.put("welcome_message", data.string("Welcome to my test server!<br /> - DS"));
+    // try root.put("auth_link", data.string("/login"));
+    // try root.put("auth_link_text", data.string("Log In"));
 
     // Request params have the same type as a `data.object()` so they can be inserted them
     // directly into the response data. Fetch `http://localhost:8080/?message=hello` to set the

@@ -5,6 +5,10 @@ const zmd = @import("zmd");
 const zqlite = @import("zqlite");
 pub const routes = @import("routes");
 
+const zdt = @import("zdt");
+
+
+
 // Override default settings in `jetzig.config` here:
 pub const jetzig_options = struct {
     /// Middleware chain. Add any custom middleware here, or use middleware provided in
@@ -13,9 +17,8 @@ pub const jetzig_options = struct {
         // htmx middleware skips layouts when `HX-Target` header is present and issues
         // `HX-Redirect` instead of a regular HTTP redirect when `request.redirect` is called.
         jetzig.middleware.HtmxMiddleware,
-        // Demo middleware included with new projects. Remove once you are familiar with Jetzig's
-        // middleware system.
-        // @import("app/middleware/DemoMiddleware.zig"),
+        // my auth middleware
+        @import("app/middleware/authmiddleware.zig"),
     };
 
     // Maximum bytes to allow in request body.
@@ -165,6 +168,14 @@ pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer std.debug.assert(gpa.deinit() == .ok);
     const allocator = gpa.allocator();
+
+    var my_tz = try zdt.Timezone.tzLocal(allocator);
+    defer my_tz.deinit();
+
+    const t = try zdt.Datetime.fromUnix(std.time.timestamp(), zdt.Duration.Resolution.second, my_tz);
+   
+    std.debug.print("timestamp: {s}\n", .{t});
+
 
     const app = try jetzig.init(allocator);
     defer app.deinit();

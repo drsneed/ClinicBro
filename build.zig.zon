@@ -22,6 +22,10 @@
         .zqlite = .{
             .url = "git+https://github.com/karlseguin/zqlite.zig#master",
             .hash = "12205e11bd7e60af91e3fe96b7fd90c2bfd73bdae778dbee9d243a5027e06fc3c101",
+        },
+        .zdt = .{
+            .url = "https://codeberg.org/FObersteiner/zdt/archive/main.tar.gz",
+            .hash = "122028c7aca1f934d9ce81d07104e9d586c61f95890575f929831ce503b8b657c0d1"
         }
     },
     .paths = .{

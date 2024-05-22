@@ -42,6 +42,13 @@ pub fn build(b: *std.Build) !void {
     exe.linkLibC();
     exe.root_module.addImport("zqlite", zqlite);
     
+    const zdt = b.dependency("zdt", .{
+        .target = target,
+        .optimize = optimize,
+    }).module("zdt");
+
+    exe.root_module.addImport("zdt", zdt);
+
     // All dependencies **must** be added to imports above this line.
 
     try jetzig.jetzigInit(b, exe, .{});

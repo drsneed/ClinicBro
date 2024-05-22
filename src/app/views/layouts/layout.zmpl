@@ -18,7 +18,7 @@
         </a>
         <ul>
            <li><a href="/">Home<span class="nav-arrow">&rsaquo;</span></a></li>
-           <li><a href="/login">Log In<span class="nav-arrow">&rsaquo;</span></a></li>
+           <li><a href="{{.auth_link}}">{{.auth_link_text}}<span class="nav-arrow">&rsaquo;</span></a></li>
            <li class="nav-category">0.0.1</li>
         </ul>
     </nav>

@@ -1,25 +1,27 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 const auth = @import("../auth.zig");
-pub const layout = "app";
+pub const layout = "layout";
 const log = std.log.scoped(.login);
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = try data.object();
+    var root = data.value.?;
     try root.put("page_title", data.string("Log In"));
     return request.render(.ok);
 }
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = try data.object();
+    var root = data.value.?;
     //log.info("root = {}\n", .{root});
     var logged_in: bool = false;
     const params = try request.params();
     if(params.getT(.string, "email")) |email| {
         if(params.getT(.string, "password")) |password| {
             log.info("Attempting to authenticate account with email {s} and password {s}", .{email, password});
-            if(try auth.authenticate(request.allocator, email, password)) {
-                log.info("Authentication succeeded!", .{});
+            if(try auth.authenticate(request.allocator, email, password)) |jwt| {
+                defer request.allocator.free(jwt);
+                var session = try request.session();
+                try session.put("jwt", data.string(jwt));
                 logged_in = true;
             }
             else {
