@@ -23,9 +23,7 @@ pub fn issueTicket(allocator: std.mem.Allocator, email: []const u8, password: []
 }
 
 pub fn login(request: *jetzig.Request, email: []const u8, password: []const u8) !bool {
-    log.info("attempting to issue ticket", .{});
     if (try issueTicket(request.allocator, email, password)) |ticket| {
-        log.info("got ticket", .{});
         defer request.allocator.free(ticket.name);
         var data = jetzig.zmpl.Data.init(request.allocator);
         var root = try data.object();
