@@ -21,9 +21,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var root = data.value.?;
     // Add a string to the root object.
     try root.put("page_title", data.string("Home"));
-    try root.put("welcome_message", data.string("Welcome to my test server!<br /> - DS"));
-    // try root.put("auth_link", data.string("/login"));
-    // try root.put("auth_link_text", data.string("Log In"));
+    //try root.put("welcome_message", data.string("Welcome to my test server!<br /> - DS"));
 
     // Request params have the same type as a `data.object()` so they can be inserted them
     // directly into the response data. Fetch `http://localhost:8080/?message=hello` to set the
@@ -42,7 +40,6 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     //try request.response.headers.append("x-example-header", "example header value");
 
     // const params = try request.params();
-
     // if (params.getT(.string, "email")) |recipient| {
     //     const mail = request.mail("createaccount", .{ .to = &.{recipient} });
     //     try mail.deliver(.background, .{});

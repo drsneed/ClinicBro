@@ -7,8 +7,6 @@ pub const routes = @import("routes");
 
 const zdt = @import("zdt");
 
-
-
 // Override default settings in `jetzig.config` here:
 pub const jetzig_options = struct {
     /// Middleware chain. Add any custom middleware here, or use middleware provided in
@@ -60,6 +58,17 @@ pub const jetzig_options = struct {
     // milliseconds.
     // pub const job_worker_sleep_interval_ms: usize = 10;
 
+    /// Cookie options.
+    pub const cookieOptions: jetzig.CookieOptions = .{
+        .backend = .memory,
+        // .backend = .file,
+        // .file_options = .{
+        //     .path = "/path/to/jetkv-store.db",
+        //     .truncate = false, // Set to `true` to clear the store on each server launch.
+        //     .address_space_size = jetzig.jetkv.JetKV.FileBackend.addressSpace(4096),
+        // },
+    };
+
     /// Key-value store options. Set backend to `.file` to use a file-based store.
     /// When using `.file` backend, you must also set `.file_options`.
     /// The key-value store is exposed as `request.store` in views and is also available in as
@@ -110,7 +119,7 @@ pub const jetzig_options = struct {
     };
 
     /// Force email delivery in development mode (instead of printing email body to logger).
-     pub const force_development_email_delivery = true;
+    pub const force_development_email_delivery = false;
 
     // Set custom fragments for rendering markdown templates. Any values will fall back to
     // defaults provided by Zmd (https://github.com/jetzig-framework/zmd/blob/main/src/zmd/html.zig).
@@ -173,9 +182,8 @@ pub fn main() !void {
     defer my_tz.deinit();
 
     const t = try zdt.Datetime.fromUnix(std.time.timestamp(), zdt.Duration.Resolution.second, my_tz);
-   
-    std.debug.print("timestamp: {s}\n", .{t});
 
+    std.debug.print("timestamp: {s}\n", .{t});
 
     const app = try jetzig.init(allocator);
     defer app.deinit();
@@ -183,17 +191,13 @@ pub fn main() !void {
     try app.start(routes, .{});
 }
 
-
-
 test "gen seeds" {
-    var myKey:[32]u8 = undefined;
+    var myKey: [32]u8 = undefined;
     const myPw = "dustin";
-    var ceoKey:[32]u8 = undefined;
+    var ceoKey: [32]u8 = undefined;
     const ceoPw = "ceo";
-    try std.crypto.pwhash.pbkdf2(&myKey, myPw, "dustin.sneeden@gmail.com", 
-        2171, std.crypto.auth.hmac.sha2.HmacSha256);
-    try std.crypto.pwhash.pbkdf2(&ceoKey, ceoPw, "ceo@cash4u.com", 
-        2171, std.crypto.auth.hmac.sha2.HmacSha256);
+    try std.crypto.pwhash.pbkdf2(&myKey, myPw, "dustin.sneeden@gmail.com", 2171, std.crypto.auth.hmac.sha2.HmacSha256);
+    try std.crypto.pwhash.pbkdf2(&ceoKey, ceoPw, "ceo@cash4u.com", 2171, std.crypto.auth.hmac.sha2.HmacSha256);
     std.debug.print("my key: {X:0>2}\n", .{myKey});
     std.debug.print("ceo key: {X:0>2}\n", .{ceoKey});
     try std.testing.expect(1 > 0);

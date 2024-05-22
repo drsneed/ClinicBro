@@ -16,6 +16,9 @@
             <img src="/icon.svg" alt="Home" />
             <span>Test Server</span>
         </a>
+        <div class="usr-btn" style="display: {{.user_name_display}};">
+            <span class="usr-btn-span">{{.user_name}}</span>
+        </div>
         <ul>
            <li><a href="/">Home<span class="nav-arrow">&rsaquo;</span></a></li>
            <li><a href="{{.auth_link}}">{{.auth_link_text}}<span class="nav-arrow">&rsaquo;</span></a></li>

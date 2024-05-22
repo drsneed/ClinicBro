@@ -1,1 +1,1 @@
-@partial root/content(message: .welcome_message)
+@partial root/content(name: .user_name)

@@ -1,4 +1,4 @@
-@args message: *ZmplValue
+@args name: *ZmplValue
 <div class="container">
-    <p>{{message}}</p>
+    <p>Welcome to my site, {{name}}!<br />- DS</p>
 </div>
