@@ -39,7 +39,6 @@ pub fn login(request: *jetzig.Request, email: []const u8, password: []const u8) 
     return false;
 }
 
-// log out of system (clear jwt cookie)
 pub fn logout(request: *jetzig.Request) !void {
     var session = try request.session();
     try session.reset();
@@ -53,18 +52,11 @@ pub fn authorize(request: *jetzig.Request) !void {
     const session = try request.session();
     if (try session.get("ticket")) |ticket| {
         try root.put("logged_in", data.boolean(true));
-        try root.put("auth_link", data.string("/logout"));
-        try root.put("auth_link_text", data.string("Log Out"));
         try root.put("user_name", data.string(ticket.getT(.string, "name") orelse "?"));
-        return;
     } else {
         try root.put("logged_in", data.boolean(false));
-        log.info("session ticket not found...", .{});
+        try root.put("user_name", data.string("Guest"));
     }
-    try root.put("auth_link", data.string("/login"));
-    try root.put("auth_link_text", data.string("Log In"));
-    try root.put("user_name", data.string("Guest"));
-    try root.put("user_name_display", data.string("none"));
 }
 
 // if(auth.validate(request.allocator, jwt.string.value)) |payload| {

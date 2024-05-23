@@ -12,20 +12,31 @@
     <input type="checkbox" id="nav-toggle" name="nav-toggle"/>
     <label for="nav-toggle" id="nav-toggle-label"></label>
     <nav id="nav" aria-hidden="false">
-        <a class="brand" href="/">
-            <img src="/icon.svg" alt="Home" />
-            <span>Test Server</span>
-        </a>
-        @zig {
+        <div class="no-padding">
+            <a class="brand" href="/">
+                <img src="/icon.svg" alt="Home" />
+                <span>Test Server</span>
+            </a>
+        </div>
+        @zig { 
             if(zmpl.getT(.boolean, "logged_in").?) {
-                <div class="usr-btn">
-                    <span class="usr-btn-span">{{.user_name}}</span>
+            <div class="dropdown" tabindex="1">
+                <i class="db2" tabindex="1"></i>
+                <a class="dropbtn">{{.user_name}}</a>
+                <div class="dropdown-content">
+                    <a href="/">Account Settings<span class="nav-arrow">&rsaquo;</span></a>
+                    <a href="/logout">Log Out<span class="nav-arrow">&rsaquo;</span></a>
                 </div>
+            </div>
             }
         }
         <ul>
            <li><a href="/">Home<span class="nav-arrow">&rsaquo;</span></a></li>
-           <li><a href="{{.auth_link}}">{{.auth_link_text}}<span class="nav-arrow">&rsaquo;</span></a></li>
+           @zig { 
+            if(!zmpl.getT(.boolean, "logged_in").?) {
+            <li><a href="/login">Log In<span class="nav-arrow">&rsaquo;</span></a></li>
+                }
+            }
            <li class="nav-category">0.0.1</li>
         </ul>
     </nav>

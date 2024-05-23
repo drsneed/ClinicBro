@@ -5,9 +5,15 @@ pub const layout = "layout";
 const log = std.log.scoped(.login);
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var root = data.value.?;
-    try root.put("page_title", data.string("Log In"));
-    return request.render(.ok);
+    const session = try request.session();
+    if (try session.get("ticket")) |ticket| {
+        _ = ticket;
+        return request.redirect("./", .found);
+    } else {
+        var root = data.value.?;
+        try root.put("page_title", data.string("Log In"));
+        return request.render(.ok);
+    }
 }
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
