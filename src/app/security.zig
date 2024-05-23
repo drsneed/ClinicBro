@@ -47,29 +47,32 @@ pub fn logout(request: *jetzig.Request) !void {
 }
 
 pub fn authorize(request: *jetzig.Request) !void {
-    var root = try request.response_data.object();
+    const data = request.response_data;
+    var root = try data.object();
     try request.server.logger.DEBUG("authorizing request for {s}", .{request.path.path});
     const session = try request.session();
     if (try session.get("ticket")) |ticket| {
-        try root.put("auth_link", request.response_data.string("/logout"));
-        try root.put("auth_link_text", request.response_data.string("Log Out"));
-        try root.put("user_name", request.response_data.string(ticket.getT(.string, "name") orelse "Guest"));
-        try root.put("user_name_display", request.response_data.string("flex"));
+        try root.put("logged_in", data.boolean(true));
+        try root.put("auth_link", data.string("/logout"));
+        try root.put("auth_link_text", data.string("Log Out"));
+        try root.put("user_name", data.string(ticket.getT(.string, "name") orelse "?"));
         return;
-        // if(auth.validate(request.allocator, jwt.string.value)) |payload| {
-        //     _ = payload;
-        //     try root.put("auth_link", request.response_data.string("/logout"));
-        //     try root.put("auth_link_text", request.response_data.string("Log Out"));
-        //     return;
-        // }
     } else {
+        try root.put("logged_in", data.boolean(false));
         log.info("session ticket not found...", .{});
     }
-    try root.put("auth_link", request.response_data.string("/login"));
-    try root.put("auth_link_text", request.response_data.string("Log In"));
-    try root.put("user_name", request.response_data.string("Guest"));
-    try root.put("user_name_display", request.response_data.string("none"));
+    try root.put("auth_link", data.string("/login"));
+    try root.put("auth_link_text", data.string("Log In"));
+    try root.put("user_name", data.string("Guest"));
+    try root.put("user_name_display", data.string("none"));
 }
+
+// if(auth.validate(request.allocator, jwt.string.value)) |payload| {
+//     _ = payload;
+//     try root.put("auth_link", request.response_data.string("/logout"));
+//     try root.put("auth_link_text", request.response_data.string("Log Out"));
+//     return;
+// }
 
 pub const JwtPayload = struct { sub: i64, iat: i64 };
 

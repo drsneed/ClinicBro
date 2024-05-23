@@ -12,19 +12,22 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    var sql_path = "/home/admin/projects/testserver.live/src/sql/";
-    switch (builtin.os.tag) {
-        .windows => {
-            sql_path = "C:/Projects/testserver.live/src/sql";
-        },
-        else => {},
-    }
+    const sql_path = "C:/Projects/testserver.live/src/sql/";
+    //"/home/admin/projects/testserver.live/src/sql/"
+    //     switch (builtin.os.tag) {
+    //     .windows => {
+    //         return "C:/Projects/testserver.live/src/sql";
+    //     },
+    //     else => {
+    //         return ;
+    //     },
+    // };
     const zqlite = b.dependency("zqlite", .{
         .target = target,
         .optimize = optimize,
     }).module("zqlite");
     zqlite.addCSourceFile(.{
-        .file = .{.path = sql_path ++ "sqlite3.c"},
+        .file = .{ .path = sql_path ++ "sqlite3.c" },
         .flags = &[_][]const u8{
             "-DSQLITE_DQS=0",
             "-DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1",
@@ -45,10 +48,10 @@ pub fn build(b: *std.Build) !void {
             "-DHAVE_USLEEP=0",
         },
     });
-    zqlite.addIncludePath(.{.path=sql_path});
+    zqlite.addIncludePath(.{ .path = sql_path });
     exe.linkLibC();
     exe.root_module.addImport("zqlite", zqlite);
-    
+
     const zdt = b.dependency("zdt", .{
         .target = target,
         .optimize = optimize,
