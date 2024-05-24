@@ -50,11 +50,11 @@
 
             } else {
                 <div class="acct-dropdown" tabindex="2">
-                    <i class="acct-db2" tabindex="2"></i>
-                    <a class="acct">
-                        <span class="mdi mdi-login mr-2"></span>
+                    <input type="checkbox" id="acct-toggle" name="acct-toggle"/>
+                    <label for="acct-toggle" class="acct login-btn">
+                        <!-- <span class="mdi mdi-login mr-2"></span> -->
                         <span>Log In</span>
-                    </a>
+                    </label>
                     <div class="acct-dropdown-content" style="width: 400px;">
                         <form action="/login" method="post">
                             <input type="text" name="email" size="20" maxlength="255" 

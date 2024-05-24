@@ -83,6 +83,7 @@ body {
 #nav-toggle { 
     position: absolute;
     opacity: 0;
+    left:9999px !important;
 }
 
 #nav-toggle-label { 
@@ -202,18 +203,16 @@ a:link {
     /* font-weight: 500; */
     text-decoration: none;
 }
-.fpl {
-    margin-left: 2px;
-}
-.fpl:visited {
-    color: black;
-}
 
 /* POWER BUTTON */
 
+.pwr-dropdown {
+    line-height: var(--header-height);
+}
+
 .pwr {
     position: absolute;
-    display: inline-block;
+    display: flex;
     text-decoration: none;
     font-optical-sizing: auto;
     font-weight: 900;
@@ -221,11 +220,21 @@ a:link {
     left: 5px;
     top: 0px;
     cursor: pointer;
+    color: var(--primary-light);
+}
+
+.pwr:hover {
+    color: var(--primary-light2);
+}
+
+.pwr:hover .pwr-icon {
+    filter: invert(72%) sepia(51%) saturate(216%) hue-rotate(161deg) brightness(82%) contrast(91%);
 }
 
 .pwr img {
     width: 24px;
     height: 24px;
+    margin: 5px;
 }
 
 .pwr img,
@@ -247,19 +256,21 @@ a span {
 /* dd container */
 .pwr-dropdown {
     display: inline-block;
-    position: absolute;
+    position: fixed;
     top: 0px;
     left: 0px;
     outline: none;
     margin: 0px;
     /* text-align: center; */
     /* width: 100%; */
+    z-index: 8;
 }
 
 /* dd content */
 .pwr-dropdown .pwr-dropdown-content {
     position: absolute;
     margin-top: 20px;
+    margin-left: 5px;
     /* top: 90%; */
     border: 1px solid var(--primary-darker);
     border-radius: 3px;
@@ -328,7 +339,23 @@ a span {
     top: 0;
     margin-bottom: 5px;
     cursor: pointer;
-    /* line-height: var(--header-height); */
+}
+
+.login-btn {
+    border: 1px solid var(--primary-light);
+    border-radius: 3px;
+    -webkit-touch-callout: none; 
+    -webkit-user-select: none; 
+    -khtml-user-select: none; 
+    -moz-user-select: none; 
+    -ms-user-select: none; 
+    user-select: none; 
+}
+
+
+#acct-toggle { 
+    position: absolute;
+    opacity: 0;
 }
 
 .acct span {
@@ -343,6 +370,17 @@ a span {
 
 .acct-dropdown:focus span {
     color: var(--primary-darker);
+}
+
+.acct-dropdown:focus .login-btn {
+    border-color: var(--primary-darker);
+}
+#acct-toggle:checked ~ .login-btn span {
+    color: var(--primary-darker);
+}
+
+#acct-toggle:checked ~ .login-btn {
+    border-color: var(--primary-darker);
 }
 
 /* dd container */
@@ -360,13 +398,13 @@ a span {
 /* dd content */
 .acct-dropdown .acct-dropdown-content {
     position: fixed;
-    right: 0;
+    right: 5px;
     margin-top: 20px;
     /* top: 90%; */
     border: 1px solid var(--primary);
     border-radius: 3px;
     background-color: var(--primary-light);
-    width: 180px;
+    width: 400px;
     
     /* box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); */
     box-shadow: 3px 3px 5px var(--primary);
@@ -375,7 +413,7 @@ a span {
     opacity: 0;
     transition: 0.35s ease-out;
     text-align: left;
-    padding: 0;
+    padding: 16px;
 }
 .acct-dropdown-content a {
     color: var(--primary-light);
@@ -396,13 +434,54 @@ a span {
     color: var(--primary-light);
 }
 
+.acct-dropdown-content .fpl {
+    width: 150px;
+    color: var(--primary);
+    margin-left: 2px;
+}
+.acct-dropdown-content .fpl:visited {
+    color: var(--primary);
+
+}
+.acct-dropdown-content .fpl:hover {
+    background: transparent;
+    color: rgb(7, 19, 41);
+
+}
+
 /* show dd content */
-.acct-dropdown:focus .acct-dropdown-content {
+#acct-toggle:checked  ~ .acct-dropdown-content {
     outline: none;
     transform: translateY(20px);
     visibility: visible;
     opacity: 1;
 }
+
+/* LOGIN BUTTON */
+
+.login-btn {
+    position: fixed;
+    display: block;
+    background-color: transparent;
+    border: 1px solid var(--primary-light);
+    border-radius: 3px;
+    color: var(--primary-light);
+    right: 10px;
+    top: 0;
+    margin-top: 4px;
+    cursor: pointer;
+    padding: 0px 6px;
+    font-size: 12px;
+    height: 30px;
+    line-height: 30px;
+}
+
+.login-btn:hover {
+    /* background-color: var(--primary-light); */
+    color: var(--primary-light2);
+    border-color: var(--primary-light2);
+}
+
 
 /* mask to close menu by clicking on the button */
 .acct-dropdown .acct-db2 {
@@ -422,36 +501,20 @@ a span {
     opacity: 0;
 }
 
-/* LOGIN BUTTON */
-
-.login-btn {
-    position: fixed;
-    display: block;
-    background-color: transparent;
-    border: 1px solid var(--primary-light);
-    border-radius: 3px;
-    color: var(--primary-light);
-    right: 5px;
-    top: 0;
-    margin-top: 4px;
-    cursor: pointer;
-    padding: 0px 6px;
-    font-size: 12px;
-    height: 30px;
-    line-height: 30px;
+input {
+    width: 100%;
+    border: 1px solid #CCC;
+    padding: 6px 10px;
+    margin: 6px 2px;
+    box-sizing: border-box;
+    border-radius: 2px;
+    font-size: 14px;
 }
-
-.login-btn:hover {
-    /* background-color: var(--primary-light); */
-    color: var(--primary-light2);
-    border-color: var(--primary-light2);
-}
-
 
 input[type=button], input[type=submit], input[type=reset] {
-    background-color: #29526D;
-    border: none;
-    color: white;
+    background-color: var(--primary);
+    border: 1px solid var(--primary);
+    color: var(--primary-light);
     padding: 10px 16px;
     text-decoration: none;
     margin: 4px 2px;
@@ -462,9 +525,9 @@ input[type=button], input[type=submit], input[type=reset] {
 }
 
 input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
-    background-color: #738ea0;
+    background-color: var(--primary-darker);
+    /* color: var(--primary); */
 }
-
 
 .login-submit-btn-container {
     text-align: center;
@@ -494,9 +557,28 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     #nav {
         left: -280px;
     }
-    .pwr {
-        opacity: 0;
+    #nav ul {
+        margin-top: 40px;
     }
+
+        
+    .pwr-dropdown {
+        margin-top: 40px;
+        margin-left: -280px;
+    }
+
+    #nav-toggle:checked ~ .pwr-dropdown {
+        margin-left: 0px;
+    }
+    
+    .pwr {
+        color: #1d3a4e;
+    }
+
+    .pwr-icon {
+        filter: invert(18%) sepia(15%) saturate(2188%) hue-rotate(162deg) brightness(89%) contrast(86%);
+    }
+
     #nav-toggle:checked ~ #nav { 
         left: 0;
     }
@@ -507,14 +589,9 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
         background:#1d3a4e;
     }
 
-   
-
-    /* .pwr-icon {
-        filter: invert(29%) sepia(66%) saturate(336%) hue-rotate(160deg) brightness(93%) contrast(103%);
-    } */
-
-    /* #nav ul {
-        margin-top: 40px;
-    } */
+    .acct-dropdown-content {
+        width: 95% !important;
+        margin-right: 10px;
+    }
     
 }
