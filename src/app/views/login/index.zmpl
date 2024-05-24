@@ -12,6 +12,6 @@
             required="">
         <input type="password" name="password" size="20" placeholder="Password" aria-label="Password" required="">
         <a class="fpl" href="/passwordreset">Forgot Password?</a>
-        <div class="login-btn-container"><input class="login-btn" type="submit" value="Log In"></div>
+        <div class="login-submit-btn-container"><input type="submit" value="Log In"></div>
     </form>
 </div>

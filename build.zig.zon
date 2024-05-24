@@ -14,20 +14,16 @@
     // `zig build --fetch` can be used to fetch all dependencies of a package, recursively.
     // Once all dependencies are fetched, `zig build` no longer requires
     // internet connectivity.
-    .dependencies = .{
-        .jetzig = .{
-            .url = "https://github.com/jetzig-framework/jetzig/archive/aec351664bfd65fedd282bdd117944e24ab151cd.tar.gz",
-            .hash = "1220823cd081a47400076e834ef45da7a547a89872b67f9b7f0e4a4b7b34120ece21",
-        },
-        .zqlite = .{
-            .url = "git+https://github.com/karlseguin/zqlite.zig#master",
-            .hash = "12205e11bd7e60af91e3fe96b7fd90c2bfd73bdae778dbee9d243a5027e06fc3c101",
-        },
-        .zdt = .{
-            .url = "https://codeberg.org/FObersteiner/zdt/archive/main.tar.gz",
-            .hash = "122035b81d1e796f241e4faf52a1e8b84bf458399da6d1e10ec248e14defc90bfa7e",
-        }
-    },
+    .dependencies = .{ .jetzig = .{
+        .url = "https://github.com/jetzig-framework/jetzig/archive/aec351664bfd65fedd282bdd117944e24ab151cd.tar.gz",
+        .hash = "1220823cd081a47400076e834ef45da7a547a89872b67f9b7f0e4a4b7b34120ece21",
+    }, .zqlite = .{
+        .url = "git+https://github.com/karlseguin/zqlite.zig#master",
+        .hash = "12205e11bd7e60af91e3fe96b7fd90c2bfd73bdae778dbee9d243a5027e06fc3c101",
+    }, .zdt = .{
+        .url = "https://codeberg.org/FObersteiner/zdt/archive/main.tar.gz",
+        .hash = "1220bddaa19778add96409dff52f49448162e3fb9742b1dc23b972f44059c4fdbab8",
+    } },
     .paths = .{
         // This makes *all* files, recursively, included in this package. It is generally
         // better to explicitly list the files and directories instead, to insure that

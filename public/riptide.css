@@ -92,10 +92,10 @@ body {
     -moz-user-select: none; 
     -ms-user-select: none; 
     user-select: none; 
-    
+    margin-left: -40px;
     height: var(--header-height); 
     width: var(--header-height); 
-    display: none; 
+    display: block; 
     position: fixed; 
     background: transparent;
     z-index: 3;
@@ -192,24 +192,35 @@ body {
     text-align: left;
 }
 
+.lc {
+    max-width: 500px;
+    width: 100%;
+}
+
+a:link {
+    color: black;
+    /* font-weight: 500; */
+    text-decoration: none;
+}
+.fpl {
+    margin-left: 2px;
+}
+.fpl:visited {
+    color: black;
+}
+
 /* POWER BUTTON */
 
 .pwr {
     position: absolute;
     display: inline-block;
     text-decoration: none;
-    background-color: transparent;
-    color: #000;
     font-optical-sizing: auto;
     font-weight: 900;
     font-size: 20px;
     left: 5px;
     top: 0px;
     cursor: pointer;
-}
-
-.pwr:hover {
-    text-decoration: none;
 }
 
 .pwr img {
@@ -225,14 +236,11 @@ a span {
 
 .pwr-icon {
     filter: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
-    /* filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%) contrast(103%); */
-    /* filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%); */
 }
 .pwr-icon:hover {
     filter: invert(72%) sepia(51%) saturate(216%) hue-rotate(161deg) brightness(82%) contrast(91%);
 }
 .pwr-dropdown:focus .pwr-icon {
-    /* filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%); */
     filter: invert(18%) sepia(15%) saturate(2188%) hue-rotate(162deg) brightness(89%) contrast(86%);
 }
 
@@ -253,7 +261,7 @@ a span {
     position: absolute;
     margin-top: 20px;
     /* top: 90%; */
-    border: 1px solid #00e80044;
+    border: 1px solid var(--primary-darker);
     border-radius: 3px;
     background-color: var(--primary-light);
     width: 200px;
@@ -264,7 +272,7 @@ a span {
     opacity: 0;
     transition: 0.35s ease-out;
     text-align: left;
-    padding: 0 4px;
+    padding: 0;
 }
 .pwr-dropdown-content a {
     /* color:#5b5a59; */
@@ -316,16 +324,15 @@ a span {
     display: block;
     text-decoration: none;
     background-color: transparent;
-    color: white;
     right: 5px;
     top: 0;
-    height: --var(--header-height);
     margin-bottom: 5px;
     cursor: pointer;
+    /* line-height: var(--header-height); */
 }
 
 .acct span {
-    font-size: 25px;
+    font-size: 16px;
     margin-bottom: 0px;
 }
 
@@ -356,10 +363,11 @@ a span {
     right: 0;
     margin-top: 20px;
     /* top: 90%; */
-    border: 1px solid #ffffff44;
+    border: 1px solid var(--primary);
     border-radius: 3px;
     background-color: var(--primary-light);
     width: 180px;
+    
     /* box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); */
     box-shadow: 3px 3px 5px var(--primary);
     z-index: 100000;
@@ -367,7 +375,7 @@ a span {
     opacity: 0;
     transition: 0.35s ease-out;
     text-align: left;
-    padding: 0 4px;
+    padding: 0;
 }
 .acct-dropdown-content a {
     color: var(--primary-light);
@@ -414,15 +422,70 @@ a span {
     opacity: 0;
 }
 
+/* LOGIN BUTTON */
+
+.login-btn {
+    position: fixed;
+    display: block;
+    background-color: transparent;
+    border: 1px solid var(--primary-light);
+    border-radius: 3px;
+    color: var(--primary-light);
+    right: 5px;
+    top: 0;
+    margin-top: 4px;
+    cursor: pointer;
+    padding: 0px 6px;
+    font-size: 12px;
+    height: 30px;
+    line-height: 30px;
+}
+
+.login-btn:hover {
+    /* background-color: var(--primary-light); */
+    color: var(--primary-light2);
+    border-color: var(--primary-light2);
+}
+
+
+input[type=button], input[type=submit], input[type=reset] {
+    background-color: #29526D;
+    border: none;
+    color: white;
+    padding: 10px 16px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 2px;
+    font-weight: 600;
+    width: 100%;
+}
+
+input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
+    background-color: #738ea0;
+}
+
+
+.login-submit-btn-container {
+    text-align: center;
+}
+
+.login-error {
+    text-align: center;
+    color: #bd1111;
+    font-size: 600;
+}
+
 
 .mr-2 {
     margin-right: 5px;
     padding-left: 5px;
 }
 
-@media only screen and (max-width: 640px) {
+@media only screen and (max-width: 770px) {
     #nav-toggle-label {
-        display: block;
+        margin-left: 0;
+        /* opacity: 1; */
     }
     #main {
         margin-left: 0;
@@ -430,6 +493,9 @@ a span {
     }
     #nav {
         left: -280px;
+    }
+    .pwr {
+        opacity: 0;
     }
     #nav-toggle:checked ~ #nav { 
         left: 0;
@@ -441,4 +507,14 @@ a span {
         background:#1d3a4e;
     }
 
+   
+
+    /* .pwr-icon {
+        filter: invert(29%) sepia(66%) saturate(336%) hue-rotate(160deg) brightness(93%) contrast(103%);
+    } */
+
+    /* #nav ul {
+        margin-top: 40px;
+    } */
+    
 }

@@ -12,6 +12,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     } else {
         var root = data.value.?;
         try root.put("page_title", data.string("Log In"));
+        try root.put("hide_login_btn", data.boolean(true));
         return request.render(.ok);
     }
 }
