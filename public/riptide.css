@@ -252,6 +252,9 @@ a span {
 .pwr-dropdown:focus .pwr-icon {
     filter: invert(18%) sepia(15%) saturate(2188%) hue-rotate(162deg) brightness(89%) contrast(86%);
 }
+.pwr-dropdown:focus span {
+    color: var(--primary-darker);
+}
 
 /* dd container */
 .pwr-dropdown {
@@ -261,8 +264,6 @@ a span {
     left: 0px;
     outline: none;
     margin: 0px;
-    /* text-align: center; */
-    /* width: 100%; */
     z-index: 8;
 }
 
@@ -271,12 +272,10 @@ a span {
     position: absolute;
     margin-top: 20px;
     margin-left: 5px;
-    /* top: 90%; */
     border: 1px solid var(--primary-darker);
     border-radius: 3px;
     background-color: var(--primary-light);
     width: 200px;
-    /* box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); */
     box-shadow: 3px 3px 5px var(--primary);
     z-index: 100000;
     visibility: hidden;
@@ -286,10 +285,7 @@ a span {
     padding: 0;
 }
 .pwr-dropdown-content a {
-    /* color:#5b5a59; */
-
     color: var(--primary-darker);
-    /* padding: 12px 16px; */
     display: block;
     text-decoration: none;
     transition: 0.35s ease-out;
@@ -302,7 +298,6 @@ a span {
     color: var(--primary-light);
 }
 
-/* show dd content */
 .pwr-dropdown:focus .pwr-dropdown-content {
     outline: none;
     transform: translateY(20px);
@@ -391,8 +386,6 @@ a span {
     left: 0px;
     outline: none;
     margin: 0px;
-    /* text-align: center; */
-    /* width: 100%; */
 }
 
 /* dd content */
@@ -400,13 +393,10 @@ a span {
     position: fixed;
     right: 5px;
     margin-top: 20px;
-    /* top: 90%; */
     border: 1px solid var(--primary);
     border-radius: 3px;
     background-color: var(--primary-light);
     width: 400px;
-    
-    /* box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); */
     box-shadow: 3px 3px 5px var(--primary);
     z-index: 100000;
     visibility: hidden;
@@ -418,7 +408,6 @@ a span {
 .acct-dropdown-content a {
     color: var(--primary-light);
     background: transparent;
-    /* padding: 12px 16px; */
     display: block;
     text-decoration: none;
     transition: 0.35s ease-out;
@@ -477,7 +466,6 @@ a span {
 }
 
 .login-btn:hover {
-    /* background-color: var(--primary-light); */
     color: var(--primary-light2);
     border-color: var(--primary-light2);
 }
@@ -526,7 +514,6 @@ input[type=button], input[type=submit], input[type=reset] {
 
 input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     background-color: var(--primary-darker);
-    /* color: var(--primary); */
 }
 
 .login-submit-btn-container {
@@ -548,7 +535,6 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
 @media only screen and (max-width: 770px) {
     #nav-toggle-label {
         margin-left: 0;
-        /* opacity: 1; */
     }
     #main {
         margin-left: 0;
@@ -593,5 +579,4 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
         width: 95% !important;
         margin-right: 10px;
     }
-    
 }
