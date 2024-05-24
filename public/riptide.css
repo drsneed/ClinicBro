@@ -252,7 +252,7 @@ a span {
 .pwr-dropdown:focus .pwr-icon {
     filter: invert(18%) sepia(15%) saturate(2188%) hue-rotate(162deg) brightness(89%) contrast(86%);
 }
-.pwr-dropdown:focus span {
+.pwr-dropdown:focus .pwr span {
     color: var(--primary-darker);
 }
 
