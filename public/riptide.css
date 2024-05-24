@@ -4,6 +4,7 @@
     --header-height: 38px;
     --nav-width: 280px;
     --primary: #29526D;
+    --primary-light2: #82aac5;
     --primary-darker: #1d3a4e;
     --primary-light: #e6e7e8;
     --fire-orange: #d35014;
@@ -119,6 +120,48 @@ body {
     background:#1d3a4e;
 }
 
+
+#nav ul {
+    font-size: 14px;
+    list-style-type:none;
+    margin-top: 10px;
+}
+
+#nav ul a {
+    display:block;
+    padding:10px; 
+    color:rgb(91, 90, 89);
+    text-decoration:none;
+}
+
+#nav ul a:hover { 
+    color:black;
+    background-color: #ECECEC;
+} 
+
+#nav li {
+    border-top: 2px solid #e6e7e8;
+}
+#nav li:last-child {
+    border-bottom: 2px solid #e6e7e8;
+}
+
+.nav-category {
+    /* background: #f5f6f7; */
+    
+    background: linear-gradient(90deg, #fff 0%, #f5f6f7 10%, #f5f6f7 90%, #fff 100%);
+    color:#000; 
+    padding: 3px;
+    text-align: center;
+}
+
+.nav-arrow {
+    position: relative;
+    font-size: 26px;
+    float: right;
+    margin-top: -12px;
+}
+
 #main {
     position: fixed; 
     width: calc(100% - var(--nav-width));
@@ -148,7 +191,10 @@ body {
     color: #292929;
     text-align: left;
 }
-.brand {
+
+/* POWER BUTTON */
+
+.pwr {
     position: absolute;
     display: inline-block;
     text-decoration: none;
@@ -159,25 +205,219 @@ body {
     font-size: 20px;
     left: 5px;
     top: 0px;
+    cursor: pointer;
 }
 
-.brand:hover {
+.pwr:hover {
     text-decoration: none;
 }
 
-.brand img {
+.pwr img {
     width: 24px;
     height: 24px;
 }
 
-.brand img,
-.brand span {
+.pwr img,
+.pwr span,
+a span {
     vertical-align: middle;
 }
 
+.pwr-icon {
+    filter: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
+    /* filter: invert(100%) sepia(0%) saturate(0%) hue-rotate(93deg) brightness(103%) contrast(103%); */
+    /* filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%); */
+}
+.pwr-icon:hover {
+    filter: invert(72%) sepia(51%) saturate(216%) hue-rotate(161deg) brightness(82%) contrast(91%);
+}
+.pwr-dropdown:focus .pwr-icon {
+    /* filter: invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(118%) contrast(119%); */
+    filter: invert(18%) sepia(15%) saturate(2188%) hue-rotate(162deg) brightness(89%) contrast(86%);
+}
 
-svg {
-    color : "red";
+/* dd container */
+.pwr-dropdown {
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    outline: none;
+    margin: 0px;
+    /* text-align: center; */
+    /* width: 100%; */
+}
+
+/* dd content */
+.pwr-dropdown .pwr-dropdown-content {
+    position: absolute;
+    margin-top: 20px;
+    /* top: 90%; */
+    border: 1px solid #00e80044;
+    border-radius: 3px;
+    background-color: var(--primary-light);
+    width: 200px;
+    /* box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); */
+    box-shadow: 3px 3px 5px var(--primary);
+    z-index: 100000;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.35s ease-out;
+    text-align: left;
+    padding: 0 4px;
+}
+.pwr-dropdown-content a {
+    /* color:#5b5a59; */
+
+    color: var(--primary-darker);
+    /* padding: 12px 16px; */
+    display: block;
+    text-decoration: none;
+    transition: 0.35s ease-out;
+    padding: 2px auto;
+    font-size: 14px;
+
+}
+.pwr-dropdown-content a:hover {
+    background-color: var(--primary);
+    color: var(--primary-light);
+}
+
+/* show dd content */
+.pwr-dropdown:focus .pwr-dropdown-content {
+    outline: none;
+    transform: translateY(20px);
+    visibility: visible;
+    opacity: 1;
+}
+
+/* mask to close menu by clicking on the button */
+.pwr-dropdown .pwr-db2 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+    display: none;
+}
+.pwr-dropdown .pwr-db2:focus .pwr-dropdown-content {
+    outline: none;
+    visibility: hidden;
+    opacity: 0;
+}
+
+/* ACCT BUTTON */
+
+.acct {
+    position: fixed;
+    display: block;
+    text-decoration: none;
+    background-color: transparent;
+    color: white;
+    right: 5px;
+    top: 0;
+    height: --var(--header-height);
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+.acct span {
+    font-size: 25px;
+    margin-bottom: 0px;
+}
+
+.acct:hover {
+    text-decoration: none;
+    color: #82aac5;
+}
+
+.acct-dropdown:focus span {
+    color: var(--primary-darker);
+}
+
+/* dd container */
+.acct-dropdown {
+    display: inline-block;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    outline: none;
+    margin: 0px;
+    /* text-align: center; */
+    /* width: 100%; */
+}
+
+/* dd content */
+.acct-dropdown .acct-dropdown-content {
+    position: fixed;
+    right: 0;
+    margin-top: 20px;
+    /* top: 90%; */
+    border: 1px solid #ffffff44;
+    border-radius: 3px;
+    background-color: var(--primary-light);
+    width: 180px;
+    /* box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); */
+    box-shadow: 3px 3px 5px var(--primary);
+    z-index: 100000;
+    visibility: hidden;
+    opacity: 0;
+    transition: 0.35s ease-out;
+    text-align: left;
+    padding: 0 4px;
+}
+.acct-dropdown-content a {
+    color: var(--primary-light);
+    background: transparent;
+    /* padding: 12px 16px; */
+    display: block;
+    text-decoration: none;
+    transition: 0.35s ease-out;
+    padding: 2px auto;
+    font-size: 14px;
+
+}
+.acct-dropdown-content a:hover {
+    background-color: var(--primary);
+    color: var(--primary-light);
+}
+.acct-dropdown-content a:hover span {
+    color: var(--primary-light);
+}
+
+/* show dd content */
+.acct-dropdown:focus .acct-dropdown-content {
+    outline: none;
+    transform: translateY(20px);
+    visibility: visible;
+    opacity: 1;
+}
+
+/* mask to close menu by clicking on the button */
+.acct-dropdown .acct-db2 {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+    display: none;
+}
+.acct-dropdown .acct-db2:focus .acct-dropdown-content {
+    outline: none;
+    visibility: hidden;
+    opacity: 0;
+}
+
+
+.mr-2 {
+    margin-right: 5px;
+    padding-left: 5px;
 }
 
 @media only screen and (max-width: 640px) {
