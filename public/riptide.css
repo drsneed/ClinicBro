@@ -80,10 +80,13 @@ body {
     margin-left: 50px;
   }
 
-#nav-toggle { 
-    position: absolute;
+#nav-toggle {
     opacity: 0;
-    left:9999px !important;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left:0;
+    z-index: 1;
 }
 
 #nav-toggle-label { 
@@ -117,10 +120,6 @@ body {
     top: 12px;
     box-shadow: 0 6px 0 var(--primary-light), 0 12px 0 var(--primary-light);
 }
-#nav-toggle-label:hover {
-    background:#1d3a4e;
-}
-
 
 #nav ul {
     font-size: 14px;
@@ -264,7 +263,7 @@ a span {
     left: 0px;
     outline: none;
     margin: 0px;
-    z-index: 8;
+    z-index: 3;
 }
 
 /* dd content */
@@ -329,7 +328,6 @@ a span {
     position: fixed;
     display: block;
     text-decoration: none;
-    background-color: transparent;
     right: 5px;
     top: 0;
     margin-bottom: 5px;
@@ -348,9 +346,13 @@ a span {
 }
 
 
-#acct-toggle { 
-    position: absolute;
+#acct-toggle {
     opacity: 0;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: 100;
 }
 
 .acct span {
@@ -367,15 +369,20 @@ a span {
     color: var(--primary-darker);
 }
 
-.acct-dropdown:focus .login-btn {
-    border-color: var(--primary-darker);
-}
-#acct-toggle:checked ~ .login-btn span {
+#acct-toggle:checked ~ .acct span {
     color: var(--primary-darker);
 }
 
 #acct-toggle:checked ~ .login-btn {
     border-color: var(--primary-darker);
+}
+
+#acct-toggle:checked {
+    position: fixed;
+}
+
+#nav-toggle:checked {
+    position: fixed;
 }
 
 /* dd container */
@@ -420,6 +427,25 @@ a span {
     color: var(--primary-light);
 }
 .acct-dropdown-content a:hover span {
+    color: var(--primary-light);
+}
+
+.logged-in {
+    padding: 4px !important;
+    width: 200px !important;
+}
+
+.logged-in a {
+    color: var(--primary-darker);
+    display: block;
+    text-decoration: none;
+    transition: 0.35s ease-out;
+    padding: 2px auto;
+    font-size: 14px;
+
+}
+.logged-in a:hover {
+    background-color: var(--primary);
     color: var(--primary-light);
 }
 
@@ -551,6 +577,7 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     .pwr-dropdown {
         margin-top: 40px;
         margin-left: -280px;
+        z-index: 1;
     }
 
     #nav-toggle:checked ~ .pwr-dropdown {
