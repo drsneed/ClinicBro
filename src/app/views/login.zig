@@ -1,7 +1,7 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 const security = @import("../security.zig");
-pub const layout = "layout";
+// pub const layout = "layout";
 const log = std.log.scoped(.login);
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {

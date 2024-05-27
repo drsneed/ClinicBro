@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="/riptide.css">
   </head>
   <body>
-    <script>0</script>
+    <!-- <script>0</script> -->
     <div class="pwr-dropdown" tabindex="1">
         <i class="pwr-db2" tabindex="1"></i>
         <a class="pwr" id="pwr">
@@ -39,7 +39,7 @@
             else if(zmpl.getT(.boolean, "hide_login_btn")) |hide_login_btn| {
                 _ = hide_login_btn;
             } else {
-                <div class="acct-dropdown" tabindex="2">
+                <!-- <div class="acct-dropdown" tabindex="2">
                     <input type="checkbox" id="acct-toggle" name="acct-toggle"/>
                     <i class="acct-db2" tabindex="1"></i>
                     <label for="acct-toggle" class="acct login-btn">
@@ -59,7 +59,7 @@
                             <div class="login-submit-btn-container"><input type="submit" value="Log In"></div>
                         </form>
                     </div>
-                </div>
+                </div> -->
             }
         }
         {{.page_title}}
@@ -78,4 +78,5 @@
         {{zmpl.content}}
     </main>
   </body>
+  <script src="/js/loader.js"></script>
 </html>
