@@ -23,7 +23,7 @@
     <header id="header">
         {{.page_title}}
     </header>
-    <main id="main">
+    <main id="loginmain">
         <div class="container lc">
             <form action="/login" method="post">
                 <input type="text" name="email" size="20" maxlength="255" 

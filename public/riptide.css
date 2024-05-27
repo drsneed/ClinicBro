@@ -178,6 +178,21 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
+#loginmain {
+    position: fixed; 
+    width: 100%;
+    height: calc(100% - var(--header-height));
+    left: 0;
+    top: 0;
+    margin-top: var(--header-height);
+    padding: 5px;
+    text-align: center;
+    overflow-y: scroll;
+    z-index: 0;
+    overflow-x:hidden; 
+    -webkit-overflow-scrolling: touch;
+}
+
 
 .container {
     padding: 7px;
