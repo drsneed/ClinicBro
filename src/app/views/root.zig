@@ -19,12 +19,12 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     // JSON requests return a JSON string representation of the root data value.
     // Zmpl templates can access all values in the root data value.
     var root = data.value.?;
-    if(!root.getT(.boolean, "logged_in").?){
+    if (!root.getT(.boolean, "authorized").?) {
         return request.redirect("./login", .found);
     }
     // Add a string to the root object.
     try root.put("page_title", data.string("Home"));
-    
+
     //try root.put("welcome_message", data.string("Welcome to my test server!<br /> - DS"));
 
     // Request params have the same type as a `data.object()` so they can be inserted them

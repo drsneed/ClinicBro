@@ -4,6 +4,8 @@ const db = @import("db.zig");
 const jwt = @import("jwt.zig");
 const log = std.log.scoped(.security);
 
+pub const RestrictedPaths = .{"/"};
+
 pub const Ticket = struct { name: []const u8, uid: i64, iat: i64, exp: i64, mod: i64 };
 
 pub fn validatePassword(password: []const u8, salt: []const u8, stored_key: *const [32]u8) !bool {
@@ -49,14 +51,20 @@ pub fn authorize(request: *jetzig.Request) !void {
     const data = request.response_data;
     var root = try data.object();
     try request.server.logger.DEBUG("authorizing request for {s}", .{request.path.path});
+    var authorized: bool = true;
     const session = try request.session();
     if (try session.get("ticket")) |ticket| {
-        try root.put("logged_in", data.boolean(true));
         try root.put("user_name", data.string(ticket.getT(.string, "name") orelse "?"));
     } else {
-        try root.put("logged_in", data.boolean(false));
         try root.put("user_name", data.string("Guest"));
+        inline for (RestrictedPaths) |restricted_path| {
+            if (std.mem.eql(u8, request.path.path, restricted_path)) {
+                authorized = false;
+                break;
+            }
+        }
     }
+    try root.put("authorized", data.boolean(authorized));
 }
 
 // if(auth.validate(request.allocator, jwt.string.value)) |payload| {
