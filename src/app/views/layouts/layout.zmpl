@@ -10,47 +10,38 @@
   </head>
   <body>
     <script>0</script>
-    <div class="pwr-dropdown" tabindex="1">
-        <i class="pwr-db2" tabindex="1"></i>
-        <a class="pwr" id="pwr">
+    <input type="checkbox" id="nav-toggle" name="nav-toggle"/>
+    <label for="nav-toggle" id="nav-toggle-label"></label>
+    <nav id="nav">
+    <hr />
+    <a href="/"><span class="mdi mdi-home-outline mr-2"></span>Home</a>
+    <hr />
+    <a href="/Setup"><span class="mdi mdi-tune mr-2"></span>Setup</a>
+    <hr />
+    </nav>
+    <div id="pwr-dropdown" class="pwr-dropdown" tabindex="1">
+        <input type="checkbox" id="pwr-toggle" name="pwr-toggle"/>
+        <label for="pwr-toggle" class="pwr" id="pwr">
             <img src="/icon.svg" alt="Home" class="pwr-icon"/>
-            <span>ts~live</span>
-        </a>
+            ts~live
+        </label>
         <div class="pwr-dropdown-content">
-            <a href="/update"><span class="mdi mdi-upload-circle-outline mr-2"></span><span>Update</span></a>
-            <a href="/about"><span class="mdi mdi-information-outline mr-2"></span><span>About</span></a>
+            <a href="/about"><span class="mdi mdi-information-outline mr-2"></span>About</a>
         </div>
     </div>
     <header id="header">
         {{.page_title}}
         <div class="acct-dropdown" tabindex="2">
             <input type="checkbox" id="acct-toggle" name="acct-toggle"/>
-            <i class="acct-db2" tabindex="2"></i>
             <label for="acct-toggle" class="acct">
-                <span class="mdi mdi-account-circle-outline mr-2"></span>
-                <span>{{.user_name}}</span>
+                <span class="mdi mdi-account-circle-outline mr-2 acct-icon"></span>
+                {{.user_name}}
             </label>
-            <div class="acct-dropdown-content logged-in">
-                <a href="/account"><span class="mdi mdi-cog mr-2"></span><span>Account Settings</span></a>
-                <a href="/logout"><span class="mdi mdi-logout mr-2"></span><span>Log Out</span></a>
+            <div class="acct-dropdown-content">
+                <a href="/logout"><span class="mdi mdi-logout mr-2"></span>Log Out</a>
             </div>
         </div>
     </header>
-    <input type="checkbox" id="nav-toggle" name="nav-toggle"/>
-    <label for="nav-toggle" id="nav-toggle-label"></label>
-    <nav id="nav">
-    <hr />
-    <a href="/"><span class="mdi mdi-home-outline mr-2"></span><span>Home</span></a>
-    <hr />
-    <a href="/Setup"><span class="mdi mdi-tune mr-2""></span><span>Setup</span></a>
-    <hr />
-      <!-- <ul>
-        <li class="nav-category">Main Menu</li>
-        <li><a href="/"><span class="mdi mdi-home-outline mr-2"></span><span>Home</span></a></li>
-        <li><a href="/clients"><span class="mdi mdi-account-group-outline mr-2"></span><span>Clients</span></a></li>
-        <li class="nav-category">0.0.1</li>
-     </ul> -->
-    </nav>
     <main id="main">
         {{zmpl.content}}
     </main>
