@@ -1,8 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700;800&display=swap');
 
 :root {
-    /* color-scheme: light dark;
-    --container-bg: light-dark(#e6e7e8, #191b1d); */
     --bg: #18191a;
     --fg: #d8d8d8;
     --header-bg: #17171a;

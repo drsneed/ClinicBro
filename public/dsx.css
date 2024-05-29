@@ -1,25 +1,29 @@
 @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700;800&display=swap');
 
 :root {
-    /* color-scheme: light dark;
-    --container-bg: light-dark(#e6e7e8, #191b1d); */
-    --bg: #18191a;
-    --fg: #d8d8d8;
-    --header-bg: #17171a;
-    --header-border: black;
-    --header-shadow: black;
-    --header-btn-focus: #121214;
-    --container-bg: #191b1d;
-    --container-border: #5b5a5914;
-    --container-shadow: black;
-    --dropdown-bg: #121214;
+    color-scheme: light dark;
+    --bg: light-dark(#d8d8d8, #18191a);
+    --fg: light-dark(#18191a, #d8d8d8);
+    --header-bg: light-dark(#1d3a4e, #17171a);
+    --header-fg: #d8d8d8;
+    --header-border: light-dark(#444, black);
+    --header-shadow: light-dark(#999, black);
+    --header-btn-focus: light-dark(#142835, #121214);
+    --pressed-btn-border: light-dark(#444, #444);
+    --container-bg: light-dark(#fff, #191b1d);
+    --container-border: light-dark(#a3a09e, #5b5a5914);
+    --container-shadow: light-dark(#999, black);
+    --dropdown-bg: light-dark(#eee, #121214);
+    --dropdown-fg: light-dark(#1d3a4e, #eee);
     --dropdown-border: #5b5a5914;
     --dropdown-shadow: black;
+    --pwr-light-scheme: invert(22%) sepia(11%) saturate(1957%) hue-rotate(162deg) brightness(92%) contrast(99%);
+    --pwr-light-scheme-pressed: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
     --input-border: #444;
-    --sep: black;
-    --sep-border: #2A2A2A;
+    --sep: light-dark(#cecbcb, black);
+    --sep-border: light-dark(#f0f0f0, #2A2A2A);
     --link: #82aac5;
-    --nav-link: #bebebe;
+    --nav-link: light-dark(#1d3a4e, #bebebe);
     --btn-primary-hover: #1d3a4e;
     --error-bg: #bb2929;
     --header-height: 38px;
@@ -184,7 +188,7 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     left: 0;
     top: 0;
     background: var(--header-bg);
-    color: var(--fg);
+    color: var(--header-fg);
     height: var(--header-height);
     line-height: var(--header-height);
     text-align: center;
@@ -243,10 +247,10 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     position: absolute; 
     height: 3px; 
     width: 20px;
-    background: var(--fg); 
+    background: var(--header-fg); 
     left: 9px; 
     top: 12px;
-    box-shadow: 0 6px 0 var(--fg), 0 12px 0 var(--fg);
+    box-shadow: 0 6px 0 var(--header-fg), 0 12px 0 var(--header-fg);
 }
 
 #main {
@@ -292,18 +296,11 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     padding-right: 5px;
     margin-top: 2px;
     margin-bottom: 2px;
+    color: var(--header-fg);
     height: calc(var(--header-height) - 4px);
     top: 0px;
     cursor: pointer;
 }
-/* 
-.pwr:hover {
-    color: var(--link);
-}
-
-.pwr:hover .pwr-icon {
-    filter: invert(72%) sepia(51%) saturate(216%) hue-rotate(161deg) brightness(82%) contrast(91%);
-} */
 
 .pwr img {
     width: 24px;
@@ -349,7 +346,7 @@ a span {
     padding: 0;
 }
 .pwr-dropdown-content a {
-    color: var(--nav-link);
+    color: var(--dropdown-fg);
     display: block;
     text-decoration: none;
     transition: 0.35s ease-out;
@@ -358,7 +355,7 @@ a span {
 
 }
 .pwr-dropdown-content a:hover {
-    background-color: var(--fg);
+    background-color: var(--dropdown-fg);
     color: var(--dropdown-bg);
 }
 
@@ -383,9 +380,9 @@ a span {
 }
 
 #pwr-toggle:checked ~ .pwr {
-    border: 1px solid var(--sep-border);
+    border: 1px solid var(--pressed-btn-border);
     background-color: var(--header-btn-focus);
-    transition: 1.5s ease-out;
+    transition: none;
 }
 
 
@@ -396,27 +393,27 @@ a span {
 
 
 /* ACCT BUTTON */
-
 .acct {
     position: fixed;
     display: block;
     text-decoration: none;
     right: 0;
     top: 0;
-    padding-left: 0px;
+    color: var(--header-fg);
+    padding-left: 5px;
     padding-right: 5px;
+    padding-top: 0;
     margin-top: 2px;
     margin-bottom: 2px;
     cursor: pointer;
     height: calc(var(--header-height) - 4px);
 }
 
-
-
-
 .acct span {
-    font-size: 24px;
+    font-size: 16px;
+    padding: 0;
 }
+
 
 .acct:hover {
     text-decoration: none;
@@ -444,7 +441,7 @@ a span {
 }
 
 #acct-toggle:checked ~ .acct {
-    border: 1px solid var(--sep-border);
+    border: 1px solid var(--pressed-btn-border);
     background-color: var(--header-btn-focus);
 }
 
@@ -486,7 +483,7 @@ a span {
 }
 
 .acct-dropdown-content a {
-    color: var(--nav-link);
+    color: var(--dropdown-fg);
     display: block;
     text-decoration: none;
     transition: none;
@@ -495,7 +492,7 @@ a span {
 
 }
 .acct-dropdown-content a:hover {
-    background-color: var(--fg);
+    background-color: var(--dropdown-fg);
     color: var(--dropdown-bg);
 }
 
@@ -550,6 +547,18 @@ a span {
         /* width: 95% !important; */
         margin-left: 10px;
     }
+
+    .pwr {
+        color: var(--dropdown-fg);
+    }
+
+    #pwr-toggle:checked ~ .pwr {
+        background-color: #fff;
+    }
+    .pwr-icon {
+        filter: var(--pwr-light-scheme);
+    }
+
 }
 
 
