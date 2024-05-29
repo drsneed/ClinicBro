@@ -17,7 +17,7 @@
             <span>ts~live</span>
         </a>
         <div class="pwr-dropdown-content">
-            <a href="/settings"><span class="mdi mdi-tune mr-2"></span><span>Configuration</span></a>
+            <a href="/update"><span class="mdi mdi-upload-circle-outline mr-2"></span><span>Update</span></a>
             <a href="/about"><span class="mdi mdi-information-outline mr-2"></span><span>About</span></a>
         </div>
     </div>
@@ -42,7 +42,7 @@
     <hr />
     <a href="/"><span class="mdi mdi-home-outline mr-2"></span><span>Home</span></a>
     <hr />
-    <a href="/clients"><span class="mdi mdi-account-group-outline mr-2"></span><span>Clients</span></a>
+    <a href="/Setup"><span class="mdi mdi-tune mr-2""></span><span>Setup</span></a>
     <hr />
       <!-- <ul>
         <li class="nav-category">Main Menu</li>

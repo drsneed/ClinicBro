@@ -3,8 +3,11 @@
 :root {
     /* color-scheme: light dark;
     --container-bg: light-dark(#e6e7e8, #191b1d); */
-    --bg: #1d1f20;
-    --fg: #e6e7e8;
+    --bg: #18191a;
+    --fg: #d8d8d8;
+    --header-bg: #17171a;
+    --header-border: black;
+    --header-shadow: black;
     --container-bg: #191b1d;
     --container-border: #5b5a5914;
     --container-shadow: black;
@@ -12,8 +15,11 @@
     --sep: black;
     --sep-border: #2A2A2A;
     --link: #82aac5;
+    --nav-link: #bebebe;
     --btn-primary-hover: #1d3a4e;
     --error-bg: #bb2929;
+    --header-height: 38px;
+    --nav-width: 280px;
 }
 
 * { 

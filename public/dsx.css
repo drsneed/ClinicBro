@@ -3,15 +3,18 @@
 :root {
     /* color-scheme: light dark;
     --container-bg: light-dark(#e6e7e8, #191b1d); */
-    --bg: #1d1f20;
-    /* --fg: #e6e7e8; */
+    --bg: #18191a;
     --fg: #d8d8d8;
-    --header-bg: #bd4a15;
+    --header-bg: #17171a;
     --header-border: black;
     --header-shadow: black;
+    --header-btn-focus: #121214;
     --container-bg: #191b1d;
     --container-border: #5b5a5914;
     --container-shadow: black;
+    --dropdown-bg: #121214;
+    --dropdown-border: #5b5a5914;
+    --dropdown-shadow: black;
     --input-border: #444;
     --sep: black;
     --sep-border: #2A2A2A;
@@ -230,10 +233,10 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     position: absolute; 
     height: 3px; 
     width: 20px;
-    background: var(--primary-light); 
+    background: var(--fg); 
     left: 9px; 
     top: 12px;
-    box-shadow: 0 6px 0 var(--primary-light), 0 12px 0 var(--primary-light);
+    box-shadow: 0 6px 0 var(--fg), 0 12px 0 var(--fg);
 }
 
 #main {
@@ -277,19 +280,21 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     font-optical-sizing: auto;
     font-weight: 900;
     font-size: 20px;
-    left: 5px;
+    left: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-bottom: 3px;
     top: 0px;
     cursor: pointer;
-    color: var(--primary-light);
 }
-
+/* 
 .pwr:hover {
-    color: var(--primary-light2);
+    color: var(--link);
 }
 
 .pwr:hover .pwr-icon {
     filter: invert(72%) sepia(51%) saturate(216%) hue-rotate(161deg) brightness(82%) contrast(91%);
-}
+} */
 
 .pwr img {
     width: 24px;
@@ -309,12 +314,18 @@ a span {
 .pwr-icon:hover {
     filter: invert(72%) sepia(51%) saturate(216%) hue-rotate(161deg) brightness(82%) contrast(91%);
 }
+
+.pwr-dropdown:focus .pwr {
+    background-color: var(--header-btn-focus);
+    border: 1px solid var(--dropdown-border);
+}
+/* 
 .pwr-dropdown:focus .pwr-icon {
     filter: invert(18%) sepia(15%) saturate(2188%) hue-rotate(162deg) brightness(89%) contrast(86%);
 }
 .pwr-dropdown:focus .pwr span {
-    color: var(--primary-darker);
-}
+    color: var(--btn-primary-hover);
+} */
 
 /* dd container */
 .pwr-dropdown {
@@ -330,13 +341,13 @@ a span {
 /* dd content */
 .pwr-dropdown .pwr-dropdown-content {
     position: absolute;
-    margin-top: 20px;
-    margin-left: 5px;
-    border: 1px solid var(--primary-darker);
+    margin-top: 15px;
+    margin-left: 0px;
+    border: 1px solid var(--dropdown-border);
     border-radius: 3px;
-    background-color: var(--primary-light);
+    background-color: var(--dropdown-bg);
     width: 200px;
-    box-shadow: 3px 3px 5px var(--primary);
+    box-shadow: 3px 3px 5px var(--dropdown-shadow);
     z-index: 100000;
     visibility: hidden;
     opacity: 0;
@@ -345,17 +356,17 @@ a span {
     padding: 0;
 }
 .pwr-dropdown-content a {
-    color: var(--primary-darker);
+    color: var(--nav-link);
     display: block;
     text-decoration: none;
     transition: 0.35s ease-out;
     padding: 2px auto;
-    font-size: 14px;
+    font-size: 12px;
 
 }
 .pwr-dropdown-content a:hover {
-    background-color: var(--primary);
-    color: var(--primary-light);
+    background-color: var(--fg);
+    color: var(--dropdown-bg);
 }
 
 .pwr-dropdown:focus .pwr-dropdown-content {
@@ -461,18 +472,19 @@ a span {
     position: fixed;
     right: 5px;
     margin-top: 20px;
-    border: 1px solid var(--primary);
+    border: 1px solid var(--dropdown-border);
     border-radius: 3px;
-    background-color: var(--primary-light);
+    background-color: var(--dropdown-bg);
     width: 400px;
-    box-shadow: 3px 3px 5px var(--primary);
-    z-index: 100000;
+    box-shadow: 3px 3px 5px var(--dropdown-shadow);
+    z-index: 30;
     visibility: hidden;
     opacity: 0;
     /* transition: 0.35s ease-out; */
     text-align: left;
     padding: 16px;
 }
+
 .acct-dropdown-content a {
     color: var(--primary-light);
     background: transparent;
@@ -491,70 +503,12 @@ a span {
     color: var(--primary-light);
 }
 
-.logged-in {
-    padding: 4px !important;
-    width: 200px !important;
-}
-
-.logged-in a {
-    color: var(--primary-darker);
-    display: block;
-    text-decoration: none;
-    transition: 0.35s ease-out;
-    padding: 2px auto;
-    font-size: 14px;
-
-}
-.logged-in a:hover {
-    background-color: var(--primary);
-    color: var(--primary-light);
-}
-
-.acct-dropdown-content .fpl {
-    width: 150px;
-    color: var(--primary);
-    margin-left: 2px;
-}
-.acct-dropdown-content .fpl:visited {
-    color: var(--primary);
-
-}
-.acct-dropdown-content .fpl:hover {
-    background: transparent;
-    color: rgb(7, 19, 41);
-
-}
-
 /* show dd content */
 #acct-toggle:checked  ~ .acct-dropdown-content {
     outline: none;
     transform: translateY(20px);
     visibility: visible;
     opacity: 1;
-}
-
-/* LOGIN BUTTON */
-
-.login-btn {
-    position: fixed;
-    display: block;
-    background-color: transparent;
-    border: 1px solid var(--primary-light);
-    border-radius: 3px;
-    color: var(--primary-light);
-    right: 10px;
-    top: 0;
-    margin-top: 4px;
-    cursor: pointer;
-    padding: 0px 6px;
-    font-size: 12px;
-    height: 30px;
-    line-height: 30px;
-}
-
-.login-btn:hover {
-    color: var(--primary-light2);
-    border-color: var(--primary-light2);
 }
 
 .mr-2 {
@@ -590,30 +544,19 @@ a span {
     }
     #nav {
         left: -280px;
-    }
-    #nav ul {
-        margin-top: 40px;
+        padding-top: 40px;
     }
 
-        
     .pwr-dropdown {
         margin-top: 40px;
         margin-left: -280px;
-        z-index: 1;
+        z-index: 40;
     }
 
     #nav-toggle:checked ~ .pwr-dropdown {
-        margin-left: 0px;
+        margin-left: 0 !important;
     }
     
-    .pwr {
-        color: #1d3a4e;
-    }
-
-    .pwr-icon {
-        filter: invert(18%) sepia(15%) saturate(2188%) hue-rotate(162deg) brightness(89%) contrast(86%);
-    }
-
     #nav-toggle:checked ~ #nav { 
         left: 0;
     }
@@ -621,7 +564,7 @@ a span {
         margin-left: 280px;
     }
     #nav-toggle:checked ~ #nav-toggle-label {
-        background:#1d3a4e;
+        background: var(--header-btn-focus);
     }
 
     .acct-dropdown-content {
