@@ -12,12 +12,12 @@
     <script>0</script>
     <input type="checkbox" id="nav-toggle" name="nav-toggle"/>
     <label for="nav-toggle" id="nav-toggle-label"></label>
-    <nav id="nav">
-    <hr />
-    <a href="/"><span class="mdi mdi-home-outline mr-2"></span>Home</a>
-    <hr />
-    <a href="/Setup"><span class="mdi mdi-tune mr-2"></span>Setup</a>
-    <hr />
+        <nav id="nav">
+        <hr />
+        <a href="/"><span class="mdi mdi-home-outline mr-2"></span>Home</a>
+        <hr />
+        <a href="/accounts"><span class="mdi mdi-account-multiple mr-2"></span>Accounts</a>
+        <hr />
     </nav>
     <div id="pwr-dropdown" class="pwr-dropdown" tabindex="1">
         <input type="checkbox" id="pwr-toggle" name="pwr-toggle"/>
