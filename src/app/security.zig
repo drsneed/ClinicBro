@@ -47,12 +47,10 @@ pub fn logout(request: *jetzig.Request) !void {
     try request.server.logger.DEBUG("session reset!", .{});
 }
 
-pub fn authorize(request: *jetzig.Request) !void {
+pub fn authorize(request: *jetzig.Request) !bool {
     var authorized = true;
     var user_name: []const u8 = "Guest";
 
-    const data = request.response_data;
-    var root = try data.object();
     const session = try request.session();
     if (try session.get("ticket")) |ticket| {
         // auth ticket found, access granted
@@ -67,14 +65,16 @@ pub fn authorize(request: *jetzig.Request) !void {
         }
     }
 
-    // apply determination
-    try root.put("authorized", data.boolean(authorized));
-    try root.put("user_name", data.string(user_name));
     try request.server.logger.DEBUG("{s} is {s}authorized to access path {s}", .{
         user_name,
         if (authorized) "" else "not ",
         request.path.path,
     });
+
+    const data = request.response_data;
+    var root = try data.object();
+    try root.put("user_name", data.string(user_name));
+    return authorized;
 }
 
 // if(auth.validate(request.allocator, jwt.string.value)) |payload| {

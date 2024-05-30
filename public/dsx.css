@@ -29,10 +29,10 @@
     --header-height: 38px;
     --nav-width: 280px;
     --table-header-bg: transparent;
-    --table-header-fg: #a2b4b1;
+    --table-header-fg: light-dark(#4a4d4c, #a2b4b1);
     --table-fg: light-dark(#16181a, #a2b4b1);
-    --table-row-bg-alt: light-dark(#e2e2e2, #16181a);
-    --table-row-hover: light-dark(#B2B2B2, #161616);
+    --table-row-bg-alt: light-dark(#f3f3f3, #16181a);
+    --table-row-hover: light-dark(#d8d5d5, #161616);
 }
 
 * { 
@@ -534,7 +534,7 @@ table tr:nth-child(even) {
 }
 
 
-table tr:hover {
+table tr:not(:first-child):hover {
     background-color: var(--table-row-hover);
 }
 
@@ -547,6 +547,8 @@ table th {
     border-bottom: 1px solid var(--table-header-fg);
     font-weight: 900;
 }
+
+
 /* 
 table tr:first-child {
     border: 1px solid var(--sep);

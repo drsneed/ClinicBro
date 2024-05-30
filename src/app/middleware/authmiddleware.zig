@@ -34,7 +34,9 @@ pub fn init(request: *jetzig.http.Request) !*AuthMiddleware {
 /// request, including any other middleware in the chain.
 pub fn afterRequest(self: *AuthMiddleware, request: *jetzig.http.Request) !void {
     _ = self;
-    try security.authorize(request);
+    if (!try security.authorize(request)) {
+        _ = request.redirect("./login", .found);
+    }
 }
 
 /// Invoked immediately before the response renders to the client.
@@ -59,7 +61,7 @@ pub fn afterResponse(
     _ = self;
     _ = response;
     _ = request;
-   // try request.server.logger.DEBUG("[AuthMiddleware:afterResponse] response completed", .{});
+    // try request.server.logger.DEBUG("[AuthMiddleware:afterResponse] response completed", .{});
 }
 
 /// Invoked after `afterResponse` is called. Use this function to do any clean-up.

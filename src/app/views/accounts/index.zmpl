@@ -6,41 +6,27 @@
           <th>Email</th>
           <th>Role</th>
           <th>Date Created</th>
+          <th>Date Updated</th>
         </tr>
-        <tr>
-          <td>69</td>
-          <td>Fake One</td>
-          <td>fake@one.com</td>
-          <td>Supervisor</td>
-          <td>11/1/2008</td>
-        </tr>
-        <tr>
-            <td>15</td>
-            <td>Fake Two</td>
-            <td>fake@two.com</td>
-            <td>User</td>
-            <td>5/29/2024</td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>Jim Thorpe</td>
-            <td>elliot2@gmail.com</td>
-            <td>User</td>
-            <td>5/1/2024</td>
-        </tr>
-        <tr>
-            <td>4</td>
-            <td>Lasker</td>
-            <td>bill_name@gmail.com</td>
-            <td>User</td>
-            <td>11/16/2023</td>
-        </tr>
-        <tr>
-            <td>9</td>
-            <td>Edward</td>
-            <td>ladyjeans@rawdog.com</td>
-            <td>User</td>
-            <td>1/23/2024</td>
-        </tr>
+        @zig {
+            if (zmpl.get("accounts")) |accounts| {
+              for (accounts.array.array.items) |account| {
+                  const uid = account.getT(.integer, "uid") orelse continue;
+                  const name = account.getT(.string, "name") orelse continue;
+                  const email = account.getT(.string, "email") orelse continue;
+                  const mod = account.getT(.integer, "mod") orelse continue;
+                  const iat = account.getT(.string, "iat") orelse continue;
+                  const uat = account.getT(.string, "uat") orelse continue;
+                  <tr>
+                    <td>{{uid}}</td>
+                    <td>{{name}}</td>
+                    <td>{{email}}</td>
+                    <td>{{mod}}</td>
+                    <td>{{iat}}</td>
+                    <td>{{uat}}</td>
+                  </tr>
+              }
+            }
+        }
     </table>
 </div>
