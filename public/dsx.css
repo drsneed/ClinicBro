@@ -4,7 +4,7 @@
     color-scheme: light dark;
     --bg: light-dark(#d8d8d8, #18191a);
     --fg: light-dark(#18191a, #d8d8d8);
-    --header-bg: light-dark(#1d3a4e, #17171a);
+    --header-bg: light-dark(#1d3a4e, #121214);
     --header-fg: #d8d8d8;
     --header-border: light-dark(#444, black);
     --header-shadow: light-dark(#999, black);
@@ -28,6 +28,11 @@
     --error-bg: #bb2929;
     --header-height: 38px;
     --nav-width: 280px;
+    --table-header-bg: #19322e;
+    --table-header-fg: #a2b4b1;
+    --table-fg: light-dark(#16181a, #a2b4b1);
+    --table-row-bg-alt: light-dark(#e2e2e2, #16181a);
+    --table-row-hover: light-dark(#B2B2B2, #161616);
 }
 
 * { 
@@ -279,6 +284,7 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     width: calc(100% - 10px);
     margin: 10px auto;
     text-align: left;
+    overflow-x: auto;
 }
 
 .pwr-dropdown {
@@ -487,7 +493,7 @@ a span {
     display: block;
     text-decoration: none;
     transition: none;
-    padding: 2px 10px;
+    padding: 0px 10px;
     font-size: 14px;
 
 }
@@ -504,6 +510,47 @@ a span {
     margin-right: 5px;
     padding-left: 5px;
 }
+
+
+/************** TABLE **************************/
+
+
+table {
+    /* border: 1px solid var(--header-bg); */
+    border-radius: 3px;
+    border-collapse: collapse;
+    width: 100%;
+    color: var(--table-fg);
+}
+
+table td, table th {
+    border-bottom: 1px solid var(--sep);
+    box-shadow: 0 1px 0 var(--sep-border);
+    padding: 8px;
+}
+
+
+table tr:nth-child(even) {
+    background-color: var(--table-row-bg-alt);
+}
+
+
+table tr:hover {
+    background-color: var(--table-row-hover);
+}
+
+table th {
+    padding-top: 6px;
+    padding-bottom: 6px;
+    text-align: left;
+    background-color: var(--table-header-bg);
+    color: var(--table-header-fg);
+    border-bottom: 1px solid var(--table-header-fg);
+}
+/* 
+table tr:first-child {
+    border: 1px solid var(--sep);
+} */
 
 @media only screen and (max-width: 770px) {
     #nav-toggle-label {
@@ -555,10 +602,11 @@ a span {
     #pwr-toggle:checked ~ .pwr {
         background-color: #fff;
     }
-    .pwr-icon {
-        filter: var(--pwr-light-scheme);
+    @media (prefers-color-scheme: light) {
+	    .pwr-icon {
+		filter: var(--pwr-light-scheme);
+	    }
     }
-
 }
 
 
