@@ -118,6 +118,14 @@ pub const jetzig_options = struct {
         .password = null,
     };
 
+    /// HTTP cookie configuration
+    pub const cookie_options: jetzig.http.Cookies.CookieOptions = .{
+        .domain = "localhost",
+        .path = "/",
+        .same_site = .strict,
+        .max_age = 10 * 365 * 24 * 60 * 60,
+    };
+
     /// Force email delivery in development mode (instead of printing email body to logger).
     pub const force_development_email_delivery = false;
 

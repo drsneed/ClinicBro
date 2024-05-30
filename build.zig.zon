@@ -15,8 +15,8 @@
     // Once all dependencies are fetched, `zig build` no longer requires
     // internet connectivity.
     .dependencies = .{ .jetzig = .{
-        .url = "https://github.com/jetzig-framework/jetzig/archive/main.tar.gz",
-        .hash = "12204d765047997e80f0d3cd6530ead064640fe7682f1c8e98d86e79259e9d2512f2",
+        .url = "https://github.com/drsneed/jetzig/archive/main.tar.gz",
+        .hash = "122066c516e32b03eda4d1caacdbb5f5b3ac57564ac09ee8d8b5f19e8a61fdf6d436",
     }, .zqlite = .{
         .url = "git+https://github.com/karlseguin/zqlite.zig#master",
         .hash = "12205e11bd7e60af91e3fe96b7fd90c2bfd73bdae778dbee9d243a5027e06fc3c101",
