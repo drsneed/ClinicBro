@@ -61,3 +61,17 @@ pub fn lookupAccount(allocator: std.mem.Allocator, email: []const u8) !?Account 
     }
     return account;
 }
+
+pub fn getAllAccounts(allocator: std.mem.Allocator) !std.ArrayList(Account) {
+    var accounts = std.ArrayList(Account).init(allocator);
+    var conn = try zqlite.open(db_name, zqlite.OpenFlags.Create | zqlite.OpenFlags.EXResCode);
+    defer conn.close();
+    var rows = try conn.rows("select * from account", .{});
+    defer rows.deinit();
+    while (rows.next()) |row| {
+        const account = try Account.init(allocator, row.int(0), row.text(1), row.text(2),
+            row.text(3), row.int(4), row.int(5), row.int(6), row.blob(7)[0..32]);
+        try accounts.append(account);
+    }
+    return accounts;
+}

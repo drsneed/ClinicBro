@@ -28,7 +28,7 @@
     --error-bg: #bb2929;
     --header-height: 38px;
     --nav-width: 280px;
-    --table-header-bg: #19322e;
+    --table-header-bg: transparent;
     --table-header-fg: #a2b4b1;
     --table-fg: light-dark(#16181a, #a2b4b1);
     --table-row-bg-alt: light-dark(#e2e2e2, #16181a);
@@ -529,7 +529,6 @@ table td, table th {
     padding: 8px;
 }
 
-
 table tr:nth-child(even) {
     background-color: var(--table-row-bg-alt);
 }
@@ -546,6 +545,7 @@ table th {
     background-color: var(--table-header-bg);
     color: var(--table-header-fg);
     border-bottom: 1px solid var(--table-header-fg);
+    font-weight: 900;
 }
 /* 
 table tr:first-child {
