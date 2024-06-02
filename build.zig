@@ -8,12 +8,12 @@ pub fn build(b: *std.Build) !void {
 
     const exe = b.addExecutable(.{
         .name = "testserver.live",
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
-    const sql_path = "C:/Projects/testserver.live/src/sql/";
-    //"/home/admin/projects/testserver.live/src/sql/"
+    //const sql_path = "C:/Projects/testserver.live/src/sql/";
+    //const sql_path = "/home/admin/projects/testserver.live/src/sql/";
     //     switch (builtin.os.tag) {
     //     .windows => {
     //         return "C:/Projects/testserver.live/src/sql";
@@ -27,7 +27,7 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     }).module("zqlite");
     zqlite.addCSourceFile(.{
-        .file = .{ .path = sql_path ++ "sqlite3.c" },
+        .file = b.path("src/sql/sqlite3.c"),
         .flags = &[_][]const u8{
             "-DSQLITE_DQS=0",
             "-DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1",
@@ -48,16 +48,16 @@ pub fn build(b: *std.Build) !void {
             "-DHAVE_USLEEP=0",
         },
     });
-    zqlite.addIncludePath(.{ .path = sql_path });
+    zqlite.addIncludePath(b.path("src/sql/sqlite.c"));
     exe.linkLibC();
     exe.root_module.addImport("zqlite", zqlite);
 
-    const zdt = b.dependency("zdt", .{
-        .target = target,
-        .optimize = optimize,
-    }).module("zdt");
+    // const zdt = b.dependency("zdt", .{
+    //     .target = target,
+    //     .optimize = optimize,
+    // }).module("zdt");
 
-    exe.root_module.addImport("zdt", zdt);
+    // exe.root_module.addImport("zdt", zdt);
 
     // All dependencies **must** be added to imports above this line.
 
@@ -74,7 +74,7 @@ pub fn build(b: *std.Build) !void {
     run_step.dependOn(&run_cmd.step);
 
     const lib_unit_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
@@ -82,7 +82,7 @@ pub fn build(b: *std.Build) !void {
     const run_lib_unit_tests = b.addRunArtifact(lib_unit_tests);
 
     const exe_unit_tests = b.addTest(.{
-        .root_source_file = .{ .path = "src/main.zig" },
+        .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
     });
