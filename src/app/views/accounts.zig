@@ -8,7 +8,6 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     try root.put("page_title", data.string("Accounts"));
     const accounts = try data.array();
     try root.put("accounts", accounts);
-
     // load account list from database
     const dbAccountList = try db.getAllAccounts(request.allocator);
     defer dbAccountList.deinit();

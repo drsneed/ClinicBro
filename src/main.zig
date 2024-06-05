@@ -5,8 +5,10 @@ const zmd = @import("zmd");
 const zqlite = @import("zqlite");
 pub const routes = @import("routes");
 
-const zdt = @import("zdt");
+const webui = @import("webui");
 
+//const zdt = @import("zdt");
+const log = std.log.scoped(.main);
 // Override default settings in `jetzig.config` here:
 pub const jetzig_options = struct {
     /// Middleware chain. Add any custom middleware here, or use middleware provided in
@@ -57,17 +59,6 @@ pub const jetzig_options = struct {
     // Duration before looking for more Jobs when the queue is found to be empty, in
     // milliseconds.
     // pub const job_worker_sleep_interval_ms: usize = 10;
-
-    /// Cookie options.
-    pub const cookieOptions: jetzig.CookieOptions = .{
-        .backend = .memory,
-        // .backend = .file,
-        // .file_options = .{
-        //     .path = "/path/to/jetkv-store.db",
-        //     .truncate = false, // Set to `true` to clear the store on each server launch.
-        //     .address_space_size = jetzig.jetkv.JetKV.FileBackend.addressSpace(4096),
-        // },
-    };
 
     /// Key-value store options. Set backend to `.file` to use a file-based store.
     /// When using `.file` backend, you must also set `.file_options`.
@@ -181,32 +172,104 @@ pub const jetzig_options = struct {
     };
 };
 
+fn server_thread(allocator: std.mem.Allocator) void {
+    const app = jetzig.init(allocator) catch return;
+    defer app.deinit();
+    app.start(routes, .{}) catch return;
+}
+
+var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+
     defer std.debug.assert(gpa.deinit() == .ok);
     const allocator = gpa.allocator();
 
-    var my_tz = try zdt.Timezone.tzLocal(allocator);
-    defer my_tz.deinit();
+    // var my_tz = try zdt.Timezone.tzLocal(allocator);
+    // defer my_tz.deinit();
 
-    const t = try zdt.Datetime.fromUnix(std.time.timestamp(), zdt.Duration.Resolution.second, my_tz);
+    // const t = try zdt.Datetime.fromUnix(std.time.timestamp(), zdt.Duration.Resolution.second, my_tz);
 
-    std.debug.print("timestamp: {s}\n", .{t});
+    // std.debug.print("timestamp: {s}\n", .{t});
 
-    const app = try jetzig.init(allocator);
-    defer app.deinit();
 
-    try app.start(routes, .{});
+    //server_thread(allocator);
+    var serverThread = try std.Thread.spawn(.{}, server_thread, .{allocator});
+    serverThread.detach();
+
+    var nwin = webui.newWindow();
+    _ = nwin.bind("", events);
+
+    //_ = nwin.bind("my_backend_func", my_backend_func);
+    _ = nwin.setPort(8081);
+
+    const my_icon = @embedFile("favicon.svg");
+    const my_icon_type = "image/svg+xml";
+    nwin.setIcon(my_icon, my_icon_type);
+
+    _ = nwin.showBrowser("http://localhost:8080/", .Firefox);
+
+    webui.wait();
+    webui.clean();
+
+
+    // const start_time = std.time.timestamp();
+
+    // while(std.time.timestamp() - start_time < 60 * 3) {
+    //     log.info("Hello there ;)\n", .{});
+    //     std.time.sleep(3 * std.time.ns_per_s);
+    // }
 }
 
-test "gen seeds" {
-    var myKey: [32]u8 = undefined;
-    const myPw = "dustin";
-    var ceoKey: [32]u8 = undefined;
-    const ceoPw = "ceo";
-    try std.crypto.pwhash.pbkdf2(&myKey, myPw, "dustin.sneeden@gmail.com", 2171, std.crypto.auth.hmac.sha2.HmacSha256);
-    try std.crypto.pwhash.pbkdf2(&ceoKey, ceoPw, "ceo@cash4u.com", 2171, std.crypto.auth.hmac.sha2.HmacSha256);
-    std.debug.print("my key: {X:0>2}\n", .{myKey});
-    std.debug.print("ceo key: {X:0>2}\n", .{ceoKey});
-    try std.testing.expect(1 > 0);
+
+fn events(e: webui.Event) void {
+    switch (e.event_type) {
+        .EVENT_CONNECTED => {
+            std.debug.print("Connected. \n", .{});
+        },
+        .EVENT_DISCONNECTED => {
+            std.debug.print("Disconnected. \n", .{});
+        },
+        .EVENT_MOUSE_CLICK => {
+            std.debug.print("Click. \n", .{});
+        },
+        .EVENT_NAVIGATION => {
+            const allocator = gpa.allocator();
+
+            defer {
+                const deinit_status = gpa.deinit();
+
+                if (deinit_status == .leak) @panic("TEST FAIL");
+            }
+
+            const url = webui.getString(e);
+            const len = webui.str_len(url);
+
+            var tmp_e = e;
+            var win = tmp_e.getWindow();
+
+            const new_url = allocator.allocSentinel(u8, len, 0) catch unreachable;
+            defer allocator.free(new_url);
+
+            std.debug.print("Starting navigation to: {s}\n", .{url});
+
+            @memcpy(new_url[0..len], url[0..len]);
+
+            win.navigate(new_url);
+        },
+        else => {},
+    }
 }
+
+
+// test "gen seeds" {
+//     var myKey: [32]u8 = undefined;
+//     const myPw = "dustin";
+//     var ceoKey: [32]u8 = undefined;
+//     const ceoPw = "ceo";
+//     try std.crypto.pwhash.pbkdf2(&myKey, myPw, "dustin.sneeden@gmail.com", 2171, std.crypto.auth.hmac.sha2.HmacSha256);
+//     try std.crypto.pwhash.pbkdf2(&ceoKey, ceoPw, "ceo@cash4u.com", 2171, std.crypto.auth.hmac.sha2.HmacSha256);
+//     std.debug.print("my key: {X:0>2}\n", .{myKey});
+//     std.debug.print("ceo key: {X:0>2}\n", .{ceoKey});
+//     try std.testing.expect(1 > 0);
+// }

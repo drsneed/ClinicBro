@@ -59,6 +59,18 @@ pub fn build(b: *std.Build) !void {
 
     // exe.root_module.addImport("zdt", zdt);
 
+    // To standardize development, maybe you should use `lazyDependency()` instead of `dependency()`
+    // more info to see: https://ziglang.org/download/0.12.0/release-notes.html#toc-Lazy-Dependencies
+    const zig_webui = b.dependency("zig-webui", .{
+        .target = target,
+        .optimize = optimize,
+        .enable_tls = false, // whether enable tls support
+        .is_static = true, // whether static link
+    });
+
+    // add module
+    exe.root_module.addImport("webui", zig_webui.module("webui"));
+
     // All dependencies **must** be added to imports above this line.
 
     try jetzig.jetzigInit(b, exe, .{});
