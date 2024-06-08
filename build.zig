@@ -12,16 +12,6 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    //const sql_path = "C:/Projects/testserver.live/src/sql/";
-    //const sql_path = "/home/admin/projects/testserver.live/src/sql/";
-    //     switch (builtin.os.tag) {
-    //     .windows => {
-    //         return "C:/Projects/testserver.live/src/sql";
-    //     },
-    //     else => {
-    //         return ;
-    //     },
-    // };
     const zqlite = b.dependency("zqlite", .{
         .target = target,
         .optimize = optimize,
@@ -48,7 +38,7 @@ pub fn build(b: *std.Build) !void {
             "-DHAVE_USLEEP=0",
         },
     });
-    zqlite.addIncludePath(b.path("src/sql/sqlite.c"));
+    zqlite.addIncludePath(b.path("src/sql"));
     exe.linkLibC();
     exe.root_module.addImport("zqlite", zqlite);
 
@@ -61,15 +51,15 @@ pub fn build(b: *std.Build) !void {
 
     // To standardize development, maybe you should use `lazyDependency()` instead of `dependency()`
     // more info to see: https://ziglang.org/download/0.12.0/release-notes.html#toc-Lazy-Dependencies
-    const zig_webui = b.dependency("zig-webui", .{
-        .target = target,
-        .optimize = optimize,
-        .enable_tls = false, // whether enable tls support
-        .is_static = true, // whether static link
-    });
+    // const zig_webui = b.dependency("zig-webui", .{
+    //     .target = target,
+    //     .optimize = optimize,
+    //     .enable_tls = false, // whether enable tls support
+    //     .is_static = true, // whether static link
+    // });
 
-    // add module
-    exe.root_module.addImport("webui", zig_webui.module("webui"));
+    // // add module
+    // exe.root_module.addImport("webui", zig_webui.module("webui"));
 
     // All dependencies **must** be added to imports above this line.
 

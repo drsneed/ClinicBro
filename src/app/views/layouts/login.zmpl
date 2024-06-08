@@ -6,8 +6,8 @@
     <title>ts~live</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="/login.css">
-    <script src="http://localhost:8081/webui.js"></script>
+    <link rel="stylesheet" href="/dsx.css">
+    <!-- <script src="http://localhost:8081/webui.js"></script> -->
   </head>
   <body>
     <script>0</script>

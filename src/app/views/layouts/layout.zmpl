@@ -7,7 +7,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/dsx.css">
-    <script src="http://localhost:8081/webui.js"></script>
+    <!-- <script src="http://localhost:8081/webui.js"></script> -->
   </head>
   <body>
     <script>0</script>
@@ -17,8 +17,11 @@
         <hr />
         <a href="/"><span class="mdi mdi-home-outline mr-2"></span>Home</a>
         <hr />
-        <a href="/accounts"><span class="mdi mdi-account-multiple mr-2"></span>Accounts</a>
+        <a href="/users"><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
         <hr />
+        <a href="/reports"><span class="mdi mdi-file-chart mr-2"></span>Reports</a>
+        <hr />
+        
     </nav>
     <div id="pwr-dropdown" class="pwr-dropdown" tabindex="1">
         <input type="checkbox" id="pwr-toggle" name="pwr-toggle"/>

@@ -14,20 +14,23 @@
     // `zig build --fetch` can be used to fetch all dependencies of a package, recursively.
     // Once all dependencies are fetched, `zig build` no longer requires
     // internet connectivity.
-    .dependencies = .{ .jetzig = .{
-        .url = "https://github.com/jetzig-framework/jetzig/archive/main.tar.gz",
-        .hash = "122088840b1a6c1472fbc4d9f60a3e1f20dfc0393f8e5093d936a0a95c97f241a907",
-    }, .zqlite = .{
-        .url = "git+https://github.com/karlseguin/zqlite.zig#master",
-        .hash = "12205e11bd7e60af91e3fe96b7fd90c2bfd73bdae778dbee9d243a5027e06fc3c101",
-    }, .@"zig-webui" = .{
-        .url = "https://github.com/webui-dev/zig-webui/archive/main.tar.gz",
-        .hash = "1220313d1eaa0437b86afa81da6a8c975d8a39cfc52ef739cc2f984375d54ae645b8",
-    },
-    // }, .zdt = .{
-    //     .url = "https://codeberg.org/FObersteiner/zdt/archive/main.tar.gz",
-    //     .hash = "1220888b19e66e7f259effe27893a6953379f1922278722011d01ef23b392d2bd1d6",
-    // } 
+    .dependencies = .{
+        .jetzig = .{
+            .url = "https://github.com/jetzig-framework/jetzig/archive/main.tar.gz",
+            .hash = "12209e5c9fce6267582ca90c9f5dc55b18bf58a2d38930e6119fe71abc50b8de2fda",
+        },
+        .zqlite = .{
+            .url = "git+https://github.com/karlseguin/zqlite.zig#master",
+            .hash = "12205e11bd7e60af91e3fe96b7fd90c2bfd73bdae778dbee9d243a5027e06fc3c101",
+        },
+        //  .@"zig-webui" = .{
+        //     .url = "https://github.com/webui-dev/zig-webui/archive/main.tar.gz",
+        //     .hash = "1220313d1eaa0437b86afa81da6a8c975d8a39cfc52ef739cc2f984375d54ae645b8",
+        // },
+        // }, .zdt = .{
+        //     .url = "https://codeberg.org/FObersteiner/zdt/archive/main.tar.gz",
+        //     .hash = "1220888b19e66e7f259effe27893a6953379f1922278722011d01ef23b392d2bd1d6",
+        // }
     },
 
     .paths = .{

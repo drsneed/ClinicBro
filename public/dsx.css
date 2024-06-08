@@ -17,14 +17,16 @@
     --dropdown-fg: light-dark(#1d3a4e, #eee);
     --dropdown-border: #5b5a5914;
     --dropdown-shadow: black;
+    --lgn-icon: light-dark(invert(22%) sepia(11%) saturate(1957%) hue-rotate(162deg) brightness(92%) contrast(99%), invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%), invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%));
     --pwr-light-scheme: invert(22%) sepia(11%) saturate(1957%) hue-rotate(162deg) brightness(92%) contrast(99%);
     --pwr-light-scheme-pressed: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
     --input-border: #444;
     --sep: light-dark(#cecbcb, black);
     --sep-border: light-dark(#f0f0f0, #2A2A2A);
-    --link: #82aac5;
+    --link: light-dark(#1d3a4e, #82aac5);
     --nav-link: light-dark(#1d3a4e, #bebebe);
     --btn-primary-hover: #1d3a4e;
+    --btn-primary-fg-hover: #CECECE;
     --error-bg: #bb2929;
     --header-height: 38px;
     --nav-width: 280px;
@@ -85,7 +87,8 @@ body {
     height: 24px;
     position: relative;
     top: 5px;
-    filter: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
+    /* filter: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%); */
+    filter: --var(--lgn-icon);
 }
 
 hr {
@@ -148,6 +151,7 @@ input[type=button], input[type=submit], input[type=reset] {
 
 input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     background-color: var(--btn-primary-hover);
+    color: var(--btn-primary-fg-hover);
     border-color: var(--fg);
 }
 
@@ -608,6 +612,9 @@ table tr:first-child {
 	    .pwr-icon {
 		filter: var(--pwr-light-scheme);
 	    }
+        .lc-icon {
+        filter: var(--pwr-light-scheme);
+        }
     }
 }
 

@@ -5,7 +5,7 @@ const zmd = @import("zmd");
 const zqlite = @import("zqlite");
 pub const routes = @import("routes");
 
-const webui = @import("webui");
+// const webui = @import("webui");
 
 //const zdt = @import("zdt");
 const log = std.log.scoped(.main);
@@ -181,7 +181,6 @@ fn server_thread(allocator: std.mem.Allocator) void {
 var gpa = std.heap.GeneralPurposeAllocator(.{}){};
 
 pub fn main() !void {
-
     defer std.debug.assert(gpa.deinit() == .ok);
     const allocator = gpa.allocator();
 
@@ -192,26 +191,24 @@ pub fn main() !void {
 
     // std.debug.print("timestamp: {s}\n", .{t});
 
+    server_thread(allocator);
+    // var serverThread = try std.Thread.spawn(.{}, server_thread, .{allocator});
+    // serverThread.detach();
 
-    //server_thread(allocator);
-    var serverThread = try std.Thread.spawn(.{}, server_thread, .{allocator});
-    serverThread.detach();
+    // var nwin = webui.newWindow();
+    // _ = nwin.bind("", events);
 
-    var nwin = webui.newWindow();
-    _ = nwin.bind("", events);
+    // //_ = nwin.bind("my_backend_func", my_backend_func);
+    // _ = nwin.setPort(8081);
 
-    //_ = nwin.bind("my_backend_func", my_backend_func);
-    _ = nwin.setPort(8081);
+    // const my_icon = @embedFile("favicon.svg");
+    // const my_icon_type = "image/svg+xml";
+    // nwin.setIcon(my_icon, my_icon_type);
 
-    const my_icon = @embedFile("favicon.svg");
-    const my_icon_type = "image/svg+xml";
-    nwin.setIcon(my_icon, my_icon_type);
+    // _ = nwin.showBrowser("http://localhost:8080/", .Firefox);
 
-    _ = nwin.showBrowser("http://localhost:8080/", .Firefox);
-
-    webui.wait();
-    webui.clean();
-
+    // webui.wait();
+    // webui.clean();
 
     // const start_time = std.time.timestamp();
 
@@ -221,46 +218,44 @@ pub fn main() !void {
     // }
 }
 
+// fn events(e: webui.Event) void {
+//     switch (e.event_type) {
+//         .EVENT_CONNECTED => {
+//             std.debug.print("Connected. \n", .{});
+//         },
+//         .EVENT_DISCONNECTED => {
+//             std.debug.print("Disconnected. \n", .{});
+//         },
+//         .EVENT_MOUSE_CLICK => {
+//             std.debug.print("Click. \n", .{});
+//         },
+//         .EVENT_NAVIGATION => {
+//             const allocator = gpa.allocator();
 
-fn events(e: webui.Event) void {
-    switch (e.event_type) {
-        .EVENT_CONNECTED => {
-            std.debug.print("Connected. \n", .{});
-        },
-        .EVENT_DISCONNECTED => {
-            std.debug.print("Disconnected. \n", .{});
-        },
-        .EVENT_MOUSE_CLICK => {
-            std.debug.print("Click. \n", .{});
-        },
-        .EVENT_NAVIGATION => {
-            const allocator = gpa.allocator();
+//             defer {
+//                 const deinit_status = gpa.deinit();
 
-            defer {
-                const deinit_status = gpa.deinit();
+//                 if (deinit_status == .leak) @panic("TEST FAIL");
+//             }
 
-                if (deinit_status == .leak) @panic("TEST FAIL");
-            }
+//             const url = webui.getString(e);
+//             const len = webui.str_len(url);
 
-            const url = webui.getString(e);
-            const len = webui.str_len(url);
+//             var tmp_e = e;
+//             var win = tmp_e.getWindow();
 
-            var tmp_e = e;
-            var win = tmp_e.getWindow();
+//             const new_url = allocator.allocSentinel(u8, len, 0) catch unreachable;
+//             defer allocator.free(new_url);
 
-            const new_url = allocator.allocSentinel(u8, len, 0) catch unreachable;
-            defer allocator.free(new_url);
+//             std.debug.print("Starting navigation to: {s}\n", .{url});
 
-            std.debug.print("Starting navigation to: {s}\n", .{url});
+//             @memcpy(new_url[0..len], url[0..len]);
 
-            @memcpy(new_url[0..len], url[0..len]);
-
-            win.navigate(new_url);
-        },
-        else => {},
-    }
-}
-
+//             win.navigate(new_url);
+//         },
+//         else => {},
+//     }
+// }
 
 // test "gen seeds" {
 //     var myKey: [32]u8 = undefined;
