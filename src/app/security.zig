@@ -4,7 +4,7 @@ const db = @import("db.zig");
 const jwt = @import("jwt.zig");
 const log = std.log.scoped(.security);
 
-pub const RestrictedPaths = .{ "/", "/accounts" };
+pub const RestrictedPaths = .{ "/", "/users" }; //"/",
 
 pub const Ticket = struct { name: []const u8, uid: i64, iat: i64, exp: i64, mod: i64 };
 
@@ -53,6 +53,7 @@ pub fn authorize(request: *jetzig.Request) !bool {
 
     const session = try request.session();
     if (try session.get("ticket")) |ticket| {
+
         // auth ticket found, access granted
         user_name = ticket.getT(.string, "name") orelse "?";
     } else {

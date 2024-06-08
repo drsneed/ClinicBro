@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Mukta:wght@200;300;400;500;600;700;800&display=swap');
-
+/*.rbroDocumentGrid {
+	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAEklEQVQYlWNgYGD4zzAKBh8AAJYTAQA4FYKbAAAAAElFTkSuQmCC);
+	background-repeat: repeat;
+	position: absolute;
+}*/
 :root {
     color-scheme: light dark;
     --bg: light-dark(#d8d8d8, #18191a);
@@ -21,10 +25,11 @@
     --pwr-light-scheme: invert(22%) sepia(11%) saturate(1957%) hue-rotate(162deg) brightness(92%) contrast(99%);
     --pwr-light-scheme-pressed: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
     --input-border: #444;
-    --sep: light-dark(#cecbcb, black);
-    --sep-border: light-dark(#f0f0f0, #2A2A2A);
+    --sep: light-dark(#b9b9b9, black);
+    --sep-border: light-dark(#f5f2f2, #2A2A2A);
     --link: light-dark(#1d3a4e, #82aac5);
     --nav-link: light-dark(#1d3a4e, #bebebe);
+    --nav-sub-link: light-dark(#2a5674, #e7e5e5);
     --btn-primary-hover: #1d3a4e;
     --btn-primary-fg-hover: #CECECE;
     --error-bg: #bb2929;
@@ -115,17 +120,16 @@ a:hover {
 #nav a {
     display: block;
     width: 100%;
-    margin-left: 0 !important;
+    margin-left: 0;
     padding-left: 0px;
 }
 
 #nav a:link, a:visited {
-    margin-left: 10px;
     color: var(--nav-link);
 }
 #nav a:hover {
     background-color: var(--nav-link);
-    color: var(--container-bg)
+    color: var(--container-bg);
 }
 input {
     width: 100%;
@@ -552,10 +556,52 @@ table th {
     font-weight: 900;
 }
 
+.collapsible {
+    color: var(--nav-link);
+    cursor: pointer;
+    padding-left: 0px;
+    border: none;
+    text-align: left;
+    outline: none;
+    width: 100%;
+    margin-left: 0;
+}
 
-/* 
-table tr:first-child {
-    border: 1px solid var(--sep);
+.active, .collapsible:hover  {
+    background-color: var(--nav-link);
+    color: var(--container-bg);
+}
+.collapsible:hover:after {
+    color: var(--container-bg);
+}
+.collapsible:after {
+    content: '\002B';
+    color: var(--nav-link);
+    font-weight: bold;
+    float: right;
+    margin-right: 5px;
+}
+
+.active:after {
+    content: "\2212";
+    color: var(--container-bg);
+}
+
+.collapsible-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    background-color: var(--container-bg);
+}
+
+.collapsible-content a {
+    padding-left: 15px !important;
+}
+.collapsible-content a:hover {
+    background-color: var(--nav-sub-link) !important;
+}
+/* .collapsible-content:hover {
+    background-color: var(--nav-link);
 } */
 
 @media only screen and (max-width: 770px) {

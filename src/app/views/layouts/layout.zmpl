@@ -7,21 +7,23 @@
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/dsx.css">
+    <script src="/dsx.js"></script>
     <!-- <script src="http://localhost:8081/webui.js"></script> -->
   </head>
   <body>
-    <script>0</script>
     <input type="checkbox" id="nav-toggle" name="nav-toggle"/>
     <label for="nav-toggle" id="nav-toggle-label"></label>
-        <nav id="nav">
+    <nav id="nav">
         <hr />
         <a href="/"><span class="mdi mdi-home-outline mr-2"></span>Home</a>
         <hr />
-        <a href="/users"><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
-        <hr />
         <a href="/reports"><span class="mdi mdi-file-chart mr-2"></span>Reports</a>
         <hr />
-        
+        <button type="button" class="collapsible"><span class="mdi mdi-tune mr-2"></span>Setup</a></button>
+        <div class="collapsible-content">
+            <a href="/users"><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
+        </div>
+        <hr />
     </nav>
     <div id="pwr-dropdown" class="pwr-dropdown" tabindex="1">
         <input type="checkbox" id="pwr-toggle" name="pwr-toggle"/>
@@ -49,5 +51,24 @@
     <main id="main">
         {{zmpl.content}}
     </main>
+
+
+    <script>
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+        
+        for (i = 0; i < coll.length; i++) {
+          coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.maxHeight){
+              content.style.maxHeight = null;
+            } else {
+              content.style.maxHeight = content.scrollHeight + "px";
+            } 
+          });
+        }
+    </script>
+
   </body>
 </html>

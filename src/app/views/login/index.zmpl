@@ -1,4 +1,4 @@
-<form action="/login" method="post">
+<form method="post">
     <input name="return_url" type="hidden" value="{{.return_url}}">
     <input type="text" name="email" size="20" maxlength="255" 
         aria-label="Email"
