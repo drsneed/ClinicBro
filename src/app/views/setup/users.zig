@@ -1,13 +1,13 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const db = @import("../db.zig");
+const db = @import("../../db.zig");
 pub const layout = "layout";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var root = data.value.?;
-    try root.put("page_title", data.string("Users"));
-    const users = try data.array();
-    try root.put("users", users);
+    try root.put("page_title", data.string("User Setup"));
+    const user_array = try data.array();
+    try root.put("users", user_array);
     // load account list from database
     const dbAccountList = try db.getAllAccounts(request.allocator);
     defer dbAccountList.deinit();
@@ -21,7 +21,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         try user.put("mod", data.integer(dbAccount.mod));
         try user.put("iat", data.string(dbAccount.iat));
         try user.put("uat", data.string(dbAccount.uat));
-        try users.append(user);
+        try user_array.append(user);
     }
 
     return request.render(.ok);

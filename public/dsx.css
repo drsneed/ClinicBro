@@ -21,7 +21,8 @@
     --dropdown-fg: light-dark(#1d3a4e, #eee);
     --dropdown-border: #5b5a5914;
     --dropdown-shadow: black;
-    --lgn-icon: light-dark(invert(22%) sepia(11%) saturate(1957%) hue-rotate(162deg) brightness(92%) contrast(99%), invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%), invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%));
+    --lgn-icon: filter: brightness(100%);
+    --lgn-icon-light-scheme: invert(8%) sepia(7%) saturate(377%) hue-rotate(169deg) brightness(97%) contrast(95%);
     --pwr-light-scheme: invert(22%) sepia(11%) saturate(1957%) hue-rotate(162deg) brightness(92%) contrast(99%);
     --pwr-light-scheme-pressed: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
     --input-border: #444;
@@ -93,7 +94,7 @@ body {
     position: relative;
     top: 5px;
     /* filter: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%); */
-    filter: --var(--lgn-icon);
+    /* filter: var(--lgn-icon); */
 }
 
 hr {
@@ -332,6 +333,11 @@ a span {
 .pwr-icon {
     filter: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
 }
+
+.lc-icon {
+    filter: invert(8%) sepia(7%) saturate(377%) hue-rotate(169deg) brightness(97%) contrast(95%);
+}
+
 
 .pwr-dropdown {
     display: inline-block;
@@ -656,10 +662,10 @@ table th {
     }
     @media (prefers-color-scheme: light) {
 	    .pwr-icon {
-		filter: var(--pwr-light-scheme);
+		    filter: var(--pwr-light-scheme);
 	    }
         .lc-icon {
-        filter: var(--pwr-light-scheme);
+            filter: var(--lgn-icon-light-scheme);
         }
     }
 }

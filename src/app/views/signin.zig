@@ -1,8 +1,8 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 const security = @import("../security.zig");
-pub const layout = "login";
-const log = std.log.scoped(.login);
+pub const layout = "signin";
+const log = std.log.scoped(.signin);
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     const params = try request.params();
@@ -16,7 +16,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         return request.redirect(return_url, .found);
     } else {
         var root = data.value.?;
-        try root.put("page_title", data.string("Log In"));
+        try root.put("page_title", data.string("Sign In"));
         try root.put("return_url", data.string(return_url));
         return request.render(.ok);
     }
@@ -25,18 +25,16 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var root = data.value.?;
     //log.info("root = {}\n", .{root});
-    var logged_in: bool = false;
+    var signed_in: bool = false;
+    var error_message: []const u8 = "Invalid credentials, please try again.";
     const params = try request.params();
-    log.info("attempting to log in , checking params...", .{});
+    log.info("attempting to sign in , checking params...", .{});
     if (params.getT(.string, "email")) |email| {
         if (params.getT(.string, "password")) |password| {
-            if (try security.login(request, email, password)) {
-                logged_in = true;
-                log.info("Successfully logged in :)", .{});
-            } else {
-                // log unsuccessful attempt
-                log.info("Authentication failed :(", .{});
-            }
+            signed_in = security.signin(request, email, password) catch blk: {
+                error_message = "Database connection failure";
+                break :blk false;
+            };
         }
     }
 
@@ -51,12 +49,12 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         }
     }
 
-    if (logged_in) {
+    if (signed_in) {
         return request.redirect(destination_url, .found);
     } else {
-        try root.put("page_title", data.string("Log In"));
+        try root.put("page_title", data.string("Sign In"));
         try root.put("return_url", data.string(destination_url));
-        try root.put("error_message", data.string("Invalid credentials, please try again."));
+        try root.put("error_message", data.string(error_message));
         return request.render(.ok);
     }
 }

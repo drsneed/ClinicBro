@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ts~live</title>
+    <title>Clinic Bro</title>
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <link rel="stylesheet" href="/dsx.css">
@@ -21,7 +21,7 @@
         <hr />
         <button type="button" class="collapsible"><span class="mdi mdi-tune mr-2"></span>Setup</a></button>
         <div class="collapsible-content">
-            <a href="/users"><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
+            <a href="/setup/users"><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
         </div>
         <hr />
     </nav>
@@ -29,7 +29,7 @@
         <input type="checkbox" id="pwr-toggle" name="pwr-toggle"/>
         <label for="pwr-toggle" class="pwr" id="pwr">
             <img src="/icon.svg" alt="Home" class="pwr-icon"/>
-            ts~live
+            Clinic&nbsp;Bro
         </label>
         <div class="pwr-dropdown-content">
             <a href="/about"><span class="mdi mdi-information-outline mr-2"></span>About</a>
@@ -44,7 +44,7 @@
                 {{.user_name}}
             </label>
             <div class="acct-dropdown-content">
-                <a href="/logout"><span class="mdi mdi-logout mr-2"></span>Log Out</a>
+                <a href="/signout"><span class="mdi mdi-logout mr-2"></span>Sign Out</a>
             </div>
         </div>
     </header>

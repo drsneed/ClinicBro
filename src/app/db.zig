@@ -1,7 +1,7 @@
 pub const std = @import("std");
 pub const zqlite = @import("zqlite");
 const Account = @import("models/account.zig");
-pub const db_name = "tslive.db";
+pub const db_name = "ClinicBro.db";
 
 pub fn lookupAccount(allocator: std.mem.Allocator, email: []const u8) !?Account {
     var account: ?Account = null;

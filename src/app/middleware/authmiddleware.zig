@@ -37,10 +37,10 @@ pub fn afterRequest(self: *AuthMiddleware, request: *jetzig.http.Request) !void 
     if (!try security.authorize(request)) {
         // don't append return_url for requests to home path '/'
         if (std.mem.eql(u8, request.path.path, "/")) {
-            _ = request.redirect("./login", .found);
+            _ = request.redirect("./signin", .found);
         } else {
             var buf: [256]u8 = undefined;
-            const url = try std.fmt.bufPrint(&buf, "./login?return_url={s}", .{request.path.path});
+            const url = try std.fmt.bufPrint(&buf, "./signin?return_url={s}", .{request.path.path});
             _ = request.redirect(url, .found);
         }
     }

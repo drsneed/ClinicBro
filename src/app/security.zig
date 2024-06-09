@@ -24,7 +24,7 @@ pub fn issueTicket(allocator: std.mem.Allocator, email: []const u8, password: []
     return null;
 }
 
-pub fn login(request: *jetzig.Request, email: []const u8, password: []const u8) !bool {
+pub fn signin(request: *jetzig.Request, email: []const u8, password: []const u8) !bool {
     if (try issueTicket(request.allocator, email, password)) |ticket| {
         defer request.allocator.free(ticket.name);
         var data = jetzig.zmpl.Data.init(request.allocator);
@@ -41,7 +41,7 @@ pub fn login(request: *jetzig.Request, email: []const u8, password: []const u8) 
     return false;
 }
 
-pub fn logout(request: *jetzig.Request) !void {
+pub fn signout(request: *jetzig.Request) !void {
     var session = try request.session();
     try session.reset();
     try request.server.logger.DEBUG("session reset!", .{});
@@ -87,7 +87,7 @@ pub fn authorize(request: *jetzig.Request) !bool {
 
 pub const JwtPayload = struct { sub: i64, iat: i64 };
 
-const sig = jwt.SignatureOptions{ .key = "-~-tslive-~-" };
+const sig = jwt.SignatureOptions{ .key = "-~-clinicbro-~-" };
 
 pub fn issueToken(allocator: std.mem.Allocator, email: []const u8, password: []const u8) !?[]const u8 {
     const account_found = try db.lookupAccount(allocator, email);
