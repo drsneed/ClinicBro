@@ -1,8 +1,11 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
 
+pub const layout = "app";
+
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    _ = data;
+    var root = data.value.?;
+    try root.put("page_title", data.string("System Setup"));
     return request.render(.ok);
 }
 
@@ -34,7 +37,6 @@ pub fn delete(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jet
     _ = id;
     return request.render(.ok);
 }
-
 
 test "index" {
     var app = try jetzig.testing.app(std.testing.allocator, @import("routes"));

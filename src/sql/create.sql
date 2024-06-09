@@ -17,6 +17,8 @@ CREATE TABLE client (
     [suffix] TEXT NULL,
 	[email] TEXT NOT NULL UNIQUE, -- max-length 256
 	[phone] TEXT NOT NULL, -- max-length 15
+    [dob] INTEGER NOT NULL,
+    [gender] TEXT NOT NULL,
     [iat] INTEGER NOT NULL, -- issued at timestamp
     [uat] INTEGER NOT NULL, -- updated at timestamp
     [uid] INTEGER NOT NULL, -- updated by
