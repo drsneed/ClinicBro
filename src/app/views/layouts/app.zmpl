@@ -7,6 +7,8 @@
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
     <link rel="stylesheet" href="/clinicbro.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    {{.reportbro_css}}
+    {{.reportbro_js}}
     <!-- <script src="http://localhost:8081/webui.js"></script> -->
   </head>
   <body>

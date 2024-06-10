@@ -6,5 +6,5 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     try request.server.logger.DEBUG("signing out!", .{});
     try auth.signout(request);
     //return request.render(.ok);
-    return request.redirect("./", .found);
+    return request.redirect("/", .found);
 }

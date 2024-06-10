@@ -28,6 +28,7 @@ const PublicPaths = .{
     "/clinicbro.js",
     "/logo.svg",
     "/favicon.svg",
+    "/reportbro/*",
 };
 
 /// Initialize middleware.

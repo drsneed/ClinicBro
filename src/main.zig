@@ -26,7 +26,7 @@ pub const jetzig_options = struct {
     // pub const max_bytes_request_body: usize = std.math.pow(usize, 2, 16);
 
     // Maximum filesize for `public/` content.
-    // pub const max_bytes_public_content: usize = std.math.pow(usize, 2, 20);
+    pub const max_bytes_public_content: usize = std.math.pow(usize, 2, 22);
 
     // Maximum filesize for `static/` content (applies only to apps using `jetzig.http.StaticRequest`).
     // pub const max_bytes_static_content: usize = std.math.pow(usize, 2, 18);

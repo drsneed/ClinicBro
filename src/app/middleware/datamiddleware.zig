@@ -21,7 +21,15 @@ const jetzig = @import("jetzig");
 
 const DataMiddleware = @This();
 
-const SetupPaths = .{ "main_home", "setup_expander_state", "setup_users", "setup_reports", "setup_system" };
+const RequiredFields = .{
+    "main_home",
+    "setup_expander_state",
+    "setup_users",
+    "setup_reports",
+    "setup_system",
+    "reportbro_css",
+    "reportbro_js",
+};
 
 /// Initialize middleware.
 pub fn init(request: *jetzig.http.Request) !*DataMiddleware {
@@ -37,8 +45,8 @@ pub fn afterRequest(self: *DataMiddleware, request: *jetzig.http.Request) !void 
     _ = self;
     // initialize data object with empty values
     if (request.response_data.value) |root| {
-        inline for (SetupPaths) |setup_path| {
-            try root.put(setup_path, request.response_data.string(""));
+        inline for (RequiredFields) |required_field| {
+            try root.put(required_field, request.response_data.string(""));
         }
     }
 }
