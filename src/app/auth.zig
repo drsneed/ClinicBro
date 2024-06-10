@@ -2,9 +2,9 @@ const std = @import("std");
 const jetzig = @import("jetzig");
 const db = @import("db.zig");
 const jwt = @import("jwt.zig");
-const log = std.log.scoped(.security);
+const log = std.log.scoped(.auth);
 
-pub const RestrictedPaths = .{ "/", "/users" }; //"/",
+pub const RestrictedPaths = .{ "/", "/reports" }; //"/",
 
 pub const Ticket = struct { name: []const u8, uid: i64, iat: i64, exp: i64, mod: i64 };
 
@@ -47,35 +47,27 @@ pub fn signout(request: *jetzig.Request) !void {
     try request.server.logger.DEBUG("session reset!", .{});
 }
 
-pub fn authorize(request: *jetzig.Request) !bool {
-    var authorized = true;
+pub fn authenticate(request: *jetzig.Request) !bool {
+    var authenticated: bool = false;
     var user_name: []const u8 = "Guest";
 
     const session = try request.session();
     if (try session.get("ticket")) |ticket| {
-
-        // auth ticket found, access granted
+        authenticated = true;
         user_name = ticket.getT(.string, "name") orelse "?";
-    } else {
-        // no auth ticket, don't allow in restricted path
-        inline for (RestrictedPaths) |restricted_path| {
-            if (std.mem.eql(u8, request.path.path, restricted_path)) {
-                authorized = false;
-                break;
-            }
-        }
     }
-
-    try request.server.logger.DEBUG("{s} is {s}authorized to access path {s}", .{
-        user_name,
-        if (authorized) "" else "not ",
-        request.path.path,
-    });
 
     const data = request.response_data;
     var root = try data.object();
     try root.put("user_name", data.string(user_name));
-    return authorized;
+
+    return authenticated;
+}
+
+pub fn authorize(request: *jetzig.Request) !bool {
+    _ = request;
+    // todo: authorize based on user permissions
+    return true;
 }
 
 // if(auth.validate(request.allocator, jwt.string.value)) |payload| {

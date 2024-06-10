@@ -19,6 +19,7 @@ pub const jetzig_options = struct {
         jetzig.middleware.HtmxMiddleware,
         // my auth middleware
         @import("app/middleware/authmiddleware.zig"),
+        @import("app/middleware/datamiddleware.zig"),
     };
 
     // Maximum bytes to allow in request body.

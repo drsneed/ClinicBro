@@ -21,25 +21,19 @@
             </div>
             <hr />
             <form method="post">
-              <input name="return_url" type="hidden" value="{{.return_url}}">
-              {{zmpl.content}}
-              <div class="text-field">
-                <input type="text" name="email" size="20" maxlength="255" 
-                aria-label="Email"
-                aria-required="true"
-                spellcheck="false"
-                autocomplete="email"
-                autofocus
-                required>
-                <label>Email</label>
-              </div>
-              <div class="text-field">
-                <input type="password" name="password" size="20" aria-label="Password" required>
-                <label>Password</label>
-              </div>
-              <a href="/resetpassword">Forgot Password?</a>
-              <div class="login-submit-btn-container"><input type="submit" value="Sign In"></div>
-          </form>
+              <div class="info-msg"><span>Verification Required</span></div>
+              <div class="info-msg info-msg-sm"><span>Check your email for a verification code and enter it here:</span></div>
+              <input type="text" name="code" maxlength="6" 
+                  aria-label="code"
+                  aria-required="true"
+                  spellcheck="false"
+                  autocomplete="code"
+                  placeholder="Verification Code"
+                  required=""
+                  autofocus="">
+              <a href="/auth/resetpassword">Re-send Email</a>
+              <div class="login-submit-btn-container"><input type="submit" value="Submit"></div>
+            </form>
         </div>
     </main>
   </body>

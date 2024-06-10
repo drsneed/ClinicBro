@@ -14,15 +14,22 @@
     <label for="nav-toggle" id="nav-toggle-label"></label>
     <nav id="nav">
         <hr />
-        <a href="/"><span class="mdi mdi-home-outline mr-2"></span>Home</a>
+        <a href="/" {{.main_home}}><span class="mdi mdi-home-outline mr-2"></span>Home</a>
         <hr />
-        <a href="/reports"><span class="mdi mdi-file-chart mr-2"></span>Reports</a>
-        <hr />
-        <button type="button" id="SetupExpander" class="collapsible"><span class="mdi mdi-tune mr-2"></span>Setup</a></button>
-        <div class="collapsible-content">
-            <a href="/setup/users"><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
-            <a href="/setup/system"><img src="/logo.svg" alt="ClinicBro" class="sys-icon mr-2"/>System</a>
-        </div>
+        <details {{.setup_expander_state}}>
+            <summary id="SetupExpander2" class="collapsible" id="setup">
+                <span class="mdi mdi-tune mr-2"></span>Setup
+            </summary>
+            <div class="collapsible-content">
+                <hr />
+                <a href="/setup/users" {{.setup_users}}><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
+                <hr />
+                <a href="/setup/reports" {{.setup_reports}}><span class="mdi mdi-file-chart mr-2"></span>Reports</a>
+                <hr />
+                <a href="/setup/system" {{.setup_system}}><img src="/logo.svg" alt="ClinicBro" class="sys-icon"/>System</a>
+            </div>
+        </details>
+        
         <hr />
     </nav>
     <div id="pwr-dropdown" class="pwr-dropdown" tabindex="1">
@@ -44,7 +51,7 @@
                 {{.user_name}}
             </label>
             <div class="acct-dropdown-content">
-                <a href="/signout"><span class="mdi mdi-logout mr-2"></span>Sign Out</a>
+                <a href="/auth/signout"><span class="mdi mdi-logout mr-2"></span>Sign Out</a>
             </div>
         </div>
     </header>

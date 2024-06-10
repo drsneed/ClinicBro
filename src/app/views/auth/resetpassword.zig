@@ -1,7 +1,7 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const security = @import("../security.zig");
-pub const layout = "login";
+const auth = @import("../../auth.zig");
+pub const layout = "auth";
 const log = std.log.scoped(.resetpassword);
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
@@ -24,8 +24,8 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     //log.info("root = {}\n", .{root});
     //var logged_in: bool = false;
     const params = try request.params();
-    if (params.getT(.string, "code")) |code| {
-        log.info("attempting to validate code {s}", .{code});
+    if (params.getT(.string, "email")) |email| {
+        log.info("attempting to reset password for {s}", .{email});
         // if (try security.login(request, email, password)) {
         //     logged_in = true;
         //     log.info("Successfully logged in :)", .{});
@@ -55,7 +55,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     //     try root.put("error_message", data.string("Invalid credentials, please try again."));
     //     return request.render(.ok);
     // }
-    try root.put("error_message", data.string("Invalid code."));
+    try root.put("error_message", data.string("Invalid email address."));
     return request.render(.ok);
     //return request.redirect("./", .found);
 }

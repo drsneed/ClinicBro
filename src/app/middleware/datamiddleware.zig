@@ -14,73 +14,39 @@
 /// ```
 const std = @import("std");
 const jetzig = @import("jetzig");
-const auth = @import("../auth.zig");
 /// Define any custom data fields you want to store here. Assigning to these fields in the `init`
 /// function allows you to access them in various middleware callbacks defined below, where they
 /// can also be modified.
 //my_custom_value: []const u8,
 
-const AuthMiddleware = @This();
+const DataMiddleware = @This();
 
-const PublicPaths = .{
-    "/auth/*",
-    "/clinicbro.css",
-    "/clinicbro.js",
-    "/logo.svg",
-    "/favicon.svg",
-};
+const SetupPaths = .{ "main_home", "setup_expander_state", "setup_users", "setup_reports", "setup_system" };
 
 /// Initialize middleware.
-pub fn init(request: *jetzig.http.Request) !*AuthMiddleware {
-    const middleware = try request.allocator.create(AuthMiddleware);
+pub fn init(request: *jetzig.http.Request) !*DataMiddleware {
+    const middleware = try request.allocator.create(DataMiddleware);
     //middleware.my_custom_value = "initial value";
     return middleware;
 }
-//    try root.put("setup_users", data.string(""));
-//try root.put("setup_system", data.string(""));
+
 /// Invoked immediately after the request is received but before it has started processing.
 /// Any calls to `request.render` or `request.redirect` will prevent further processing of the
 /// request, including any other middleware in the chain.
-pub fn afterRequest(self: *AuthMiddleware, request: *jetzig.http.Request) !void {
+pub fn afterRequest(self: *DataMiddleware, request: *jetzig.http.Request) !void {
     _ = self;
-    const path = request.path.path;
-    try request.server.logger.DEBUG("auth middleware running for {s}", .{path});
-    inline for (PublicPaths) |public_path| {
-        if (std.mem.endsWith(u8, public_path, "*") and std.mem.startsWith(u8, path, public_path[0 .. public_path.len - 1])) {
-            try request.server.logger.DEBUG("{s} is a public path. No auth required.", .{path});
-            return;
-        }
-        if (std.mem.eql(u8, path, public_path)) {
-            try request.server.logger.DEBUG("{s} is a public path. No auth required.", .{path});
-            return;
-        } else {
-            try request.server.logger.DEBUG("{s} != {s}", .{ path, public_path });
+    // initialize data object with empty values
+    if (request.response_data.value) |root| {
+        inline for (SetupPaths) |setup_path| {
+            try root.put(setup_path, request.response_data.string(""));
         }
     }
-    if (!try auth.authenticate(request)) {
-        try request.server.logger.DEBUG("User is unauthenticated for path {s}. Redirecting to sign in.", .{path});
-        // don't append return_url for requests to home path '/'
-        if (std.mem.eql(u8, path, "/")) {
-            _ = request.redirect("/auth/signin", .found);
-        } else {
-            var buf: [256]u8 = undefined;
-            const url = try std.fmt.bufPrint(&buf, "/auth/signin?return_url={s}", .{path});
-            _ = request.redirect(url, .found);
-        }
-        return;
-    }
-    if (!try auth.authorize(request)) {
-        try request.server.logger.DEBUG("Unauthorized request: {s}", .{path});
-        _ = request.render(.forbidden);
-        return;
-    }
-    try request.server.logger.DEBUG("Request for {s} has been authenticated and authorized", .{path});
 }
 
 /// Invoked immediately before the response renders to the client.
 /// The response can be modified here if needed.
 pub fn beforeResponse(
-    self: *AuthMiddleware,
+    self: *DataMiddleware,
     request: *jetzig.http.Request,
     response: *jetzig.http.Response,
 ) !void {
@@ -92,7 +58,7 @@ pub fn beforeResponse(
 /// Invoked immediately after the response has been finalized and sent to the client.
 /// Response data can be accessed for logging, but any modifications will have no impact.
 pub fn afterResponse(
-    self: *AuthMiddleware,
+    self: *DataMiddleware,
     request: *jetzig.http.Request,
     response: *jetzig.http.Response,
 ) !void {
@@ -105,6 +71,6 @@ pub fn afterResponse(
 /// Invoked after `afterResponse` is called. Use this function to do any clean-up.
 /// Note that `request.allocator` is an arena allocator, so any allocations are automatically
 /// freed before the next request starts processing.
-pub fn deinit(self: *AuthMiddleware, request: *jetzig.http.Request) void {
+pub fn deinit(self: *DataMiddleware, request: *jetzig.http.Request) void {
     request.allocator.destroy(self);
 }
