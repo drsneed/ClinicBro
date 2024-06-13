@@ -23,12 +23,12 @@ const DataMiddleware = @This();
 
 const RequiredFields = .{
     "main_home",
+    "main_schedule",
     "setup_expander_state",
     "setup_users",
     "setup_reports",
     "setup_system",
-    "reportbro_css",
-    "reportbro_js",
+    "header_include",
 };
 
 /// Initialize middleware.

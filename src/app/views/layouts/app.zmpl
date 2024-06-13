@@ -7,8 +7,7 @@
     <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
     <link rel="stylesheet" href="/clinicbro.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
-    {{.reportbro_css}}
-    {{.reportbro_js}}
+    {{.header_include}}
     <!-- <script src="http://localhost:8081/webui.js"></script> -->
   </head>
   <body>
@@ -18,6 +17,8 @@
         <hr />
         <a href="/" {{.main_home}}><span class="mdi mdi-home-outline mr-2"></span>Home</a>
         <hr />
+        <a href="/schedule" {{.main_schedule}}><span class="mdi mdi-calendar-account-outline mr-2"></span>Schedule</a>
+        <hr />
         <details {{.setup_expander_state}}>
             <summary id="SetupExpander2" class="collapsible" id="setup">
                 <span class="mdi mdi-tune mr-2"></span>Setup
@@ -25,9 +26,7 @@
             <div class="collapsible-content">
                 <hr />
                 <a href="/setup/users" {{.setup_users}}><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
-                <hr />
                 <a href="/setup/reports" {{.setup_reports}}><span class="mdi mdi-file-chart mr-2"></span>Reports</a>
-                <hr />
                 <a href="/setup/system" {{.setup_system}}><img src="/logo.svg" alt="ClinicBro" class="sys-icon"/>System</a>
             </div>
         </details>
@@ -60,6 +59,7 @@
     <main id="main">
         {{zmpl.content}}
     </main>
+    
     <script src="/clinicbro.js"></script>
   </body>
 </html>

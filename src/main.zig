@@ -1,9 +1,11 @@
 const std = @import("std");
+const builtin = @import("builtin");
 
 const jetzig = @import("jetzig");
 const zmd = @import("zmd");
-const zqlite = @import("zqlite");
+
 pub const routes = @import("routes");
+pub const static = @import("static");
 
 // const webui = @import("webui");
 
@@ -173,50 +175,21 @@ pub const jetzig_options = struct {
     };
 };
 
-fn server_thread(allocator: std.mem.Allocator) void {
-    const app = jetzig.init(allocator) catch return;
-    defer app.deinit();
-    app.start(routes, .{}) catch return;
+pub fn init(app: *jetzig.App) !void {
+    _ = app;
+    // Example custom route:
+    // app.route(.GET, "/custom/:id/foo/bar", @import("app/views/custom/foo.zig"), .bar);
 }
 
-var gpa = std.heap.GeneralPurposeAllocator(.{}){};
-
 pub fn main() !void {
-    defer std.debug.assert(gpa.deinit() == .ok);
-    const allocator = gpa.allocator();
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    const allocator = if (builtin.mode == .Debug) gpa.allocator() else std.heap.c_allocator;
+    defer if (builtin.mode == .Debug) std.debug.assert(gpa.deinit() == .ok);
 
-    // var my_tz = try zdt.Timezone.tzLocal(allocator);
-    // defer my_tz.deinit();
+    var app = try jetzig.init(allocator);
+    defer app.deinit();
 
-    // const t = try zdt.Datetime.fromUnix(std.time.timestamp(), zdt.Duration.Resolution.second, my_tz);
-
-    // std.debug.print("timestamp: {s}\n", .{t});
-
-    server_thread(allocator);
-    // var serverThread = try std.Thread.spawn(.{}, server_thread, .{allocator});
-    // serverThread.detach();
-
-    // var nwin = webui.newWindow();
-    // _ = nwin.bind("", events);
-
-    // //_ = nwin.bind("my_backend_func", my_backend_func);
-    // _ = nwin.setPort(8081);
-
-    // const my_icon = @embedFile("favicon.svg");
-    // const my_icon_type = "image/svg+xml";
-    // nwin.setIcon(my_icon, my_icon_type);
-
-    // _ = nwin.showBrowser("http://localhost:8080/", .Firefox);
-
-    // webui.wait();
-    // webui.clean();
-
-    // const start_time = std.time.timestamp();
-
-    // while(std.time.timestamp() - start_time < 60 * 3) {
-    //     log.info("Hello there ;)\n", .{});
-    //     std.time.sleep(3 * std.time.ns_per_s);
-    // }
+    try app.start(routes, .{});
 }
 
 // fn events(e: webui.Event) void {

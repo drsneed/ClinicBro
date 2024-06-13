@@ -1,5 +1,13 @@
 .{
+    // This is the default name used by packages depending on this one. For
+    // example, when a user runs `zig fetch --save <url>`, this field is used
+    // as the key in the `dependencies` table. Although the user can choose a
+    // different name, most users will stick with this provided value.
+    //
+    // It is redundant to include "zig" in this name because it is already
+    // within the Zig package namespace.
     .name = "ClinicBro",
+
     // This is a [Semantic Version](https://semver.org/).
     // In a future version of Zig it will be used for package deduplication.
     .version = "0.0.0",
@@ -16,34 +24,23 @@
     // internet connectivity.
     .dependencies = .{
         .jetzig = .{
-            .url = "https://github.com/drsneed/jetzig/archive/main.tar.gz",
-            .hash = "122090342317a4dbbd3f80c27abc5b50e346700a980a9e565396858f8a0e5bb31a53",
+            .url = "https://github.com/drsneed/jetzig/archive/179b5e77c3a79ca3506e318e91e8e1ade698ba30.tar.gz",
+            .hash = "12201d3f4e053def21a60518e5b1dabbd019da9abfed67120145ea333cc9764873ac",
         },
+        // .jetzig = .{
+        //     .url = "https://github.com/jetzig-framework/jetzig/archive/179b5e77c3a79ca3506e318e91e8e1ade698ba30.tar.gz",
+        //     .hash = "12201d3f4e053def21a60518e5b1dabbd019da9abfed67120145ea333cc9764873ac",
+        // },
         .zqlite = .{
             .url = "git+https://github.com/karlseguin/zqlite.zig#master",
             .hash = "12205e11bd7e60af91e3fe96b7fd90c2bfd73bdae778dbee9d243a5027e06fc3c101",
         },
-
-        //  .@"zig-webui" = .{
-        //     .url = "https://github.com/webui-dev/zig-webui/archive/main.tar.gz",
-        //     .hash = "1220313d1eaa0437b86afa81da6a8c975d8a39cfc52ef739cc2f984375d54ae645b8",
-        // },
-        // }, .zdt = .{
-        //     .url = "https://codeberg.org/FObersteiner/zdt/archive/main.tar.gz",
-        //     .hash = "1220888b19e66e7f259effe27893a6953379f1922278722011d01ef23b392d2bd1d6",
-        // }
     },
-
     .paths = .{
-        // This makes *all* files, recursively, included in this package. It is generally
-        // better to explicitly list the files and directories instead, to insure that
-        // fetching from tarballs, file system paths, and version control all result
-        // in the same contents hash.
-        "",
+        "build.zig",
+        "build.zig.zon",
+        "src",
         // For example...
-        //"build.zig",
-        //"build.zig.zon",
-        //"src",
         //"LICENSE",
         //"README.md",
     },

@@ -75,7 +75,6 @@ pub fn afterRequest(self: *AuthMiddleware, request: *jetzig.http.Request) !void 
         _ = request.render(.forbidden);
         return;
     }
-    try request.server.logger.DEBUG("Request for {s} has been authenticated and authorized", .{path});
 }
 
 /// Invoked immediately before the response renders to the client.

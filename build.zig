@@ -1,5 +1,4 @@
 const std = @import("std");
-const builtin = @import("builtin");
 const jetzig = @import("jetzig");
 
 pub fn build(b: *std.Build) !void {
@@ -12,56 +11,18 @@ pub fn build(b: *std.Build) !void {
         .target = target,
         .optimize = optimize,
     });
-    const zqlite = b.dependency("zqlite", .{
+
+    const zqlite_a = b.dependency("zqlite", .{
         .target = target,
         .optimize = optimize,
-    }).module("zqlite");
-    zqlite.addCSourceFile(.{
-        .file = b.path("src/sql/sqlite3.c"),
-        .flags = &[_][]const u8{
-            "-DSQLITE_DQS=0",
-            "-DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1",
-            "-DSQLITE_USE_ALLOCA=1",
-            "-DSQLITE_THREADSAFE=1",
-            "-DSQLITE_TEMP_STORE=3",
-            "-DSQLITE_ENABLE_API_ARMOR=1",
-            "-DSQLITE_ENABLE_UNLOCK_NOTIFY",
-            "-DSQLITE_ENABLE_UPDATE_DELETE_LIMIT=1",
-            "-DSQLITE_DEFAULT_FILE_PERMISSIONS=0600",
-            "-DSQLITE_OMIT_DECLTYPE=1",
-            "-DSQLITE_OMIT_DEPRECATED=1",
-            "-DSQLITE_OMIT_LOAD_EXTENSION=1",
-            "-DSQLITE_OMIT_PROGRESS_CALLBACK=1",
-            "-DSQLITE_OMIT_SHARED_CACHE",
-            "-DSQLITE_OMIT_TRACE=1",
-            "-DSQLITE_OMIT_UTF16=1",
-            "-DHAVE_USLEEP=0",
-        },
     });
-    zqlite.addIncludePath(b.path("src/sql"));
-    exe.linkLibC();
+    const zqlite = zqlite_a.module("zqlite");
+    zqlite.addIncludePath(zqlite_a.path("lib/sqlite3/"));
     exe.root_module.addImport("zqlite", zqlite);
+    exe.addLibraryPath(b.path("./"));
+    exe.linkSystemLibrary("sqlite3");
 
-    // const zdt = b.dependency("zdt", .{
-    //     .target = target,
-    //     .optimize = optimize,
-    // }).module("zdt");
-
-    // exe.root_module.addImport("zdt", zdt);
-
-    // To standardize development, maybe you should use `lazyDependency()` instead of `dependency()`
-    // more info to see: https://ziglang.org/download/0.12.0/release-notes.html#toc-Lazy-Dependencies
-    // const zig_webui = b.dependency("zig-webui", .{
-    //     .target = target,
-    //     .optimize = optimize,
-    //     .enable_tls = false, // whether enable tls support
-    //     .is_static = true, // whether static link
-    // });
-
-    // // add module
-    // exe.root_module.addImport("webui", zig_webui.module("webui"));
-
-    // All dependencies **must** be added to imports above this line.
+    // ^ Add all dependencies before `jetzig.jetzigInit()` ^
 
     try jetzig.jetzigInit(b, exe, .{});
 

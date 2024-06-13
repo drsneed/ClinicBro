@@ -37,7 +37,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         }
     }
 
-    var destination_url: []const u8 = "./";
+    var destination_url: []const u8 = "/";
 
     if (params.get("return_url")) |location| {
         switch (location.*) {

@@ -118,6 +118,7 @@ hr {
 a:link, a:visited {
     color: var(--link);
     text-decoration: none;
+    margin-left: 6px;
 }
 
 a:hover {

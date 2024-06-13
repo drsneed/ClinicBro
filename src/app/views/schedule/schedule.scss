@@ -1,0 +1,9 @@
+:root {
+    --calendar-header-fg: light-dark(#FFAA00, #EEE);
+}
+.month {
+    h2 {
+        color: var(--calendar-header-fg);
+    }
+}
+
