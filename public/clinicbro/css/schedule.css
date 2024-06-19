@@ -1,14 +1,11 @@
-:root {
+/* :root {
   --calendar-header-fg: light-dark(#2e1804, #353434);
   --calendar-header-bg: light-dark(#d4c192, #6e6c6c);
   --calendar-number-fg: light-dark(#787777, #444);
   --calendar-this-month-bg: light-dark(#f4f2d3, #442d2d);
   --calendar-month-bg: light-dark(#eeeeec, #323030);
+  --calendar-today-fg: light-dark(#155741, #adf5c5);
 }
-
-/* .month-table caption {
-  border-bottom: 1px solid black;
-} */
 
 .month-table {
   background: var(--container-bg);
@@ -20,14 +17,9 @@
 .month-table td, .month-table th {
   border: 1px solid var(--sep);
   box-shadow: none;
-  padding: 8px;
+  padding: 0px 8px;
 }
 
-.month-table td {
-  padding: 0px;
-  margin: 0px;
-  text-align: top;
-}
 
 .month-table tr:nth-child(even) {
   background-color: transparent;
@@ -70,25 +62,32 @@
   padding: 6px 0;
 }
 
-.month-table td span {
+.month-table td .num {
   font-size: 10px;
   color: var(--calendar-number-fg);
-  padding: 2px;
-  margin: 0;
+  padding: 0px;
 }
 
 .month-table td {
   background-color: var(--calendar-month-bg);
   vertical-align: top;
+  height: 80px;
+  overflow: hidden;
 }
 
 .this-month {
   background-color: var(--calendar-this-month-bg) !important;
 }
 
+.today {
+  font-weight: bold;
+  border: 1px solid var(--calendar-today-fg);
+  border-radius: 50%;
+  padding: 0px 4px !important;
+  color: var(--calendar-today-fg) !important;
+}
+
 .btn-left, .btn-right {
   padding-top: 1px;
   transition: none;
-}
-
-/*# sourceMappingURL=schedule.css.map */
+} */

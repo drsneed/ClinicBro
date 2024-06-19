@@ -24,11 +24,8 @@ const AuthMiddleware = @This();
 
 const PublicPaths = .{
     "/auth/*",
-    "/clinicbro.css",
-    "/clinicbro.js",
-    "/logo.svg",
-    "/favicon.svg",
-    "/reportbro/*",
+    "/clinicbro/*",
+    "/lib/*",
 };
 
 /// Initialize middleware.

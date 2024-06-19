@@ -1,9 +1,9 @@
 <table class="month-table" align="center">
     <caption align="top">
         <div class="month-header">
-            <button type="button" class="btn-left" onclick="calendar.prev();"><span class="mdi mdi-chevron-left"></span></button>
+            <button size="small" class="btn-left" onclick="calendar.prev();"><span class="mdi mdi-chevron-left"></span></button>
             <h2 align="center" id="month_title"></h2>
-            <button type="button" class="btn-right" onclick="calendar.next();"><span class="mdi mdi-chevron-right"></span></button>
+            <button size="small" class="btn-right" onclick="calendar.next();"><span class="mdi mdi-chevron-right"></span></button>
         </div>
     </caption>
     <thead>
@@ -51,7 +51,11 @@
             <td id="d23"><span class="num"></span></td>
             <td id="d24"><span class="num"></span></td>
             <td id="d25"><span class="num"></span></td>
-            <td id="d26"><span class="num"></span></td>
+            <td id="d26"><span class="num"></span>
+                <x-appt name="Doc Appt" start="2024-06-15T12:30:00" end="2024-06-15T13:00:00"></x-appt>
+                <x-appt name="HSP MEET" start="2024-06-15T13:00:00" end="2024-06-15T13:30:00"></x-appt>
+                <x-appt name="AUD EXAM" start="2024-06-15T13:30:00" end="2024-06-15T14:30:00"></x-appt>
+            </td>
             <td id="d27"><span class="num"></span></td>
         </tr>
         <tr>

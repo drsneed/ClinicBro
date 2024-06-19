@@ -26,8 +26,8 @@
     --pwr-light-scheme: invert(22%) sepia(11%) saturate(1957%) hue-rotate(162deg) brightness(92%) contrast(99%);
     --pwr-light-scheme-pressed: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
     --input-border: #444;
-    --sep: light-dark(#b9b9b9, black);
-    --sep-border: light-dark(#f5f2f2, #2A2A2A);
+    --sep: light-dark(#cecdcd, black);
+    --sep-border: light-dark(#ffffff, #2A2A2A);
     --link: light-dark(#1d3a4e, #82aac5);
     --nav-link: light-dark(#2d4159, #bebebe);
     --nav-link-bg-hover: light-dark(#d7e0e5, #3b5574);
@@ -44,6 +44,7 @@
     --table-fg: light-dark(#16181a, #a2b4b1);
     --table-row-bg-alt: light-dark(#f3f3f3, #16181a);
     --table-row-hover: light-dark(#d8d5d5, #161616);
+    --mfmf: #55577a;
 }
 
 * { 
@@ -58,8 +59,10 @@
     margin: 0; 
     padding: 0; 
     -webkit-text-size-adjust: none;
-    font-family: 'Mukta', sans-serif; 
-    font-size: 16px;
+    /* font-family: 'Mukta', sans-serif; */
+    font-family: 'Open Sans', sans-serif;
+    font-variation-settings: "wdth" 100;
+    font-size: 14px;
 } 
 
 body {

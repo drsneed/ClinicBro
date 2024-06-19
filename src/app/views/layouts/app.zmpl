@@ -4,11 +4,13 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ClinicBro</title>
-    <link rel="shortcut icon" type="image/x-icon" href="/favicon.svg">
-    <link rel="stylesheet" href="/clinicbro.css">
+    <link rel="shortcut icon" type="image/x-icon" href="/clinicbro/img/favicon.svg">
+    <link rel="stylesheet" href="/clinicbro/css/app.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     {{.header_include}}
-    <!-- <script src="http://localhost:8081/webui.js"></script> -->
   </head>
   <body>
     <input type="checkbox" id="nav-toggle" name="nav-toggle"/>
@@ -27,7 +29,7 @@
                 <hr />
                 <a href="/setup/users" {{.setup_users}}><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
                 <a href="/setup/reports" {{.setup_reports}}><span class="mdi mdi-file-chart mr-2"></span>Reports</a>
-                <a href="/setup/system" {{.setup_system}}><img src="/logo.svg" alt="ClinicBro" class="sys-icon"/>System</a>
+                <a href="/setup/system" {{.setup_system}}><img src="/clinicbro/img/logo.svg" alt="ClinicBro" class="sys-icon"/>System</a>
             </div>
         </details>
         
@@ -36,7 +38,7 @@
     <div id="pwr-dropdown" class="pwr-dropdown" tabindex="1">
         <input type="checkbox" id="pwr-toggle" name="pwr-toggle"/>
         <label for="pwr-toggle" class="pwr" id="pwr">
-            <img src="/logo.svg" alt="Home" class="pwr-icon"/>
+            <img src="/clinicbro/img/logo.svg" alt="Home" class="pwr-icon"/>
             ClinicBro
         </label>
         <div class="pwr-dropdown-content">
@@ -60,6 +62,6 @@
         {{zmpl.content}}
     </main>
     
-    <script src="/clinicbro.js"></script>
+    <script src="/clinicbro/js/app.js"></script>
   </body>
 </html>
