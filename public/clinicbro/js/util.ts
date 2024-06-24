@@ -25,3 +25,13 @@ export function sameDay(d1, d2) {
     d1.getMonth() === d2.getMonth() &&
     d1.getDate() === d2.getDate();
 }
+
+export function clearAllSelectedDays() {
+  var schedule = document.getElementById("schedule");
+  schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
+    day.removeAttribute("selected");
+  });
+  schedule.shadowRoot.querySelectorAll("mv-appt").forEach(function(appt) {
+    appt.removeAttribute("selected");
+  });
+}

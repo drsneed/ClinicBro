@@ -1,12 +1,10 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const db = @import("db.zig");
+const DbContext = @import("db_context.zig");
 const jwt = @import("jwt.zig");
 const log = std.log.scoped(.auth);
 
-pub const RestrictedPaths = .{ "/", "/reports" }; //"/",
-
-pub const Ticket = struct { name: []const u8, uid: i64, iat: i64, exp: i64, mod: i64 };
+pub const Ticket = struct { name: []const u8, id: i64, iat: i64, exp: i64 };
 
 pub fn validatePassword(password: []const u8, salt: []const u8, stored_key: *const [32]u8) !bool {
     var key: [32]u8 = undefined;
@@ -14,12 +12,11 @@ pub fn validatePassword(password: []const u8, salt: []const u8, stored_key: *con
     return std.mem.eql(u8, &key, stored_key);
 }
 
-pub fn issueTicket(allocator: std.mem.Allocator, email: []const u8, password: []const u8) !?Ticket {
-    if (try db.lookupAccount(allocator, email)) |account| {
-        defer allocator.free(account.email);
-        if (try validatePassword(password, email, account.key[0..32])) {
-            return .{ .name = account.name, .uid = account.uid, .iat = std.time.timestamp(), .exp = 0, .mod = account.mod };
-        }
+pub fn issueTicket(allocator: std.mem.Allocator, name: []const u8, password: []const u8) !?Ticket {
+    var db_context = try DbContext.init(allocator);
+    defer db_context.deinit();
+    if (try db_context.validateUser(name, password)) |user| {
+        return .{ .name = user.name, .id = user.id, .iat = std.time.timestamp(), .exp = 0 };
     }
     return null;
 }
@@ -30,10 +27,9 @@ pub fn signin(request: *jetzig.Request, email: []const u8, password: []const u8)
         var data = jetzig.zmpl.Data.init(request.allocator);
         var root = try data.object();
         try root.put("name", data.string(ticket.name));
-        try root.put("uid", data.integer(ticket.uid));
+        try root.put("id", data.integer(ticket.id));
         try root.put("iat", data.integer(ticket.iat));
         try root.put("exp", data.integer(ticket.exp));
-        try root.put("mod", data.integer(ticket.mod));
         var session = try request.session();
         try session.put("ticket", root);
         return true;
@@ -77,36 +73,36 @@ pub fn authorize(request: *jetzig.Request) !bool {
 //     return;
 // }
 
-pub const JwtPayload = struct { sub: i64, iat: i64 };
+// pub const JwtPayload = struct { sub: i64, iat: i64 };
 
-const sig = jwt.SignatureOptions{ .key = "-~-clinicbro-~-" };
+// const sig = jwt.SignatureOptions{ .key = "-~-clinicbro-~-" };
 
-pub fn issueToken(allocator: std.mem.Allocator, email: []const u8, password: []const u8) !?[]const u8 {
-    const account_found = try db.lookupAccount(allocator, email);
-    if (account_found) |account| {
-        defer account.deinit();
-        log.info("account lookup succeeded for email {s}", .{email});
-        // generate hash and compare with key
-        var key: [32]u8 = undefined;
-        try std.crypto.pwhash.pbkdf2(&key, password, email, 2171, std.crypto.auth.hmac.sha2.HmacSha256);
-        if (std.mem.eql(u8, &key, &account.key)) {
-            // issue token
-            const payload = JwtPayload{
-                .sub = account.id,
-                .iat = std.time.timestamp(),
-            };
-            const token = try jwt.encode(allocator, .HS256, payload, sig);
-            return token;
-        }
-        log.info("authentication failed for password {s}", .{password});
-        return null;
-    }
-    log.info("account lookup failed for email {s}", .{email});
-    return null;
-}
+// pub fn issueToken(allocator: std.mem.Allocator, email: []const u8, password: []const u8) !?[]const u8 {
+//     const account_found = try db.lookupAccount(allocator, email);
+//     if (account_found) |account| {
+//         defer account.deinit();
+//         log.info("account lookup succeeded for email {s}", .{email});
+//         // generate hash and compare with key
+//         var key: [32]u8 = undefined;
+//         try std.crypto.pwhash.pbkdf2(&key, password, email, 2171, std.crypto.auth.hmac.sha2.HmacSha256);
+//         if (std.mem.eql(u8, &key, &account.key)) {
+//             // issue token
+//             const payload = JwtPayload{
+//                 .sub = account.id,
+//                 .iat = std.time.timestamp(),
+//             };
+//             const token = try jwt.encode(allocator, .HS256, payload, sig);
+//             return token;
+//         }
+//         log.info("authentication failed for password {s}", .{password});
+//         return null;
+//     }
+//     log.info("account lookup failed for email {s}", .{email});
+//     return null;
+// }
 
-pub fn validateToken(allocator: std.mem.Allocator, token: []const u8) ?JwtPayload {
-    var decoded_p = jwt.validate(JwtPayload, allocator, .HS256, token, sig) catch return null;
-    defer decoded_p.deinit();
-    return decoded_p.value;
-}
+// pub fn validateToken(allocator: std.mem.Allocator, token: []const u8) ?JwtPayload {
+//     var decoded_p = jwt.validate(JwtPayload, allocator, .HS256, token, sig) catch return null;
+//     defer decoded_p.deinit();
+//     return decoded_p.value;
+// }

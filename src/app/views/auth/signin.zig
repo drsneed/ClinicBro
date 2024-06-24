@@ -1,6 +1,6 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const auth = @import("../../auth.zig");
+const security = @import("../../security.zig");
 pub const layout = "auth";
 const log = std.log.scoped(.signin);
 
@@ -28,9 +28,9 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var error_message: []const u8 = "Invalid credentials, please try again.";
     const params = try request.params();
     log.info("attempting to sign in , checking params...", .{});
-    if (params.getT(.string, "email")) |email| {
+    if (params.getT(.string, "name")) |name| {
         if (params.getT(.string, "password")) |password| {
-            signed_in = auth.signin(request, email, password) catch blk: {
+            signed_in = security.signin(request, name, password) catch blk: {
                 error_message = "Database connection failure";
                 break :blk false;
             };

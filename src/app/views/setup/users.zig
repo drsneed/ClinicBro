@@ -1,6 +1,6 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const db = @import("../../db.zig");
+const DbContext = @import("../../db_context.zig");
 pub const layout = "app";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
@@ -11,19 +11,19 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     const user_array = try data.array();
     try root.put("users", user_array);
     // load account list from database
-    const dbAccountList = try db.getAllAccounts(request.allocator);
-    defer dbAccountList.deinit();
+
+    var db_context = try DbContext.init(request.allocator);
+    defer db_context.deinit();
+    const users = try db_context.getAllUsers();
+    defer users.deinit();
 
     // append each db account to accounts json array
-    for (dbAccountList.items) |dbAccount| {
-        var user = try data.object();
-        try user.put("uid", data.integer(dbAccount.uid));
-        try user.put("name", data.string(dbAccount.name));
-        try user.put("email", data.string(dbAccount.email));
-        try user.put("mod", data.integer(dbAccount.mod));
-        try user.put("iat", data.string(dbAccount.iat));
-        try user.put("uat", data.string(dbAccount.uat));
-        try user_array.append(user);
+    for (users.items) |user| {
+        var usr = try data.object();
+        try usr.put("id", data.integer(user.id));
+        try usr.put("name", data.string(user.name));
+        try usr.put("date_created", data.integer(user.date_created));
+        try user_array.append(usr);
     }
 
     return request.render(.ok);

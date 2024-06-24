@@ -1,4 +1,4 @@
-
 document.addEventListener("DOMContentLoaded", function(event) {
-    console.log("Hello Earth!");
+  console.log("Hello Earth!");
 });
+

@@ -1,23 +1,23 @@
 import {html, css, LitElement} from 'lit';
-import {dateAdd, months, sameDay} from '../util';
+import {dateAdd, months, sameDay, clearAllSelectedDays} from '../util';
 import {monthviewStyle} from './monthview-style';
-import {Appointment} from './appointment';
-
+import {customElement, property} from 'lit/decorators.js';
 import 'lit-icon/pkg/dist-src/lit-icon.js';
 import 'lit-icon/pkg/dist-src/lit-iconset.js';
 
+
+@customElement("month-view")
 export class MonthView extends LitElement {
   static styles = monthviewStyle();
     
-  static properties = {
-    current_date: {
-        reflect: true,
-        converter(value) {
-          return new Date(value);
-        }
-      },
-    appointments: {type: Array},
-  };
+
+  // @ts-ignore
+  @property({converter(value) {return new Date(value);}, reflect: true})
+  current_date: Date;
+
+  // @ts-ignore
+  @property({type: Array, attribute: false})
+  appointments = [];
 
   calendarTitle() {
     return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
@@ -26,27 +26,30 @@ export class MonthView extends LitElement {
   constructor() {
     super();
     this.current_date = new Date();
-    // '<x-appt name="AUD EXAM" start="2024-06-15T13:30:00" end="2024-06-15T14:30:00"></x-appt>'
-    var appt1 = new Appointment();
-    appt1.name = "AUD EXAM";
-    appt1.start = new Date("2024-06-15T13:30:00");
-    appt1.end = new Date("2024-06-15T14:30:00");
+    var appt1 = {
+      name: "AUD EXAM",
+      start: new Date("2024-06-15T13:30:00"),
+      end: new Date("2024-06-15T14:30:00")
+    };
+    
     this.appointments = [appt1];
   }
 
   updated(changedProperties) {
     //console.log(changedProperties); // logs previous values
     if(changedProperties.has('current_date')) {
-      //this.calendar_title = months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
+      
     }
   }
 
   private _prev(e: Event) {
     this.current_date = dateAdd(this.current_date, 'month', -1);
+    clearAllSelectedDays();
   }
 
   private _next(e: Event) {
     this.current_date = dateAdd(this.current_date, 'month', 1);
+    clearAllSelectedDays();
   }
 
   renderCaption() {
@@ -66,9 +69,20 @@ export class MonthView extends LitElement {
     </caption>`;
   }
 
+  renderDay(today: Date, id: string, date_of_day: Date) {
+    let current_month = date_of_day.getMonth() == this.current_date.getMonth();
+    return html`<mv-day id="${id}" current_date="${date_of_day.toISOString()}" ?current_month=${current_month}>
+      ${ // @ts-ignore
+        this.appointments.filter((appt) => sameDay(appt.start, date_of_day)).map((appt) => 
+        html`<mv-appt name="${appt.name}" start="${appt.start.toISOString()}" end="${appt.end.toISOString()}"></mv-appt>`
+      )}
+    </mv-day>`;
+  }
+
   renderDays() {
+    var today = new Date();
     let rows = [];
-    const today = new Date();
+    // @ts-ignore
     let firstOfDaMonth = new Date(this.current_date.getFullYear(), this.current_date.getMonth(), 1);
     let d = firstOfDaMonth.getDay();
     let i = 0;
@@ -77,43 +91,33 @@ export class MonthView extends LitElement {
       for(let day = 0; day < 7; day++) {
         let id = "d" + i;
         let thisDaysDate = dateAdd(firstOfDaMonth, "day", i - d);
-        let dayClass = thisDaysDate.getMonth() == this.current_date.getMonth() ? "this-month" : "";
-        //let numClass = thisDaysDate.toDateString() === today.toDateString() ? "today" : "";
-        let numClass = sameDay(thisDaysDate, today) ? "today" : "";
-        let num = thisDaysDate.getDate();
-        days.push(html`<td id="${id}" class="${dayClass}"><span class="num ${numClass}">${num}</span>
-          ${this.appointments.filter((appt) => sameDay(appt.start, thisDaysDate)).map((appt) => 
-            html`<x-appt name="${appt.name}" start="${appt.start}" end="${appt.end}"></x-appt>`
-          )}</td>`);
+        days.push(html`<td>${this.renderDay(today, id, thisDaysDate)}</td>`);
         i++;
       }
       rows.push(html`<tr>${days}</tr>`);
     }
     return html`${rows}`;
-    
   }
   
   render() {
     return html`
-<table class="month-table" align="center" cellspacing="0">
-    ${this.renderCaption()}
-    <thead>
-        <tr>
-            <th>Sun</th>
-            <th>Mon</th>
-            <th>Tue</th>
-            <th>Wed</th>
-            <th>Thu</th>
-            <th>Fri</th>
-            <th>Sat</th>
-        </tr>
-    </thead>
-    <tbody>
-       ${this.renderDays()} 
-    </tbody>
-</table>
+    <table class="month-table" align="center" cellspacing="0">
+      ${this.renderCaption()}
+      <thead>
+          <tr>
+              <th>Sun</th>
+              <th>Mon</th>
+              <th>Tue</th>
+              <th>Wed</th>
+              <th>Thu</th>
+              <th>Fri</th>
+              <th>Sat</th>
+          </tr>
+      </thead>
+      <tbody>
+        ${this.renderDays()} 
+      </tbody>
+    </table>
     `;
   }
 }
-
-customElements.define('month-view', MonthView);

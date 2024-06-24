@@ -2,10 +2,11 @@ import {css} from 'lit';
 export function monthviewStyle() {
     return css`
   :host {
-    --calendar-header-fg: light-dark(#2e1804, #9EAF91);
-    --calendar-header-bg: light-dark(#d4c192, #2e2d2f);
+    --calendar-header-fg: light-dark(#eeeeec, #9EAF91);
+    --calendar-header-bg: light-dark(#37af4d, #2e2d2f);
     --calendar-number-fg: light-dark(#787777, #22);
-    --calendar-this-month-bg: light-dark(#f4f2d3, #442d2d);
+    --calendar-this-month-bg: light-dark(#dae2f8, #442d2d);
+    --calendar-this-month-active-bg: light-dark(#fff, #000);
     --calendar-month-bg: light-dark(#eeeeec, #323030);
     --calendar-today-fg: light-dark(#155741, #adf5c5);
     --table-fg: light-dark(#16181a, #a2b4b1);
@@ -14,9 +15,10 @@ export function monthviewStyle() {
   .month-table {
     background: var(--container-bg);
     table-layout: fixed;
-    height: 550px;
+    //height: 550px;
     border-collapse: collapse;
     padding: 0px !important;
+    margin: 0px;
     width: 100%;
     color: var(--table-fg);
   }
@@ -25,7 +27,8 @@ export function monthviewStyle() {
   .month-table td, .month-table th {
     border: 1px solid var(--sep);
     box-shadow: none;
-    padding: 0px 8px;
+    width: auto !important;
+    padding: 0px;
   }
   
   .month-table th {
@@ -50,7 +53,7 @@ export function monthviewStyle() {
   
   .month-header {
     display: flex;
-    background-color: var(--calendar-header-bg);
+    background-color: var(--header-bg);
     text-align: center;
     
   }
@@ -63,30 +66,17 @@ export function monthviewStyle() {
     font-size: 16px;
   }
   
-  .month-table td .num {
-    font-size: 10px;
-    color: var(--calendar-number-fg);
-    padding: 0px;
-  }
-  
   .month-table td {
     background-color: var(--calendar-month-bg);
     vertical-align: top;
     height: 80px;
     overflow: hidden;
   }
-  
-  .this-month {
-    background-color: var(--calendar-this-month-bg) !important;
+
+  .month-table tr {
+    white-space: nowrap;
   }
-  
-  .today {
-    font-weight: bold;
-    border: 1px solid var(--calendar-today-fg);
-    border-radius: 50%;
-    padding: 0px 4px !important;
-    color: var(--calendar-today-fg) !important;
-  }
+
   .month-table .btn-left, .month-table .btn-right {
     display: inline-block;
     margin: 5px;

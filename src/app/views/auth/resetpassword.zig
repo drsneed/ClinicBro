@@ -1,6 +1,5 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const auth = @import("../../auth.zig");
 pub const layout = "auth";
 const log = std.log.scoped(.resetpassword);
 

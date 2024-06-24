@@ -14,7 +14,7 @@
 /// ```
 const std = @import("std");
 const jetzig = @import("jetzig");
-const auth = @import("../auth.zig");
+const security = @import("../security.zig");
 /// Define any custom data fields you want to store here. Assigning to these fields in the `init`
 /// function allows you to access them in various middleware callbacks defined below, where they
 /// can also be modified.
@@ -42,21 +42,20 @@ pub fn init(request: *jetzig.http.Request) !*AuthMiddleware {
 pub fn afterRequest(self: *AuthMiddleware, request: *jetzig.http.Request) !void {
     _ = self;
     const path = request.path.path;
-    try request.server.logger.DEBUG("auth middleware running for {s}", .{path});
     inline for (PublicPaths) |public_path| {
         if (std.mem.endsWith(u8, public_path, "*") and std.mem.startsWith(u8, path, public_path[0 .. public_path.len - 1])) {
-            try request.server.logger.DEBUG("{s} is a public path. No auth required.", .{path});
+            //try request.server.logger.DEBUG("{s} is a public path. No auth required.", .{path});
             return;
         }
         if (std.mem.eql(u8, path, public_path)) {
-            try request.server.logger.DEBUG("{s} is a public path. No auth required.", .{path});
+            //try request.server.logger.DEBUG("{s} is a public path. No auth required.", .{path});
             return;
         } else {
-            try request.server.logger.DEBUG("{s} != {s}", .{ path, public_path });
+            //try request.server.logger.DEBUG("{s} != {s}", .{ path, public_path });
         }
     }
-    if (!try auth.authenticate(request)) {
-        try request.server.logger.DEBUG("User is unauthenticated for path {s}. Redirecting to sign in.", .{path});
+    if (!try security.authenticate(request)) {
+        //try request.server.logger.DEBUG("User is unauthenticated for path {s}. Redirecting to sign in.", .{path});
         // don't append return_url for requests to home path '/'
         if (std.mem.eql(u8, path, "/")) {
             _ = request.redirect("/auth/signin", .found);
@@ -67,7 +66,7 @@ pub fn afterRequest(self: *AuthMiddleware, request: *jetzig.http.Request) !void 
         }
         return;
     }
-    if (!try auth.authorize(request)) {
+    if (!try security.authorize(request)) {
         try request.server.logger.DEBUG("Unauthorized request: {s}", .{path});
         _ = request.render(.forbidden);
         return;

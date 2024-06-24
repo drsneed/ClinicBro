@@ -292,7 +292,6 @@ class b extends HTMLElement {
   }
 }
 b.elementStyles = [], b.shadowRootOptions = { mode: "open" }, b[d("elementProperties")] = new Map, b[d("finalized")] = new Map, p?.({ ReactiveElement: b }), (a.reactiveElementVersions ??= []).push("2.0.4");
-
 // node_modules/lit-html/lit-html.js
 var C = function(t2, i3) {
   if (!Array.isArray(t2) || !t2.hasOwnProperty("raw"))
@@ -595,46 +594,6 @@ var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
 // public/clinicbro/js/util.ts
-function dateAdd(date, interval, units) {
-  var ret = new Date(date.valueOf());
-  var checkRollover = function() {
-    if (ret.getDate() != date.getDate())
-      ret.setDate(0);
-  };
-  switch (String(interval).toLowerCase()) {
-    case "year":
-      ret.setFullYear(ret.getFullYear() + units);
-      checkRollover();
-      break;
-    case "quarter":
-      ret.setMonth(ret.getMonth() + 3 * units);
-      checkRollover();
-      break;
-    case "month":
-      ret.setMonth(ret.getMonth() + units);
-      checkRollover();
-      break;
-    case "week":
-      ret.setDate(ret.getDate() + 7 * units);
-      break;
-    case "day":
-      ret.setDate(ret.getDate() + units);
-      break;
-    case "hour":
-      ret.setTime(ret.getTime() + units * 3600000);
-      break;
-    case "minute":
-      ret.setTime(ret.getTime() + units * 60000);
-      break;
-    case "second":
-      ret.setTime(ret.getTime() + units * 1000);
-      break;
-    default:
-      ret = undefined;
-      break;
-  }
-  return ret;
-}
 function sameDay(d1, d22) {
   return d1.getFullYear() === d22.getFullYear() && d1.getMonth() === d22.getMonth() && d1.getDate() === d22.getDate();
 }
@@ -647,436 +606,130 @@ function clearAllSelectedDays() {
     appt.removeAttribute("selected");
   });
 }
-var months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-];
-
-// public/clinicbro/js/schedule/monthview-style.ts
-function monthviewStyle() {
-  return i`
-  :host {
-    --calendar-header-fg: light-dark(#eeeeec, #9EAF91);
-    --calendar-header-bg: light-dark(#37af4d, #2e2d2f);
-    --calendar-number-fg: light-dark(#787777, #22);
-    --calendar-this-month-bg: light-dark(#dae2f8, #442d2d);
-    --calendar-this-month-active-bg: light-dark(#fff, #000);
-    --calendar-month-bg: light-dark(#eeeeec, #323030);
-    --calendar-today-fg: light-dark(#155741, #adf5c5);
-    --table-fg: light-dark(#16181a, #a2b4b1);
-  }
-  
-  .month-table {
-    background: var(--container-bg);
-    table-layout: fixed;
-    //height: 550px;
-    border-collapse: collapse;
-    padding: 0px !important;
-    margin: 0px;
-    width: 100%;
-    color: var(--table-fg);
-  }
-  
-  
-  .month-table td, .month-table th {
-    border: 1px solid var(--sep);
-    box-shadow: none;
-    width: auto !important;
-    padding: 0px;
-  }
-  
-  .month-table th {
-    padding-top: 6px;
-    padding-bottom: 6px;
-    text-align: center;
-    background-color: var(--table-header-bg);
-    color: var(--table-header-fg);
-    border-bottom: 1px solid var(--table-header-fg);
-    font-weight: 900;
-    height: 30px;
-  }
-  
-  .month-table .btn-left, .month-table .btn-right {
-    display: inline-block;
-    margin: 5px;
-  }
-  
-  .month-table .btn-right {
-    float: right;
-  }
-  
-  .month-header {
-    display: flex;
-    background-color: var(--header-bg);
-    text-align: center;
-    
-  }
-  
-  .month-header h2 {
-    width: 100%;
-    color: var(--calendar-header-fg);
-    padding: 0;
-    margin: 8px auto;
-    font-size: 16px;
-  }
-  
-  .month-table td {
-    background-color: var(--calendar-month-bg);
-    vertical-align: top;
-    height: 80px;
-    overflow: hidden;
-  }
-
-  .month-table tr {
-    white-space: nowrap;
-  }
-
-  .month-table .btn-left, .month-table .btn-right {
-    display: inline-block;
-    margin: 5px;
-  }
-  .btn-left, .btn-right {
-    padding-top: 1px;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-bottom: 1px;
-    transition: none;
-    height: 32px;
-  }`;
-}
 
 // node_modules/@lit/reactive-element/decorators/custom-element.js
-var t3 = (t4) => (e4, o4) => {
-  o4 !== undefined ? o4.addInitializer(() => {
+var t3 = (t4) => (e4, o5) => {
+  o5 !== undefined ? o5.addInitializer(() => {
     customElements.define(t4, e4);
   }) : customElements.define(t4, e4);
 };
 // node_modules/@lit/reactive-element/decorators/property.js
 var n4 = function(t4) {
-  return (e4, o4) => typeof o4 == "object" ? r5(t4, e4, o4) : ((t5, e5, o5) => {
-    const r5 = e5.hasOwnProperty(o5);
-    return e5.constructor.createProperty(o5, r5 ? { ...t5, wrapped: true } : t5), r5 ? Object.getOwnPropertyDescriptor(e5, o5) : undefined;
-  })(t4, e4, o4);
+  return (e4, o5) => typeof o5 == "object" ? r5(t4, e4, o5) : ((t5, e5, o6) => {
+    const r5 = e5.hasOwnProperty(o6);
+    return e5.constructor.createProperty(o6, r5 ? { ...t5, wrapped: true } : t5), r5 ? Object.getOwnPropertyDescriptor(e5, o6) : undefined;
+  })(t4, e4, o5);
 };
-var o4 = { attribute: true, type: String, converter: u, reflect: false, hasChanged: f };
-var r5 = (t4 = o4, e4, r6) => {
+var o5 = { attribute: true, type: String, converter: u, reflect: false, hasChanged: f };
+var r5 = (t4 = o5, e4, r6) => {
   const { kind: n5, metadata: i4 } = r6;
   let s4 = globalThis.litPropertyMetadata.get(i4);
   if (s4 === undefined && globalThis.litPropertyMetadata.set(i4, s4 = new Map), s4.set(r6.name, t4), n5 === "accessor") {
-    const { name: o5 } = r6;
+    const { name: o6 } = r6;
     return { set(r7) {
       const n6 = e4.get.call(this);
-      e4.set.call(this, r7), this.requestUpdate(o5, n6, t4);
+      e4.set.call(this, r7), this.requestUpdate(o6, n6, t4);
     }, init(e5) {
-      return e5 !== undefined && this.P(o5, undefined, t4), e5;
+      return e5 !== undefined && this.P(o6, undefined, t4), e5;
     } };
   }
   if (n5 === "setter") {
-    const { name: o5 } = r6;
+    const { name: o6 } = r6;
     return function(r7) {
-      const n6 = this[o5];
-      e4.call(this, r7), this.requestUpdate(o5, n6, t4);
+      const n6 = this[o6];
+      e4.call(this, r7), this.requestUpdate(o6, n6, t4);
     };
   }
   throw Error("Unsupported decorator location: " + n5);
 };
-// node_modules/lit-icon/pkg/dist-src/lit-icon.js
-class LitIcon extends HTMLElement {
-  constructor() {
-    super();
-    this._icon = "";
-    const shadow = this.attachShadow({
-      mode: "open"
-    });
-    shadow.innerHTML = `
-      <style>
-        :host {
-          display: inline-block;
-          width: 24px;
-          height: 24px;
-          margin: 0 5px;
-          box-sizing: content-box;
-          vertical-align: sub;
-        }
-        .iron-icon {
-          display: -webkit-inline-flex;
-          display: inline-flex;
-          -ms-flex-align: center;
-          -webkit-align-items: center;
-          align-items: center;
-          -ms-flex-pack: center;
-          -webkit-justify-content: center;
-          justify-content: center;
-          position: relative;
-          fill: currentcolor;
-          stroke: none;
-          width: 100%;
-          height: 100%;
-        }
-        i {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          font-style: normal;
-          height: 100%;
-          width: 100%;
-          min-width: 100%;
-        }
-      </style>
-      <i></i>
-    `;
-    this.size = "24";
-    this._icon = "";
-    this._iconset = "iconset";
-    document.iconMap = document.iconMap || {};
-    window.addEventListener("ionset-loaded", this.updateIconset.bind(this));
-  }
-  static get observedAttributes() {
-    return ["size", "icon", "iconset"];
-  }
-  get icon() {
-    return this._icon;
-  }
-  set icon(value) {
-    this._icon = value;
-    this.setAttribute("icon", value);
-  }
-  get iconset() {
-    return this._iconset;
-  }
-  set iconset(value) {
-    this._iconset = value;
-    this.setAttribute("iconset", value);
-  }
-  attributeChangedCallback(name, oldValue, newValue) {
-    switch (name) {
-      case "size":
-        this.size = newValue;
-        this.shadowRoot.querySelector("i").style.height = this.size;
-        this.shadowRoot.querySelector("i").style.width = this.size;
-        break;
-      case "icon":
-        this._icon = newValue;
-        this.findIcon();
-        break;
-      case "iconset":
-        this._iconset = newValue;
-        break;
-      default:
-        break;
-    }
-  }
-  updateIconset() {
-    const iconset = document.iconMap[this._iconset];
-    if (!iconset)
-      return;
-    this.findIcon();
-    this.shadowRoot.querySelector("i").style.height = this.size;
-    this.shadowRoot.querySelector("i").style.width = this.size;
-  }
-  findIcon() {
-    const iconset = document.iconMap[this._iconset];
-    if (!iconset)
-      return;
-    const _tpl = document.createElement("template");
-    iconset.forEach((icon2) => _tpl.appendChild(icon2));
-    let icon = _tpl.querySelector(`#${this._icon}`);
-    if (!icon)
-      return console.error(`[lit-icon] Icon '${this._icon}' no found in iconset`);
-    this.shadowRoot.querySelector("i").innerHTML = "";
-    this._cloneIcon(icon);
-  }
-  _cloneIcon(icon) {
-    let content = icon.cloneNode(true);
-    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.classList.add("iron-icon");
-    icon.classList.add("iron-icon");
-    let viewBox = content.getAttribute("viewBox") || `0 0 ${this.size} ${this.size}`;
-    let cssText = "pointer-events: none; display: block; width: 100%; height: 100%;";
-    svg.setAttribute("viewBox", viewBox);
-    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-    svg.setAttribute("focusable", "false");
-    svg.style.cssText = cssText;
-    let clonedIcon = icon.cloneNode(true);
-    svg.appendChild(clonedIcon);
-    const i4 = this.shadowRoot.querySelector("i");
-    i4.style.height = this.size;
-    i4.style.width = this.size;
-    i4.appendChild(svg);
-  }
-}
-customElements.define("lit-icon", LitIcon);
-
-// node_modules/lit-icon/pkg/dist-src/lit-iconset.js
-class LitIconset extends HTMLElement {
-  constructor() {
-    super();
-    document.iconMap = document.iconMap || {};
-    this._iconset = "iconset";
-    const shadow = this.attachShadow({
-      mode: "open"
-    });
-    shadow.innerHTML = `<style>:host{display:none;}</style><slot></slot>`;
-  }
-  static get observedAttributes() {
-    return ["iconset"];
-  }
-  get iconset() {
-    return this._iconset;
-  }
-  set iconset(value) {
-    this._iconset = value;
-    this.setAttribute("iconset", value);
-  }
-  connectedCallback() {
-    this.setIconset();
-  }
-  setIconset() {
-    const slot = this.shadowRoot.querySelector("slot");
-    slot.addEventListener("slotchange", () => {
-      const [svg2] = slot.assignedNodes().filter((node) => node.nodeType !== Node.TEXT_NODE);
-      const icons = svg2.querySelectorAll("g");
-      if (!icons.length)
-        return false;
-      document.iconMap[this._iconset] = icons;
-      const event = new CustomEvent("ionset-loaded");
-      return window.dispatchEvent(event);
-    });
-    const [svg] = slot.assignedNodes().filter((node) => node.nodeType !== Node.TEXT_NODE);
-    if (svg) {
-      const icons = svg.querySelectorAll("g");
-      if (!icons.length)
-        return false;
-      document.iconMap[this._iconset] = icons;
-      const event = new CustomEvent("ionset-loaded");
-      return window.dispatchEvent(event);
-    }
-  }
-  attributeChangedCallback(name, oldValue, newValue) {
-    switch (name) {
-      case "iconset":
-        this._iconset = newValue;
-        this.setIconset();
-        break;
-      default:
-        break;
-    }
-  }
-}
-customElements.define("lit-iconset", LitIconset);
-
-// public/clinicbro/js/schedule/monthview.ts
-class MonthView extends s3 {
-  static styles = monthviewStyle();
-  calendarTitle() {
-    return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
-  }
-  constructor() {
-    super();
-    this.appointments = [];
-    this.current_date = new Date;
-    var appt1 = {
-      name: "AUD EXAM",
-      start: new Date("2024-06-15T13:30:00"),
-      end: new Date("2024-06-15T14:30:00")
-    };
-    this.appointments = [appt1];
-  }
-  updated(changedProperties) {
-    if (changedProperties.has("current_date")) {
-    }
-  }
-  _prev(e5) {
-    this.current_date = dateAdd(this.current_date, "month", -1);
-    clearAllSelectedDays();
-  }
-  _next(e5) {
-    this.current_date = dateAdd(this.current_date, "month", 1);
-    clearAllSelectedDays();
-  }
-  renderCaption() {
-    return x`
-    <caption align="top">
-        <div class="month-header">
-            <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset"></lit-icon></button>
-            <h2 align="center" id="month_title">${this.calendarTitle()}</h2>
-            <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset"></lit-icon></button>
-            <lit-iconset iconset="iconset">
-              <svg><defs>
-                <g id="chevron_left"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></g>
-                <g id="chevron_right"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></g>
-              </defs></svg>
-            </lit-iconset>
-        </div>
-    </caption>`;
-  }
-  renderDay(today, id, date_of_day) {
-    let current_month = date_of_day.getMonth() == this.current_date.getMonth();
-    return x`<mv-day id="${id}" current_date="${date_of_day.toISOString()}" ?current_month=${current_month}>
-      ${this.appointments.filter((appt) => sameDay(appt.start, date_of_day)).map((appt) => x`<mv-appt name="${appt.name}" start="${appt.start.toISOString()}" end="${appt.end.toISOString()}"></mv-appt>`)}
-    </mv-day>`;
-  }
-  renderDays() {
-    var today = new Date;
-    let rows = [];
-    let firstOfDaMonth = new Date(this.current_date.getFullYear(), this.current_date.getMonth(), 1);
-    let d3 = firstOfDaMonth.getDay();
-    let i4 = 0;
-    for (let week = 0;week < 6; week++) {
-      var days = [];
-      for (let day = 0;day < 7; day++) {
-        let id = "d" + i4;
-        let thisDaysDate = dateAdd(firstOfDaMonth, "day", i4 - d3);
-        days.push(x`<td>${this.renderDay(today, id, thisDaysDate)}</td>`);
-        i4++;
+// public/clinicbro/js/schedule/monthview-day.ts
+class MonthViewDay extends s3 {
+  static styles = i`
+      :host {
+        --calendar-number-fg: light-dark(#787777, #22);
+        --calendar-this-month-bg: light-dark(#dae2f8, #442d2d);
+        --calendar-this-month-active-bg: light-dark(#fff, #000);
+        --calendar-month-bg: light-dark(#eeeeec, #323030);
+        --calendar-today-fg: light-dark(#155741, #adf5c5);
+        --table-fg: light-dark(#16181a, #a2b4b1);
       }
-      rows.push(x`<tr>${days}</tr>`);
+      div {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        white-space: nowrap;
+      }
+      
+      .num {
+        font-size: 10px;
+        color: var(--calendar-number-fg);
+        padding: 0px 6px;
+      }
+
+      .this-month {
+        background-color: var(--calendar-this-month-bg) !important;
+      }
+
+      .this-month-active {
+        background-color: var(--calendar-this-month-active-bg) !important;
+      }
+      
+      .today {
+        font-weight: bold;
+        border: 1px solid var(--calendar-today-fg);
+        border-radius: 50%;
+        padding: 0px 4px !important;
+        color: var(--calendar-today-fg) !important;
+      }
+    `;
+  constructor() {
+    super();
+    this.current_month = false;
+    this.selected = false;
+    this.addEventListener("click", this._clickHandler);
+  }
+  numClass() {
+    return sameDay(this.current_date, new Date) ? "today" : "";
+  }
+  clicked() {
+    this.selected = true;
+  }
+  _clickHandler(e5) {
+    clearAllSelectedDays();
+    e5.target.clicked();
+    switch (e5.target.localName) {
+      case "mv-day":
+      case "mv-appt":
+        e5.target.clicked();
+        break;
     }
-    return x`${rows}`;
   }
   render() {
-    return x`
-    <table class="month-table" align="center" cellspacing="0">
-      ${this.renderCaption()}
-      <thead>
-          <tr>
-              <th>Sun</th>
-              <th>Mon</th>
-              <th>Tue</th>
-              <th>Wed</th>
-              <th>Thu</th>
-              <th>Fri</th>
-              <th>Sat</th>
-          </tr>
-      </thead>
-      <tbody>
-        ${this.renderDays()} 
-      </tbody>
-    </table>
-    `;
+    let dayClass = this.selected ? "this-month-active" : this.current_month ? "this-month" : "";
+    let num = this.current_date.getDate();
+    return x`<div class="${dayClass}">
+        <span class="num ${this.numClass()}">${num}</span>
+        <slot></slot>
+      </div>`;
   }
 }
+__legacyDecorateClassTS([
+  n4({ type: String, reflect: true })
+], MonthViewDay.prototype, "id", undefined);
 __legacyDecorateClassTS([
   n4({ converter(value) {
     return new Date(value);
   }, reflect: true })
-], MonthView.prototype, "current_date", undefined);
+], MonthViewDay.prototype, "current_date", undefined);
 __legacyDecorateClassTS([
-  n4({ type: Array, attribute: false })
-], MonthView.prototype, "appointments", undefined);
-MonthView = __legacyDecorateClassTS([
-  t3("month-view")
-], MonthView);
+  n4({ type: Boolean })
+], MonthViewDay.prototype, "current_month", undefined);
+__legacyDecorateClassTS([
+  n4({ type: Boolean, reflect: true })
+], MonthViewDay.prototype, "selected", undefined);
+MonthViewDay = __legacyDecorateClassTS([
+  t3("mv-day")
+], MonthViewDay);
 export {
-  MonthView
+  MonthViewDay
 };

@@ -22,6 +22,12 @@ pub fn build(b: *std.Build) !void {
     exe.addLibraryPath(b.path("./"));
     exe.linkSystemLibrary("sqlite3");
 
+    const pg = b.dependency("pg", .{
+        .target = target,
+        .optimize = optimize,
+    });
+    exe.root_module.addImport("pg", pg.module("pg"));
+
     // ^ Add all dependencies before `jetzig.jetzigInit()` ^
 
     try jetzig.jetzigInit(b, exe, .{});

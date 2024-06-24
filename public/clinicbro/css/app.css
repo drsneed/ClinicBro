@@ -44,7 +44,7 @@
     --table-fg: light-dark(#16181a, #a2b4b1);
     --table-row-bg-alt: light-dark(#f3f3f3, #16181a);
     --table-row-hover: light-dark(#d8d5d5, #161616);
-    --mfmf: #55577a;
+    --mfmf: #37af4d;
 }
 
 * { 
@@ -161,7 +161,7 @@ input {
     padding: 6px 10px;
     margin: 6px 2px;
     box-sizing: border-box;
-    border-radius: 6px;
+    border-radius: 3px;
     font-size: 14px;
     background-color: var(--bg);
     color: var(--fg);
@@ -597,8 +597,7 @@ table {
 
 table td, table th {
     border-bottom: 1px solid var(--sep);
-    box-shadow: 0 1px 0 var(--sep-border);
-    padding: 8px;
+    box-shadow: 0 1;
 }
 
 table tr:nth-child(even) {

@@ -594,167 +594,6 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// public/clinicbro/js/util.ts
-function dateAdd(date, interval, units) {
-  var ret = new Date(date.valueOf());
-  var checkRollover = function() {
-    if (ret.getDate() != date.getDate())
-      ret.setDate(0);
-  };
-  switch (String(interval).toLowerCase()) {
-    case "year":
-      ret.setFullYear(ret.getFullYear() + units);
-      checkRollover();
-      break;
-    case "quarter":
-      ret.setMonth(ret.getMonth() + 3 * units);
-      checkRollover();
-      break;
-    case "month":
-      ret.setMonth(ret.getMonth() + units);
-      checkRollover();
-      break;
-    case "week":
-      ret.setDate(ret.getDate() + 7 * units);
-      break;
-    case "day":
-      ret.setDate(ret.getDate() + units);
-      break;
-    case "hour":
-      ret.setTime(ret.getTime() + units * 3600000);
-      break;
-    case "minute":
-      ret.setTime(ret.getTime() + units * 60000);
-      break;
-    case "second":
-      ret.setTime(ret.getTime() + units * 1000);
-      break;
-    default:
-      ret = undefined;
-      break;
-  }
-  return ret;
-}
-function sameDay(d1, d22) {
-  return d1.getFullYear() === d22.getFullYear() && d1.getMonth() === d22.getMonth() && d1.getDate() === d22.getDate();
-}
-function clearAllSelectedDays() {
-  var schedule = document.getElementById("schedule");
-  schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
-    day.removeAttribute("selected");
-  });
-  schedule.shadowRoot.querySelectorAll("mv-appt").forEach(function(appt) {
-    appt.removeAttribute("selected");
-  });
-}
-var months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-];
-
-// public/clinicbro/js/schedule/monthview-style.ts
-function monthviewStyle() {
-  return i`
-  :host {
-    --calendar-header-fg: light-dark(#eeeeec, #9EAF91);
-    --calendar-header-bg: light-dark(#37af4d, #2e2d2f);
-    --calendar-number-fg: light-dark(#787777, #22);
-    --calendar-this-month-bg: light-dark(#dae2f8, #442d2d);
-    --calendar-this-month-active-bg: light-dark(#fff, #000);
-    --calendar-month-bg: light-dark(#eeeeec, #323030);
-    --calendar-today-fg: light-dark(#155741, #adf5c5);
-    --table-fg: light-dark(#16181a, #a2b4b1);
-  }
-  
-  .month-table {
-    background: var(--container-bg);
-    table-layout: fixed;
-    //height: 550px;
-    border-collapse: collapse;
-    padding: 0px !important;
-    margin: 0px;
-    width: 100%;
-    color: var(--table-fg);
-  }
-  
-  
-  .month-table td, .month-table th {
-    border: 1px solid var(--sep);
-    box-shadow: none;
-    width: auto !important;
-    padding: 0px;
-  }
-  
-  .month-table th {
-    padding-top: 6px;
-    padding-bottom: 6px;
-    text-align: center;
-    background-color: var(--table-header-bg);
-    color: var(--table-header-fg);
-    border-bottom: 1px solid var(--table-header-fg);
-    font-weight: 900;
-    height: 30px;
-  }
-  
-  .month-table .btn-left, .month-table .btn-right {
-    display: inline-block;
-    margin: 5px;
-  }
-  
-  .month-table .btn-right {
-    float: right;
-  }
-  
-  .month-header {
-    display: flex;
-    background-color: var(--header-bg);
-    text-align: center;
-    
-  }
-  
-  .month-header h2 {
-    width: 100%;
-    color: var(--calendar-header-fg);
-    padding: 0;
-    margin: 8px auto;
-    font-size: 16px;
-  }
-  
-  .month-table td {
-    background-color: var(--calendar-month-bg);
-    vertical-align: top;
-    height: 80px;
-    overflow: hidden;
-  }
-
-  .month-table tr {
-    white-space: nowrap;
-  }
-
-  .month-table .btn-left, .month-table .btn-right {
-    display: inline-block;
-    margin: 5px;
-  }
-  .btn-left, .btn-right {
-    padding-top: 1px;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-bottom: 1px;
-    transition: none;
-    height: 32px;
-  }`;
-}
-
 // node_modules/@lit/reactive-element/decorators/custom-element.js
 var t3 = (t4) => (e4, o4) => {
   o4 !== undefined ? o4.addInitializer(() => {
@@ -790,293 +629,62 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
-// node_modules/lit-icon/pkg/dist-src/lit-icon.js
-class LitIcon extends HTMLElement {
+// public/clinicbro/js/schedule/monthview-appt.ts
+class MonthViewAppointment extends s3 {
+  static styles = i`
+    :host {
+    --border-left: light-dark(#FF000055, #CCC);
+    --bg: light-dark(#CCC, #222);
+    --fg: light-dark(#444, #CCC);
+    --selected-border: light-dark(#232323, #f5f2f2);
+  }
+    div {
+      border-left: 4px solid var(--border-left);
+      font-size: 12px;
+      background-color: var(--bg);
+      color: var(--fg);
+      padding: 0px 2px;
+      margin: 2px 0px;
+    }
+    .selected {
+      border: 1px solid var(--selected-border);
+    }`;
   constructor() {
     super();
-    this._icon = "";
-    const shadow = this.attachShadow({
-      mode: "open"
-    });
-    shadow.innerHTML = `
-      <style>
-        :host {
-          display: inline-block;
-          width: 24px;
-          height: 24px;
-          margin: 0 5px;
-          box-sizing: content-box;
-          vertical-align: sub;
-        }
-        .iron-icon {
-          display: -webkit-inline-flex;
-          display: inline-flex;
-          -ms-flex-align: center;
-          -webkit-align-items: center;
-          align-items: center;
-          -ms-flex-pack: center;
-          -webkit-justify-content: center;
-          justify-content: center;
-          position: relative;
-          fill: currentcolor;
-          stroke: none;
-          width: 100%;
-          height: 100%;
-        }
-        i {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          font-style: normal;
-          height: 100%;
-          width: 100%;
-          min-width: 100%;
-        }
-      </style>
-      <i></i>
-    `;
-    this.size = "24";
-    this._icon = "";
-    this._iconset = "iconset";
-    document.iconMap = document.iconMap || {};
-    window.addEventListener("ionset-loaded", this.updateIconset.bind(this));
+    this.selected = false;
   }
-  static get observedAttributes() {
-    return ["size", "icon", "iconset"];
-  }
-  get icon() {
-    return this._icon;
-  }
-  set icon(value) {
-    this._icon = value;
-    this.setAttribute("icon", value);
-  }
-  get iconset() {
-    return this._iconset;
-  }
-  set iconset(value) {
-    this._iconset = value;
-    this.setAttribute("iconset", value);
-  }
-  attributeChangedCallback(name, oldValue, newValue) {
-    switch (name) {
-      case "size":
-        this.size = newValue;
-        this.shadowRoot.querySelector("i").style.height = this.size;
-        this.shadowRoot.querySelector("i").style.width = this.size;
-        break;
-      case "icon":
-        this._icon = newValue;
-        this.findIcon();
-        break;
-      case "iconset":
-        this._iconset = newValue;
-        break;
-      default:
-        break;
-    }
-  }
-  updateIconset() {
-    const iconset = document.iconMap[this._iconset];
-    if (!iconset)
-      return;
-    this.findIcon();
-    this.shadowRoot.querySelector("i").style.height = this.size;
-    this.shadowRoot.querySelector("i").style.width = this.size;
-  }
-  findIcon() {
-    const iconset = document.iconMap[this._iconset];
-    if (!iconset)
-      return;
-    const _tpl = document.createElement("template");
-    iconset.forEach((icon2) => _tpl.appendChild(icon2));
-    let icon = _tpl.querySelector(`#${this._icon}`);
-    if (!icon)
-      return console.error(`[lit-icon] Icon '${this._icon}' no found in iconset`);
-    this.shadowRoot.querySelector("i").innerHTML = "";
-    this._cloneIcon(icon);
-  }
-  _cloneIcon(icon) {
-    let content = icon.cloneNode(true);
-    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.classList.add("iron-icon");
-    icon.classList.add("iron-icon");
-    let viewBox = content.getAttribute("viewBox") || `0 0 ${this.size} ${this.size}`;
-    let cssText = "pointer-events: none; display: block; width: 100%; height: 100%;";
-    svg.setAttribute("viewBox", viewBox);
-    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-    svg.setAttribute("focusable", "false");
-    svg.style.cssText = cssText;
-    let clonedIcon = icon.cloneNode(true);
-    svg.appendChild(clonedIcon);
-    const i4 = this.shadowRoot.querySelector("i");
-    i4.style.height = this.size;
-    i4.style.width = this.size;
-    i4.appendChild(svg);
-  }
-}
-customElements.define("lit-icon", LitIcon);
-
-// node_modules/lit-icon/pkg/dist-src/lit-iconset.js
-class LitIconset extends HTMLElement {
-  constructor() {
-    super();
-    document.iconMap = document.iconMap || {};
-    this._iconset = "iconset";
-    const shadow = this.attachShadow({
-      mode: "open"
-    });
-    shadow.innerHTML = `<style>:host{display:none;}</style><slot></slot>`;
-  }
-  static get observedAttributes() {
-    return ["iconset"];
-  }
-  get iconset() {
-    return this._iconset;
-  }
-  set iconset(value) {
-    this._iconset = value;
-    this.setAttribute("iconset", value);
-  }
-  connectedCallback() {
-    this.setIconset();
-  }
-  setIconset() {
-    const slot = this.shadowRoot.querySelector("slot");
-    slot.addEventListener("slotchange", () => {
-      const [svg2] = slot.assignedNodes().filter((node) => node.nodeType !== Node.TEXT_NODE);
-      const icons = svg2.querySelectorAll("g");
-      if (!icons.length)
-        return false;
-      document.iconMap[this._iconset] = icons;
-      const event = new CustomEvent("ionset-loaded");
-      return window.dispatchEvent(event);
-    });
-    const [svg] = slot.assignedNodes().filter((node) => node.nodeType !== Node.TEXT_NODE);
-    if (svg) {
-      const icons = svg.querySelectorAll("g");
-      if (!icons.length)
-        return false;
-      document.iconMap[this._iconset] = icons;
-      const event = new CustomEvent("ionset-loaded");
-      return window.dispatchEvent(event);
-    }
-  }
-  attributeChangedCallback(name, oldValue, newValue) {
-    switch (name) {
-      case "iconset":
-        this._iconset = newValue;
-        this.setIconset();
-        break;
-      default:
-        break;
-    }
-  }
-}
-customElements.define("lit-iconset", LitIconset);
-
-// public/clinicbro/js/schedule/monthview.ts
-class MonthView extends s3 {
-  static styles = monthviewStyle();
-  calendarTitle() {
-    return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
-  }
-  constructor() {
-    super();
-    this.appointments = [];
-    this.current_date = new Date;
-    var appt1 = {
-      name: "AUD EXAM",
-      start: new Date("2024-06-15T13:30:00"),
-      end: new Date("2024-06-15T14:30:00")
-    };
-    this.appointments = [appt1];
-  }
-  updated(changedProperties) {
-    if (changedProperties.has("current_date")) {
-    }
-  }
-  _prev(e5) {
-    this.current_date = dateAdd(this.current_date, "month", -1);
-    clearAllSelectedDays();
-  }
-  _next(e5) {
-    this.current_date = dateAdd(this.current_date, "month", 1);
-    clearAllSelectedDays();
-  }
-  renderCaption() {
-    return x`
-    <caption align="top">
-        <div class="month-header">
-            <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset"></lit-icon></button>
-            <h2 align="center" id="month_title">${this.calendarTitle()}</h2>
-            <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset"></lit-icon></button>
-            <lit-iconset iconset="iconset">
-              <svg><defs>
-                <g id="chevron_left"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></g>
-                <g id="chevron_right"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></g>
-              </defs></svg>
-            </lit-iconset>
-        </div>
-    </caption>`;
-  }
-  renderDay(today, id, date_of_day) {
-    let current_month = date_of_day.getMonth() == this.current_date.getMonth();
-    return x`<mv-day id="${id}" current_date="${date_of_day.toISOString()}" ?current_month=${current_month}>
-      ${this.appointments.filter((appt) => sameDay(appt.start, date_of_day)).map((appt) => x`<mv-appt name="${appt.name}" start="${appt.start.toISOString()}" end="${appt.end.toISOString()}"></mv-appt>`)}
-    </mv-day>`;
-  }
-  renderDays() {
-    var today = new Date;
-    let rows = [];
-    let firstOfDaMonth = new Date(this.current_date.getFullYear(), this.current_date.getMonth(), 1);
-    let d3 = firstOfDaMonth.getDay();
-    let i4 = 0;
-    for (let week = 0;week < 6; week++) {
-      var days = [];
-      for (let day = 0;day < 7; day++) {
-        let id = "d" + i4;
-        let thisDaysDate = dateAdd(firstOfDaMonth, "day", i4 - d3);
-        days.push(x`<td>${this.renderDay(today, id, thisDaysDate)}</td>`);
-        i4++;
-      }
-      rows.push(x`<tr>${days}</tr>`);
-    }
-    return x`${rows}`;
+  clicked() {
+    this.selected = true;
   }
   render() {
-    return x`
-    <table class="month-table" align="center" cellspacing="0">
-      ${this.renderCaption()}
-      <thead>
-          <tr>
-              <th>Sun</th>
-              <th>Mon</th>
-              <th>Tue</th>
-              <th>Wed</th>
-              <th>Thu</th>
-              <th>Fri</th>
-              <th>Sat</th>
-          </tr>
-      </thead>
-      <tbody>
-        ${this.renderDays()} 
-      </tbody>
-    </table>
-    `;
+    let startHours = this.start.getHours() % 12 || 12;
+    let startMinutes = ("0" + this.start.getMinutes()).slice(-2);
+    let endHours = this.end.getHours() % 12 || 12;
+    let endMinutes = ("0" + this.end.getMinutes()).slice(-2);
+    let pm = this.end.getHours() >= 12 ? "pm" : "am";
+    let selectedClass = this.selected ? "selected" : "";
+    return x`<div class="${selectedClass}"><span>${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${this.name}</span></div>`;
   }
 }
 __legacyDecorateClassTS([
-  n4({ converter(value) {
-    return new Date(value);
-  }, reflect: true })
-], MonthView.prototype, "current_date", undefined);
+  n4({ type: String })
+], MonthViewAppointment.prototype, "name", undefined);
 __legacyDecorateClassTS([
-  n4({ type: Array, attribute: false })
-], MonthView.prototype, "appointments", undefined);
-MonthView = __legacyDecorateClassTS([
-  t3("month-view")
-], MonthView);
+  n4({ reflect: true, converter(value) {
+    return new Date(value);
+  } })
+], MonthViewAppointment.prototype, "start", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, converter(value) {
+    return new Date(value);
+  } })
+], MonthViewAppointment.prototype, "end", undefined);
+__legacyDecorateClassTS([
+  n4({ type: Boolean, reflect: true })
+], MonthViewAppointment.prototype, "selected", undefined);
+MonthViewAppointment = __legacyDecorateClassTS([
+  t3("mv-appt")
+], MonthViewAppointment);
 export {
-  MonthView
+  MonthViewAppointment
 };
