@@ -19,6 +19,10 @@ export class MonthView extends LitElement {
   @property({type: Array, attribute: false})
   appointments = [];
 
+  // @ts-ignore
+  @property({type: Boolean})
+  dialog_visible: boolean;
+
   calendarTitle() {
     return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
   }
@@ -26,6 +30,7 @@ export class MonthView extends LitElement {
   constructor() {
     super();
     this.current_date = new Date();
+    this.dialog_visible = false;
     var appt1 = {
       name: "AUD EXAM",
       start: new Date("2024-06-15T13:30:00"),
@@ -98,6 +103,14 @@ export class MonthView extends LitElement {
     }
     return html`${rows}`;
   }
+
+  toggleDialog (e) {
+    this.dialog_visible = !this.dialog_visible;
+  }
+
+  closeDialog (e) {
+    this.dialog_visible = false;
+  }
   
   render() {
     return html`
@@ -118,6 +131,10 @@ export class MonthView extends LitElement {
         ${this.renderDays()} 
       </tbody>
     </table>
+    <button @click="${this.toggleDialog.bind(this)}">Toggle dialog</button>
+    <mv-dialog ?opened="${this.dialog_visible}" 
+               @dialog.accept="${this.closeDialog.bind(this)}"
+               @dialog.cancel="${this.closeDialog.bind(this)}"></mv-dialog>
     `;
   }
 }

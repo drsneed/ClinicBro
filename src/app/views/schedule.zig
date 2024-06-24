@@ -12,6 +12,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         \\ <script type="module" src="/clinicbro/js/schedule/monthview.js"></script>
         \\ <script type="module" src="/clinicbro/js/schedule/monthview-day.js"></script>
         \\ <script type="module" src="/clinicbro/js/schedule/monthview-appt.js"></script>
+        \\ <script type="module" src="/clinicbro/js/schedule/monthview-dialog.js"></script>
         \\ <script src="/clinicbro/js/schedule.js"></script>
     ));
     try root.put("main_schedule", data.string("class=\"current\""));

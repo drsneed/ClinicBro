@@ -594,167 +594,6 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// public/clinicbro/js/util.ts
-function dateAdd(date, interval, units) {
-  var ret = new Date(date.valueOf());
-  var checkRollover = function() {
-    if (ret.getDate() != date.getDate())
-      ret.setDate(0);
-  };
-  switch (String(interval).toLowerCase()) {
-    case "year":
-      ret.setFullYear(ret.getFullYear() + units);
-      checkRollover();
-      break;
-    case "quarter":
-      ret.setMonth(ret.getMonth() + 3 * units);
-      checkRollover();
-      break;
-    case "month":
-      ret.setMonth(ret.getMonth() + units);
-      checkRollover();
-      break;
-    case "week":
-      ret.setDate(ret.getDate() + 7 * units);
-      break;
-    case "day":
-      ret.setDate(ret.getDate() + units);
-      break;
-    case "hour":
-      ret.setTime(ret.getTime() + units * 3600000);
-      break;
-    case "minute":
-      ret.setTime(ret.getTime() + units * 60000);
-      break;
-    case "second":
-      ret.setTime(ret.getTime() + units * 1000);
-      break;
-    default:
-      ret = undefined;
-      break;
-  }
-  return ret;
-}
-function sameDay(d1, d22) {
-  return d1.getFullYear() === d22.getFullYear() && d1.getMonth() === d22.getMonth() && d1.getDate() === d22.getDate();
-}
-function clearAllSelectedDays() {
-  var schedule = document.getElementById("schedule");
-  schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
-    day.removeAttribute("selected");
-  });
-  schedule.shadowRoot.querySelectorAll("mv-appt").forEach(function(appt) {
-    appt.removeAttribute("selected");
-  });
-}
-var months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-];
-
-// public/clinicbro/js/schedule/monthview-style.ts
-function monthviewStyle() {
-  return i`
-  :host {
-    --calendar-header-fg: light-dark(#eeeeec, #9EAF91);
-    --calendar-header-bg: light-dark(#37af4d, #2e2d2f);
-    --calendar-number-fg: light-dark(#787777, #22);
-    --calendar-this-month-bg: light-dark(#dae2f8, #442d2d);
-    --calendar-this-month-active-bg: light-dark(#fff, #000);
-    --calendar-month-bg: light-dark(#eeeeec, #323030);
-    --calendar-today-fg: light-dark(#155741, #adf5c5);
-    --table-fg: light-dark(#16181a, #a2b4b1);
-  }
-  
-  .month-table {
-    background: var(--container-bg);
-    table-layout: fixed;
-    //height: 550px;
-    border-collapse: collapse;
-    padding: 0px !important;
-    margin: 0px;
-    width: 100%;
-    color: var(--table-fg);
-  }
-  
-  
-  .month-table td, .month-table th {
-    border: 1px solid var(--sep);
-    box-shadow: none;
-    width: auto !important;
-    padding: 0px;
-  }
-  
-  .month-table th {
-    padding-top: 6px;
-    padding-bottom: 6px;
-    text-align: center;
-    background-color: var(--table-header-bg);
-    color: var(--table-header-fg);
-    border-bottom: 1px solid var(--table-header-fg);
-    font-weight: 900;
-    height: 30px;
-  }
-  
-  .month-table .btn-left, .month-table .btn-right {
-    display: inline-block;
-    margin: 5px;
-  }
-  
-  .month-table .btn-right {
-    float: right;
-  }
-  
-  .month-header {
-    display: flex;
-    background-color: var(--header-bg);
-    text-align: center;
-    
-  }
-  
-  .month-header h2 {
-    width: 100%;
-    color: var(--calendar-header-fg);
-    padding: 0;
-    margin: 8px auto;
-    font-size: 16px;
-  }
-  
-  .month-table td {
-    background-color: var(--calendar-month-bg);
-    vertical-align: top;
-    height: 80px;
-    overflow: hidden;
-  }
-
-  .month-table tr {
-    white-space: nowrap;
-  }
-
-  .month-table .btn-left, .month-table .btn-right {
-    display: inline-block;
-    margin: 5px;
-  }
-  .btn-left, .btn-right {
-    padding-top: 1px;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-bottom: 1px;
-    transition: none;
-    height: 32px;
-  }`;
-}
-
 // node_modules/@lit/reactive-element/decorators/custom-element.js
 var t3 = (t4) => (e4, o4) => {
   o4 !== undefined ? o4.addInitializer(() => {
@@ -790,307 +629,102 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
-// node_modules/lit-icon/pkg/dist-src/lit-icon.js
-class LitIcon extends HTMLElement {
-  constructor() {
-    super();
-    this._icon = "";
-    const shadow = this.attachShadow({
-      mode: "open"
-    });
-    shadow.innerHTML = `
-      <style>
-        :host {
-          display: inline-block;
-          width: 24px;
-          height: 24px;
-          margin: 0 5px;
-          box-sizing: content-box;
-          vertical-align: sub;
-        }
-        .iron-icon {
-          display: -webkit-inline-flex;
-          display: inline-flex;
-          -ms-flex-align: center;
-          -webkit-align-items: center;
-          align-items: center;
-          -ms-flex-pack: center;
-          -webkit-justify-content: center;
-          justify-content: center;
-          position: relative;
-          fill: currentcolor;
-          stroke: none;
-          width: 100%;
-          height: 100%;
-        }
-        i {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          font-style: normal;
-          height: 100%;
-          width: 100%;
-          min-width: 100%;
-        }
-      </style>
-      <i></i>
-    `;
-    this.size = "24";
-    this._icon = "";
-    this._iconset = "iconset";
-    document.iconMap = document.iconMap || {};
-    window.addEventListener("ionset-loaded", this.updateIconset.bind(this));
+// node_modules/lit-html/directive.js
+var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
+var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
+
+class i4 {
+  constructor(t5) {
   }
-  static get observedAttributes() {
-    return ["size", "icon", "iconset"];
+  get _$AU() {
+    return this._$AM._$AU;
   }
-  get icon() {
-    return this._icon;
+  _$AT(t5, e6, i5) {
+    this._$Ct = t5, this._$AM = e6, this._$Ci = i5;
   }
-  set icon(value) {
-    this._icon = value;
-    this.setAttribute("icon", value);
+  _$AS(t5, e6) {
+    return this.update(t5, e6);
   }
-  get iconset() {
-    return this._iconset;
-  }
-  set iconset(value) {
-    this._iconset = value;
-    this.setAttribute("iconset", value);
-  }
-  attributeChangedCallback(name, oldValue, newValue) {
-    switch (name) {
-      case "size":
-        this.size = newValue;
-        this.shadowRoot.querySelector("i").style.height = this.size;
-        this.shadowRoot.querySelector("i").style.width = this.size;
-        break;
-      case "icon":
-        this._icon = newValue;
-        this.findIcon();
-        break;
-      case "iconset":
-        this._iconset = newValue;
-        break;
-      default:
-        break;
-    }
-  }
-  updateIconset() {
-    const iconset = document.iconMap[this._iconset];
-    if (!iconset)
-      return;
-    this.findIcon();
-    this.shadowRoot.querySelector("i").style.height = this.size;
-    this.shadowRoot.querySelector("i").style.width = this.size;
-  }
-  findIcon() {
-    const iconset = document.iconMap[this._iconset];
-    if (!iconset)
-      return;
-    const _tpl = document.createElement("template");
-    iconset.forEach((icon2) => _tpl.appendChild(icon2));
-    let icon = _tpl.querySelector(`#${this._icon}`);
-    if (!icon)
-      return console.error(`[lit-icon] Icon '${this._icon}' no found in iconset`);
-    this.shadowRoot.querySelector("i").innerHTML = "";
-    this._cloneIcon(icon);
-  }
-  _cloneIcon(icon) {
-    let content = icon.cloneNode(true);
-    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.classList.add("iron-icon");
-    icon.classList.add("iron-icon");
-    let viewBox = content.getAttribute("viewBox") || `0 0 ${this.size} ${this.size}`;
-    let cssText = "pointer-events: none; display: block; width: 100%; height: 100%;";
-    svg.setAttribute("viewBox", viewBox);
-    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-    svg.setAttribute("focusable", "false");
-    svg.style.cssText = cssText;
-    let clonedIcon = icon.cloneNode(true);
-    svg.appendChild(clonedIcon);
-    const i4 = this.shadowRoot.querySelector("i");
-    i4.style.height = this.size;
-    i4.style.width = this.size;
-    i4.appendChild(svg);
+  update(t5, e6) {
+    return this.render(...e6);
   }
 }
-customElements.define("lit-icon", LitIcon);
 
-// node_modules/lit-icon/pkg/dist-src/lit-iconset.js
-class LitIconset extends HTMLElement {
+// node_modules/lit-html/directives/class-map.js
+var e6 = e5(class extends i4 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
+      throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
+  }
+  render(t5) {
+    return " " + Object.keys(t5).filter((s4) => t5[s4]).join(" ") + " ";
+  }
+  update(s4, [i5]) {
+    if (this.st === undefined) {
+      this.st = new Set, s4.strings !== undefined && (this.nt = new Set(s4.strings.join(" ").split(/\s/).filter((t5) => t5 !== "")));
+      for (const t5 in i5)
+        i5[t5] && !this.nt?.has(t5) && this.st.add(t5);
+      return this.render(i5);
+    }
+    const r6 = s4.element.classList;
+    for (const t5 of this.st)
+      t5 in i5 || (r6.remove(t5), this.st.delete(t5));
+    for (const t5 in i5) {
+      const s5 = !!i5[t5];
+      s5 === this.st.has(t5) || this.nt?.has(t5) || (s5 ? (r6.add(t5), this.st.add(t5)) : (r6.remove(t5), this.st.delete(t5)));
+    }
+    return w;
+  }
+});
+// public/clinicbro/js/schedule/monthview-dialog.ts
+class MonthViewDialog extends s3 {
   constructor() {
     super();
-    document.iconMap = document.iconMap || {};
-    this._iconset = "iconset";
-    const shadow = this.attachShadow({
-      mode: "open"
-    });
-    shadow.innerHTML = `<style>:host{display:none;}</style><slot></slot>`;
+    this.opened = false;
   }
-  static get observedAttributes() {
-    return ["iconset"];
-  }
-  get iconset() {
-    return this._iconset;
-  }
-  set iconset(value) {
-    this._iconset = value;
-    this.setAttribute("iconset", value);
-  }
-  connectedCallback() {
-    this.setIconset();
-  }
-  setIconset() {
-    const slot = this.shadowRoot.querySelector("slot");
-    slot.addEventListener("slotchange", () => {
-      const [svg2] = slot.assignedNodes().filter((node) => node.nodeType !== Node.TEXT_NODE);
-      const icons = svg2.querySelectorAll("g");
-      if (!icons.length)
-        return false;
-      document.iconMap[this._iconset] = icons;
-      const event = new CustomEvent("ionset-loaded");
-      return window.dispatchEvent(event);
-    });
-    const [svg] = slot.assignedNodes().filter((node) => node.nodeType !== Node.TEXT_NODE);
-    if (svg) {
-      const icons = svg.querySelectorAll("g");
-      if (!icons.length)
-        return false;
-      document.iconMap[this._iconset] = icons;
-      const event = new CustomEvent("ionset-loaded");
-      return window.dispatchEvent(event);
-    }
-  }
-  attributeChangedCallback(name, oldValue, newValue) {
-    switch (name) {
-      case "iconset":
-        this._iconset = newValue;
-        this.setIconset();
-        break;
-      default:
-        break;
-    }
-  }
-}
-customElements.define("lit-iconset", LitIconset);
-
-// public/clinicbro/js/schedule/monthview.ts
-class MonthView extends s3 {
-  static styles = monthviewStyle();
-  calendarTitle() {
-    return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
-  }
-  constructor() {
-    super();
-    this.appointments = [];
-    this.current_date = new Date;
-    this.dialog_visible = false;
-    var appt1 = {
-      name: "AUD EXAM",
-      start: new Date("2024-06-15T13:30:00"),
-      end: new Date("2024-06-15T14:30:00")
-    };
-    this.appointments = [appt1];
-  }
-  updated(changedProperties) {
-    if (changedProperties.has("current_date")) {
-    }
-  }
-  _prev(e5) {
-    this.current_date = dateAdd(this.current_date, "month", -1);
-    clearAllSelectedDays();
-  }
-  _next(e5) {
-    this.current_date = dateAdd(this.current_date, "month", 1);
-    clearAllSelectedDays();
-  }
-  renderCaption() {
-    return x`
-    <caption align="top">
-        <div class="month-header">
-            <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset"></lit-icon></button>
-            <h2 align="center" id="month_title">${this.calendarTitle()}</h2>
-            <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset"></lit-icon></button>
-            <lit-iconset iconset="iconset">
-              <svg><defs>
-                <g id="chevron_left"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></g>
-                <g id="chevron_right"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></g>
-              </defs></svg>
-            </lit-iconset>
-        </div>
-    </caption>`;
-  }
-  renderDay(today, id, date_of_day) {
-    let current_month = date_of_day.getMonth() == this.current_date.getMonth();
-    return x`<mv-day id="${id}" current_date="${date_of_day.toISOString()}" ?current_month=${current_month}>
-      ${this.appointments.filter((appt) => sameDay(appt.start, date_of_day)).map((appt) => x`<mv-appt name="${appt.name}" start="${appt.start.toISOString()}" end="${appt.end.toISOString()}"></mv-appt>`)}
-    </mv-day>`;
-  }
-  renderDays() {
-    var today = new Date;
-    let rows = [];
-    let firstOfDaMonth = new Date(this.current_date.getFullYear(), this.current_date.getMonth(), 1);
-    let d3 = firstOfDaMonth.getDay();
-    let i4 = 0;
-    for (let week = 0;week < 6; week++) {
-      var days = [];
-      for (let day = 0;day < 7; day++) {
-        let id = "d" + i4;
-        let thisDaysDate = dateAdd(firstOfDaMonth, "day", i4 - d3);
-        days.push(x`<td>${this.renderDay(today, id, thisDaysDate)}</td>`);
-        i4++;
-      }
-      rows.push(x`<tr>${days}</tr>`);
-    }
-    return x`${rows}`;
-  }
-  toggleDialog(e5) {
-    this.dialog_visible = !this.dialog_visible;
-  }
-  closeDialog(e5) {
-    this.dialog_visible = false;
-  }
+  static styles = i`
+        .opened {
+            display: flex;
+        }
+        .closed {
+            display: none;
+        }
+        .dialog {
+            flex-direction: column;
+            border: 2px outset black;
+            padding: 1em;
+            margin: 1em;
+        }
+        .buttons {
+            display: flex;
+            flex-direction: row;
+        }
+        .accept {
+            justify-content: space-around;
+            align-content: space-around;
+        }
+        .cancel {
+            justify-content: space-around;
+            align-content: space-around;
+        }`;
   render() {
     return x`
-    <table class="month-table" align="center" cellspacing="0">
-      ${this.renderCaption()}
-      <thead>
-          <tr>
-              <th>Sun</th>
-              <th>Mon</th>
-              <th>Tue</th>
-              <th>Wed</th>
-              <th>Thu</th>
-              <th>Fri</th>
-              <th>Sat</th>
-          </tr>
-      </thead>
-      <tbody>
-        ${this.renderDays()} 
-      </tbody>
-    </table>
-    <button @click="${this.toggleDialog.bind(this)}">Toggle dialog</button>
-    <mv-dialog ?opened="${this.dialog_visible}" 
-               @dialog.accept="${this.closeDialog.bind(this)}"
-               @dialog.cancel="${this.closeDialog.bind(this)}"></mv-dialog>
-    `;
+        <div class="${e6({ dialog: true, opened: this.opened, closed: !this.opened })}">
+            <h1 class="title ">Title</h1>
+            <p class="content">This is a dialog</p>
+            <div class="buttons">
+            <button class="accept" @click="${() => this.dispatchEvent(new CustomEvent("dialog.accept"))}">Ok</button>
+            <button class="cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>    
+            </div>
+        </div>`;
   }
 }
 __legacyDecorateClassTS([
-  n4({ converter(value) {
-    return new Date(value);
-  }, reflect: true })
-], MonthView.prototype, "current_date", undefined);
-__legacyDecorateClassTS([
-  n4({ type: Array, attribute: false })
-], MonthView.prototype, "appointments", undefined);
-__legacyDecorateClassTS([
   n4({ type: Boolean })
-], MonthView.prototype, "dialog_visible", undefined);
-MonthView = __legacyDecorateClassTS([
-  t3("month-view")
-], MonthView);
+], MonthViewDialog.prototype, "opened", undefined);
+MonthViewDialog = __legacyDecorateClassTS([
+  t3("mv-dialog")
+], MonthViewDialog);
 export {
-  MonthView
+  MonthViewDialog
 };

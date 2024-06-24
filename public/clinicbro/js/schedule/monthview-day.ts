@@ -51,15 +51,16 @@ export class MonthViewDay extends LitElement {
     current_date: Date;
     // @ts-ignore
     @property({type: Boolean})
-    current_month: Boolean;
+    current_month: boolean;
     // @ts-ignore
     @property({type: Boolean, reflect: true})
-    selected: Boolean;
+    selected: boolean;
 
     constructor() {
       super();
       this.current_month = false;
       this.selected = false;
+      this.dialog_visible = false;
       this.addEventListener('click', this._clickHandler);
       this.addEventListener('dblclick', this._doubleClickHandler);
     }
