@@ -645,6 +645,7 @@ class MonthViewAppointment extends s3 {
       color: var(--fg);
       padding: 0px 2px;
       margin: 2px 0px;
+      user-select: none;
     }
     .selected {
       border: 1px solid var(--selected-border);
@@ -655,6 +656,9 @@ class MonthViewAppointment extends s3 {
   }
   clicked() {
     this.selected = true;
+  }
+  doubleClicked() {
+    console.log(this.name + " double clicked!");
   }
   render() {
     let startHours = this.start.getHours() % 12 || 12;

@@ -61,6 +61,7 @@ export class MonthViewDay extends LitElement {
       this.current_month = false;
       this.selected = false;
       this.addEventListener('click', this._clickHandler);
+      this.addEventListener('dblclick', this._doubleClickHandler);
     }
 
     numClass() {
@@ -71,13 +72,25 @@ export class MonthViewDay extends LitElement {
       this.selected = true;
     }
 
+    public doubleClicked() {
+      console.log(this.id + " double clicked!");
+    }
+
     private _clickHandler(e) {
       clearAllSelectedDays();
-      e.target.clicked();
       switch(e.target.localName) {
         case 'mv-day':
         case 'mv-appt':
           e.target.clicked();
+          break;
+      }
+    }
+
+    private _doubleClickHandler(e) {
+      switch(e.target.localName) {
+        case 'mv-day':
+        case 'mv-appt':
+          e.target.doubleClicked();
           break;
       }
     }

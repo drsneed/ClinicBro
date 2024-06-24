@@ -687,6 +687,7 @@ class MonthViewDay extends s3 {
     this.current_month = false;
     this.selected = false;
     this.addEventListener("click", this._clickHandler);
+    this.addEventListener("dblclick", this._doubleClickHandler);
   }
   numClass() {
     return sameDay(this.current_date, new Date) ? "today" : "";
@@ -694,13 +695,23 @@ class MonthViewDay extends s3 {
   clicked() {
     this.selected = true;
   }
+  doubleClicked() {
+    console.log(this.id + " double clicked!");
+  }
   _clickHandler(e5) {
     clearAllSelectedDays();
-    e5.target.clicked();
     switch (e5.target.localName) {
       case "mv-day":
       case "mv-appt":
         e5.target.clicked();
+        break;
+    }
+  }
+  _doubleClickHandler(e5) {
+    switch (e5.target.localName) {
+      case "mv-day":
+      case "mv-appt":
+        e5.target.doubleClicked();
         break;
     }
   }

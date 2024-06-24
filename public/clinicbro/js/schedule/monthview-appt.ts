@@ -17,6 +17,7 @@ export class MonthViewAppointment extends LitElement {
       color: var(--fg);
       padding: 0px 2px;
       margin: 2px 0px;
+      user-select: none;
     }
     .selected {
       border: 1px solid var(--selected-border);
@@ -42,6 +43,10 @@ export class MonthViewAppointment extends LitElement {
 
   public clicked() {
     this.selected = true;
+  }
+
+  public doubleClicked() {
+    console.log(this.name + " double clicked!");
   }
 
   render() {
