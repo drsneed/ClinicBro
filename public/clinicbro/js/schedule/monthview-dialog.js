@@ -998,20 +998,16 @@ class MonthViewDialog extends s3 {
 
     .dialog {
         flex-direction: column;
-        //border: 2px outset black;
         padding: 0;
         margin: 1em;
         border: 2px outset var(--container-border);
         border-radius: 3px;
         background-color: var(--container-bg);
-        position: absolute;
-        //margin-top: -200px; /* half of you height */
         width: 512px;
-        height: 256px;
-        //margin-left: -256px; /* half of you width */
     }
     .content {
-        margin: 50px 8px 10px 8px;
+        margin: 40px 8px 10px 8px;
+        text-align: center;
     }
     .title {
         margin-top: 4px;
@@ -1037,12 +1033,9 @@ class MonthViewDialog extends s3 {
     }
 
     .buttons {
-        display: flex;
-        flex-direction: row;
-        margin: 8px;
-        position: absolute;
-        left: calc(50% - 80px);
-        bottom: 2px;
+        display: table;
+        margin: 4px auto;
+        text-align: center;
     }
 
     .btn {
@@ -1074,6 +1067,53 @@ class MonthViewDialog extends s3 {
         color: var(--btn-cancel-bg);
     }
     
+    .text-field {
+        position: relative;
+        margin: 5px 2.5px 5px 2.5px;
+    }
+
+    .text-field input + label {
+        position: absolute;
+        pointer-events: none;
+        left: 10px;
+        top: 12px;
+        transition: 0.2s;
+    }
+
+    .text-field input:focus, .text-field input:valid {
+        background-color: var(--container-bg);
+    }
+
+    .text-field input:focus + label, .text-field input:valid + label {
+        top: -6px;
+        left: 15px;
+        font-size: small;
+        padding: 0 5px 0 5px;
+        background-color: var(--container-bg);
+    }
+
+        
+    input {
+        width: 100%;
+        border: 1px solid var(--input-border);
+        padding: 6px 10px;
+        margin: 6px 2px;
+        box-sizing: border-box;
+        border-radius: 3px;
+        font-size: 14px;
+        background-color: var(--bg);
+        color: var(--fg);
+    }
+
+    input[type=date], input[type=time] {
+        text-indent: 35px;
+    }
+
+    input[type=date]:focus, input[type=date]:valid,
+    input[type=time]:focus, input[type=time]:valid {
+        text-indent: 0px;
+    }
+
     `;
   render() {
     return x`
@@ -1082,10 +1122,45 @@ class MonthViewDialog extends s3 {
                 <h4 class="title">${this.title}</h4>
                 <button class="closebtn" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">&times;</button>
             </div>
-            <div class="content">Let's make this mothafuckin appointment!</div>
-            <div class="buttons">
-                <button class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>
-                <button class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>    
+            <div class="content">
+                <form>
+                    <div class="text-field">
+                        <input type="text" name="name" size="20" maxlength="255" 
+                            aria-label="Name"
+                            aria-required="true"
+                            spellcheck="false"
+                            required>
+                        <label for="name">Name</label>
+                    </div>
+                    <div class="text-field">
+                        <input type="date" name="date" size="20" maxlength="255" 
+                            aria-label="Date"
+                            aria-required="true"
+                            spellcheck="false"
+                            required>
+                        <label for="date">Date</label>
+                    </div>
+                    <div class="text-field">
+                        <input type="time" name="from" size="20" maxlength="255" 
+                            aria-label="From"
+                            aria-required="true"
+                            spellcheck="false"
+                            required>
+                        <label for="from">From</label>
+                    </div>
+                    <div class="text-field">
+                        <input type="time" name="to" size="20" maxlength="255" 
+                            aria-label="To"
+                            aria-required="true"
+                            spellcheck="false"
+                            required>
+                        <label for="to">To</label>
+                    </div>
+                    <div class="buttons">
+                        <button class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>
+                        <button class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>    
+                    </div>
+                </form>
             </div>
         </div>`;
   }
