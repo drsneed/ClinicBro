@@ -44,7 +44,10 @@
     --table-fg: light-dark(#16181a, #a2b4b1);
     --table-row-bg-alt: light-dark(#f3f3f3, #16181a);
     --table-row-hover: light-dark(#d8d5d5, #161616);
-    --mfmf: #37af4d;
+    --btn-cancel-bg: light-dark(#393f3e, #a2b4b1);
+    --btn-cancel-fg: light-dark(#ddd, #393f3e);
+    --btn-save-fg: light-dark(#ddd, #ddd);
+    --btn-save-bg: light-dark(#397268, #397268);
 }
 
 * { 

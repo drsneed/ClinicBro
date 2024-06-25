@@ -60,7 +60,6 @@ export class MonthViewDay extends LitElement {
       super();
       this.current_month = false;
       this.selected = false;
-      this.dialog_visible = false;
       this.addEventListener('click', this._clickHandler);
       this.addEventListener('dblclick', this._doubleClickHandler);
     }
@@ -74,7 +73,8 @@ export class MonthViewDay extends LitElement {
     }
 
     public doubleClicked() {
-      console.log(this.id + " double clicked!");
+      const schedule = document.getElementById("schedule");
+      schedule.showAppointmentDialog(this.current_date);
     }
 
     private _clickHandler(e) {

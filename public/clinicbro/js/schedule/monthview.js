@@ -985,7 +985,7 @@ class MonthView extends s3 {
     super();
     this.appointments = [];
     this.current_date = new Date;
-    this.dialog_visible = false;
+    this.appointment_dialog_opened = false;
     var appt1 = {
       name: "AUD EXAM",
       start: new Date("2024-06-15T13:30:00"),
@@ -997,6 +997,12 @@ class MonthView extends s3 {
     if (changedProperties.has("current_date")) {
     }
   }
+  showAppointmentDialog(date_clicked) {
+    let dialog = this.shadowRoot.querySelector("#mv_dialog");
+    dialog.title = "New Appointment - " + date_clicked.toDateString();
+    this.appointment_dialog_opened = true;
+    return true;
+  }
   _prev(e5) {
     this.current_date = dateAdd(this.current_date, "month", -1);
     clearAllSelectedDays();
@@ -1007,10 +1013,10 @@ class MonthView extends s3 {
   }
   renderCaption() {
     return x`
-    <caption align="top">
+    <caption>
         <div class="month-header">
             <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset"></lit-icon></button>
-            <h2 align="center" id="month_title">${this.calendarTitle()}</h2>
+            <h2 id="month_title">${this.calendarTitle()}</h2>
             <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset"></lit-icon></button>
             <lit-iconset iconset="iconset">
               <svg><defs>
@@ -1045,15 +1051,16 @@ class MonthView extends s3 {
     }
     return x`${rows}`;
   }
-  toggleDialog(e5) {
-    this.dialog_visible = !this.dialog_visible;
+  saveAppointment(e5) {
+    console.log("We saved that mothafuckin appointment bro!");
+    this.closeAppointmentDialog();
   }
-  closeDialog(e5) {
-    this.dialog_visible = false;
+  closeAppointmentDialog() {
+    this.appointment_dialog_opened = false;
   }
   render() {
     return x`
-    <table class="month-table" align="center" cellspacing="0">
+    <table class="month-table" cellspacing="0">
       ${this.renderCaption()}
       <thead>
           <tr>
@@ -1070,10 +1077,9 @@ class MonthView extends s3 {
         ${this.renderDays()} 
       </tbody>
     </table>
-    <button @click="${this.toggleDialog.bind(this)}">Toggle dialog</button>
-    <mv-dialog ?opened="${this.dialog_visible}" 
-               @dialog.accept="${this.closeDialog.bind(this)}"
-               @dialog.cancel="${this.closeDialog.bind(this)}"></mv-dialog>
+    <mv-dialog id="mv_dialog" ?opened="${this.appointment_dialog_opened}" 
+               @dialog.save="${this.saveAppointment.bind(this)}"
+               @dialog.cancel="${this.closeAppointmentDialog}"></mv-dialog>
     `;
   }
 }
@@ -1086,8 +1092,8 @@ __legacyDecorateClassTS([
   n4({ type: Array, attribute: false })
 ], MonthView.prototype, "appointments", undefined);
 __legacyDecorateClassTS([
-  n4({ type: Boolean })
-], MonthView.prototype, "dialog_visible", undefined);
+  n4({ type: Boolean, reflect: true })
+], MonthView.prototype, "appointment_dialog_opened", undefined);
 MonthView = __legacyDecorateClassTS([
   t3("month-view")
 ], MonthView);

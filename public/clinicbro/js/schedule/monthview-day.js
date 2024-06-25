@@ -696,7 +696,8 @@ class MonthViewDay extends s3 {
     this.selected = true;
   }
   doubleClicked() {
-    console.log(this.id + " double clicked!");
+    const schedule = document.getElementById("schedule");
+    schedule.showAppointmentDialog(this.current_date);
   }
   _clickHandler(e5) {
     clearAllSelectedDays();

@@ -676,52 +676,426 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
+// node_modules/lit-html/directives/style-map.js
+var n5 = "important";
+var i5 = " !" + n5;
+var o5 = e5(class extends i4 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "style" || t5.strings?.length > 2)
+      throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
+  }
+  render(t5) {
+    return Object.keys(t5).reduce((e7, r6) => {
+      const s4 = t5[r6];
+      return s4 == null ? e7 : e7 + `${r6 = r6.includes("-") ? r6 : r6.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s4};`;
+    }, "");
+  }
+  update(e7, [r6]) {
+    const { style: s4 } = e7.element;
+    if (this.ft === undefined)
+      return this.ft = new Set(Object.keys(r6)), this.render(r6);
+    for (const t5 of this.ft)
+      r6[t5] == null && (this.ft.delete(t5), t5.includes("-") ? s4.removeProperty(t5) : s4[t5] = null);
+    for (const t5 in r6) {
+      const e8 = r6[t5];
+      if (e8 != null) {
+        this.ft.add(t5);
+        const r7 = typeof e8 == "string" && e8.endsWith(i5);
+        t5.includes("-") || r7 ? s4.setProperty(t5, r7 ? e8.slice(0, -11) : e8, r7 ? n5 : "") : s4[t5] = e8;
+      }
+    }
+    return w;
+  }
+});
+// node_modules/pointer-tracker/dist/PointerTracker.mjs
+class Pointer {
+  constructor(nativePointer) {
+    this.id = -1;
+    this.nativePointer = nativePointer;
+    this.pageX = nativePointer.pageX;
+    this.pageY = nativePointer.pageY;
+    this.clientX = nativePointer.clientX;
+    this.clientY = nativePointer.clientY;
+    if (self.Touch && nativePointer instanceof Touch) {
+      this.id = nativePointer.identifier;
+    } else if (isPointerEvent(nativePointer)) {
+      this.id = nativePointer.pointerId;
+    }
+  }
+  getCoalesced() {
+    if ("getCoalescedEvents" in this.nativePointer) {
+      const events = this.nativePointer.getCoalescedEvents().map((p3) => new Pointer(p3));
+      if (events.length > 0)
+        return events;
+    }
+    return [this];
+  }
+}
+var isPointerEvent = (event) => ("pointerId" in event);
+var isTouchEvent = (event) => ("changedTouches" in event);
+var noop = () => {
+};
+
+class PointerTracker {
+  constructor(_element, { start = () => true, move = noop, end = noop, rawUpdates = false, avoidPointerEvents = false } = {}) {
+    this._element = _element;
+    this.startPointers = [];
+    this.currentPointers = [];
+    this._excludeFromButtonsCheck = new Set;
+    this._pointerStart = (event) => {
+      if (isPointerEvent(event) && event.buttons === 0) {
+        this._excludeFromButtonsCheck.add(event.pointerId);
+      } else if (!(event.buttons & 1)) {
+        return;
+      }
+      const pointer = new Pointer(event);
+      if (this.currentPointers.some((p3) => p3.id === pointer.id))
+        return;
+      if (!this._triggerPointerStart(pointer, event))
+        return;
+      if (isPointerEvent(event)) {
+        const capturingElement = event.target && "setPointerCapture" in event.target ? event.target : this._element;
+        capturingElement.setPointerCapture(event.pointerId);
+        this._element.addEventListener(this._rawUpdates ? "pointerrawupdate" : "pointermove", this._move);
+        this._element.addEventListener("pointerup", this._pointerEnd);
+        this._element.addEventListener("pointercancel", this._pointerEnd);
+      } else {
+        window.addEventListener("mousemove", this._move);
+        window.addEventListener("mouseup", this._pointerEnd);
+      }
+    };
+    this._touchStart = (event) => {
+      for (const touch of Array.from(event.changedTouches)) {
+        this._triggerPointerStart(new Pointer(touch), event);
+      }
+    };
+    this._move = (event) => {
+      if (!isTouchEvent(event) && (!isPointerEvent(event) || !this._excludeFromButtonsCheck.has(event.pointerId)) && event.buttons === 0) {
+        this._pointerEnd(event);
+        return;
+      }
+      const previousPointers = this.currentPointers.slice();
+      const changedPointers = isTouchEvent(event) ? Array.from(event.changedTouches).map((t5) => new Pointer(t5)) : [new Pointer(event)];
+      const trackedChangedPointers = [];
+      for (const pointer of changedPointers) {
+        const index = this.currentPointers.findIndex((p3) => p3.id === pointer.id);
+        if (index === -1)
+          continue;
+        trackedChangedPointers.push(pointer);
+        this.currentPointers[index] = pointer;
+      }
+      if (trackedChangedPointers.length === 0)
+        return;
+      this._moveCallback(previousPointers, trackedChangedPointers, event);
+    };
+    this._triggerPointerEnd = (pointer, event) => {
+      if (!isTouchEvent(event) && event.buttons & 1) {
+        return false;
+      }
+      const index = this.currentPointers.findIndex((p3) => p3.id === pointer.id);
+      if (index === -1)
+        return false;
+      this.currentPointers.splice(index, 1);
+      this.startPointers.splice(index, 1);
+      this._excludeFromButtonsCheck.delete(pointer.id);
+      const cancelled = !(event.type === "mouseup" || event.type === "touchend" || event.type === "pointerup");
+      this._endCallback(pointer, event, cancelled);
+      return true;
+    };
+    this._pointerEnd = (event) => {
+      if (!this._triggerPointerEnd(new Pointer(event), event))
+        return;
+      if (isPointerEvent(event)) {
+        if (this.currentPointers.length)
+          return;
+        this._element.removeEventListener(this._rawUpdates ? "pointerrawupdate" : "pointermove", this._move);
+        this._element.removeEventListener("pointerup", this._pointerEnd);
+        this._element.removeEventListener("pointercancel", this._pointerEnd);
+      } else {
+        window.removeEventListener("mousemove", this._move);
+        window.removeEventListener("mouseup", this._pointerEnd);
+      }
+    };
+    this._touchEnd = (event) => {
+      for (const touch of Array.from(event.changedTouches)) {
+        this._triggerPointerEnd(new Pointer(touch), event);
+      }
+    };
+    this._startCallback = start;
+    this._moveCallback = move;
+    this._endCallback = end;
+    this._rawUpdates = rawUpdates && "onpointerrawupdate" in window;
+    if (self.PointerEvent && !avoidPointerEvents) {
+      this._element.addEventListener("pointerdown", this._pointerStart);
+    } else {
+      this._element.addEventListener("mousedown", this._pointerStart);
+      this._element.addEventListener("touchstart", this._touchStart);
+      this._element.addEventListener("touchmove", this._move);
+      this._element.addEventListener("touchend", this._touchEnd);
+      this._element.addEventListener("touchcancel", this._touchEnd);
+    }
+  }
+  stop() {
+    this._element.removeEventListener("pointerdown", this._pointerStart);
+    this._element.removeEventListener("mousedown", this._pointerStart);
+    this._element.removeEventListener("touchstart", this._touchStart);
+    this._element.removeEventListener("touchmove", this._move);
+    this._element.removeEventListener("touchend", this._touchEnd);
+    this._element.removeEventListener("touchcancel", this._touchEnd);
+    this._element.removeEventListener(this._rawUpdates ? "pointerrawupdate" : "pointermove", this._move);
+    this._element.removeEventListener("pointerup", this._pointerEnd);
+    this._element.removeEventListener("pointercancel", this._pointerEnd);
+    window.removeEventListener("mousemove", this._move);
+    window.removeEventListener("mouseup", this._pointerEnd);
+  }
+  _triggerPointerStart(pointer, event) {
+    if (!this._startCallback(pointer, event))
+      return false;
+    this.currentPointers.push(pointer);
+    this.startPointers.push(pointer);
+    return true;
+  }
+}
+
+// public/clinicbro/js/schedule/dragcontroller.ts
+class DragController {
+  x = 0;
+  y = 0;
+  state = "idle";
+  styles = {
+    position: "absolute",
+    top: "calc(50% - 128px)",
+    left: "calc(50% - 256px)"
+  };
+  constructor(host, options) {
+    const {
+      getContainerEl = () => null,
+      getDraggableEl = () => Promise.resolve(null)
+    } = options;
+    this.host = host;
+    this.host.addController(this);
+    this.getContainerEl = getContainerEl;
+    getDraggableEl().then((el) => {
+      if (!el)
+        return;
+      this.draggableEl = el;
+      this.init();
+    });
+  }
+  reset() {
+    this.x = 0;
+    this.y = 0;
+    this.updateElPosition();
+  }
+  init() {
+    this.pointerTracker = new PointerTracker(this.draggableEl, {
+      start: (pointer, event) => {
+        this.onDragStart(pointer);
+        this.state = "dragging";
+        this.host.requestUpdate();
+        return true;
+      },
+      move: (previousPointers, changedPointers, event) => {
+        this.onDrag(changedPointers[0]);
+      },
+      end: (pointer, event, cancelled) => {
+        this.state = "idle";
+        this.host.requestUpdate();
+      }
+    });
+  }
+  hostDisconnected() {
+    if (this.pointerTracker) {
+      this.pointerTracker.stop();
+    }
+  }
+  onDragStart = (pointer) => {
+    this.cursorPositionX = Math.floor(pointer.pageX);
+    this.cursorPositionY = Math.floor(pointer.pageY);
+  };
+  onDrag(pointer) {
+    const el = this.draggableEl;
+    const containerEl = this.getContainerEl();
+    if (!el || !containerEl)
+      return;
+    const oldX = this.x;
+    const oldY = this.y;
+    const parsedTop = Math.floor(pointer.pageX);
+    const parsedLeft = Math.floor(pointer.pageY);
+    const cursorPositionX = Math.floor(pointer.pageX);
+    const cursorPositionY = Math.floor(pointer.pageY);
+    const hasCursorMoved = cursorPositionX !== this.cursorPositionX || cursorPositionY !== this.cursorPositionY;
+    if (hasCursorMoved) {
+      const { bottom, height } = el.getBoundingClientRect();
+      const { right, width } = containerEl.getBoundingClientRect();
+      const xDelta = cursorPositionX - this.cursorPositionX;
+      const yDelta = cursorPositionY - this.cursorPositionY;
+      this.x = oldX + xDelta;
+      this.y = oldY + yDelta;
+      const outOfBoundsTop = this.y < 0;
+      const outOfBoundsLeft = this.x < 0;
+      const outOfBoundsBottom = bottom + yDelta > window.innerHeight;
+      const outOfBoundsRight = right + xDelta >= window.innerWidth;
+      const isOutOfBounds = outOfBoundsBottom || outOfBoundsLeft || outOfBoundsRight || outOfBoundsTop;
+      this.cursorPositionX = cursorPositionX;
+      this.cursorPositionY = cursorPositionY;
+      this.updateElPosition();
+      this.host.requestUpdate();
+    }
+  }
+  updateElPosition() {
+    this.styles.transform = `translate(${this.x}px, ${this.y}px)`;
+  }
+}
+
 // public/clinicbro/js/schedule/monthview-dialog.ts
 class MonthViewDialog extends s3 {
   constructor() {
     super();
     this.opened = false;
+    this.title = "Window";
+  }
+  updated(changedProperties) {
+    if (changedProperties.has("opened")) {
+      this.drag.reset();
+    }
+  }
+  drag = new DragController(this, {
+    getContainerEl: () => this.shadowRoot.querySelector("#window"),
+    getDraggableEl: () => this.getDraggableEl()
+  });
+  async getDraggableEl() {
+    await this.updateComplete;
+    return this.shadowRoot.querySelector("#draggable");
   }
   static styles = i`
-        .opened {
-            display: flex;
-        }
-        .closed {
-            display: none;
-        }
-        .dialog {
-            flex-direction: column;
-            border: 2px outset black;
-            padding: 1em;
-            margin: 1em;
-        }
-        .buttons {
-            display: flex;
-            flex-direction: row;
-        }
-        .accept {
-            justify-content: space-around;
-            align-content: space-around;
-        }
-        .cancel {
-            justify-content: space-around;
-            align-content: space-around;
-        }`;
+    .opened {
+        display: flex;
+    }
+    .closed {
+        display: none;
+    }
+    .header {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--header-bg);
+        color: var(--header-fg);
+        height: 30px;
+        text-align: center;
+        box-shadow: 0 0 4px var(--container-shadow);
+        user-select: none;
+    }
+
+    [data-dragging="idle"] {
+      cursor: grab;
+    }
+
+    [data-dragging="dragging"] {
+      cursor: grabbing;
+    }
+
+    .dialog {
+        flex-direction: column;
+        //border: 2px outset black;
+        padding: 0;
+        margin: 1em;
+        border: 2px outset var(--container-border);
+        border-radius: 3px;
+        background-color: var(--container-bg);
+        position: absolute;
+        //margin-top: -200px; /* half of you height */
+        width: 512px;
+        height: 256px;
+        //margin-left: -256px; /* half of you width */
+    }
+    .content {
+        margin: 50px 8px 10px 8px;
+    }
+    .title {
+        margin-top: 4px;
+    }
+    .closebtn {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        width: 25px;
+        height: 100%;
+        padding: 0px auto;
+        border-radius: 0;
+        background-color: transparent;
+        color: var(--dialog-header-fg);
+        font-size: 16px;
+        border: none;
+    }
+
+    .closebtn:hover {
+        background-color: light-dark(darkred, red);
+        border: 1px solid var(--header-fg);
+        cursor: pointer;
+    }
+
+    .buttons {
+        display: flex;
+        flex-direction: row;
+        margin: 8px;
+        position: absolute;
+        left: calc(50% - 80px);
+        bottom: 2px;
+    }
+
+    .btn {
+        justify-content: space-around;
+        align-content: space-around;
+        padding: 8px 16px;
+        cursor: pointer;
+        border-radius: 3px;
+        border: 1px solid var(--input-border);
+        margin: 6px;
+        font-weight: bold;
+    }
+
+    .btn-save {
+        background-color: var(--btn-save-bg);
+        color: var(--btn-save-fg);
+    }
+    .btn-save:hover {
+        background-color: var(--btn-save-fg);
+        color: var(--btn-save-bg);
+    }
+    
+    .btn-cancel {
+        background-color: var(--btn-cancel-bg);
+        color: var(--btn-cancel-fg);
+    }
+    .btn-cancel:hover {
+        background-color: var(--btn-cancel-fg);
+        color: var(--btn-cancel-bg);
+    }
+    
+    `;
   render() {
     return x`
-        <div class="${e6({ dialog: true, opened: this.opened, closed: !this.opened })}">
-            <h1 class="title ">Title</h1>
-            <p class="content">This is a dialog</p>
+        <div id="window" class="${e6({ dialog: true, opened: this.opened, closed: !this.opened })}" style=${o5(this.drag.styles)}>
+            <div id="draggable" class="header" data-dragging=${this.drag.state}>
+                <h4 class="title">${this.title}</h4>
+                <button class="closebtn" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">&times;</button>
+            </div>
+            <div class="content">Let's make this mothafuckin appointment!</div>
             <div class="buttons">
-            <button class="accept" @click="${() => this.dispatchEvent(new CustomEvent("dialog.accept"))}">Ok</button>
-            <button class="cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>    
+                <button class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>
+                <button class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>    
             </div>
         </div>`;
   }
 }
 __legacyDecorateClassTS([
-  n4({ type: Boolean })
+  n4({ type: Boolean, reflect: true })
 ], MonthViewDialog.prototype, "opened", undefined);
+__legacyDecorateClassTS([
+  n4({ type: String })
+], MonthViewDialog.prototype, "title", undefined);
 MonthViewDialog = __legacyDecorateClassTS([
   t3("mv-dialog")
 ], MonthViewDialog);

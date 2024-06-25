@@ -1,4 +1,5 @@
-document.addEventListener("DOMContentLoaded", function(event) {
-  console.log("Hello Earth!");
-});
+export {dialogHeaderMouseDown};
 
+function dialogHeaderMouseDown(e) {
+  console.log("Header mouse down");
+}

@@ -20,8 +20,8 @@ export class MonthView extends LitElement {
   appointments = [];
 
   // @ts-ignore
-  @property({type: Boolean})
-  dialog_visible: boolean;
+  @property({type: Boolean, reflect: true})
+  appointment_dialog_opened: boolean;
 
   calendarTitle() {
     return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
@@ -30,21 +30,32 @@ export class MonthView extends LitElement {
   constructor() {
     super();
     this.current_date = new Date();
-    this.dialog_visible = false;
+    this.appointment_dialog_opened = false;
     var appt1 = {
       name: "AUD EXAM",
       start: new Date("2024-06-15T13:30:00"),
       end: new Date("2024-06-15T14:30:00")
     };
-    
     this.appointments = [appt1];
   }
+
 
   updated(changedProperties) {
     //console.log(changedProperties); // logs previous values
     if(changedProperties.has('current_date')) {
       
     }
+  }
+
+  showAppointmentDialog(date_clicked: Date) {
+    // if(this.appointment_dialog_opened) {
+    //   console.log("Dialog is already open. Aborting mission :(");
+    //   return false;
+    // }
+    let dialog = this.shadowRoot.querySelector("#mv_dialog");
+    dialog.title = "New Appointment - " + date_clicked.toDateString();
+    this.appointment_dialog_opened = true;
+    return true;
   }
 
   private _prev(e: Event) {
@@ -59,10 +70,10 @@ export class MonthView extends LitElement {
 
   renderCaption() {
     return html`
-    <caption align="top">
+    <caption>
         <div class="month-header">
             <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset"></lit-icon></button>
-            <h2 align="center" id="month_title">${this.calendarTitle()}</h2>
+            <h2 id="month_title">${this.calendarTitle()}</h2>
             <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset"></lit-icon></button>
             <lit-iconset iconset="iconset">
               <svg><defs>
@@ -104,17 +115,18 @@ export class MonthView extends LitElement {
     return html`${rows}`;
   }
 
-  toggleDialog (e) {
-    this.dialog_visible = !this.dialog_visible;
+  saveAppointment (e) {
+    console.log("We saved that mothafuckin appointment bro!");
+    this.closeAppointmentDialog();
   }
 
-  closeDialog (e) {
-    this.dialog_visible = false;
+  closeAppointmentDialog () {
+    this.appointment_dialog_opened = false;
   }
   
   render() {
     return html`
-    <table class="month-table" align="center" cellspacing="0">
+    <table class="month-table" cellspacing="0">
       ${this.renderCaption()}
       <thead>
           <tr>
@@ -131,10 +143,9 @@ export class MonthView extends LitElement {
         ${this.renderDays()} 
       </tbody>
     </table>
-    <button @click="${this.toggleDialog.bind(this)}">Toggle dialog</button>
-    <mv-dialog ?opened="${this.dialog_visible}" 
-               @dialog.accept="${this.closeDialog.bind(this)}"
-               @dialog.cancel="${this.closeDialog.bind(this)}"></mv-dialog>
+    <mv-dialog id="mv_dialog" ?opened="${this.appointment_dialog_opened}" 
+               @dialog.save="${this.saveAppointment.bind(this)}"
+               @dialog.cancel="${this.closeAppointmentDialog}"></mv-dialog>
     `;
   }
 }
