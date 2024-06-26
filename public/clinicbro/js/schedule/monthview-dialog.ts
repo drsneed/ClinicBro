@@ -3,6 +3,7 @@ import {customElement, property} from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { DragController } from './dragcontroller';
+import { toIsoDateString, toIsoTimeString, dateAdd } from './../util';
 
 @customElement("mv-dialog")
 export class MonthViewDialog extends LitElement {
@@ -14,17 +15,40 @@ export class MonthViewDialog extends LitElement {
     @property({type: String})
     title: string;
 
+    // @ts-ignore
+    @property({converter(value) {return new Date(value);}})
+    appointment_date: Date;
+
+    // @ts-ignore
+    @property({converter(value) {return new Date(value);}})
+    from: Date;
+
+    // @ts-ignore
+    @property({converter(value) {return new Date(value);}, reflect: true})
+    to: Date;
+
 
     constructor () {
         super();
         this.opened = false;
         this.title = "Window";
+        this.appointment_date = new Date();
+        this.from = new Date();
+        this.to = dateAdd(this.from, 'minute', 30);
     }
 
     updated(changedProperties) {
         //console.log(changedProperties); // logs previous values
         if(changedProperties.has('opened')) {
           this.drag.reset();
+        }
+        if(changedProperties.has('from')) {
+            let appt_from = this.shadowRoot.querySelector("#appt_from");
+            appt_from.value = toIsoTimeString(this.from);
+        }
+        if(changedProperties.has('to')) {
+            let appt_to = this.shadowRoot.querySelector("#appt_to");
+            appt_to.value = toIsoTimeString(this.to);
         }
       }
 
@@ -115,7 +139,7 @@ export class MonthViewDialog extends LitElement {
         cursor: pointer;
         border-radius: 3px;
         border: 1px solid var(--input-border);
-        margin: 6px;
+        margin: 6px 2px;
         font-weight: bold;
     }
 
@@ -124,7 +148,7 @@ export class MonthViewDialog extends LitElement {
         color: var(--btn-save-fg);
     }
     .btn-save:hover {
-        background-color: var(--btn-save-fg);
+        background-color: var(--btn-save-hover-bg);
         color: var(--btn-save-bg);
     }
     
@@ -148,6 +172,7 @@ export class MonthViewDialog extends LitElement {
         left: 10px;
         top: 12px;
         transition: 0.2s;
+        color: var(--placeholder-fg);
     }
 
     .text-field input:focus, .text-field input:valid {
@@ -160,6 +185,7 @@ export class MonthViewDialog extends LitElement {
         font-size: small;
         padding: 0 5px 0 5px;
         background-color: var(--container-bg);
+        color: var(--fg);
     }
 
         
@@ -184,6 +210,36 @@ export class MonthViewDialog extends LitElement {
         text-indent: 0px;
     }
 
+    .time-inputs {
+        display: block;
+        width: 100%;
+        margin: 0;
+        margin-left: 1px;
+        padding: 0;
+        text-align: left;
+    }
+
+    .time-input {
+        /* vertical-align: middle; */
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+        width: 150px;
+    }
+
+    .date-container {
+        width: 306px;
+    }
+
+    ::placeholder {
+        color: var(--placeholder-fg);
+        opacity: 1; /* Firefox */
+    }
+
+    ::-ms-input-placeholder { /* Edge 12-18 */
+        color: var(--placeholder-fg);
+    }
+
     `;
 
     render() {
@@ -197,40 +253,30 @@ export class MonthViewDialog extends LitElement {
             <div class="content">
                 <form>
                     <div class="text-field">
-                        <input type="text" name="name" size="20" maxlength="255" 
-                            aria-label="Name"
-                            aria-required="true"
-                            spellcheck="false"
-                            required>
-                        <label for="name">Name</label>
+                        <input type="text" name="type" maxlength="255" required>
+                        <label for="type">Appointment Type</label>
                     </div>
-                    <div class="text-field">
-                        <input type="date" name="date" size="20" maxlength="255" 
-                            aria-label="Date"
-                            aria-required="true"
-                            spellcheck="false"
-                            required>
-                        <label for="date">Date</label>
+                    <div class="date-container">
+                        <div class="text-field">
+                            <input type="date" name="date"
+                                value="${toIsoDateString(this.appointment_date)}" required>
+                            <label for="date">Date</label>
+                        </div>
                     </div>
-                    <div class="text-field">
-                        <input type="time" name="from" size="20" maxlength="255" 
-                            aria-label="From"
-                            aria-required="true"
-                            spellcheck="false"
-                            required>
-                        <label for="from">From</label>
+                    <div class="time-inputs">
+                        <div class="text-field time-input">
+                            <input id="appt_from" type="time" name="from" required>
+                            <label for="from">From</label>
+                        </div>
+                        <div class="text-field time-input">
+                            <input id="appt_to" type="time" name="to" required>
+                            <label for="to">&nbsp;&nbsp;&nbsp;To</label>
+                        </div>
                     </div>
-                    <div class="text-field">
-                        <input type="time" name="to" size="20" maxlength="255" 
-                            aria-label="To"
-                            aria-required="true"
-                            spellcheck="false"
-                            required>
-                        <label for="to">To</label>
-                    </div>
+                    
                     <div class="buttons">
-                        <button class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent('dialog.cancel'))}">Cancel</button>
-                        <button class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent('dialog.save'))}">Save</button>    
+                        <button class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent('dialog.save'))}">Save</button>  
+                        <button class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent('dialog.cancel'))}">Cancel</button>  
                     </div>
                 </form>
             </div>

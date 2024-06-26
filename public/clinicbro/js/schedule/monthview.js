@@ -724,7 +724,7 @@ function monthviewStyle() {
   
   .month-header h2 {
     width: 100%;
-    color: var(--calendar-header-fg);
+    color: var(--header-fg);
     padding: 0;
     margin: 8px auto;
     font-size: 16px;
@@ -999,7 +999,14 @@ class MonthView extends s3 {
   }
   showAppointmentDialog(date_clicked) {
     let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.title = "New Appointment - " + date_clicked.toDateString();
+    dialog.title = "New Appointment";
+    dialog.appointment_date = date_clicked;
+    let from = new Date;
+    from.setSeconds(0);
+    from.setMinutes(from.getMinutes() < 30 ? 0 : 30);
+    console.log("from = " + from.toLocaleTimeString());
+    dialog.from = from;
+    dialog.to = dateAdd(from, "minute", 30);
     this.appointment_dialog_opened = true;
     return true;
   }

@@ -60,7 +60,7 @@ export function monthviewStyle() {
   
   .month-header h2 {
     width: 100%;
-    color: var(--calendar-header-fg);
+    color: var(--header-fg);
     padding: 0;
     margin: 8px auto;
     font-size: 16px;

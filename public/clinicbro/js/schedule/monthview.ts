@@ -53,7 +53,14 @@ export class MonthView extends LitElement {
     //   return false;
     // }
     let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.title = "New Appointment - " + date_clicked.toDateString();
+    dialog.title = "New Appointment";
+    dialog.appointment_date = date_clicked;
+    let from = new Date();
+    from.setSeconds(0);
+    from.setMinutes(from.getMinutes() < 30 ? 0 : 30);
+    console.log("from = " + from.toLocaleTimeString());
+    dialog.from = from;
+    dialog.to = dateAdd(from, 'minute', 30);
     this.appointment_dialog_opened = true;
     return true;
   }

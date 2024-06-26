@@ -8,13 +8,13 @@
     color-scheme: light dark;
     --bg: light-dark(#eeecec, #18191a);
     --fg: light-dark(#18191a, #d8d8d8);
-    --header-bg: light-dark(#2d4159, #121214); /* #1d3a4e */
-    --header-fg: #d8d8d8;
+    --header-bg: light-dark(#027160, #223c38); /* #1d3a4e */
+    --header-fg: #f1f1e3;
     --header-border: light-dark(#444, black);
     --header-shadow: light-dark(#999, black);
     --header-btn-focus: light-dark(#142835, #121214);
     --pressed-btn-border: light-dark(#444, #444);
-    --container-bg: light-dark(#fff, #191b1d);
+    --container-bg: light-dark(#fff, #202225);
     --container-border: light-dark(#a3a09e, #5b5a5914);
     --container-shadow: light-dark(#999, black);
     --dropdown-bg: light-dark(#eee, #121214);
@@ -44,10 +44,12 @@
     --table-fg: light-dark(#16181a, #a2b4b1);
     --table-row-bg-alt: light-dark(#f3f3f3, #16181a);
     --table-row-hover: light-dark(#d8d5d5, #161616);
-    --btn-cancel-bg: light-dark(#393f3e, #a2b4b1);
-    --btn-cancel-fg: light-dark(#ddd, #393f3e);
-    --btn-save-fg: light-dark(#ddd, #ddd);
-    --btn-save-bg: light-dark(#397268, #397268);
+    --btn-cancel-bg: light-dark(#393f3e, #393f3e);
+    --btn-cancel-fg: light-dark(#f1f1e3, #9cacaa);
+    --btn-save-fg: light-dark(#f1f1e3, #f1f1e3);
+    --btn-save-bg: light-dark(#027160, #027160);
+    --btn-save-hover-bg: light-dark(#f1f1e3, #9cacaa);
+    --placeholder-fg: light-dark(#717123, #dfdf99);
 }
 
 * { 

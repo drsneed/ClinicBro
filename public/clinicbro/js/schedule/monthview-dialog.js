@@ -948,16 +948,75 @@ class DragController {
   }
 }
 
+// public/clinicbro/js/util.ts
+function dateAdd(date, interval, units) {
+  var ret = new Date(date.valueOf());
+  var checkRollover = function() {
+    if (ret.getDate() != date.getDate())
+      ret.setDate(0);
+  };
+  switch (String(interval).toLowerCase()) {
+    case "year":
+      ret.setFullYear(ret.getFullYear() + units);
+      checkRollover();
+      break;
+    case "quarter":
+      ret.setMonth(ret.getMonth() + 3 * units);
+      checkRollover();
+      break;
+    case "month":
+      ret.setMonth(ret.getMonth() + units);
+      checkRollover();
+      break;
+    case "week":
+      ret.setDate(ret.getDate() + 7 * units);
+      break;
+    case "day":
+      ret.setDate(ret.getDate() + units);
+      break;
+    case "hour":
+      ret.setTime(ret.getTime() + units * 3600000);
+      break;
+    case "minute":
+      ret.setTime(ret.getTime() + units * 60000);
+      break;
+    case "second":
+      ret.setTime(ret.getTime() + units * 1000);
+      break;
+    default:
+      ret = undefined;
+      break;
+  }
+  return ret;
+}
+function toIsoDateString(d3) {
+  return d3.toISOString().split("T")[0];
+}
+function toIsoTimeString(d3) {
+  return d3.toTimeString().substring(0, 8);
+}
+
 // public/clinicbro/js/schedule/monthview-dialog.ts
 class MonthViewDialog extends s3 {
   constructor() {
     super();
     this.opened = false;
     this.title = "Window";
+    this.appointment_date = new Date;
+    this.from = new Date;
+    this.to = dateAdd(this.from, "minute", 30);
   }
   updated(changedProperties) {
     if (changedProperties.has("opened")) {
       this.drag.reset();
+    }
+    if (changedProperties.has("from")) {
+      let appt_from = this.shadowRoot.querySelector("#appt_from");
+      appt_from.value = toIsoTimeString(this.from);
+    }
+    if (changedProperties.has("to")) {
+      let appt_to = this.shadowRoot.querySelector("#appt_to");
+      appt_to.value = toIsoTimeString(this.to);
     }
   }
   drag = new DragController(this, {
@@ -1045,7 +1104,7 @@ class MonthViewDialog extends s3 {
         cursor: pointer;
         border-radius: 3px;
         border: 1px solid var(--input-border);
-        margin: 6px;
+        margin: 6px 2px;
         font-weight: bold;
     }
 
@@ -1054,7 +1113,7 @@ class MonthViewDialog extends s3 {
         color: var(--btn-save-fg);
     }
     .btn-save:hover {
-        background-color: var(--btn-save-fg);
+        background-color: var(--btn-save-hover-bg);
         color: var(--btn-save-bg);
     }
     
@@ -1078,6 +1137,7 @@ class MonthViewDialog extends s3 {
         left: 10px;
         top: 12px;
         transition: 0.2s;
+        color: var(--placeholder-fg);
     }
 
     .text-field input:focus, .text-field input:valid {
@@ -1090,6 +1150,7 @@ class MonthViewDialog extends s3 {
         font-size: small;
         padding: 0 5px 0 5px;
         background-color: var(--container-bg);
+        color: var(--fg);
     }
 
         
@@ -1114,6 +1175,36 @@ class MonthViewDialog extends s3 {
         text-indent: 0px;
     }
 
+    .time-inputs {
+        display: block;
+        width: 100%;
+        margin: 0;
+        margin-left: 1px;
+        padding: 0;
+        text-align: left;
+    }
+
+    .time-input {
+        /* vertical-align: middle; */
+        display: inline-block;
+        margin: 0;
+        padding: 0;
+        width: 150px;
+    }
+
+    .date-container {
+        width: 306px;
+    }
+
+    ::placeholder {
+        color: var(--placeholder-fg);
+        opacity: 1; /* Firefox */
+    }
+
+    ::-ms-input-placeholder { /* Edge 12-18 */
+        color: var(--placeholder-fg);
+    }
+
     `;
   render() {
     return x`
@@ -1125,40 +1216,30 @@ class MonthViewDialog extends s3 {
             <div class="content">
                 <form>
                     <div class="text-field">
-                        <input type="text" name="name" size="20" maxlength="255" 
-                            aria-label="Name"
-                            aria-required="true"
-                            spellcheck="false"
-                            required>
-                        <label for="name">Name</label>
+                        <input type="text" name="type" maxlength="255" required>
+                        <label for="type">Appointment Type</label>
                     </div>
-                    <div class="text-field">
-                        <input type="date" name="date" size="20" maxlength="255" 
-                            aria-label="Date"
-                            aria-required="true"
-                            spellcheck="false"
-                            required>
-                        <label for="date">Date</label>
+                    <div class="date-container">
+                        <div class="text-field">
+                            <input type="date" name="date"
+                                value="${toIsoDateString(this.appointment_date)}" required>
+                            <label for="date">Date</label>
+                        </div>
                     </div>
-                    <div class="text-field">
-                        <input type="time" name="from" size="20" maxlength="255" 
-                            aria-label="From"
-                            aria-required="true"
-                            spellcheck="false"
-                            required>
-                        <label for="from">From</label>
+                    <div class="time-inputs">
+                        <div class="text-field time-input">
+                            <input id="appt_from" type="time" name="from" required>
+                            <label for="from">From</label>
+                        </div>
+                        <div class="text-field time-input">
+                            <input id="appt_to" type="time" name="to" required>
+                            <label for="to">&nbsp;&nbsp;&nbsp;To</label>
+                        </div>
                     </div>
-                    <div class="text-field">
-                        <input type="time" name="to" size="20" maxlength="255" 
-                            aria-label="To"
-                            aria-required="true"
-                            spellcheck="false"
-                            required>
-                        <label for="to">To</label>
-                    </div>
+                    
                     <div class="buttons">
-                        <button class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>
-                        <button class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>    
+                        <button class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>  
+                        <button class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>  
                     </div>
                 </form>
             </div>
@@ -1171,6 +1252,21 @@ __legacyDecorateClassTS([
 __legacyDecorateClassTS([
   n4({ type: String })
 ], MonthViewDialog.prototype, "title", undefined);
+__legacyDecorateClassTS([
+  n4({ converter(value) {
+    return new Date(value);
+  } })
+], MonthViewDialog.prototype, "appointment_date", undefined);
+__legacyDecorateClassTS([
+  n4({ converter(value) {
+    return new Date(value);
+  } })
+], MonthViewDialog.prototype, "from", undefined);
+__legacyDecorateClassTS([
+  n4({ converter(value) {
+    return new Date(value);
+  }, reflect: true })
+], MonthViewDialog.prototype, "to", undefined);
 MonthViewDialog = __legacyDecorateClassTS([
   t3("mv-dialog")
 ], MonthViewDialog);

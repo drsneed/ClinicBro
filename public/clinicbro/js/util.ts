@@ -26,6 +26,14 @@ export function sameDay(d1, d2) {
     d1.getDate() === d2.getDate();
 }
 
+export function toIsoDateString(d: Date) {
+  return d.toISOString().split('T')[0];
+}
+
+export function toIsoTimeString(d: Date) {
+  return d.toTimeString().substring(0, 8);
+}
+
 export function clearAllSelectedDays() {
   var schedule = document.getElementById("schedule");
   schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
