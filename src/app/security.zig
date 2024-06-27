@@ -1,10 +1,10 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const DbContext = @import("db_context.zig");
+const db_context = @import("db_context.zig");
 const jwt = @import("jwt.zig");
 const log = std.log.scoped(.auth);
 
-pub const Ticket = struct { name: []const u8, id: i64, iat: i64, exp: i64 };
+pub const Ticket = struct { name: [16]u8, id: i64, iat: i64, exp: i64 };
 
 pub fn validatePassword(password: []const u8, salt: []const u8, stored_key: *const [32]u8) !bool {
     var key: [32]u8 = undefined;
@@ -12,21 +12,18 @@ pub fn validatePassword(password: []const u8, salt: []const u8, stored_key: *con
     return std.mem.eql(u8, &key, stored_key);
 }
 
-pub fn issueTicket(allocator: std.mem.Allocator, name: []const u8, password: []const u8) !?Ticket {
-    var db_context = try DbContext.init(allocator);
-    defer db_context.deinit();
-    if (try db_context.validateUser(name, password)) |user| {
-        return .{ .name = user.name, .id = user.id, .iat = std.time.timestamp(), .exp = 0 };
+pub fn issueTicket(database: *jetzig.http.Database, name: []const u8, password: []const u8) !?Ticket {
+    if (try db_context.validateBro(database, name, password)) |bro| {
+        return .{ .name = bro.name, .id = bro.id, .iat = std.time.timestamp(), .exp = 0 };
     }
     return null;
 }
 
 pub fn signin(request: *jetzig.Request, email: []const u8, password: []const u8) !bool {
-    if (try issueTicket(request.allocator, email, password)) |ticket| {
-        defer request.allocator.free(ticket.name);
+    if (try issueTicket(request.server.database, email, password)) |ticket| {
         var data = jetzig.zmpl.Data.init(request.allocator);
         var root = try data.object();
-        try root.put("name", data.string(ticket.name));
+        try root.put("name", data.string(&ticket.name));
         try root.put("id", data.integer(ticket.id));
         try root.put("iat", data.integer(ticket.iat));
         try root.put("exp", data.integer(ticket.exp));

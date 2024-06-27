@@ -647,7 +647,7 @@ class MonthViewDay extends s3 {
   static styles = i`
       :host {
         --calendar-number-fg: light-dark(#787777, #22);
-        --calendar-this-month-bg: light-dark(#dae2f8, #442d2d);
+        --calendar-this-month-bg: light-dark(#dae2f8, #3b463b);
         --calendar-this-month-active-bg: light-dark(#fff, #000);
         --calendar-month-bg: light-dark(#eeeeec, #323030);
         --calendar-today-fg: light-dark(#155741, #adf5c5);

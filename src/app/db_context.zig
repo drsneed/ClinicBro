@@ -1,58 +1,43 @@
 const std = @import("std");
-const pg = @import("pg");
-const UserAccount = @import("models/user_account.zig");
+const jetzig = @import("jetzig");
+const Bro = @import("models/domain/bro.zig");
 const log = std.log.scoped(.DbContext);
 const DbContext = @This();
 allocator: std.mem.Allocator,
-pool: *pg.Pool,
 
-pub fn init(allocator: std.mem.Allocator) !DbContext {
-    return .{
-        .allocator = allocator,
-        .pool = try pg.Pool.init(allocator, .{ .size = 5, .connect = .{
-            .port = 5432,
-            .host = "127.0.0.1",
-        }, .auth = .{
-            .username = "postgres",
-            .database = "ClinicBro",
-            .password = "tokyo_2",
-            .timeout = 10_000,
-        } }),
-    };
-}
-
-pub fn deinit(self: DbContext) void {
-    self.pool.deinit();
-}
-
-pub fn validateUser(self: DbContext, name: []const u8, password: []const u8) !?UserAccount {
-    var result = try self.pool.query("SELECT id, name FROM user_account where name=$1 and (password = crypt($2, password))", .{ name, password });
+pub fn validateBro(database: *jetzig.http.Database, name: []const u8, password: []const u8) !?Bro {
+    var result = try database.pool.query("select * from Bro where name=$1 and (password = crypt($2, password))", .{ name, password });
     defer result.deinit();
     if (try result.next()) |row| {
-        const id = row.get(i32, 0);
-        const db_name = row.get([]u8, 1);
-        //const date_created = row.get(i64, 2);
-        //log.info("date_created = {d}", .{date_created});
-        const user = try UserAccount.init(self.allocator, id, db_name, 0);
-        return user;
+        return makeBro(row);
     }
-
     return null;
 }
 
-pub fn getAllUsers(self: DbContext) !std.ArrayList(UserAccount) {
-    var result = try self.pool.query("select id, name, date_created from user_account", .{});
+fn makeBro(row: jetzig.http.Database.pg.Row) Bro {
+    var bro = Bro{
+        .id = row.get(i32, 0),
+        .active = row.get(bool, 1),
+        // copy name below (row 2)
+        // skip password (row 3)
+        .color = row.get(i32, 4),
+        .sees_clients = row.get(bool, 5),
+        .date_created = row.get(i64, 6),
+        .date_updated = row.get(i64, 7),
+        .created_bro_id = row.get(i32, 8),
+        .updated_bro_id = row.get(i32, 9),
+    };
+    _ = std.fmt.bufPrint(bro.name[0..], "{s}", .{row.get([]u8, 2)}) catch unreachable;
+    return bro;
+}
+
+pub fn getBros(allocator: std.mem.Allocator, database: *jetzig.http.Database, include_inactive: bool) !std.ArrayList(Bro) {
+    const query = if (include_inactive) "select * from Bro" else "select * from Bro where active=true";
+    var result = try database.pool.query(query, .{});
     defer result.deinit();
-
-    var users = std.ArrayList(UserAccount).init(self.allocator);
-
+    var bros = std.ArrayList(Bro).init(allocator);
     while (try result.next()) |row| {
-        const id = row.get(i32, 0);
-        const name = row.get([]u8, 1);
-        const date_created = row.get(i64, 2);
-        const user = try UserAccount.init(self.allocator, id, name, date_created);
-        try users.append(user);
+        try bros.append(makeBro(row));
     }
-
-    return users;
+    return bros;
 }

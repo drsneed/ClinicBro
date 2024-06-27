@@ -3,10 +3,8 @@ const builtin = @import("builtin");
 
 const jetzig = @import("jetzig");
 const zmd = @import("zmd");
-
 pub const routes = @import("routes");
 pub const static = @import("static");
-
 // const webui = @import("webui");
 
 //const zdt = @import("zdt");
@@ -118,6 +116,16 @@ pub const jetzig_options = struct {
         .path = "/",
         .same_site = .strict,
         .max_age = 10 * 365 * 24 * 60 * 60,
+    };
+
+    /// Postgres database configuration
+    pub const database_options: jetzig.http.Database.DatabaseOptions = .{
+        .host = "127.0.0.1",
+        .port = 5432,
+        .username = "postgres",
+        .database = "ClinicBro",
+        .password = "tokyo_2",
+        .timeout = 10_000,
     };
 
     /// Force email delivery in development mode (instead of printing email body to logger).

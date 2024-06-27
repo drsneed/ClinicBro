@@ -6,11 +6,11 @@
           <th>Date Created</th>
         </tr>
         @zig {
-            const users = zmpl.getT(.array, "users").?;
-            for (users) |user| {
-                const id = user.getT(.integer, "id") orelse continue;
-                const name = user.getT(.string, "name") orelse continue;
-                const date_created = user.getT(.integer, "date_created") orelse continue;
+            const bros = zmpl.getT(.array, "bros").?;
+            for (bros) |bro| {
+                const id = bro.getT(.integer, "id") orelse continue;
+                const name = bro.getT(.string, "name") orelse continue;
+                const date_created = bro.getT(.integer, "date_created") orelse continue;
                 <tr>
                   <td>{{id}}</td>
                   <td>{{name}}</td>

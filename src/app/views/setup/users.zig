@@ -1,29 +1,25 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const DbContext = @import("../../db_context.zig");
+const db_context = @import("../../db_context.zig");
+const log = std.log.scoped(.bros);
 pub const layout = "app";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var root = data.value.?;
-    try root.put("page_title", data.string("User Setup"));
+    try root.put("page_title", data.string("Bro Setup"));
     try root.put("setup_expander_state", data.string("open"));
-    try root.put("setup_users", data.string("class=\"current\""));
-    const user_array = try data.array();
-    try root.put("users", user_array);
-    // load account list from database
-
-    var db_context = try DbContext.init(request.allocator);
-    defer db_context.deinit();
-    const users = try db_context.getAllUsers();
-    defer users.deinit();
-
-    // append each db account to accounts json array
-    for (users.items) |user| {
-        var usr = try data.object();
-        try usr.put("id", data.integer(user.id));
-        try usr.put("name", data.string(user.name));
-        try usr.put("date_created", data.integer(user.date_created));
-        try user_array.append(usr);
+    try root.put("setup_bros", data.string("class=\"current\""));
+    const json_bros = try data.array();
+    try root.put("bros", json_bros);
+    // load bros from database and build json array for page model
+    const bros = try db_context.getBros(request.allocator, request.server.database, false);
+    defer bros.deinit();
+    for (bros.items) |bro| {
+        var json_bro = try data.object();
+        try json_bro.put("id", data.integer(bro.id));
+        try json_bro.put("name", data.string(&bro.name));
+        try json_bro.put("date_created", data.integer(bro.date_created));
+        try json_bros.append(json_bro);
     }
 
     return request.render(.ok);

@@ -8,7 +8,7 @@
     color-scheme: light dark;
     --bg: light-dark(#eeecec, #18191a);
     --fg: light-dark(#18191a, #d8d8d8);
-    --header-bg: light-dark(#027160, #223c38); /* #1d3a4e */
+    --header-bg: light-dark(#027160, #0c261c); /* #1d3a4e */
     --header-fg: #f1f1e3;
     --header-border: light-dark(#444, black);
     --header-shadow: light-dark(#999, black);
