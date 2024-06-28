@@ -13,7 +13,11 @@ export class MonthViewDialog extends LitElement {
 
     // @ts-ignore
     @property({type: String})
-    title: string;
+    window_title: string;
+
+    // @ts-ignore
+    @property({type: String})
+    event_title: string;
 
     // @ts-ignore
     @property({converter(value) {return new Date(value);}})
@@ -24,14 +28,15 @@ export class MonthViewDialog extends LitElement {
     from: Date;
 
     // @ts-ignore
-    @property({converter(value) {return new Date(value);}, reflect: true})
+    @property({converter(value) {return new Date(value);}})
     to: Date;
 
 
     constructor () {
         super();
         this.opened = false;
-        this.title = "Window";
+        this.window_title = "Window";
+        this.event_title = "";
         this.appointment_date = new Date();
         this.from = new Date();
         this.to = dateAdd(this.from, 'minute', 30);
@@ -243,18 +248,21 @@ export class MonthViewDialog extends LitElement {
     `;
 
     render() {
+        return this.renderEvent();
+    }
+    renderEvent() {
         
         return html`
         <div id="window" class="${classMap({dialog: true, opened: this.opened, closed: !this.opened})}" style=${styleMap(this.drag.styles)}>
             <div id="draggable" class="header" data-dragging=${this.drag.state}>
-                <h4 class="title">${this.title}</h4>
+                <h4 class="title">${this.window_title}</h4>
                 <button class="closebtn" @click="${() => this.dispatchEvent(new CustomEvent('dialog.cancel'))}">&times;</button>
             </div>
             <div class="content">
                 <form>
                     <div class="text-field">
-                        <input type="text" name="type" maxlength="255" required>
-                        <label for="type">Appointment Type</label>
+                        <input type="text" name="type" maxlength="255" value="${this.event_title}" required>
+                        <label for="type">Title</label>
                     </div>
                     <div class="date-container">
                         <div class="text-field">

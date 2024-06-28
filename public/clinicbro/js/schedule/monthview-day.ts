@@ -148,7 +148,7 @@ export class MonthViewDay extends LitElement {
 
     private _addAppointment() {
       const schedule = document.getElementById("schedule");
-      schedule.showAppointmentDialog(this.current_date);
+      schedule.showCreateAppointmentDialog(this.current_date);
     }
 
     protected render() {
@@ -159,7 +159,7 @@ export class MonthViewDay extends LitElement {
           <div class="${dayClass}">
             <span class="num ${this.numClass()}">${num}</span>
             <button class="${classMap({btn_add: true, btn_add_show: this.selected, btn_add_hide: !this.selected})}" 
-              @click="${this._addAppointment}" title="Create New Appointment">+</button>
+              @click="${this._addAppointment}" title="Add New Event">+</button>
             <slot></slot>
           </div>
       `;

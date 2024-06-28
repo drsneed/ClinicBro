@@ -17,7 +17,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     for (bros.items) |bro| {
         var json_bro = try data.object();
         try json_bro.put("id", data.integer(bro.id));
-        try json_bro.put("name", data.string(&bro.name));
+        try json_bro.put("name", data.string(bro.name[0..bro.name_len()]));
         try json_bro.put("date_created", data.integer(bro.date_created));
         try json_bros.append(json_bro);
     }

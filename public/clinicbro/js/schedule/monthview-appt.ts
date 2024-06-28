@@ -46,7 +46,8 @@ export class MonthViewAppointment extends LitElement {
   }
 
   public doubleClicked() {
-    console.log(this.name + " double clicked!");
+    const schedule = document.getElementById("schedule");
+    schedule.showEditAppointmentDialog(this);
   }
 
   render() {

@@ -4,31 +4,23 @@ const db_context = @import("db_context.zig");
 const jwt = @import("jwt.zig");
 const log = std.log.scoped(.auth);
 
-pub const Ticket = struct { name: [16]u8, id: i64, iat: i64, exp: i64 };
-
 pub fn validatePassword(password: []const u8, salt: []const u8, stored_key: *const [32]u8) !bool {
     var key: [32]u8 = undefined;
     try std.crypto.pwhash.pbkdf2(&key, password, salt, 2171, std.crypto.auth.hmac.sha2.HmacSha256);
     return std.mem.eql(u8, &key, stored_key);
 }
 
-pub fn issueTicket(database: *jetzig.http.Database, name: []const u8, password: []const u8) !?Ticket {
-    if (try db_context.validateBro(database, name, password)) |bro| {
-        return .{ .name = bro.name, .id = bro.id, .iat = std.time.timestamp(), .exp = 0 };
-    }
-    return null;
-}
-
-pub fn signin(request: *jetzig.Request, email: []const u8, password: []const u8) !bool {
-    if (try issueTicket(request.server.database, email, password)) |ticket| {
+pub fn signin(request: *jetzig.Request, name: []const u8, password: []const u8) !bool {
+    if (try db_context.validateBro(request.server.database, name, password)) |bro| {
+        log.info("security, validated bro {s}", .{bro.name});
         var data = jetzig.zmpl.Data.init(request.allocator);
         var root = try data.object();
-        try root.put("name", data.string(&ticket.name));
-        try root.put("id", data.integer(ticket.id));
-        try root.put("iat", data.integer(ticket.iat));
-        try root.put("exp", data.integer(ticket.exp));
+        try root.put("name", data.string(bro.name[0..bro.name_len()]));
+        try root.put("id", data.integer(bro.id));
+        try root.put("iat", data.integer(std.time.timestamp()));
+        try root.put("exp", data.integer(0));
         var session = try request.session();
-        try session.put("ticket", root);
+        try session.put("bro", root);
         return true;
     }
     return false;
@@ -45,9 +37,9 @@ pub fn authenticate(request: *jetzig.Request) !bool {
     var user_name: []const u8 = "Guest";
 
     const session = try request.session();
-    if (try session.get("ticket")) |ticket| {
+    if (try session.get("bro")) |bro| {
         authenticated = true;
-        user_name = ticket.getT(.string, "name") orelse "?";
+        user_name = bro.getT(.string, "name") orelse "?";
     }
 
     const data = request.response_data;

@@ -1001,7 +1001,8 @@ class MonthViewDialog extends s3 {
   constructor() {
     super();
     this.opened = false;
-    this.title = "Window";
+    this.window_title = "Window";
+    this.event_title = "";
     this.appointment_date = new Date;
     this.from = new Date;
     this.to = dateAdd(this.from, "minute", 30);
@@ -1207,17 +1208,20 @@ class MonthViewDialog extends s3 {
 
     `;
   render() {
+    return this.renderEvent();
+  }
+  renderEvent() {
     return x`
         <div id="window" class="${e6({ dialog: true, opened: this.opened, closed: !this.opened })}" style=${o5(this.drag.styles)}>
             <div id="draggable" class="header" data-dragging=${this.drag.state}>
-                <h4 class="title">${this.title}</h4>
+                <h4 class="title">${this.window_title}</h4>
                 <button class="closebtn" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">&times;</button>
             </div>
             <div class="content">
                 <form>
                     <div class="text-field">
-                        <input type="text" name="type" maxlength="255" required>
-                        <label for="type">Appointment Type</label>
+                        <input type="text" name="type" maxlength="255" value="${this.event_title}" required>
+                        <label for="type">Title</label>
                     </div>
                     <div class="date-container">
                         <div class="text-field">
@@ -1251,7 +1255,10 @@ __legacyDecorateClassTS([
 ], MonthViewDialog.prototype, "opened", undefined);
 __legacyDecorateClassTS([
   n4({ type: String })
-], MonthViewDialog.prototype, "title", undefined);
+], MonthViewDialog.prototype, "window_title", undefined);
+__legacyDecorateClassTS([
+  n4({ type: String })
+], MonthViewDialog.prototype, "event_title", undefined);
 __legacyDecorateClassTS([
   n4({ converter(value) {
     return new Date(value);

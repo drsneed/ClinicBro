@@ -11,8 +11,8 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         return_url = return_url_param;
     }
     const session = try request.session();
-    if (try session.get("ticket")) |ticket| {
-        _ = ticket;
+    if (try session.get("bro")) |bro| {
+        _ = bro;
         return request.redirect(return_url, .found);
     } else {
         var root = try data.object();

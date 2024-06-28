@@ -997,9 +997,14 @@ class MonthView extends s3 {
     if (changedProperties.has("current_date")) {
     }
   }
-  showAppointmentDialog(date_clicked) {
+  showCreateAppointmentDialog(date_clicked) {
+    if (this.appointment_dialog_opened) {
+      console.log("Dialog is already open. Aborting mission :(");
+      return false;
+    }
     let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.title = "New Appointment";
+    dialog.window_title = "New Event";
+    dialog.event_title = "";
     dialog.appointment_date = date_clicked;
     let from = new Date;
     from.setSeconds(0);
@@ -1007,6 +1012,20 @@ class MonthView extends s3 {
     console.log("from = " + from.toLocaleTimeString());
     dialog.from = from;
     dialog.to = dateAdd(from, "minute", 30);
+    this.appointment_dialog_opened = true;
+    return true;
+  }
+  showEditAppointmentDialog(appointment) {
+    if (this.appointment_dialog_opened) {
+      console.log("Dialog is already open. Aborting mission :(");
+      return false;
+    }
+    let dialog = this.shadowRoot.querySelector("#mv_dialog");
+    dialog.window_title = "Edit Event";
+    dialog.event_title = appointment.title;
+    dialog.appointment_date = appointment.start;
+    dialog.from = appointment.start;
+    dialog.to = appointment.end;
     this.appointment_dialog_opened = true;
     return true;
   }
@@ -1064,6 +1083,7 @@ class MonthView extends s3 {
   }
   closeAppointmentDialog() {
     this.appointment_dialog_opened = false;
+    clearAllSelectedDays();
   }
   render() {
     return x`

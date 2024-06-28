@@ -47,13 +47,14 @@ export class MonthView extends LitElement {
     }
   }
 
-  showAppointmentDialog(date_clicked: Date) {
-    // if(this.appointment_dialog_opened) {
-    //   console.log("Dialog is already open. Aborting mission :(");
-    //   return false;
-    // }
+  showCreateAppointmentDialog(date_clicked: Date) {
+    if(this.appointment_dialog_opened) {
+      console.log("Dialog is already open. Aborting mission :(");
+      return false;
+    }
     let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.title = "New Appointment";
+    dialog.window_title = "New Event";
+    dialog.event_title = "";
     dialog.appointment_date = date_clicked;
     let from = new Date();
     from.setSeconds(0);
@@ -61,6 +62,21 @@ export class MonthView extends LitElement {
     console.log("from = " + from.toLocaleTimeString());
     dialog.from = from;
     dialog.to = dateAdd(from, 'minute', 30);
+    this.appointment_dialog_opened = true;
+    return true;
+  }
+
+  showEditAppointmentDialog(appointment: MonthViewAppointment) {
+    if(this.appointment_dialog_opened) {
+      console.log("Dialog is already open. Aborting mission :(");
+      return false;
+    }
+    let dialog = this.shadowRoot.querySelector("#mv_dialog");
+    dialog.window_title = "Edit Event";
+    dialog.event_title = appointment.title;
+    dialog.appointment_date = appointment.start;
+    dialog.from = appointment.start;
+    dialog.to = appointment.end;
     this.appointment_dialog_opened = true;
     return true;
   }
@@ -129,6 +145,7 @@ export class MonthView extends LitElement {
 
   closeAppointmentDialog () {
     this.appointment_dialog_opened = false;
+    clearAllSelectedDays();
   }
   
   render() {

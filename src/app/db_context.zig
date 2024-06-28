@@ -27,7 +27,8 @@ fn makeBro(row: jetzig.http.Database.pg.Row) Bro {
         .created_bro_id = row.get(i32, 8),
         .updated_bro_id = row.get(i32, 9),
     };
-    _ = std.fmt.bufPrint(bro.name[0..], "{s}", .{row.get([]u8, 2)}) catch unreachable;
+    @memset(&bro.name, 0);
+    _ = std.fmt.bufPrint(&bro.name, "{s}", .{row.get([]u8, 2)}) catch unreachable;
     return bro;
 }
 

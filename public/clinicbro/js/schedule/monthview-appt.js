@@ -658,7 +658,8 @@ class MonthViewAppointment extends s3 {
     this.selected = true;
   }
   doubleClicked() {
-    console.log(this.name + " double clicked!");
+    const schedule = document.getElementById("schedule");
+    schedule.showEditAppointmentDialog(this);
   }
   render() {
     let startHours = this.start.getHours() % 12 || 12;
