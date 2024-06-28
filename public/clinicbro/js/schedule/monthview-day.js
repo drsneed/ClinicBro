@@ -642,6 +642,53 @@ var r5 = (t4 = o5, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
+// node_modules/lit-html/directive.js
+var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
+var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
+
+class i4 {
+  constructor(t5) {
+  }
+  get _$AU() {
+    return this._$AM._$AU;
+  }
+  _$AT(t5, e6, i5) {
+    this._$Ct = t5, this._$AM = e6, this._$Ci = i5;
+  }
+  _$AS(t5, e6) {
+    return this.update(t5, e6);
+  }
+  update(t5, e6) {
+    return this.render(...e6);
+  }
+}
+
+// node_modules/lit-html/directives/class-map.js
+var e6 = e5(class extends i4 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
+      throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
+  }
+  render(t5) {
+    return " " + Object.keys(t5).filter((s4) => t5[s4]).join(" ") + " ";
+  }
+  update(s4, [i5]) {
+    if (this.st === undefined) {
+      this.st = new Set, s4.strings !== undefined && (this.nt = new Set(s4.strings.join(" ").split(/\s/).filter((t5) => t5 !== "")));
+      for (const t5 in i5)
+        i5[t5] && !this.nt?.has(t5) && this.st.add(t5);
+      return this.render(i5);
+    }
+    const r6 = s4.element.classList;
+    for (const t5 of this.st)
+      t5 in i5 || (r6.remove(t5), this.st.delete(t5));
+    for (const t5 in i5) {
+      const s5 = !!i5[t5];
+      s5 === this.st.has(t5) || this.nt?.has(t5) || (s5 ? (r6.add(t5), this.st.add(t5)) : (r6.remove(t5), this.st.delete(t5)));
+    }
+    return w;
+  }
+});
 // public/clinicbro/js/schedule/monthview-day.ts
 class MonthViewDay extends s3 {
   static styles = i`
@@ -652,12 +699,14 @@ class MonthViewDay extends s3 {
         --calendar-month-bg: light-dark(#eeeeec, #323030);
         --calendar-today-fg: light-dark(#155741, #adf5c5);
         --table-fg: light-dark(#16181a, #a2b4b1);
+        --btn-add-fg: light-dark()
       }
       div {
         width: 100%;
         height: 100%;
         max-width: 100%;
         white-space: nowrap;
+        user-select: none;
       }
       
       .num {
@@ -681,6 +730,52 @@ class MonthViewDay extends s3 {
         padding: 0px 4px !important;
         color: var(--calendar-today-fg) !important;
       }
+
+      .menu {
+        position: absolute;
+        top: -20px;
+        left: 0;
+        margin: 0;
+      }
+
+      .menu_opened {
+        display: flex;
+      }
+      .menu_closed {
+        display: none;
+      }
+
+      .btn_add {
+        padding-left: 2px;
+        padding-top: 0px;
+        padding-right: 2px;
+        padding-bottom: 1px;
+        cursor: pointer;
+        border-radius: 50%;
+        /* border: 1px solid var(--btn-save-bg); */
+        border: none;
+        margin-right: 2px;
+        margin-top: 2px;
+        font-size: 11px;
+        font-weight: bold;
+        background-color: transparent;
+        color: var(--btn-save-bg);
+        float: right;
+      }
+
+      .btn_add_show {
+        display: flex;
+      }
+      .btn_add_hide {
+        display: none;
+      }
+
+      .btn_add:hover {
+        background-color: var(--btn-save-bg);
+        color: var(--btn-save-hover-bg);
+        /* text-decoration: underline; */
+        
+      }
     `;
   constructor() {
     super();
@@ -696,33 +791,40 @@ class MonthViewDay extends s3 {
     this.selected = true;
   }
   doubleClicked() {
+    console.log("swoosh");
+  }
+  _clickHandler(e7) {
+    clearAllSelectedDays();
+    switch (e7.target.localName) {
+      case "mv-day":
+      case "mv-appt":
+        e7.target.clicked();
+        break;
+    }
+  }
+  _doubleClickHandler(e7) {
+    switch (e7.target.localName) {
+      case "mv-day":
+      case "mv-appt":
+        e7.target.doubleClicked();
+        break;
+    }
+  }
+  _addAppointment() {
     const schedule = document.getElementById("schedule");
     schedule.showAppointmentDialog(this.current_date);
-  }
-  _clickHandler(e5) {
-    clearAllSelectedDays();
-    switch (e5.target.localName) {
-      case "mv-day":
-      case "mv-appt":
-        e5.target.clicked();
-        break;
-    }
-  }
-  _doubleClickHandler(e5) {
-    switch (e5.target.localName) {
-      case "mv-day":
-      case "mv-appt":
-        e5.target.doubleClicked();
-        break;
-    }
   }
   render() {
     let dayClass = this.selected ? "this-month-active" : this.current_month ? "this-month" : "";
     let num = this.current_date.getDate();
-    return x`<div class="${dayClass}">
-        <span class="num ${this.numClass()}">${num}</span>
-        <slot></slot>
-      </div>`;
+    return x`
+          <div class="${dayClass}">
+            <span class="num ${this.numClass()}">${num}</span>
+            <button class="${e6({ btn_add: true, btn_add_show: this.selected, btn_add_hide: !this.selected })}" 
+              @click="${this._addAppointment}" title="Create New Appointment">+</button>
+            <slot></slot>
+          </div>
+      `;
   }
 }
 __legacyDecorateClassTS([

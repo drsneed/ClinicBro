@@ -19,7 +19,7 @@
         <hr />
         <a href="/" {{.main_home}}><span class="mdi mdi-home-outline mr-2"></span>Home</a>
         <hr />
-        <a href="/schedule" {{.main_schedule}}><span class="mdi mdi-calendar-account-outline mr-2"></span>Schedule</a>
+        <a href="/scheduler" {{.main_schedule}}><span class="mdi mdi-calendar-account-outline mr-2"></span>Scheduler</a>
         <hr />
         <details {{.setup_expander_state}}>
             <summary id="SetupExpander2" class="collapsible" id="setup">

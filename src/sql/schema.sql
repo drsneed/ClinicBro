@@ -12,6 +12,49 @@ create table Bro (
     updated_bro_id int
 );
 
+create table Location (
+    id serial primary key,
+    active boolean,
+    name varchar(50) not null unique,
+    phone varchar(15),
+    address_1 varchar(128),
+    address_2 varchar(32),
+    city varchar(35),
+    state varchar(2),
+    zip_code varchar(15),
+
+    -- tracking columns
+    date_created timestamp not null,
+    date_updated timestamp not null,
+    created_bro_id int,
+    updated_bro_id int
+);
+
+create table Schedule (
+    location_id int not null,
+    bro_id int, -- if null, it's the location's hours of operation
+    hours_sun_from time not null,
+    hours_sun_to time not null,
+    hours_mon_from time not null,
+    hours_mon_to time not null,
+    hours_tue_from time not null,
+    hours_tue_to time not null,
+    hours_wed_from time not null,
+    hours_wed_to time not null,
+    hours_thu_from time not null,
+    hours_thu_to time not null,
+    hours_fri_from time not null,
+    hours_fri_to time not null,
+    hours_sat_from time not null,
+    hours_sat_to time not null,
+    -- tracking columns
+    date_created timestamp not null,
+    date_updated timestamp not null,
+    created_bro_id int,
+    updated_bro_id int,
+    unique nulls not distinct(location_id, bro_id)
+);
+
 create table Client (
     id serial primary key,
     active boolean,
@@ -27,18 +70,20 @@ create table Client (
     address_2 varchar(32),
     city varchar(35),
     state varchar(2),
-    zip varchar(15),
+    zip_code varchar(15),
     notes varchar(2500),
     can_call boolean not null,
     can_text boolean not null,
     can_email boolean not null,
-    bro_id int references Bro(id),
+    location_id int not null references location(id),
+    bro_id int not null references Bro(id),
     -- tracking columns
     date_created timestamp not null,
     date_updated timestamp not null,
     created_bro_id int,
     updated_bro_id int
 );
+
 
 
 create table AppointmentType (
@@ -75,6 +120,7 @@ create table Appointment (
     client_id int references Client(id),
     type_id int references AppointmentType(id),
     status_id int references AppointmentStatus(id),
+    location_id int not null references Location(id),
     -- tracking columns
     date_created timestamp not null,
     date_updated timestamp not null,
