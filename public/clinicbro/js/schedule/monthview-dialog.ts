@@ -48,6 +48,12 @@ export class MonthViewDialog extends LitElement {
         this.appt_to = new Date();
     }
 
+    private _apptTitleKeyDown(e) {
+        if(e.code === 'Enter') {
+            this.dispatchEvent(new CustomEvent('dialog.save'));
+        }
+    }
+
     public apptDate() {
         let appt_date_input = this.shadowRoot.querySelector("#appt_date");
         return new Date(appt_date_input.value + "T00:00:00");
@@ -90,13 +96,11 @@ export class MonthViewDialog extends LitElement {
     updated(changedProperties) {
         //console.log(changedProperties); // logs previous values
         if(changedProperties.has('opened')) {
-          if(!this.opened) {
+          if(this.opened) {
+            this.shadowRoot.querySelector("#appt_title").focus();
+          }
+          else {
             this.drag.resetPosition();
-            // just closed
-            // let appt_from_input = this.shadowRoot.querySelector("#appt_from");
-            // this.appt_from = combineDateWithTimeString(this.appt_date, appt_from_input.value);
-            // let appt_to_input = this.shadowRoot.querySelector("#appt_to");
-            // this.appt_to = combineDateWithTimeString(this.appt_date, appt_to_input.value);
           }
           
           
@@ -323,34 +327,33 @@ export class MonthViewDialog extends LitElement {
                 <button class="closebtn" @click="${() => this.dispatchEvent(new CustomEvent('dialog.cancel'))}">&times;</button>
             </div>
             <div class="content">
-                <form>
+                <div class="text-field">
+                    <input id="appt_title" type="text" name="type" maxlength="255" @keydown="${this._apptTitleKeyDown}"
+                        value="${this.appt_title}" required>
+                    <label for="type">Title</label>
+                </div>
+                <div class="date-container">
                     <div class="text-field">
-                        <input id="appt_title" type="text" name="type" maxlength="255" value="${this.appt_title}" required>
-                        <label for="type">Title</label>
+                        <input id="appt_date" type="date" name="date"
+                            value="${toIsoDateString(this.appt_date)}" required>
+                        <label for="date">Date</label>
                     </div>
-                    <div class="date-container">
-                        <div class="text-field">
-                            <input id="appt_date" type="date" name="date"
-                                value="${toIsoDateString(this.appt_date)}" required>
-                            <label for="date">Date</label>
-                        </div>
+                </div>
+                <div class="time-inputs">
+                    <div class="text-field time-input">
+                        <input id="appt_from" type="time" name="from" required>
+                        <label for="from">From</label>
                     </div>
-                    <div class="time-inputs">
-                        <div class="text-field time-input">
-                            <input id="appt_from" type="time" name="from" required>
-                            <label for="from">From</label>
-                        </div>
-                        <div class="text-field time-input">
-                            <input id="appt_to" type="time" name="to" required>
-                            <label for="to">&nbsp;&nbsp;&nbsp;To</label>
-                        </div>
+                    <div class="text-field time-input">
+                        <input id="appt_to" type="time" name="to" required>
+                        <label for="to">&nbsp;&nbsp;&nbsp;To</label>
                     </div>
-                    
-                    <div class="buttons">
-                        <button type="button" class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent('dialog.save'))}">Save</button>  
-                        <button type="button" class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent('dialog.cancel'))}">Cancel</button>  
-                    </div>
-                </form>
+                </div>
+                
+                <div class="buttons">
+                    <button type="button" class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent('dialog.save'))}">Save</button>  
+                    <button type="button" class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent('dialog.cancel'))}">Cancel</button>  
+                </div>
             </div>
         </div>`;
     }

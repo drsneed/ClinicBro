@@ -712,8 +712,23 @@ class MonthViewDay extends s3 {
       
       .num {
         font-size: 10px;
-        color: var(--calendar-number-fg);
-        padding: 0px 6px;
+        padding-left: 4px;
+        padding-top: 2px;
+        padding-right: 4px;
+        padding-bottom: 2px;
+        cursor: pointer;
+        border-radius: 50%;
+        border: none;
+        margin-left: 2px;
+        margin-top: 2px;
+        background-color: transparent;
+      }
+      .today {
+        border: 1px solid var(--calendar-today-fg);
+        color: var(--calendar-today-fg) !important;
+      }
+      .num:hover {
+        font-weight: bold;
       }
 
       .this_month {
@@ -724,13 +739,7 @@ class MonthViewDay extends s3 {
         background-color: var(--calendar-this-month-active-bg) !important;
       }
       
-      .today {
-        font-weight: bold;
-        border: 1px solid var(--calendar-today-fg);
-        border-radius: 50%;
-        padding: 0px 4px !important;
-        color: var(--calendar-today-fg) !important;
-      }
+
 
       .menu {
         position: absolute;
@@ -792,9 +801,6 @@ class MonthViewDay extends s3 {
       }
     }
   }
-  numClass() {
-    return sameDay(this.current_date, new Date) ? "today" : "";
-  }
   clicked() {
     let schedule = document.querySelector("#schedule");
     if (schedule.appointment_dialog_opened) {
@@ -804,7 +810,8 @@ class MonthViewDay extends s3 {
     this.selected = true;
   }
   doubleClicked() {
-    console.log("swoosh");
+    const schedule = document.getElementById("schedule");
+    schedule.showCreateAppointmentDialog(this.current_date);
   }
   _clickHandler(e7) {
     clearAllSelectedDays();
@@ -837,13 +844,19 @@ class MonthViewDay extends s3 {
   _allowDrop(e7) {
     e7.preventDefault();
   }
+  _gotoDayView(e7) {
+    e7.preventDefault();
+    alert("Gone baby boom!");
+  }
   render() {
     let num = this.current_date.getDate();
     return x`
           <div class="${e6({ selected: this.selected, this_month: this.current_month })}" @drop="${this._drop}" @dragover="${this._allowDrop}">
-            <span class="${e6({ num: true, today: sameDay(this.current_date, new Date) })}">${num}</span>
-            <button class="${e6({ btn_add: true, btn_add_show: this.selected, btn_add_hide: !this.selected })}" 
-              @click="${this._addAppointment}" title="Add New Event">+</button>
+            <!-- <span class="${e6({ num: true, today: sameDay(this.current_date, new Date) })}">${num}</span> -->
+            <button class="${e6({ num: true, today: sameDay(this.current_date, new Date) })}" 
+              @click="${this._gotoDayView}">${num}</button>
+            <!-- <button type="button" class="${e6({ btn_add: true, btn_add_show: this.selected, btn_add_hide: !this.selected })}" 
+              @click="${this._addAppointment}" title="Add New Event">+</button> -->
             <slot></slot>
           </div>
       `;

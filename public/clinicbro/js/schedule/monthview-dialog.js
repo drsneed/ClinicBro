@@ -972,6 +972,11 @@ class MonthViewDialog extends s3 {
     this.appt_from = new Date;
     this.appt_to = new Date;
   }
+  _apptTitleKeyDown(e7) {
+    if (e7.code === "Enter") {
+      this.dispatchEvent(new CustomEvent("dialog.save"));
+    }
+  }
   apptDate() {
     let appt_date_input = this.shadowRoot.querySelector("#appt_date");
     return new Date(appt_date_input.value + "T00:00:00");
@@ -1003,7 +1008,9 @@ class MonthViewDialog extends s3 {
   }
   updated(changedProperties) {
     if (changedProperties.has("opened")) {
-      if (!this.opened) {
+      if (this.opened) {
+        this.shadowRoot.querySelector("#appt_title").focus();
+      } else {
         this.drag.resetPosition();
       }
     }
@@ -1206,34 +1213,33 @@ class MonthViewDialog extends s3 {
                 <button class="closebtn" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">&times;</button>
             </div>
             <div class="content">
-                <form>
+                <div class="text-field">
+                    <input id="appt_title" type="text" name="type" maxlength="255" @keydown="${this._apptTitleKeyDown}"
+                        value="${this.appt_title}" required>
+                    <label for="type">Title</label>
+                </div>
+                <div class="date-container">
                     <div class="text-field">
-                        <input id="appt_title" type="text" name="type" maxlength="255" value="${this.appt_title}" required>
-                        <label for="type">Title</label>
+                        <input id="appt_date" type="date" name="date"
+                            value="${toIsoDateString(this.appt_date)}" required>
+                        <label for="date">Date</label>
                     </div>
-                    <div class="date-container">
-                        <div class="text-field">
-                            <input id="appt_date" type="date" name="date"
-                                value="${toIsoDateString(this.appt_date)}" required>
-                            <label for="date">Date</label>
-                        </div>
+                </div>
+                <div class="time-inputs">
+                    <div class="text-field time-input">
+                        <input id="appt_from" type="time" name="from" required>
+                        <label for="from">From</label>
                     </div>
-                    <div class="time-inputs">
-                        <div class="text-field time-input">
-                            <input id="appt_from" type="time" name="from" required>
-                            <label for="from">From</label>
-                        </div>
-                        <div class="text-field time-input">
-                            <input id="appt_to" type="time" name="to" required>
-                            <label for="to">&nbsp;&nbsp;&nbsp;To</label>
-                        </div>
+                    <div class="text-field time-input">
+                        <input id="appt_to" type="time" name="to" required>
+                        <label for="to">&nbsp;&nbsp;&nbsp;To</label>
                     </div>
-                    
-                    <div class="buttons">
-                        <button type="button" class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>  
-                        <button type="button" class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>  
-                    </div>
-                </form>
+                </div>
+                
+                <div class="buttons">
+                    <button type="button" class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>  
+                    <button type="button" class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>  
+                </div>
             </div>
         </div>`;
   }
