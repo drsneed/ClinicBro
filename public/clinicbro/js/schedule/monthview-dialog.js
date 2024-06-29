@@ -882,7 +882,7 @@ class DragController {
       this.init();
     });
   }
-  reset() {
+  resetPosition() {
     this.x = 0;
     this.y = 0;
     this.updateElPosition();
@@ -949,45 +949,9 @@ class DragController {
 }
 
 // public/clinicbro/js/util.ts
-function dateAdd(date, interval, units) {
-  var ret = new Date(date.valueOf());
-  var checkRollover = function() {
-    if (ret.getDate() != date.getDate())
-      ret.setDate(0);
-  };
-  switch (String(interval).toLowerCase()) {
-    case "year":
-      ret.setFullYear(ret.getFullYear() + units);
-      checkRollover();
-      break;
-    case "quarter":
-      ret.setMonth(ret.getMonth() + 3 * units);
-      checkRollover();
-      break;
-    case "month":
-      ret.setMonth(ret.getMonth() + units);
-      checkRollover();
-      break;
-    case "week":
-      ret.setDate(ret.getDate() + 7 * units);
-      break;
-    case "day":
-      ret.setDate(ret.getDate() + units);
-      break;
-    case "hour":
-      ret.setTime(ret.getTime() + units * 3600000);
-      break;
-    case "minute":
-      ret.setTime(ret.getTime() + units * 60000);
-      break;
-    case "second":
-      ret.setTime(ret.getTime() + units * 1000);
-      break;
-    default:
-      ret = undefined;
-      break;
-  }
-  return ret;
+function combineDateWithTimeString(d3, s4) {
+  let date_str = toIsoDateString(d3);
+  return new Date(date_str + "T" + s4);
 }
 function toIsoDateString(d3) {
   return d3.toISOString().split("T")[0];
@@ -1002,22 +966,46 @@ class MonthViewDialog extends s3 {
     super();
     this.opened = false;
     this.window_title = "Window";
-    this.event_title = "";
-    this.appointment_date = new Date;
-    this.from = new Date;
-    this.to = dateAdd(this.from, "minute", 30);
+    this.appt_title = "";
+    this.appt_id = 0;
+    this.appt_date = new Date;
+    this.appt_from = new Date;
+    this.appt_to = new Date;
+  }
+  apptDate() {
+    let appt_date_input = this.shadowRoot.querySelector("#appt_date");
+    return new Date(appt_date_input.value + "T00:00:00");
+  }
+  ready() {
+    let appt_title_input = this.shadowRoot.querySelector("#appt_title");
+    appt_title_input.value = this.appt_title;
+    let appt_date_input = this.shadowRoot.querySelector("#appt_date");
+    appt_date_input.value = toIsoDateString(this.appt_date);
+    let appt_from_input = this.shadowRoot.querySelector("#appt_from");
+    appt_from_input.value = toIsoTimeString(this.appt_from);
+    let appt_to_input = this.shadowRoot.querySelector("#appt_to");
+    appt_to_input.value = toIsoTimeString(this.appt_to);
+  }
+  collect() {
+    let appt_title_input = this.shadowRoot.querySelector("#appt_title");
+    this.appt_title = appt_title_input.value;
+    let appt_date_input = this.shadowRoot.querySelector("#appt_date");
+    this.appt_date = new Date(appt_date_input.value + "T00:00:00");
+    let appt_from_input = this.shadowRoot.querySelector("#appt_from");
+    this.appt_from = combineDateWithTimeString(this.apptDate(), appt_from_input.value);
+    let appt_to_input = this.shadowRoot.querySelector("#appt_to");
+    this.appt_to = combineDateWithTimeString(this.apptDate(), appt_to_input.value);
+  }
+  updateDate(new_date) {
+    this.collect();
+    this.appt_date = new_date;
+    this.ready();
   }
   updated(changedProperties) {
     if (changedProperties.has("opened")) {
-      this.drag.reset();
-    }
-    if (changedProperties.has("from")) {
-      let appt_from = this.shadowRoot.querySelector("#appt_from");
-      appt_from.value = toIsoTimeString(this.from);
-    }
-    if (changedProperties.has("to")) {
-      let appt_to = this.shadowRoot.querySelector("#appt_to");
-      appt_to.value = toIsoTimeString(this.to);
+      if (!this.opened) {
+        this.drag.resetPosition();
+      }
     }
   }
   drag = new DragController(this, {
@@ -1220,13 +1208,13 @@ class MonthViewDialog extends s3 {
             <div class="content">
                 <form>
                     <div class="text-field">
-                        <input type="text" name="type" maxlength="255" value="${this.event_title}" required>
+                        <input id="appt_title" type="text" name="type" maxlength="255" value="${this.appt_title}" required>
                         <label for="type">Title</label>
                     </div>
                     <div class="date-container">
                         <div class="text-field">
-                            <input type="date" name="date"
-                                value="${toIsoDateString(this.appointment_date)}" required>
+                            <input id="appt_date" type="date" name="date"
+                                value="${toIsoDateString(this.appt_date)}" required>
                             <label for="date">Date</label>
                         </div>
                     </div>
@@ -1242,8 +1230,8 @@ class MonthViewDialog extends s3 {
                     </div>
                     
                     <div class="buttons">
-                        <button class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>  
-                        <button class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>  
+                        <button type="button" class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>  
+                        <button type="button" class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>  
                     </div>
                 </form>
             </div>
@@ -1257,23 +1245,26 @@ __legacyDecorateClassTS([
   n4({ type: String })
 ], MonthViewDialog.prototype, "window_title", undefined);
 __legacyDecorateClassTS([
-  n4({ type: String })
-], MonthViewDialog.prototype, "event_title", undefined);
+  n4({ type: Number, reflect: true })
+], MonthViewDialog.prototype, "appt_id", undefined);
+__legacyDecorateClassTS([
+  n4({ type: String, reflect: true })
+], MonthViewDialog.prototype, "appt_title", undefined);
 __legacyDecorateClassTS([
   n4({ converter(value) {
     return new Date(value);
   } })
-], MonthViewDialog.prototype, "appointment_date", undefined);
+], MonthViewDialog.prototype, "appt_date", undefined);
 __legacyDecorateClassTS([
   n4({ converter(value) {
     return new Date(value);
   } })
-], MonthViewDialog.prototype, "from", undefined);
+], MonthViewDialog.prototype, "appt_from", undefined);
 __legacyDecorateClassTS([
   n4({ converter(value) {
     return new Date(value);
-  }, reflect: true })
-], MonthViewDialog.prototype, "to", undefined);
+  } })
+], MonthViewDialog.prototype, "appt_to", undefined);
 MonthViewDialog = __legacyDecorateClassTS([
   t3("mv-dialog")
 ], MonthViewDialog);

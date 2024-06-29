@@ -21,6 +21,7 @@ export class MonthViewDay extends LitElement {
         max-width: 100%;
         white-space: nowrap;
         user-select: none;
+        overflow-y: auto;
       }
       
       .num {
@@ -29,11 +30,11 @@ export class MonthViewDay extends LitElement {
         padding: 0px 6px;
       }
 
-      .this-month {
+      .this_month {
         background-color: var(--calendar-this-month-bg) !important;
       }
 
-      .this-month-active {
+      .selected {
         background-color: var(--calendar-this-month-active-bg) !important;
       }
       
@@ -113,11 +114,24 @@ export class MonthViewDay extends LitElement {
       this.addEventListener('dblclick', this._doubleClickHandler);
     }
 
+    updated(changedProperties) {
+      if(changedProperties.has('selected')) {
+        if(this.selected) {
+          console.log("wtf");
+        }
+      }
+    }
+
     numClass() {
       return sameDay(this.current_date, new Date()) ? "today" : "";
     }
 
     public clicked() {
+      let schedule = document.querySelector("#schedule");
+      if(schedule.appointment_dialog_opened) {
+        let dialog = schedule.shadowRoot.querySelector("#mv_dialog");
+        dialog.updateDate(this.current_date);
+      }
       this.selected = true;
     }
 
@@ -151,13 +165,23 @@ export class MonthViewDay extends LitElement {
       schedule.showCreateAppointmentDialog(this.current_date);
     }
 
+    private _drop(e) {
+      e.preventDefault();
+      let appt_id_str = e.dataTransfer.getData("text");
+      let appt_id = parseInt(appt_id_str.substring(4));
+      let schedule = document.getElementById("schedule");
+      schedule.moveAppointment(appt_id, this.current_date);
+    }
+
+    private _allowDrop(e) {
+      e.preventDefault();
+    }
+
     protected render() {
-        // @ts-ignore
-        let dayClass = this.selected ? "this-month-active" : (this.current_month ? "this-month" : "");
         let num = this.current_date.getDate();
         return html`
-          <div class="${dayClass}">
-            <span class="num ${this.numClass()}">${num}</span>
+          <div class="${classMap({selected: this.selected, this_month: this.current_month})}" @drop="${this._drop}" @dragover="${this._allowDrop}">
+            <span class="${classMap({num: true, today: sameDay(this.current_date, new Date())})}">${num}</span>
             <button class="${classMap({btn_add: true, btn_add_show: this.selected, btn_add_hide: !this.selected})}" 
               @click="${this._addAppointment}" title="Add New Event">+</button>
             <slot></slot>

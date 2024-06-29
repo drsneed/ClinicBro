@@ -1,6 +1,7 @@
 import {html, css, LitElement} from 'lit';
 import {dateAdd, months, sameDay, clearAllSelectedDays} from '../util';
 import {monthviewStyle} from './monthview-style';
+import {MonthViewAppointment} from './monthview-appt';
 import {customElement, property} from 'lit/decorators.js';
 import 'lit-icon/pkg/dist-src/lit-icon.js';
 import 'lit-icon/pkg/dist-src/lit-iconset.js';
@@ -32,9 +33,11 @@ export class MonthView extends LitElement {
     this.current_date = new Date();
     this.appointment_dialog_opened = false;
     var appt1 = {
-      name: "AUD EXAM",
-      start: new Date("2024-06-15T13:30:00"),
-      end: new Date("2024-06-15T14:30:00")
+      appt_id: 1,
+      appt_title: "Staff Meeting",
+      appt_date: new Date("2024-06-29T00:00:00"),
+      appt_from: new Date("2024-06-29T13:30:00"),
+      appt_to: new Date("2024-06-29T14:30:00")
     };
     this.appointments = [appt1];
   }
@@ -54,14 +57,16 @@ export class MonthView extends LitElement {
     }
     let dialog = this.shadowRoot.querySelector("#mv_dialog");
     dialog.window_title = "New Event";
-    dialog.event_title = "";
-    dialog.appointment_date = date_clicked;
+    dialog.appt_id = 0;
+    dialog.appt_title = "";
+    dialog.appt_date = date_clicked;
     let from = new Date();
     from.setSeconds(0);
     from.setMinutes(from.getMinutes() < 30 ? 0 : 30);
     console.log("from = " + from.toLocaleTimeString());
-    dialog.from = from;
-    dialog.to = dateAdd(from, 'minute', 30);
+    dialog.appt_from = from;
+    dialog.appt_to = dateAdd(from, 'minute', 30);
+    dialog.ready();
     this.appointment_dialog_opened = true;
     return true;
   }
@@ -73,12 +78,49 @@ export class MonthView extends LitElement {
     }
     let dialog = this.shadowRoot.querySelector("#mv_dialog");
     dialog.window_title = "Edit Event";
-    dialog.event_title = appointment.title;
-    dialog.appointment_date = appointment.start;
-    dialog.from = appointment.start;
-    dialog.to = appointment.end;
+    dialog.appt_title = appointment.appt_title;
+    dialog.appt_id = appointment.appt_id;
+    dialog.appt_date = appointment.appt_date;
+    dialog.appt_from = appointment.appt_from;
+    dialog.appt_to = appointment.appt_to;
+    dialog.ready();
     this.appointment_dialog_opened = true;
     return true;
+  }
+
+
+  saveAppointment (e) {
+    this.closeAppointmentDialog();
+    let dialog = this.shadowRoot.querySelector("#mv_dialog");
+    dialog.collect();
+    if(dialog.appt_id > 0) {
+      let index = this.appointments.findIndex(appt => appt.appt_id == dialog.appt_id);
+      this.appointments[index].appt_title = dialog.appt_title;
+      this.appointments[index].appt_from = dialog.appt_from;
+      this.appointments[index].appt_to = dialog.appt_to;
+      this.appointments[index].appt_date = dialog.appt_date;
+    }
+    else {
+      var id = Math.max(...this.appointments.map(o => o.appt_id)) + 1;
+      this.appointments.push({
+        appt_id: id,
+        appt_title: dialog.appt_title,
+        appt_date: dialog.appt_date,
+        appt_from: dialog.appt_from,
+        appt_to: dialog.appt_to
+      });
+    }
+  }
+
+  moveAppointment(appt_id: number, new_date: Date) {
+    let index = this.appointments.findIndex(appt => appt.appt_id == appt_id);
+    this.appointments[index].appt_date = new_date;
+    this.requestUpdate();
+  }
+
+  closeAppointmentDialog () {
+    this.appointment_dialog_opened = false;
+    clearAllSelectedDays();
   }
 
   private _prev(e: Event) {
@@ -112,8 +154,9 @@ export class MonthView extends LitElement {
     let current_month = date_of_day.getMonth() == this.current_date.getMonth();
     return html`<mv-day id="${id}" current_date="${date_of_day.toISOString()}" ?current_month=${current_month}>
       ${ // @ts-ignore
-        this.appointments.filter((appt) => sameDay(appt.start, date_of_day)).map((appt) => 
-        html`<mv-appt name="${appt.name}" start="${appt.start.toISOString()}" end="${appt.end.toISOString()}"></mv-appt>`
+        this.appointments.filter((appt) => sameDay(appt.appt_date, date_of_day)).map((appt) => 
+        html`<mv-appt appt_id="${appt.appt_id}" appt_title="${appt.appt_title}" appt_date = "${appt.appt_date.toISOString()}" 
+          appt_from="${appt.appt_from.toISOString()}" appt_to="${appt.appt_to.toISOString()}"></mv-appt>`
       )}
     </mv-day>`;
   }
@@ -136,16 +179,6 @@ export class MonthView extends LitElement {
       rows.push(html`<tr>${days}</tr>`);
     }
     return html`${rows}`;
-  }
-
-  saveAppointment (e) {
-    console.log("We saved that mothafuckin appointment bro!");
-    this.closeAppointmentDialog();
-  }
-
-  closeAppointmentDialog () {
-    this.appointment_dialog_opened = false;
-    clearAllSelectedDays();
   }
   
   render() {

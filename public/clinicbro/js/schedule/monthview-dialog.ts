@@ -3,7 +3,8 @@ import {customElement, property} from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { DragController } from './dragcontroller';
-import { toIsoDateString, toIsoTimeString, dateAdd } from './../util';
+import { toIsoDateString, toIsoTimeString, combineDateWithTimeString} from './../util';
+import { MonthViewAppointment } from './monthview-appt';
 
 @customElement("mv-dialog")
 export class MonthViewDialog extends LitElement {
@@ -16,46 +17,109 @@ export class MonthViewDialog extends LitElement {
     window_title: string;
 
     // @ts-ignore
-    @property({type: String})
-    event_title: string;
+    @property({type: Number, reflect: true})
+    appt_id: number;
+
+    // @ts-ignore
+    @property({type: String, reflect: true})
+    appt_title: string;
 
     // @ts-ignore
     @property({converter(value) {return new Date(value);}})
-    appointment_date: Date;
+    appt_date: Date;
 
     // @ts-ignore
     @property({converter(value) {return new Date(value);}})
-    from: Date;
+    appt_from: Date;
 
     // @ts-ignore
     @property({converter(value) {return new Date(value);}})
-    to: Date;
+    appt_to: Date;
 
 
     constructor () {
         super();
         this.opened = false;
         this.window_title = "Window";
-        this.event_title = "";
-        this.appointment_date = new Date();
-        this.from = new Date();
-        this.to = dateAdd(this.from, 'minute', 30);
+        this.appt_title = "";
+        this.appt_id = 0;
+        this.appt_date = new Date();
+        this.appt_from = new Date();
+        this.appt_to = new Date();
+    }
+
+    public apptDate() {
+        let appt_date_input = this.shadowRoot.querySelector("#appt_date");
+        return new Date(appt_date_input.value + "T00:00:00");
+    }
+
+    public ready() {
+        let appt_title_input = this.shadowRoot.querySelector("#appt_title");
+        appt_title_input.value = this.appt_title;
+
+        let appt_date_input = this.shadowRoot.querySelector("#appt_date");
+        appt_date_input.value = toIsoDateString(this.appt_date);
+
+        let appt_from_input = this.shadowRoot.querySelector("#appt_from");
+        appt_from_input.value = toIsoTimeString(this.appt_from);
+
+        let appt_to_input = this.shadowRoot.querySelector("#appt_to");
+        appt_to_input.value = toIsoTimeString(this.appt_to);
+    }
+
+    public collect() {
+        let appt_title_input = this.shadowRoot.querySelector("#appt_title");
+        this.appt_title = appt_title_input.value;
+
+        let appt_date_input = this.shadowRoot.querySelector("#appt_date");
+        this.appt_date = new Date(appt_date_input.value + "T00:00:00");
+
+        let appt_from_input = this.shadowRoot.querySelector("#appt_from");
+        this.appt_from = combineDateWithTimeString(this.apptDate(), appt_from_input.value);
+
+        let appt_to_input = this.shadowRoot.querySelector("#appt_to");
+        this.appt_to = combineDateWithTimeString(this.apptDate(), appt_to_input.value);
+    }
+
+    public updateDate(new_date: Date) {
+        this.collect();
+        this.appt_date = new_date;
+        this.ready();
     }
 
     updated(changedProperties) {
         //console.log(changedProperties); // logs previous values
         if(changedProperties.has('opened')) {
-          this.drag.reset();
+          if(!this.opened) {
+            this.drag.resetPosition();
+            // just closed
+            // let appt_from_input = this.shadowRoot.querySelector("#appt_from");
+            // this.appt_from = combineDateWithTimeString(this.appt_date, appt_from_input.value);
+            // let appt_to_input = this.shadowRoot.querySelector("#appt_to");
+            // this.appt_to = combineDateWithTimeString(this.appt_date, appt_to_input.value);
+          }
+          
+          
         }
-        if(changedProperties.has('from')) {
-            let appt_from = this.shadowRoot.querySelector("#appt_from");
-            appt_from.value = toIsoTimeString(this.from);
-        }
-        if(changedProperties.has('to')) {
-            let appt_to = this.shadowRoot.querySelector("#appt_to");
-            appt_to.value = toIsoTimeString(this.to);
-        }
-      }
+        // if(changedProperties.has('appt_from')) {
+        //     let appt_from = this.shadowRoot.querySelector("#appt_from");
+        //     appt_from.value = toIsoTimeString(this.appt_from);
+        // }
+        // if(changedProperties.has('appt_to')) {
+        //     let appt_to = this.shadowRoot.querySelector("#appt_to");
+        //     appt_to.value = toIsoTimeString(this.appt_to);
+        // }
+        // if(changedProperties.has('appt_date')) {
+        //     let appt_date = this.shadowRoot.querySelector("#appt_date");
+        //     appt_date.value = toIsoDateString(this.appt_date);
+        // }
+        // if(changedProperties.has('appt_title')) {
+        //     let appt_title = this.shadowRoot.querySelector("#appt_title");
+        //     appt_title.value = this.appt_title;
+        // }
+    }
+
+    
 
     drag = new DragController(this, {
         getContainerEl: () => this.shadowRoot.querySelector("#window"),
@@ -261,13 +325,13 @@ export class MonthViewDialog extends LitElement {
             <div class="content">
                 <form>
                     <div class="text-field">
-                        <input type="text" name="type" maxlength="255" value="${this.event_title}" required>
+                        <input id="appt_title" type="text" name="type" maxlength="255" value="${this.appt_title}" required>
                         <label for="type">Title</label>
                     </div>
                     <div class="date-container">
                         <div class="text-field">
-                            <input type="date" name="date"
-                                value="${toIsoDateString(this.appointment_date)}" required>
+                            <input id="appt_date" type="date" name="date"
+                                value="${toIsoDateString(this.appt_date)}" required>
                             <label for="date">Date</label>
                         </div>
                     </div>
@@ -283,8 +347,8 @@ export class MonthViewDialog extends LitElement {
                     </div>
                     
                     <div class="buttons">
-                        <button class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent('dialog.save'))}">Save</button>  
-                        <button class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent('dialog.cancel'))}">Cancel</button>  
+                        <button type="button" class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent('dialog.save'))}">Save</button>  
+                        <button type="button" class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent('dialog.cancel'))}">Cancel</button>  
                     </div>
                 </form>
             </div>

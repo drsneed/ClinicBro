@@ -629,6 +629,95 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
+// node_modules/lit-html/directive.js
+var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
+var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
+
+class i4 {
+  constructor(t5) {
+  }
+  get _$AU() {
+    return this._$AM._$AU;
+  }
+  _$AT(t5, e6, i5) {
+    this._$Ct = t5, this._$AM = e6, this._$Ci = i5;
+  }
+  _$AS(t5, e6) {
+    return this.update(t5, e6);
+  }
+  update(t5, e6) {
+    return this.render(...e6);
+  }
+}
+
+// node_modules/lit-html/directives/class-map.js
+var e6 = e5(class extends i4 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
+      throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
+  }
+  render(t5) {
+    return " " + Object.keys(t5).filter((s4) => t5[s4]).join(" ") + " ";
+  }
+  update(s4, [i5]) {
+    if (this.st === undefined) {
+      this.st = new Set, s4.strings !== undefined && (this.nt = new Set(s4.strings.join(" ").split(/\s/).filter((t5) => t5 !== "")));
+      for (const t5 in i5)
+        i5[t5] && !this.nt?.has(t5) && this.st.add(t5);
+      return this.render(i5);
+    }
+    const r6 = s4.element.classList;
+    for (const t5 of this.st)
+      t5 in i5 || (r6.remove(t5), this.st.delete(t5));
+    for (const t5 in i5) {
+      const s5 = !!i5[t5];
+      s5 === this.st.has(t5) || this.nt?.has(t5) || (s5 ? (r6.add(t5), this.st.add(t5)) : (r6.remove(t5), this.st.delete(t5)));
+    }
+    return w;
+  }
+});
+// public/clinicbro/js/util.ts
+function dateAdd(date, interval, units) {
+  var ret = new Date(date.valueOf());
+  var checkRollover = function() {
+    if (ret.getDate() != date.getDate())
+      ret.setDate(0);
+  };
+  switch (String(interval).toLowerCase()) {
+    case "year":
+      ret.setFullYear(ret.getFullYear() + units);
+      checkRollover();
+      break;
+    case "quarter":
+      ret.setMonth(ret.getMonth() + 3 * units);
+      checkRollover();
+      break;
+    case "month":
+      ret.setMonth(ret.getMonth() + units);
+      checkRollover();
+      break;
+    case "week":
+      ret.setDate(ret.getDate() + 7 * units);
+      break;
+    case "day":
+      ret.setDate(ret.getDate() + units);
+      break;
+    case "hour":
+      ret.setTime(ret.getTime() + units * 3600000);
+      break;
+    case "minute":
+      ret.setTime(ret.getTime() + units * 60000);
+      break;
+    case "second":
+      ret.setTime(ret.getTime() + units * 1000);
+      break;
+    default:
+      ret = undefined;
+      break;
+  }
+  return ret;
+}
+
 // public/clinicbro/js/schedule/monthview-appt.ts
 class MonthViewAppointment extends s3 {
   static styles = i`
@@ -647,12 +736,20 @@ class MonthViewAppointment extends s3 {
       margin: 2px 0px;
       user-select: none;
     }
+    div.span {
+      text-overflow: ellipsis;
+    }
     .selected {
       border: 1px solid var(--selected-border);
-    }`;
+    }
+    `;
   constructor() {
     super();
+    this.appt_title = "New Appt";
     this.selected = false;
+    this.appt_date = new Date;
+    this.appt_from = new Date;
+    this.appt_to = dateAdd(this.appt_from, "minute", 30);
   }
   clicked() {
     this.selected = true;
@@ -661,29 +758,40 @@ class MonthViewAppointment extends s3 {
     const schedule = document.getElementById("schedule");
     schedule.showEditAppointmentDialog(this);
   }
+  _drag(e7) {
+    e7.dataTransfer.setData("text", e7.target.id);
+  }
   render() {
-    let startHours = this.start.getHours() % 12 || 12;
-    let startMinutes = ("0" + this.start.getMinutes()).slice(-2);
-    let endHours = this.end.getHours() % 12 || 12;
-    let endMinutes = ("0" + this.end.getMinutes()).slice(-2);
-    let pm = this.end.getHours() >= 12 ? "pm" : "am";
-    let selectedClass = this.selected ? "selected" : "";
-    return x`<div class="${selectedClass}"><span>${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${this.name}</span></div>`;
+    let startHours = this.appt_from.getHours() % 12 || 12;
+    let startMinutes = ("0" + this.appt_from.getMinutes()).slice(-2);
+    let endHours = this.appt_to.getHours() % 12 || 12;
+    let endMinutes = ("0" + this.appt_to.getMinutes()).slice(-2);
+    let pm = this.appt_to.getHours() >= 12 ? "pm" : "am";
+    return x`<div id="appt${this.appt_id}" class="${e6({ selected: this.selected })}"
+                    draggable="true" @dragstart="${this._drag}"><span>${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${this.appt_title}</span></div>`;
   }
 }
 __legacyDecorateClassTS([
-  n4({ type: String })
-], MonthViewAppointment.prototype, "name", undefined);
+  n4({ reflect: true, type: String, reflect: true })
+], MonthViewAppointment.prototype, "appt_id", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String, reflect: true })
+], MonthViewAppointment.prototype, "appt_title", undefined);
 __legacyDecorateClassTS([
   n4({ reflect: true, converter(value) {
     return new Date(value);
   } })
-], MonthViewAppointment.prototype, "start", undefined);
+], MonthViewAppointment.prototype, "appt_date", undefined);
 __legacyDecorateClassTS([
   n4({ reflect: true, converter(value) {
     return new Date(value);
   } })
-], MonthViewAppointment.prototype, "end", undefined);
+], MonthViewAppointment.prototype, "appt_from", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, converter(value) {
+    return new Date(value);
+  } })
+], MonthViewAppointment.prototype, "appt_to", undefined);
 __legacyDecorateClassTS([
   n4({ type: Boolean, reflect: true })
 ], MonthViewAppointment.prototype, "selected", undefined);

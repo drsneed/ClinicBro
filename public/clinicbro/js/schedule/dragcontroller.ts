@@ -29,7 +29,7 @@ export class DragController {
         });
     }
 
-    reset() {
+    resetPosition() {
         this.x = 0;
         this.y = 0;
         this.updateElPosition();

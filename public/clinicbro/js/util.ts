@@ -26,6 +26,11 @@ export function sameDay(d1, d2) {
     d1.getDate() === d2.getDate();
 }
 
+export function combineDateWithTimeString(d: Date, s: string) {
+  let date_str = toIsoDateString(d);
+  return new Date(date_str + "T" + s);
+}
+
 export function toIsoDateString(d: Date) {
   return d.toISOString().split('T')[0];
 }
