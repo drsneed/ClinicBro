@@ -1,6 +1,6 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const db_context = @import("db_context.zig");
+const DbContext = @import("db_context.zig");
 const jwt = @import("jwt.zig");
 const log = std.log.scoped(.auth);
 
@@ -11,12 +11,13 @@ pub fn validatePassword(password: []const u8, salt: []const u8, stored_key: *con
 }
 
 pub fn signin(request: *jetzig.Request, name: []const u8, password: []const u8) !bool {
-    if (try db_context.validateBro(request.server.database, name, password)) |bro| {
-        log.info("security, validated bro {s}", .{bro.name});
+    var db_context = DbContext.init(request.allocator, request.server.database);
+    defer db_context.deinit();
+    if (try db_context.validateBroPassword(name, password)) |bro_item| {
         var data = jetzig.zmpl.Data.init(request.allocator);
         var root = try data.object();
-        try root.put("name", data.string(bro.name[0..bro.name_len()]));
-        try root.put("id", data.integer(bro.id));
+        try root.put("name", data.string(bro_item.name));
+        try root.put("id", data.integer(bro_item.id));
         try root.put("iat", data.integer(std.time.timestamp()));
         try root.put("exp", data.integer(0));
         var session = try request.session();

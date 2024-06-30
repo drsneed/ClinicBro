@@ -189,7 +189,7 @@ input {
     background-color: var(--container-bg);
 }
 
-.text-field input:focus + label, .text-field input:valid + label {
+.text-field input:focus + label, .text-field input:valid + label, .text-field input:read-only + label {
     top: -6px;
     left: 15px;
     font-size: small;
@@ -691,16 +691,53 @@ details[open] summary {
     color: var(--container-bg); */
 }
 
-#user-list {
+btn {
+    transition: none;
+}
+
+.setup-screen {
     display: flex;
+}
+
+.setup-item-menu {
     width: 20%;
+    border-radius: 3px;
+}
+.setup-item-menu select {
+    width: 100%;
+}
+.setup-item-menu select option {
+    padding: 4px 8px;
+}
+.setup-item-menu select:focus option:checked {
+    /*border: 1px solid #eeecec;*/
+}
+
+.setup-item-content {
+    width: 80%;
+    margin-left: 20px;
+    margin-top: 50px;
+}
+
+.setup-button-bar {
     border-radius: 3px;
     border: 1px solid #9A9A9A;
     padding: 8px 16px;
 }
-#user-list ul {
+.setup-item-list {
+
+    /* border-radius: 3px; */
+    /* border: 1px solid #9A9A9A; */
+    padding: 0;
+}
+.setup-item-list ul {
     list-style-type: none;
 }
+
+.tracking ul {
+    margin-left: 10px;
+}
+
 
 @media only screen and (max-width: 770px) {
     #nav-toggle-label {
