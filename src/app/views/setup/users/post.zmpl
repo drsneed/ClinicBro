@@ -2,18 +2,15 @@
   <div class="setup-screen">
     <div class="setup-item-menu">
       <div class="setup-button-bar">
-        <button type="button" class="btn tool-btn"><span class="mdi mdi-plus"></span></button>
-        <button type="button" class="btn tool-btn"
-          hx-include="#user-form"
-          hx-post="/setup/users"
-          hx-target="#UserSetupScreen"
-          hx-swap="outerHTML"><span class="mdi mdi-content-save"></span></button>
-        <button type="button" class="btn tool-btn"><span class="mdi mdi-trash-can"></span></button>
+        <button type="button" class="btnbar-btn"
+          hx-get="/setup/users/0"
+          hx-target="#UserSetupContent"
+          hx-swap="outerHTML"><span class="mdi mdi-plus mr-2"></span>Add New</button>
       </div>
-      <div class="setup-item-list">
+      <div class="setup-item-list" hx-ext="path-params">
         <select id="bros" size="20"
           name="id"
-          hx-get="/setup/users"
+          hx-get="/setup/users/{id}"
           hx-target="#UserSetupContent"
           hx-swap="outerHTML">
           @zig {
@@ -30,26 +27,42 @@
     </div>
     <div id="UserSetupContent" class="setup-item-content">
       <form id="user-form" method="post">
-        <input type="hidden" name="id" value="{{.id}}">
-        <div>
+        <input id="user-id-input" type="hidden" name="id" value="{{.id}}">
+        <div class="id-field">
           <span>ID</span>
           <code>{{.id}}</code>
         </div>
+        <hr />
+        <input type="checkbox" id="user_active" name="active" class="cbcb">
+        <label for="active">Active</label>
+        <br />
         <div class="text-field">
           <input id="user_name" type="text" name="name" maxlength="16"
               value="{{.name}}" required>
           <label for="name">Name</label>
         </div>
+        <div class="setup-item-buttons" hx-ext="path-params">
+          <button type="button" class="btn btn-save"
+              hx-include="#user-form"
+              hx-post="/setup/users"
+              hx-target="#UserSetupScreen"
+              hx-swap="outerHTML"><span class="mdi mdi-content-save mr-2"></span>Save</button>
+          <button type="button" class="btn btn-delete"
+              hx-include="#user-id-input"
+              hx-delete="/setup/users/{id}"
+              hx-target="#UserSetupScreen"
+              hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span>Delete</button>  
+        </div>
       </form>
       <hr />
       <div class="tracking">
-        <h2>Tracking</h2>
-        <ul>
+          <h2>Tracking</h2>
+          <ul>
           <li>Created on {{.date_created}} by {{.created_by}}</li>
           <li>Updated on {{.date_updated}} by {{.updated_by}}</li>
-        </ul>
-      </div>
-    </div>
+          </ul>
+      </div> 
+  </div>
   </div>
 </div>
 

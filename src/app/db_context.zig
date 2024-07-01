@@ -14,6 +14,10 @@ const bro_select_query =
     \\left join Bro updated_bro on bro.updated_bro_id=updated_bro.id
 ;
 const bro_item_select_query = "select id, name from Bro";
+const bro_insert_query =
+    \\insert into Bro(active, name, password, color, sees_clients, date_created, date_updated, created_bro_id, updated_bro_id)
+    \\values(true, $1, $2, 0, false, NOW(), NOW(), $3, $3);
+;
 
 allocator: std.mem.Allocator,
 results: std.ArrayList(jetzig.http.Database.pg.Result),
@@ -57,15 +61,6 @@ fn makeBro(row: jetzig.http.Database.pg.Row) Bro {
         .updated_by = row.get(?[]u8, 8),
     };
 }
-
-pub fn insertBro(database: *jetzig.http.Database, bro: Bro, password: []const u8, created_bro_id: i32) !bool {
-    const conn = try database.pool.acquire();
-    defer database.pool.release(conn);
-    _ = try conn.exec("INSERT INTO Bro(active, name, password, color, sees_clients, date_created, date_updated, created_bro_id, updated_bro_id) VALUES($1, $2, crypt($3, gen_salt('bf')), $4, $5, NOW(), NOW(), $6, $6);", .{
-        true, bro.name, password, bro.color, bro.sees_clients, created_bro_id,
-    });
-    return true;
-}
 pub fn updateBro(self: *DbContext, args: struct {
     id: i32,
     updated_bro_id: i32,
@@ -84,8 +79,29 @@ pub fn updateBro(self: *DbContext, args: struct {
 
     return true;
 }
-pub fn deleteBro(database: *jetzig.http.Database, bro: Bro) !bool {
-    _ = try database.pool.exec("delete from Bro where id=$1", .{bro.id});
+
+pub fn createBro(self: *DbContext, args: struct {
+    updated_bro_id: i32,
+    name: []const u8,
+    password: ?[]const u8 = null,
+    color: ?i32 = null,
+    active: ?bool = null,
+}) !i32 {
+    _ = try self.database.pool.exec(bro_insert_query, .{
+        args.name,
+        "temp",
+        args.updated_bro_id,
+    });
+    var result = try self.database.pool.query("select id from bro where name = $1", .{args.name});
+    try self.results.append(result);
+    if (try result.next()) |row| {
+        return row.get(i32, 0);
+    }
+    return 0;
+}
+
+pub fn deleteBro(self: *DbContext, id: i32) !bool {
+    _ = try self.database.pool.exec("delete from Bro where id=$1", .{id});
     return true;
 }
 

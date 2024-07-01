@@ -27,7 +27,7 @@
     --pwr-light-scheme-pressed: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
     --input-border: #444;
     --sep: light-dark(#cecdcd, black);
-    --sep-border: light-dark(#ffffff, #2A2A2A);
+    --sep-border: light-dark(#ffffff, #3a3a3a);
     --link: light-dark(#1d3a4e, #82aac5);
     --nav-link: light-dark(#2d4159, #bebebe);
     --nav-link-bg-hover: light-dark(#d7e0e5, #3b5574);
@@ -46,10 +46,16 @@
     --table-row-hover: light-dark(#d8d5d5, #161616);
     --btn-cancel-bg: light-dark(#393f3e, #393f3e);
     --btn-cancel-fg: light-dark(#f1f1e3, #9cacaa);
+    --btn-delete-fg: light-dark(#f1f1e3, #f1f1e3);
+    --btn-delete-bg: light-dark(#ab0f0f, #ab0f0f);
     --btn-save-fg: light-dark(#f1f1e3, #f1f1e3);
     --btn-save-bg: light-dark(#027160, #027160);
     --btn-save-hover-bg: light-dark(#f1f1e3, #9cacaa);
     --placeholder-fg: light-dark(#717123, #dfdf99);
+    --setup-btnbar-bg: light-dark(#b4d2ce, #0c261c); /* #1d3a4e */
+    --setup-btnbar-fg: light-dark(#052e0b, #dcf0df);
+    --code-fg: light-dark(#9f0707, #a1c7db);
+    --code-bg: light-dark(#c2cff0, #121212);
 }
 
 * { 
@@ -160,7 +166,7 @@ a:hover {
     filter: invert(35%) sepia(97%) saturate(1583%) hue-rotate(116deg) brightness(100%) contrast(95%);
 } */
 
-input {
+input:not([type='checkbox']) {
     width: 100%;
     border: 1px solid var(--input-border);
     padding: 6px 10px;
@@ -170,6 +176,64 @@ input {
     font-size: 14px;
     background-color: var(--bg);
     color: var(--fg);
+}
+
+.cbcb {
+    margin-left: 10px;
+    margin-bottom: 10px;
+    margin-right: 4px;
+    margin-top: 0px;
+    width: 15px;
+    height: 15px;
+}
+
+.btn {
+    justify-content: space-around;
+    align-content: space-around;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 3px;
+    border: 1px solid var(--input-border);
+    margin: 6px 2px;
+    font-weight: bold;
+}
+
+.btnbar-btn {
+    padding: 4px 8px 4px 2px;
+    cursor: pointer;
+    border-radius: 3px;
+    border: 1px solid var(--setup-btnbar-fg);
+    margin: 0px 0px;
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--setup-btnbar-fg);
+}
+
+.btn-save {
+    background-color: var(--btn-save-bg);
+    color: var(--btn-save-fg);
+}
+.btn-save:hover {
+    background-color: var(--btn-save-hover-bg);
+    color: var(--btn-save-bg);
+}
+
+.btn-delete {
+    background-color: var(--btn-delete-bg);
+    color: var(--btn-delete-fg);
+}
+.btn-delete:hover {
+    background-color: var(--btn-delete-fg);
+    color: var(--btn-delete-bg);
+}
+
+.btn-cancel {
+    background-color: var(--btn-cancel-bg);
+    color: var(--btn-cancel-fg);
+}
+.btn-cancel:hover {
+    background-color: var(--btn-cancel-fg);
+    color: var(--btn-cancel-bg);
 }
 
 .text-field {
@@ -185,11 +249,14 @@ input {
     transition: 0.2s;
 }
 
-.text-field input:focus, .text-field input:valid {
+.text-field input:focus, .text-field input:valid, .text-field input[type=checkbox] {
     background-color: var(--container-bg);
 }
 
-.text-field input:focus + label, .text-field input:valid + label, .text-field input:read-only + label {
+.text-field input:focus + label, 
+.text-field input:valid + label, 
+.text-field input:read-only + label, 
+.text-field input:checked + label {
     top: -6px;
     left: 15px;
     font-size: small;
@@ -226,6 +293,23 @@ input[type=button]:hover, input[type=submit]:hover, input[type=reset]:hover {
     margin: 2px 4px;
     border-radius: 8px;
     padding: 0 5px;
+}
+
+.id-field {
+    margin-bottom: 10px;
+    margin-left: 10px;
+    font-weight: bold;
+}
+
+code {
+    background-color: var(--code-bg);
+    color: var(--code-fg);
+    font-family: monospace;
+    padding: 4px 10px;
+    border-radius: 3px;
+    font-weight: bold;
+    display: inline-block;
+    align-items: center;
 }
 
 .pwreset-error {
@@ -699,6 +783,10 @@ btn {
     display: flex;
 }
 
+.setup-item-buttons {
+    /* margin-bottom: 10px; */
+}
+
 .setup-item-menu {
     width: 20%;
     border-radius: 3px;
@@ -713,16 +801,23 @@ btn {
     /*border: 1px solid #eeecec;*/
 }
 
+.setup-item-list {
+    
+    box-shadow: 20px 20px 20px 20px #9cAD22F1 inset;
+}
+
 .setup-item-content {
     width: 80%;
     margin-left: 20px;
-    margin-top: 50px;
+    margin-top: 10px;
 }
 
 .setup-button-bar {
-    border-radius: 3px;
+    border-radius: 3px 3px 0px 0px;
     border: 1px solid #9A9A9A;
-    padding: 8px 16px;
+    padding: 4px;
+    background-color: var(--setup-btnbar-bg);
+    color: var(--setup-btnbar-fg);
 }
 .setup-item-list {
 
