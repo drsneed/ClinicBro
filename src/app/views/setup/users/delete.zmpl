@@ -6,6 +6,7 @@
           hx-get="/setup/users/0"
           hx-target="#UserSetupContent"
           hx-swap="outerHTML"><span class="mdi mdi-plus mr-2"></span>Add New</button>
+          <label class="cb-label"><input type="checkbox" id="include_inactive" name="include_inactive" class="cbcb">Include Inactive</label>
       </div>
       <div class="setup-item-list" hx-ext="path-params">
         <select id="bros" size="20"

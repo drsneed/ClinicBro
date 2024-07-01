@@ -9,8 +9,7 @@
       @zig {
         const id = zmpl.getT(.integer, "id").?;
         if(id > 0) {
-            <input type="checkbox" id="user_active" name="active" class="cbcb">
-            <label for="active">Active</label>
+            <label class="cb-label"><input type="checkbox" id="user_active" name="active" class="cbcb" {{.active}}>Active</label>
             <br />
     }
     }

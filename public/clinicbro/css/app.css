@@ -783,12 +783,16 @@ btn {
     display: flex;
 }
 
+.cb-label {
+    font-weight: bold;
+}
+
 .setup-item-buttons {
     /* margin-bottom: 10px; */
 }
 
 .setup-item-menu {
-    width: 20%;
+    width: 22%;
     border-radius: 3px;
 }
 .setup-item-menu select {
@@ -807,7 +811,7 @@ btn {
 }
 
 .setup-item-content {
-    width: 80%;
+    width: 78%;
     margin-left: 20px;
     margin-top: 10px;
 }

@@ -94,6 +94,7 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
     var root = data.value.?;
     try root.put("id", data.integer(bro.id));
     try root.put("name", data.string(bro.name));
+    try root.put("active", data.string(if (bro.active) "checked" else ""));
     try root.put("date_created", data.string(bro.date_created));
     try root.put("date_updated", data.string(bro.date_updated));
     try root.put("created_by", data.string(bro.created_by orelse "System"));
