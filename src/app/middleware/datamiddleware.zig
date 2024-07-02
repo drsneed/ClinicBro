@@ -26,6 +26,7 @@ const RequiredFields = .{
     "main_schedule",
     "setup_expander_state",
     "setup_users",
+    "setup_locations",
     "setup_reports",
     "setup_system",
     "header_include",

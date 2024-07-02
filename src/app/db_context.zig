@@ -179,7 +179,6 @@ pub fn updateLocation(
         updated_bro_id,
         id,
     });
-    return true;
 }
 
 pub fn createLocation(

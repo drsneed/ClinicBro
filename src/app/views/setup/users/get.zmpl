@@ -1,6 +1,7 @@
 @zig {
   const active = zmpl.getT(.boolean, "active") orelse true;
   const inactive_class = if(active) "" else "setup-item-inactive";
+  const id = zmpl.getT(.integer, "id").?;
 }
 <div id="UserSetupContent" class="setup-item-content {{inactive_class}}">
     <form id="user-form" method="post">
@@ -8,12 +9,17 @@
       <div class="id-field">
         <span>ID</span>
         <code>{{.id}}</code>
+        @zig {
+          if(id > 0) {
+              <label class="cb-label"><input type="checkbox" id="user_active" name="active" class="cbcb" value="1" {{.active_check}}>Active</label>
+              
+          }
+        }
       </div>
       <hr />
       
       <div class="text-field">
         @zig {
-            const id = zmpl.getT(.integer, "id").?;
             if(id > 0) {
             <input id="user_name" type="text" name="name" maxlength="16"
                 value="{{.name}}" required>
@@ -25,13 +31,6 @@
         }
         <label for="name">Name</label>
       </div>
-      @zig {
-        
-        if(id > 0) {
-            <label class="cb-label"><input type="checkbox" id="user_active" name="active" class="cbcb" value="1" {{.active_check}}>Active</label>
-            
-        }
-      }
       <label class="cb-label"><input type="checkbox" id="user_sees_clients" name="sees_clients" class="cbcb" value="1" {{.sees_clients_check}}>Sees Clients</label>
       <br />
 

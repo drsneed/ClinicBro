@@ -1,6 +1,8 @@
 @zig {
   const bros = zmpl.getT(.array, "bros").?;
   const item_count = bros.len;
+  const active = zmpl.getT(.boolean, "active") orelse true;
+  const inactive_class = if(active) "" else "setup-item-inactive";
 }
 <div id="UserSetupScreen" class="container">
   <div class="setup-screen">
@@ -18,7 +20,8 @@
         <button type="button" class="btn btn-add" title="Add New"
           hx-get="/setup/users/0"
           hx-target="#UserSetupContent"
-          hx-swap="outerHTML"><span class="mdi mdi-plus mr-2"></span></button>
+          hx-swap="outerHTML"
+          onclick="clearSetupSelectedItem();"><span class="mdi mdi-plus mr-2"></span></button>
             <button type="button" class="btn btn-save" title="Save"
             hx-include="#user-form, #include_inactive"
             hx-post="/setup/users"
@@ -31,7 +34,7 @@
             hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span></button>  
       </div>
       <div class="setup-item-list" hx-ext="path-params">
-        <select id="bros" size="20"
+        <select id="setup-select" size="20"
           name="id"
           hx-get="/setup/users/{id}"
           hx-target="#UserSetupContent"
@@ -40,14 +43,16 @@
             for (bros) |bro| {
                 const id = bro.getT(.integer, "id") orelse continue;
                 const name = bro.getT(.string, "name") orelse continue;
+                const this_active = bro.getT(.boolean, "active") orelse continue;
+                const this_inactive_class = if(this_active) "" else "setup-item-inactive";
                 const selected = bro.getT(.string, "selected") orelse continue;
-                <option value="{{id}}" {{selected}}>{{name}}</option>
+                <option value="{{id}}" class="{{this_inactive_class}}" {{selected}}>{{name}}</option>
             }
           }
         </select>
       </div>
     </div>
-    <div id="UserSetupContent" class="setup-item-content">
+    <div id="UserSetupContent" class="setup-item-content {{inactive_class}}">
       @zig {
         if(zmpl.getT(.integer, "id")) |id| {
           <form id="user-form" method="post">
@@ -55,6 +60,7 @@
             <div class="id-field">
               <span>ID</span>
               <code>{{id}}</code>
+              <label class="cb-label"><input type="checkbox" id="user_active" name="active" class="cbcb" value="1" {{.active_check}}>Active</label>
             </div>
             <hr />
             <div class="text-field">
@@ -62,7 +68,6 @@
                   value="{{.name}}" required>
               <label for="name">Name</label>
             </div>
-            <label class="cb-label"><input type="checkbox" id="user_active" name="active" class="cbcb" value="1" {{.active_check}}>Active</label>
             <label class="cb-label"><input type="checkbox" id="user_sees_clients" name="sees_clients" class="cbcb" value="1" {{.sees_clients_check}}>Sees Clients</label>
           </form>
           <hr />
@@ -76,7 +81,7 @@
         }
       }
       
-  </div>
+    </div>
   </div>
 </div>
 

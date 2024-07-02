@@ -18,7 +18,8 @@
         <button type="button" class="btn btn-add" title="Add New"
           hx-get="/setup/users/0"
           hx-target="#UserSetupContent"
-          hx-swap="outerHTML"><span class="mdi mdi-plus mr-2"></span></button>
+          hx-swap="outerHTML"
+          onclick="clearSetupSelectedItem();"><span class="mdi mdi-plus mr-2"></span></button>
             <button type="button" class="btn btn-save" title="Save"
             hx-include="#user-form, #include_inactive"
             hx-post="/setup/users"
@@ -31,7 +32,7 @@
             hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span></button>  
       </div>
       <div class="setup-item-list" hx-ext="path-params">
-        <select id="bros" size="20"
+        <select id="setup-select" size="20"
           name="id"
           hx-get="/setup/users/{id}"
           hx-target="#UserSetupContent"

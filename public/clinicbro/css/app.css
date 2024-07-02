@@ -48,20 +48,21 @@
     --btn-cancel-bg: light-dark(#393f3e, #393f3e);
     --btn-cancel-fg: light-dark(#f1f1e3, #9cacaa);
     --btn-add-fg: light-dark(#f1f1e3, #f1f1e3);
-    --btn-add-bg: light-dark(#330fab, #330fab);
-    --btn-add-hover-bg: light-dark(#4a17f0, #4a17f0);
+    --btn-add-bg: light-dark(#3d5fa8, #244897);
+    --btn-add-hover-bg: light-dark(rgb(107, 153, 252), #3970e6);
     --btn-delete-fg: light-dark(#f1f1e3, #f1f1e3);
     --btn-delete-bg: light-dark(#ab0f0f, #ab0f0f);
     --btn-delete-hover-bg: light-dark(#f01616, #f11717);
     --btn-save-fg: light-dark(#f1f1e3, #f1f1e3);
     --btn-save-bg: light-dark(#027160, #027160);
-    --btn-save-hover-bg: light-dark(#f1f1e3, #03aa91);
+    --btn-save-hover-bg: light-dark(#03aa91, #03aa91);
     --placeholder-fg: light-dark(#717123, #dfdf99);
     --setup-btnbar-bg: light-dark(#dedede, #202120); /* #1d3a4e */
     --setup-btnbar-fg: light-dark(#052e0b, #dcf0df);
     --code-fg: light-dark(#9f0707, #a1c7db);
     --code-bg: light-dark(#c2cff0, #121212);
-    --setup-item-inactive-fg: light-dark(#ccc, #5d5d5d);
+    --setup-item-inactive-fg: light-dark(#979797, #5d5d5d);
+    --input-required-bg: light-dark(#f4f5b3, #ccce5f);
 }
 
 * { 
@@ -180,7 +181,7 @@ input:not([type='checkbox']) {
     box-sizing: border-box;
     border-radius: 3px;
     font-size: 14px;
-    background-color: var(--bg);
+    background-color: var(--input-required-bg);
     color: var(--fg);
 }
 
