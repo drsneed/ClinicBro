@@ -35,7 +35,7 @@
       <label class="cb-label"><input type="checkbox" id="user_sees_clients" name="sees_clients" class="cbcb" value="1" {{.sees_clients_check}}>Sees Clients</label>
       <br />
 
-      <div class="setup-item-buttons" hx-ext="path-params">
+      <!-- <div class="setup-item-buttons" hx-ext="path-params">
         <button type="button" class="btn btn-save"
             hx-include="#user-form, #include_inactive"
             hx-post="/setup/users"
@@ -50,7 +50,7 @@
                     hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span>Delete</button>  
             }
             }
-      </div>
+      </div> -->
     </form>
 @zig { 
     if(id > 0) {

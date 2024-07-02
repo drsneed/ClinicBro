@@ -51,7 +51,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
             selected_id = try db_context.createBro(current_bro_id, name, sees_clients);
             log.info("Created new Bro with ID {d}", .{selected_id});
         } else {
-            _ = try db_context.updateBro(
+            try db_context.updateBro(
                 selected_id,
                 name,
                 params.getT(.boolean, "active") orelse false,

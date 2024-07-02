@@ -5,20 +5,30 @@
 <div id="UserSetupScreen" class="container">
   <div class="setup-screen">
     <div class="setup-item-menu">
-      <div class="setup-button-bar">
-        <button type="button" class="btnbar-btn"
+      <div class="setup-list-info">
+        <span class="cb-label">Items: {{item_count}}</span>
+        <label class="cb-label"><input type="checkbox" id="include_inactive" name="include_inactive" class="cbcb" value="1"
+          hx-get="/setup/users"
+          hx-target="#UserSetupScreen"
+          hx-swap="outerHTML"
+          {{.include_inactive}}
+          >Include Inactive</label>
+      </div>
+      <div class="setup-button-bar" hx-ext="path-params">
+        <button type="button" class="btn btn-add" title="Add New"
           hx-get="/setup/users/0"
           hx-target="#UserSetupContent"
-          hx-swap="outerHTML"><span class="mdi mdi-plus mr-2"></span>Add New</button>
-          <label class="cb-label"><input type="checkbox" id="include_inactive" name="include_inactive" class="cbcb" value="1"
-            hx-get="/setup/users"
+          hx-swap="outerHTML"><span class="mdi mdi-plus mr-2"></span></button>
+            <button type="button" class="btn btn-save" title="Save"
+            hx-include="#user-form, #include_inactive"
+            hx-post="/setup/users"
             hx-target="#UserSetupScreen"
-            hx-swap="outerHTML"
-            {{.include_inactive}}
-            >Include Inactive</label>
-      </div>
-      <div class="setup-list-info">
-        <span>Count: {{item_count}}</span>
+            hx-swap="outerHTML"><span class="mdi mdi-content-save mr-2"></span></button>
+            <button type="button" class="btn btn-delete" title="Delete"
+            hx-include="#user-id-input"
+            hx-delete="/setup/users/{id}"
+            hx-target="#UserSetupScreen"
+            hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span></button>  
       </div>
       <div class="setup-item-list" hx-ext="path-params">
         <select id="bros" size="20"
@@ -54,20 +64,6 @@
             </div>
             <label class="cb-label"><input type="checkbox" id="user_active" name="active" class="cbcb" value="1" {{.active_check}}>Active</label>
             <label class="cb-label"><input type="checkbox" id="user_sees_clients" name="sees_clients" class="cbcb" value="1" {{.sees_clients_check}}>Sees Clients</label>
-            <br />
-
-            <div class="setup-item-buttons" hx-ext="path-params">
-              <button type="button" class="btn btn-save"
-                  hx-include="#user-form, #include_inactive"
-                  hx-post="/setup/users"
-                  hx-target="#UserSetupScreen"
-                  hx-swap="outerHTML"><span class="mdi mdi-content-save mr-2"></span>Save</button>
-              <button type="button" class="btn btn-delete"
-                  hx-include="#user-id-input"
-                  hx-delete="/setup/users/{id}"
-                  hx-target="#UserSetupScreen"
-                  hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span>Delete</button>  
-            </div>
           </form>
           <hr />
           <div class="tracking">
