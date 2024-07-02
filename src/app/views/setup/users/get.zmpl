@@ -1,4 +1,8 @@
-<div id="UserSetupContent" class="setup-item-content">
+@zig {
+  const active = zmpl.getT(.boolean, "active") orelse true;
+  const inactive_class = if(active) "" else "setup-item-inactive";
+}
+<div id="UserSetupContent" class="setup-item-content {{inactive_class}}">
     <form id="user-form" method="post">
       <input id="user-id-input" type="hidden" name="id" value="{{.id}}">
       <div class="id-field">
@@ -6,16 +10,10 @@
         <code>{{.id}}</code>
       </div>
       <hr />
-      @zig {
-        const id = zmpl.getT(.integer, "id").?;
-        if(id > 0) {
-            <label class="cb-label"><input type="checkbox" id="user_active" name="active" class="cbcb" {{.active}}>Active</label>
-            <br />
-    }
-    }
-
+      
       <div class="text-field">
         @zig {
+            const id = zmpl.getT(.integer, "id").?;
             if(id > 0) {
             <input id="user_name" type="text" name="name" maxlength="16"
                 value="{{.name}}" required>
@@ -27,9 +25,19 @@
         }
         <label for="name">Name</label>
       </div>
+      @zig {
+        
+        if(id > 0) {
+            <label class="cb-label"><input type="checkbox" id="user_active" name="active" class="cbcb" value="1" {{.active_check}}>Active</label>
+            
+        }
+      }
+      <label class="cb-label"><input type="checkbox" id="user_sees_clients" name="sees_clients" class="cbcb" value="1" {{.sees_clients_check}}>Sees Clients</label>
+      <br />
+
       <div class="setup-item-buttons" hx-ext="path-params">
         <button type="button" class="btn btn-save"
-            hx-include="#user-form"
+            hx-include="#user-form, #include_inactive"
             hx-post="/setup/users"
             hx-target="#UserSetupScreen"
             hx-swap="outerHTML"><span class="mdi mdi-content-save mr-2"></span>Save</button>

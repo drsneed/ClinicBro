@@ -1,5 +1,4 @@
 const Bro = @This();
-
 id: i32,
 active: bool,
 name: []u8,

@@ -56,6 +56,7 @@
     --setup-btnbar-fg: light-dark(#052e0b, #dcf0df);
     --code-fg: light-dark(#9f0707, #a1c7db);
     --code-bg: light-dark(#c2cff0, #121212);
+    --setup-item-inactive-fg: light-dark(#ccc, #ccc);
 }
 
 * { 
@@ -791,6 +792,14 @@ btn {
     /* margin-bottom: 10px; */
 }
 
+#user_name {
+    width: 250px;
+}
+
+.tracking li {
+    font-size: 12px;
+}
+
 .setup-item-menu {
     width: 22%;
     border-radius: 3px;
@@ -801,14 +810,17 @@ btn {
 .setup-item-menu select option {
     padding: 4px 8px;
 }
+.setup-item-inactive {
+    color: var(--setup-item-inactive-fg);
+}
+.setup-item-inactive:checked {
+    color: var(--fg);
+}
 .setup-item-menu select:focus option:checked {
     /*border: 1px solid #eeecec;*/
 }
 
-.setup-item-list {
-    
-    box-shadow: 20px 20px 20px 20px #9cAD22F1 inset;
-}
+
 
 .setup-item-content {
     width: 78%;
@@ -819,10 +831,25 @@ btn {
 .setup-button-bar {
     border-radius: 3px 3px 0px 0px;
     border: 1px solid #9A9A9A;
+    border-bottom: none;
     padding: 4px;
     background-color: var(--setup-btnbar-bg);
     color: var(--setup-btnbar-fg);
 }
+.setup-list-info {
+    border-left: 1px solid #9A9A9A;
+    border-right: 1px solid #9A9A9A;
+    padding: 4px;
+    background-color: var(--setup-btnbar-bg);
+    color: var(--setup-btnbar-fg);
+    font-size: 8;
+}
+.setup-item-list {
+    background-color: var(--setup-btnbar-bg);
+    border-left: 1px solid #9A9A9A;
+    border-right: 1px solid #9A9A9A;
+}
+
 .setup-item-list {
 
     /* border-radius: 3px; */

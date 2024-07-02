@@ -1,7 +1,7 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-pub const Bro = @import("models/domain/bro.zig");
-pub const BroItem = @import("models/bro_item.zig");
+pub const Bro = @import("models/bro.zig");
+pub const BroLookup = @import("models/bro_lookup.zig");
 const log = std.log.scoped(.DbContext);
 const DbContext = @This();
 
@@ -13,10 +13,10 @@ const bro_select_query =
     \\left join Bro created_bro on bro.created_bro_id=created_bro.id
     \\left join Bro updated_bro on bro.updated_bro_id=updated_bro.id
 ;
-const bro_item_select_query = "select id, name from Bro";
+const bro_item_select_query = "select id, active, name from Bro";
 const bro_insert_query =
     \\insert into Bro(active, name, password, color, sees_clients, date_created, date_updated, created_bro_id, updated_bro_id)
-    \\values(true, $1, $2, 0, false, NOW(), NOW(), $3, $3);
+    \\values(true, $1, crypt($2, gen_salt('bf')), 0, $3, NOW(), NOW(), $4, $4);
 ;
 
 allocator: std.mem.Allocator,
@@ -36,14 +36,14 @@ pub fn deinit(self: DbContext) void {
     self.results.deinit();
 }
 
-pub fn validateBroPassword(self: *DbContext, name: []const u8, password: []const u8) !?BroItem {
-    var result = try self.database.pool.query(bro_item_select_query ++ " where name=$1 and (password = crypt($2, password))", .{
+pub fn validateBroPassword(self: *DbContext, name: []const u8, password: []const u8) !?BroLookup {
+    var result = try self.database.pool.query(bro_item_select_query ++ " where name=$1 and active=true and (password = crypt($2, password))", .{
         name,
         password,
     });
     try self.results.append(result);
     if (try result.next()) |row| {
-        return .{ .id = row.get(i32, 0), .name = row.get([]u8, 1) };
+        return .{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) };
     }
     return null;
 }
@@ -61,38 +61,26 @@ fn makeBro(row: jetzig.http.Database.pg.Row) Bro {
         .updated_by = row.get(?[]u8, 8),
     };
 }
-pub fn updateBro(self: *DbContext, args: struct {
-    id: i32,
-    updated_bro_id: i32,
-    name: ?[]const u8 = null,
-    password: ?[]const u8 = null,
-    color: ?i32 = null,
-    active: ?bool = null,
-}) !bool {
-    if (args.name) |name| {
-        _ = try self.database.pool.exec("update Bro set name=$1, date_updated = NOW(), updated_bro_id=$2 where id=$3", .{
-            name,
-            args.updated_bro_id,
-            args.id,
-        });
-    }
+pub fn updateBro(self: *DbContext, id: i32, name: []const u8, active: bool, sees_clients: bool, updated_bro_id: i32) !bool {
+    _ = try self.database.pool.exec("update Bro set active=$1, name=$2, sees_clients=$3, date_updated = NOW(), updated_bro_id=$4 where id=$5", .{
+        active,
+        name,
+        sees_clients,
+        updated_bro_id,
+        id,
+    });
 
     return true;
 }
 
-pub fn createBro(self: *DbContext, args: struct {
-    updated_bro_id: i32,
-    name: []const u8,
-    password: ?[]const u8 = null,
-    color: ?i32 = null,
-    active: ?bool = null,
-}) !i32 {
+pub fn createBro(self: *DbContext, updated_bro_id: i32, name: []const u8, sees_clients: bool) !i32 {
     _ = try self.database.pool.exec(bro_insert_query, .{
-        args.name,
+        name,
         "temp",
-        args.updated_bro_id,
+        sees_clients,
+        updated_bro_id,
     });
-    var result = try self.database.pool.query("select id from bro where name = $1", .{args.name});
+    var result = try self.database.pool.query("select id from bro where name = $1", .{name});
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -114,17 +102,17 @@ pub fn getBro(self: *DbContext, id: i32) !?Bro {
     return null;
 }
 
-pub fn getBroItems(self: *DbContext, include_all: bool) !std.ArrayList(BroItem) {
+pub fn lookupBros(self: *DbContext, include_all: bool) !std.ArrayList(BroLookup) {
     const query = if (include_all)
-        bro_item_select_query ++ " order by name"
+        bro_item_select_query ++ " order by active desc, name"
     else
         bro_item_select_query ++ " where active=true order by name";
 
     var result = try self.database.pool.query(query, .{});
     try self.results.append(result);
-    var bros = std.ArrayList(BroItem).init(self.allocator);
+    var bros = std.ArrayList(BroLookup).init(self.allocator);
     while (try result.next()) |row| {
-        try bros.append(.{ .id = row.get(i32, 0), .name = row.get([]u8, 1) });
+        try bros.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
     }
     return bros;
 }
