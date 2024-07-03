@@ -989,9 +989,9 @@ class MonthView extends s3 {
     var appt1 = {
       appt_id: 1,
       appt_title: "Staff Meeting",
-      appt_date: new Date("2024-06-29T00:00:00"),
-      appt_from: new Date("2024-06-29T13:30:00"),
-      appt_to: new Date("2024-06-29T14:30:00")
+      appt_date: new Date("2024-07-14T00:00:00"),
+      appt_from: new Date("2024-07-14T13:30:00"),
+      appt_to: new Date("2024-07-14T14:30:00")
     };
     this.appointments = [appt1];
   }

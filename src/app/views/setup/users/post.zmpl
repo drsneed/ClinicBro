@@ -17,17 +17,17 @@
           >Include Inactive</label>
       </div>
       <div class="setup-button-bar" hx-ext="path-params">
-        <button type="button" class="btn btn-add" title="Add New"
+        <button type="button" class="btn" title="Add New"
           hx-get="/setup/users/0"
           hx-target="#UserSetupContent"
           hx-swap="outerHTML"
           onclick="addSetupBlankItem();"><span class="mdi mdi-plus mr-2"></span></button>
-            <button type="button" class="btn btn-save" title="Save"
+            <button type="button" class="btn" title="Save"
             hx-include="#user-form, #include_inactive"
             hx-post="/setup/users"
             hx-target="#UserSetupScreen"
             hx-swap="outerHTML"><span class="mdi mdi-content-save mr-2"></span></button>
-            <button type="button" class="btn btn-delete" title="Delete"
+            <button type="button" class="btn" title="Delete"
             hx-include="#user-id-input"
             hx-delete="/setup/users/{id}"
             hx-target="#UserSetupScreen"
