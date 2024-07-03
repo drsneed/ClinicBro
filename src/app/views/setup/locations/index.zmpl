@@ -19,17 +19,23 @@
           hx-get="/setup/locations/0"
           hx-target="#LocationSetupContent"
           hx-swap="outerHTML"
-          onclick="clearSetupSelectedItem();"><span class="mdi mdi-plus mr-2"></span></button>
-            <button type="button" class="btn btn-save" title="Save"
+          onclick="addSetupBlankItem();">
+            <span class="mdi mdi-plus mr-2"></span>
+        </button>
+        <button type="button" class="btn btn-save" title="Save"
             hx-include="#location-form, #include_inactive"
             hx-post="/setup/locations"
             hx-target="#LocationSetupScreen"
-            hx-swap="outerHTML"><span class="mdi mdi-content-save mr-2"></span></button>
-            <button type="button" class="btn btn-delete" title="Delete"
+            hx-swap="outerHTML">
+              <span class="mdi mdi-content-save mr-2"></span>
+          </button>
+        <button type="button" class="btn btn-delete" title="Delete"
             hx-include="#location-id-input"
             hx-delete="/setup/locations/{id}"
             hx-target="#LocationSetupScreen"
-            hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span></button>  
+            hx-swap="outerHTML">
+              <span class="mdi mdi-trash-can mr-2"></span>
+          </button>  
       </div>
       <div class="setup-item-list" hx-ext="path-params">
         <select id="setup-select" size="20"

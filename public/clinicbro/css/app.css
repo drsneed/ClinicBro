@@ -47,15 +47,15 @@
     --btn-border: light-dark(#121212, #797979);
     --btn-cancel-bg: light-dark(#393f3e, #393f3e);
     --btn-cancel-fg: light-dark(#f1f1e3, #9cacaa);
-    --btn-add-fg: light-dark(#f1f1e3, #f1f1e3);
-    --btn-add-bg: light-dark(#3d5fa8, #244897);
-    --btn-add-hover-bg: light-dark(rgb(107, 153, 252), #3970e6);
+    --btn-save-fg: light-dark(#f1f1e3, #f1f1e3);
+    --btn-save-bg: light-dark(#3d5fa8, #244897);
+    --btn-save-hover-bg: light-dark(rgb(107, 153, 252), #3970e6);
     --btn-delete-fg: light-dark(#f1f1e3, #f1f1e3);
     --btn-delete-bg: light-dark(#ab0f0f, #ab0f0f);
     --btn-delete-hover-bg: light-dark(#f01616, #f11717);
-    --btn-save-fg: light-dark(#f1f1e3, #f1f1e3);
-    --btn-save-bg: light-dark(#027160, #027160);
-    --btn-save-hover-bg: light-dark(#03aa91, #03aa91);
+    --btn-add-fg: light-dark(#f1f1e3, #f1f1e3);
+    --btn-add-bg: light-dark(#027160, #027160);
+    --btn-add-hover-bg: light-dark(#03aa91, #03aa91);
     --placeholder-fg: light-dark(#717123, #dfdf99);
     --setup-btnbar-bg: light-dark(#dedede, #202120); /* #1d3a4e */
     --setup-btnbar-fg: light-dark(#052e0b, #dcf0df);
@@ -63,6 +63,12 @@
     --code-bg: light-dark(#c2cff0, #121212);
     --setup-item-inactive-fg: light-dark(#979797, #5d5d5d);
     --input-required-bg: light-dark(#f4f5b3, #ccce5f);
+    --selected-tab-bg: light-dark(#4e4949, #ccc);
+    --selected-tab-fg: light-dark(#e8e1e1, #f1f1e3);
+    --tab-bg: light-dark(#f1f1f1, #ccc);
+    --tab-fg: light-dark(#383535, #f1f1e3);
+    --tab-border: light-dark(#ccc, #ccc);
+    --tab-button-hover: light-dark(#ddd, #ddd);
 }
 
 * { 
@@ -820,6 +826,7 @@ details[open] summary {
 }
 .setup-item-menu select option {
     padding: 4px 8px;
+    height: 26px;
 }
 .setup-item-inactive {
     color: var(--setup-item-inactive-fg);
@@ -878,6 +885,97 @@ details[open] summary {
     margin-left: 10px;
 }
 
+.client-card {
+    border: 1px solid var(--container-border);
+    border-radius: 3px;
+    width: 98%;
+    margin: 10px auto;
+    position: sticky;
+}
+
+.client-card-header {
+    background: var(--header-bg);
+    color: var(--header-fg);
+    margin: 0;
+    padding: 4px 8px;
+    text-align: center;
+}
+
+.client-card-details {
+    margin: 0;
+    padding: 0;
+    /* height: 260px; */
+}
+
+.search-field {
+    display: flex;
+    padding: 0;
+    margin: 6px;
+}
+.client-search {
+    margin-right: 0 !important;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0  !important;
+    background-color: var(--container-bg) !important;
+}
+.search-field-addon {
+    margin-left: 0 !important;
+    border-bottom-left-radius: 0  !important;
+    border-top-left-radius: 0  !important;
+}
+
+.tab-button-bar {
+    display: flex;
+    overflow: hidden;
+    /* border: 1px solid var(--tab-border); */
+    background-color: var(--tab-bg);
+    color: var(--tab-fg);
+}
+
+.tab-button-bar button {
+    background-color: inherit;
+    float: left;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 4px 16px;
+    transition: 0.3s;
+    /* border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    margin-top: 3px;
+    border: 1px solid var(--container-border);
+    border-bottom: none; */
+}
+.last-tab-button {
+    width: 100%;
+}
+.tab-button-bar button:hover {
+    background-color: var(--tab-button-hover);
+}
+.tab-button-bar button.active {
+    background-color: var(--selected-tab-bg);
+    color: var(--selected-tab-fg);
+    font-weight: bold;
+}
+.client-card {
+    /* background-color: var(--selected-tab-bg); */
+}
+
+.client-menu-tab {
+    display:none;
+    padding: 6px 12px;
+    animation: fadeEffect 0.7s; /* Fading effect takes 1 second */
+    background-color: var(--container-bg);
+    height: 250px;
+    margin: 0px;
+    border: 2px solid var(--selected-tab-bg);
+}
+
+/* Go from zero to full opacity */
+@keyframes fadeEffect {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
 
 @media only screen and (max-width: 770px) {
     #nav-toggle-label {

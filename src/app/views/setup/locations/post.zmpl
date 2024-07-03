@@ -21,7 +21,7 @@
           hx-get="/setup/locations/0"
           hx-target="#LocationSetupContent"
           hx-swap="outerHTML"
-          onclick="clearSetupSelectedItem();"><span class="mdi mdi-plus mr-2"></span></button>
+          onclick="addSetupBlankItem();"><span class="mdi mdi-plus mr-2"></span></button>
             <button type="button" class="btn btn-save" title="Save"
             hx-include="#location-form, #include_inactive"
             hx-post="/setup/locations"

@@ -19,7 +19,7 @@
           hx-get="/setup/users/0"
           hx-target="#UserSetupContent"
           hx-swap="outerHTML"
-          onclick="clearSetupSelectedItem();"><span class="mdi mdi-plus mr-2"></span></button>
+          onclick="addSetupBlankItem();"><span class="mdi mdi-plus mr-2"></span></button>
             <button type="button" class="btn btn-save" title="Save"
             hx-include="#user-form, #include_inactive"
             hx-post="/setup/users"

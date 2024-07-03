@@ -35,7 +35,42 @@
                 <a href="/setup/system" {{.setup_system}}><img src="/clinicbro/img/logo.svg" alt="ClinicBro" class="sys-icon"/>System</a>
             </div>
         </details>
-        
+        <hr />
+        <div class="client-card">
+            <div class="client-card-header">
+                <h1>Clients</h1>
+            </div>
+            <div class="client-card-details">
+                <div class="tab-button-bar">
+                    <button id="defaultOpen" class="tab-button" onclick="openClientTab(event, 'client-finder')">Search</button>
+                    <button class="tab-button" onclick="openClientTab(event, 'client-recent')">Recent</button>
+                    <button class="tab-button last-tab-button" onclick="openClientTab(event, 'client-appt')">Appt Today</button>
+                  </div>
+                <div id="client-finder" class="client-menu-tab">
+                    <span class="search-field">
+                        <input type="text" class="client-search" placeholder="Search Clients..." value="">
+                        <button type="button" class="btn search-field-addon"><span class="mdi mdi-account-search"></span></button>
+                    </span>
+                </div>
+                <div id="client-recent" class="client-menu-tab">
+                    <h2>Recent Clients</h2>
+                    <ul>
+                        <li>Smith, Charlie</li>
+                        <li>Felton, Edward</li>
+                        <li>Green, Samantha</li>
+                    </ul>
+                </div>
+                <div id="client-appt" class="client-menu-tab">
+                    <h2>Appt Today</h2>
+                    <ul>
+                        <li>Beard, Timothy</li>
+                        <li>Juarez, Guillermo</li>
+                        <li>McNutt, Brandon</li>
+                        <li>Thomas, Aaron</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
         <hr />
     </nav>
     <div id="pwr-dropdown" class="pwr-dropdown" tabindex="1">
