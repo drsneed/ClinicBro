@@ -65,10 +65,13 @@
     --input-required-bg: light-dark(#f4f5b3, #ccce5f);
     --selected-tab-bg: light-dark(#393f3e, #9d9c9c);
     --selected-tab-fg: light-dark(#e8e1e1, #2a2a29);
-    --tab-bg: light-dark(#f1f1f1, #3f3f3f);
+    --tab-bg: light-dark(#f1f1f1, #312f2f);
     --tab-fg: light-dark(#383535, #f1f1e3);
     --tab-border: light-dark(#ccc, #ccc);
+    --tab-button-fg: light-dark(#383535, #8d8f90);
     --tab-button-hover: light-dark(#ddd, #807d7d);
+    --tab-button-hover-fg: light-dark(#383535, #121212);
+    --client-card-header-bg: light-dark(#abbcde, #232b3b);
 }
 
 * { 
@@ -906,12 +909,13 @@ details[open] summary {
 }
 
 .client-card-header {
-    background: var(--header-bg);
-    color: var(--header-fg);
+    background: var(--client-card-header-bg);
+    color: var(--nav-link);
     border: 1px solid var(--tab-border);
     margin: 0;
     padding: 4px 8px;
     text-align: center;
+    font-weight: bold;
 }
 
 .client-card-details {
@@ -932,10 +936,10 @@ details[open] summary {
     border-top-left-radius: 9px !important;
     border-bottom-left-radius: 9px !important;
     background-color: var(--container-bg) !important;
+
 }
 .client-search:focus {
-    margin-right: 4px !important;
-    transition: none;
+    z-index: 999 !important;
 }
 .search-field-addon {
     margin-left: 0;
@@ -961,6 +965,7 @@ details[open] summary {
     cursor: pointer;
     padding: 4px 16px;
     transition: 0.3s;
+    color: var(--tab-button-fg);
     /* border-top-left-radius: 5px;
     border-top-right-radius: 5px;
     margin-top: 3px;
@@ -972,6 +977,7 @@ details[open] summary {
 }
 .tab-button-bar button:hover {
     background-color: var(--tab-button-hover);
+    color: var(--tab-button-hover-fg);
 }
 .tab-button-bar button.active {
     background-color: var(--selected-tab-bg);
