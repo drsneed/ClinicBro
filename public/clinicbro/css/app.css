@@ -8,14 +8,14 @@
     color-scheme: light dark;
     --bg: light-dark(#eeecec, #18191a);
     --fg: light-dark(#18191a, #d8d8d8);
-    --header-bg: light-dark(#027160, #0c261c); /* #1d3a4e */
+    --header-bg: light-dark(#232b3b, #232b3b); /* #1d3a4e */
     --header-fg: #f1f1e3;
     --header-border: light-dark(#444, black);
     --header-shadow: light-dark(#999, black);
     --header-btn-focus: light-dark(#142835, #121214);
     --pressed-btn-border: light-dark(#444, #444);
     --container-bg: light-dark(#fff, #202225);
-    --container-border: light-dark(#a3a09e, #5b5a5914);
+    --container-border: light-dark(#a3a09e, #1e1e1e);
     --container-shadow: light-dark(#999, black);
     --dropdown-bg: light-dark(#eee, #121214);
     --dropdown-fg: light-dark(#1d3a4e, #eee);
@@ -49,7 +49,7 @@
     --btn-cancel-fg: light-dark(#f1f1e3, #9cacaa);
     --btn-save-fg: light-dark(#f1f1e3, #f1f1e3);
     --btn-save-bg: light-dark(#3d5fa8, #244897);
-    --btn-save-hover-bg: light-dark(rgb(107, 153, 252), #3970e6);
+    --btn-save-hover-bg: light-dark(#f1f1e3, #3970e6);
     --btn-delete-fg: light-dark(#f1f1e3, #f1f1e3);
     --btn-delete-bg: light-dark(#ab0f0f, #ab0f0f);
     --btn-delete-hover-bg: light-dark(#f01616, #f11717);
@@ -63,12 +63,12 @@
     --code-bg: light-dark(#c2cff0, #121212);
     --setup-item-inactive-fg: light-dark(#979797, #5d5d5d);
     --input-required-bg: light-dark(#f4f5b3, #ccce5f);
-    --selected-tab-bg: light-dark(#4e4949, #ccc);
-    --selected-tab-fg: light-dark(#e8e1e1, #f1f1e3);
-    --tab-bg: light-dark(#f1f1f1, #ccc);
+    --selected-tab-bg: light-dark(#393f3e, #9d9c9c);
+    --selected-tab-fg: light-dark(#e8e1e1, #2a2a29);
+    --tab-bg: light-dark(#f1f1f1, #3f3f3f);
     --tab-fg: light-dark(#383535, #f1f1e3);
     --tab-border: light-dark(#ccc, #ccc);
-    --tab-button-hover: light-dark(#ddd, #ddd);
+    --tab-button-hover: light-dark(#ddd, #807d7d);
 }
 
 * { 
@@ -208,6 +208,18 @@ input:not([type='checkbox']) {
     border-radius: 3px;
     border: 1px solid var(--btn-border);
     margin: 6px 2px;
+    font-weight: bold;
+}
+
+.btn-add-client {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    padding: 0px;
+    cursor: pointer;
+    border-radius: 3px;
+    border: 1px solid var(--btn-border);
+    margin: 2px;
     font-weight: bold;
 }
 
@@ -896,6 +908,7 @@ details[open] summary {
 .client-card-header {
     background: var(--header-bg);
     color: var(--header-fg);
+    border: 1px solid var(--tab-border);
     margin: 0;
     padding: 4px 8px;
     text-align: center;
@@ -913,15 +926,23 @@ details[open] summary {
     margin: 6px;
 }
 .client-search {
-    margin-right: 0 !important;
+    margin-right: 0px !important;
     border-top-right-radius: 0 !important;
     border-bottom-right-radius: 0  !important;
+    border-top-left-radius: 9px !important;
+    border-bottom-left-radius: 9px !important;
     background-color: var(--container-bg) !important;
 }
+.client-search:focus {
+    margin-right: 4px !important;
+    transition: none;
+}
 .search-field-addon {
-    margin-left: 0 !important;
-    border-bottom-left-radius: 0  !important;
-    border-top-left-radius: 0  !important;
+    margin-left: 0;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
+    border-bottom-right-radius: 9px;
+    border-top-right-radius: 9px;
 }
 
 .tab-button-bar {
