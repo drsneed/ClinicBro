@@ -72,26 +72,7 @@
               <input id="location_phone" type="text" name="phone" maxlength="15" value="{{.phone}}">
               <label for="phone">Phone</label>
             </div>
-            <div class="text-field">
-              <input id="location_address_1" type="text" name="address_1" maxlength="128" value="{{.address_1}}">
-              <label for="address_1">Address Line 1</label>
-            </div>
-            <div class="text-field">
-              <input id="location_address_2" type="text" name="address_2" maxlength="32" value="{{.address_2}}">
-              <label for="address_2">Address Line 2</label>
-            </div>
-            <div class="text-field">
-              <input id="location_city" type="text" name="city" maxlength="32" value="{{.city}}">
-              <label for="city">City</label>
-            </div>
-            <div class="text-field">
-              <input id="location_state" type="text" name="state" maxlength="32" value="{{.state}}">
-              <label for="state">State</label>
-            </div>
-            <div class="text-field">
-              <input id="location_zip_code" type="text" name="zip_code" maxlength="32" value="{{.zip_code}}">
-              <label for="zip_code">Zip Code</label>
-            </div>
+            @partial address(address_1: .address_1, address_2: .address_2, city: .city, state: .state, zip_code: .zip_code)
           </form>
           <hr />
           <div class="tracking">

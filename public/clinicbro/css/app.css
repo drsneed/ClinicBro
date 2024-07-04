@@ -25,7 +25,8 @@
     --lgn-icon-light-scheme: invert(8%) sepia(7%) saturate(377%) hue-rotate(169deg) brightness(97%) contrast(95%);
     --pwr-light-scheme: invert(22%) sepia(11%) saturate(1957%) hue-rotate(162deg) brightness(92%) contrast(99%);
     --pwr-light-scheme-pressed: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
-    --input-border: #444;
+    --input-border: light-dark(#838282, #444);
+    --input-border-valid: light-dark(#325bd6, #17358e);
     --sep: light-dark(#cecdcd, black);
     --sep-border: light-dark(#ffffff, #3a3a3a);
     --link: light-dark(#1d3a4e, #82aac5);
@@ -190,12 +191,12 @@ input:not([type='checkbox']) {
     box-sizing: border-box;
     border-radius: 3px;
     font-size: 14px;
-    background-color: var(--input-required-bg);
+    background-color: var(--bg);
     color: var(--fg);
 }
 
 .cbcb {
-    margin-left: 10px;
+    margin-left: 0px;
     margin-bottom: 10px;
     margin-right: 4px;
     margin-top: 0px;
@@ -273,6 +274,47 @@ input:not([type='checkbox']) {
     color: var(--btn-cancel-bg);
 }
 
+.address-fields {
+    position: relative;
+    margin: 5px 2.5px 5px 2.5px;
+    border-radius: 3px;
+    border: 1px solid var(--input-border);
+    padding: 10px;
+    margin: 10px 4px;
+}
+.address-fields label {
+    position: absolute;
+    pointer-events: none;
+    left: 15px;
+    top: -12px;
+    font-size: small;
+    padding: 0 5px 0 5px;
+    background-color: var(--container-bg);
+    transition: 0.2s;
+}
+.address-fields input {
+    border: none;
+    border-bottom: 1px solid var(--input-border);
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
+.address-fields input:valid {
+    background-color: var(--container-bg);
+}
+.address-fields input:focus {
+    background-color: var(--container-bg);
+    outline: none;
+    border-bottom: 2px solid var(--input-border-valid);
+}
+#address-city {
+    width: 50%;
+}
+#address-state {
+    padding: 6px;
+}
+#address-zip-code {
+    width: 25%;
+}
 .text-field {
     position: relative;
     margin: 5px 2.5px 5px 2.5px;
@@ -814,6 +856,8 @@ details[open] summary {
 
 .cb-label {
     font-weight: bold;
+    white-space: nowrap;
+    margin-right: 10px;
 }
 
 .setup-item-buttons {
@@ -829,7 +873,7 @@ details[open] summary {
 }
 
 .setup-item-menu {
-    width: 22%;
+    /* width: 222px; */
     border-radius: 3px;
 }
 .setup-item-menu select {
