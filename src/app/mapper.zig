@@ -1,5 +1,6 @@
 const jetzig = @import("jetzig");
 const Client = @import("models/client.zig");
+const AppointmentType = @import("models/appointment_type.zig");
 
 pub const client = struct {
     pub fn fromRequest(request: *jetzig.http.Request) !Client {
@@ -79,6 +80,45 @@ pub const client = struct {
             .date_updated = row.get([]const u8, 21),
             .created_by = row.get(?[]const u8, 22),
             .updated_by = row.get(?[]const u8, 23),
+        };
+    }
+};
+
+pub const appointment_type = struct {
+    pub fn fromRequest(request: *jetzig.http.Request) !AppointmentType {
+        var model = AppointmentType{};
+        const params = try request.params();
+        model.id = @intCast(params.getT(.integer, "id") orelse 0);
+        model.active = params.getT(.boolean, "active") orelse false;
+        model.name = params.getT(.string, "name") orelse return error.MissingParam;
+        model.abbreviation = params.getT(.string, "abbreviation") orelse "";
+        model.color = @intCast(params.getT(.integer, "color") orelse 0);
+        return model;
+    }
+    pub fn toResponse(model: AppointmentType, data: *jetzig.Data) !void {
+        var root = data.value.?;
+        try root.put("id", data.integer(model.id));
+        try root.put("name", data.string(model.name));
+        try root.put("abbreviation", data.string(model.abbreviation));
+        try root.put("active", data.boolean(model.active));
+        try root.put("active_check", data.string(if (model.active) "checked" else ""));
+        try root.put("color", data.integer(model.color));
+        try root.put("date_created", data.string(model.date_created));
+        try root.put("date_updated", data.string(model.date_updated));
+        try root.put("created_by", data.string(model.created_by orelse "System"));
+        try root.put("updated_by", data.string(model.updated_by orelse "System"));
+    }
+    pub fn fromDatabase(row: jetzig.http.Database.pg.Row) AppointmentType {
+        return .{
+            .id = row.get(i32, 0),
+            .active = row.get(bool, 1),
+            .name = row.get([]const u8, 2),
+            .abbreviation = row.get([]const u8, 3),
+            .color = row.get(i32, 4),
+            .date_created = row.get([]const u8, 5),
+            .date_updated = row.get([]const u8, 6),
+            .created_by = row.get(?[]const u8, 7),
+            .updated_by = row.get(?[]const u8, 8),
         };
     }
 };

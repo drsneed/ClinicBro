@@ -96,6 +96,7 @@ create table AppointmentType (
     id serial primary key,
     active boolean not null,
     name varchar(32) not null,
+    abbreviation varchar(4) null,
     color int not null,
     -- tracking columns
     date_created timestamp not null,
@@ -108,7 +109,7 @@ create table AppointmentStatus (
     id serial primary key,
     active boolean not null,
     name varchar(32) not null,
-    visible boolean not null,
+    show boolean not null,
     -- tracking columns
     date_created timestamp not null,
     date_updated timestamp not null,

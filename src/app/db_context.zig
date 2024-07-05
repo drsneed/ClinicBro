@@ -3,6 +3,7 @@ const jetzig = @import("jetzig");
 pub const Bro = @import("models/bro.zig");
 pub const Location = @import("models/location.zig");
 const Client = @import("models/client.zig");
+const AppointmentType = @import("models/appointment_type.zig");
 pub const LookupItem = @import("models/lookup_item.zig");
 const mapper = @import("mapper.zig");
 const log = std.log.scoped(.DbContext);
@@ -376,4 +377,76 @@ pub fn lookupRecentClients(self: *DbContext, bro_id: i32) !std.ArrayList(LookupI
 
 pub fn addRecentClient(self: *DbContext, bro_id: i32, client_id: i32) !void {
     _ = try self.database.pool.exec("insert into RecentClient(bro_id, client_id, date_created) values($1, $2, NOW())", .{ bro_id, client_id });
+}
+
+// ------------------------------- AppointmentType Context ------------------------------------------
+const appointment_type_select_query =
+    \\select apt.id, apt.active, apt.name, apt.abbreviation, apt.color,
+    \\to_char(apt.date_created, 'YYYY-MM-DD at HH12:MI AM') as date_created,
+    \\to_char(apt.date_updated, 'YYYY-MM-DD at HH12:MI AM') as date_updated,
+    \\created_bro.name, updated_bro.name from AppointmentType apt
+    \\left join Bro created_bro on apt.created_bro_id=created_bro.id
+    \\left join Bro updated_bro on apt.updated_bro_id=updated_bro.id
+;
+const appointment_type_lookup_query = "select id, active, name from AppointmentType";
+const appointment_type_insert_query =
+    \\insert into AppointmentType(active,name,abbreviation,color,date_created,date_updated,created_bro_id,updated_bro_id)
+    \\values(true, $1, $2, $3, NOW(), NOW(), $4, $4);
+;
+const appointment_type_update_query =
+    \\update AppointmentType set active=$2,name=$3,abbreviation=$4,color=$5,date_updated=NOW(),updated_bro_id=$6 where id=$1
+;
+
+pub fn updateAppointmentType(self: *DbContext, appointment_type: AppointmentType, updated_bro_id: i32) !void {
+    _ = try self.database.pool.exec(appointment_type_update_query, .{
+        appointment_type.id,
+        appointment_type.active,
+        appointment_type.name,
+        appointment_type.abbreviation,
+        appointment_type.color,
+        updated_bro_id,
+    });
+}
+
+pub fn createAppointmentType(self: *DbContext, appointment_type: AppointmentType, created_bro_id: i32) !i32 {
+    _ = try self.database.pool.exec(appointment_type_insert_query, .{
+        appointment_type.name,
+        appointment_type.abbreviation,
+        appointment_type.color,
+        created_bro_id,
+    });
+    var result = try self.database.pool.query("select max(id) from AppointmentType where name = $1", .{appointment_type.name});
+    try self.results.append(result);
+    if (try result.next()) |row| {
+        return row.get(i32, 0);
+    }
+    return 0;
+}
+
+pub fn deleteAppointmentType(self: *DbContext, id: i32) !bool {
+    _ = try self.database.pool.exec("delete from AppointmentType where id=$1", .{id});
+    return true;
+}
+
+pub fn getAppointmentType(self: *DbContext, id: i32) !?AppointmentType {
+    var result = try self.database.pool.query(appointment_type_select_query ++ " where apt.id=$1", .{id});
+    try self.results.append(result);
+    if (try result.next()) |row| {
+        return mapper.appointment_type.fromDatabase(row);
+    }
+    return null;
+}
+
+pub fn lookupAppointmentTypes(self: *DbContext, include_all: bool) !std.ArrayList(LookupItem) {
+    const query = if (include_all)
+        appointment_type_lookup_query ++ " order by active desc, name"
+    else
+        appointment_type_lookup_query ++ " where active=true order by name";
+    var result = try self.database.pool.query(query, .{});
+    try self.results.append(result);
+    var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
+    while (try result.next()) |row| {
+        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
+    }
+    return lookup_list;
 }
