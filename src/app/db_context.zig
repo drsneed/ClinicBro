@@ -2,8 +2,9 @@ const std = @import("std");
 const jetzig = @import("jetzig");
 pub const Bro = @import("models/bro.zig");
 pub const Location = @import("models/location.zig");
-pub const Client = @import("models/client.zig");
+const Client = @import("models/client.zig");
 pub const LookupItem = @import("models/lookup_item.zig");
+const mapper = @import("mapper.zig");
 const log = std.log.scoped(.DbContext);
 const DbContext = @This();
 
@@ -90,6 +91,7 @@ pub fn createBro(self: *DbContext, updated_bro_id: i32, name: []const u8, sees_c
 }
 
 pub fn deleteBro(self: *DbContext, id: i32) !bool {
+    _ = try self.database.pool.exec("delete from RecentClient where bro_id=$1", .{id});
     _ = try self.database.pool.exec("delete from Bro where id=$1", .{id});
     return true;
 }
@@ -273,131 +275,59 @@ const client_insert_query =
     \\values(true, $1, $2, $3, $4, null, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW(), NOW(), $18, $18);
 ;
 const client_update_query =
-    \\update Client set active=$1,first_name=$2,middle_name=$3,last_name=$4,date_of_birth=$5,date_of_death=$6,email=$7,phone=$8,
-    \\address_1=$9,address_2=$10,city=$11,state=$12,zip_code=$13,notes=$14,can_call=$15,can_text=$16,can_email=$17,
-    \\location_id=$18,bro_id=$19,date_updated=NOW(),updated_bro_id=$20
+    \\update Client set active=$2,first_name=$3,middle_name=$4,last_name=$5,date_of_birth=$6,date_of_death=$7,email=$8,phone=$9,
+    \\address_1=$10,address_2=$11,city=$12,state=$13,zip_code=$14,notes=$15,can_call=$16,can_text=$17,can_email=$18,
+    \\location_id=$19,bro_id=$20,date_updated=NOW(),updated_bro_id=$21 where id=$1
 ;
 
-fn mapClient(row: jetzig.http.Database.pg.Row) Client {
-    return .{
-        .id = row.get(i32, 0),
-        .active = row.get(bool, 1),
-        .first_name = row.get([]u8, 2),
-        .middle_name = row.get([]u8, 3),
-        .last_name = row.get([]u8, 4),
-        .date_of_birth = row.get(?[]u8, 5),
-        .date_of_death = row.get(?[]u8, 6),
-        .email = row.get([]u8, 7),
-        .phone = row.get([]u8, 8),
-        .address_1 = row.get([]u8, 9),
-        .address_2 = row.get([]u8, 10),
-        .city = row.get([]u8, 11),
-        .state = row.get([]u8, 12),
-        .zip_code = row.get([]u8, 13),
-        .notes = row.get([]u8, 14),
-        .can_call = row.get(bool, 15),
-        .can_text = row.get(bool, 16),
-        .can_email = row.get(bool, 17),
-        .location_id = row.get(i32, 18),
-        .bro_id = row.get(i32, 19),
-        .date_created = row.get([]u8, 20),
-        .date_updated = row.get([]u8, 21),
-        .created_by = row.get(?[]u8, 22),
-        .updated_by = row.get(?[]u8, 23),
-    };
-}
-
-pub fn updateClient(
-    self: *DbContext,
-    id: i32,
-    active: bool,
-    first_name: []const u8,
-    middle_name: []const u8,
-    last_name: []const u8,
-    date_of_birth: ?[]const u8,
-    date_of_death: ?[]const u8,
-    email: []const u8,
-    phone: []const u8,
-    address_1: []const u8,
-    address_2: []const u8,
-    city: []const u8,
-    state: []const u8,
-    zip_code: []const u8,
-    notes: []const u8,
-    can_call: bool,
-    can_text: bool,
-    can_email: bool,
-    location_id: i32,
-    bro_id: i32,
-    updated_bro_id: i32,
-) !void {
+pub fn updateClient(self: *DbContext, client: Client, updated_bro_id: i32) !void {
     _ = try self.database.pool.exec(client_update_query, .{
-        active,
-        first_name,
-        middle_name,
-        last_name,
-        date_of_birth,
-        date_of_death,
-        email,
-        phone,
-        address_1,
-        address_2,
-        city,
-        state,
-        zip_code,
-        notes,
-        can_call,
-        can_text,
-        can_email,
-        location_id,
-        bro_id,
+        client.id,
+        client.active,
+        client.first_name,
+        client.middle_name,
+        client.last_name,
+        client.date_of_birth,
+        client.date_of_death,
+        client.email,
+        client.phone,
+        client.address_1,
+        client.address_2,
+        client.city,
+        client.state,
+        client.zip_code,
+        client.notes,
+        client.can_call,
+        client.can_text,
+        client.can_email,
+        client.location_id,
+        client.bro_id,
         updated_bro_id,
-        id,
     });
 }
 
-pub fn createClient(
-    self: *DbContext,
-    first_name: []const u8,
-    middle_name: []const u8,
-    last_name: []const u8,
-    date_of_birth: ?[]const u8,
-    email: []const u8,
-    phone: []const u8,
-    address_1: []const u8,
-    address_2: []const u8,
-    city: []const u8,
-    state: []const u8,
-    zip_code: []const u8,
-    notes: []const u8,
-    can_call: bool,
-    can_text: bool,
-    can_email: bool,
-    location_id: i32,
-    bro_id: i32,
-    updated_bro_id: i32,
-) !i32 {
+pub fn createClient(self: *DbContext, client: Client, created_bro_id: i32) !i32 {
     _ = try self.database.pool.exec(client_insert_query, .{
-        first_name,
-        middle_name,
-        last_name,
-        date_of_birth,
-        email,
-        phone,
-        address_1,
-        address_2,
-        city,
-        state,
-        zip_code,
-        notes,
-        can_call,
-        can_text,
-        can_email,
-        location_id,
-        bro_id,
-        updated_bro_id,
+        client.first_name,
+        client.middle_name,
+        client.last_name,
+        client.date_of_birth,
+        client.email,
+        client.phone,
+        client.address_1,
+        client.address_2,
+        client.city,
+        client.state,
+        client.zip_code,
+        client.notes,
+        client.can_call,
+        client.can_text,
+        client.can_email,
+        client.location_id,
+        client.bro_id,
+        created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from Client where first_name = $1 and last_name=$2", .{ first_name, last_name });
+    var result = try self.database.pool.query("select max(id) from Client where first_name = $1 and last_name=$2", .{ client.first_name, client.last_name });
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -406,6 +336,7 @@ pub fn createClient(
 }
 
 pub fn deleteClient(self: *DbContext, id: i32) !bool {
+    _ = try self.database.pool.exec("delete from RecentClient where client_id=$1", .{id});
     _ = try self.database.pool.exec("delete from Client where id=$1", .{id});
     return true;
 }
@@ -414,7 +345,7 @@ pub fn getClient(self: *DbContext, id: i32) !?Client {
     var result = try self.database.pool.query(client_select_query ++ " where cl.id=$1", .{id});
     try self.results.append(result);
     if (try result.next()) |row| {
-        return mapClient(row);
+        return mapper.client.fromDatabase(row);
     }
     return null;
 }
@@ -441,4 +372,8 @@ pub fn lookupRecentClients(self: *DbContext, bro_id: i32) !std.ArrayList(LookupI
         try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
     }
     return lookup_list;
+}
+
+pub fn addRecentClient(self: *DbContext, bro_id: i32, client_id: i32) !void {
+    _ = try self.database.pool.exec("insert into RecentClient(bro_id, client_id, date_created) values($1, $2, NOW())", .{ bro_id, client_id });
 }

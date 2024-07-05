@@ -16,7 +16,7 @@
 <cb-window id="cb-window" opened="" window_title="{{window_title}}">
     <form id="client-form" method="post" class="{{inactive_class}}">
       <input id="client-id-input" type="hidden" name="id" value="{{id}}">
-      <div class="id-field">
+      <div class="id-field" hx-ext="path-params">
         <span>ID</span>
         <code>{{id}}</code>
         @zig {
@@ -27,6 +27,15 @@
         <input id="first_name" type="text" name="first_name" placeholder="First" maxlength="50" value="{{.first_name}}" required {{autofocus}}>
         <input id="middle_name" type="text" name="middle_name" placeholder="M" maxlength="50" value="{{.middle_name}}" required>
         <input id="last_name" type="text" name="last_name" placeholder="Last" maxlength="50" value="{{.last_name}}" required>
+        @zig {
+          if(id > 0) {
+          <button type="button" id="client-delete" class="btn" title="Delete"
+            hx-include="#client-id-input"
+            hx-delete="/clients/{id}"
+            hx-target="#cb-window"
+            hx-swap="outerHTML"><span class="mdi mdi-trash-can"></span></button>  
+        }
+        }
       </div>
       <hr />
       <div class="date-container">
@@ -98,17 +107,8 @@
           hx-post="/clients"
           hx-target="#cb-window"
           hx-swap="outerHTML">Save</button>
-        @zig {
-          if(id > 0) {
-          <button type="button" class="btn btn-delete" title="Delete"
-            hx-include="#client-id-input"
-            hx-delete="/clients/{id}"
-            hx-target="#cb-window"
-            hx-swap="outerHTML">Delete</button>  
-        }
-        }
-        <button type="button" class="btn btn-cancel" title="Cancel"
-          onclick="document.getElementById('cb-window').opened=false;">Cancel</button>
+        <button type="button" class="btn btn-cancel" title="Close"
+          onclick="document.getElementById('cb-window').opened=false;">Close</button>
     </div>
 
 </cb-window>

@@ -73,6 +73,7 @@
     --tab-button-hover: light-dark(#ddd, #807d7d);
     --tab-button-hover-fg: light-dark(#383535, #121212);
     --client-card-header-bg: light-dark(#abbcde, #232b3b);
+    --listbox-shadow: light-dark(#111, #000);
 }
 
 * { 
@@ -326,6 +327,10 @@ select {
 }
 #recent-clients-select {
     width: 100%;
+    margin-top: 6px;
+    padding: 10px 0px 0px 10px;
+    border: 1px solid var(--container-border);
+    box-shadow: inset 0.25em 0.25em 0.25em -0.25em var(--listbox-shadow);
 }
 #client-delete {
     float: right;
