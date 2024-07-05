@@ -865,7 +865,7 @@ class DragController {
   styles = {
     position: "absolute",
     top: "0px",
-    left: "0px"
+    left: "-5px"
   };
   constructor(host, options) {
     const {

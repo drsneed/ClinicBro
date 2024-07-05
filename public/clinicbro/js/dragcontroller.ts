@@ -8,7 +8,7 @@ export class DragController {
     styles = {
         position: "absolute",
         top: "0px",
-        left: "0px",
+        left: "-5px",
         // top: "calc(50% - 128px)",
         // left: "calc(50% - 256px)",
     };

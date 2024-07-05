@@ -266,7 +266,8 @@ const client_select_query =
     \\left join Bro created_bro on cl.created_bro_id=created_bro.id
     \\left join Bro updated_bro on cl.updated_bro_id=updated_bro.id
 ;
-const client_lookup_query = "select id, active, name from Client";
+const recent_client_query = "select cl.id, cl.active, concat(cl.last_name, ', ', cl.first_name) as name from RecentClient rc join Client cl on rc.client_id=cl.id where rc.bro_id=$1";
+const client_lookup_query = "select id, active, concat(last_name, ', ', first_name) as name from Client";
 const client_insert_query =
     \\insert into Client(active,first_name,middle_name,last_name,date_of_birth,date_of_death,email,phone,address_1,address_2,city,state,zip_code,notes,can_call,can_text,can_email,location_id,bro_id,date_created,date_updated,created_bro_id,updated_bro_id)
     \\values(true, $1, $2, $3, $4, null, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW(), NOW(), $18, $18);
@@ -424,6 +425,16 @@ pub fn lookupClients(self: *DbContext, include_all: bool) !std.ArrayList(LookupI
     else
         client_lookup_query ++ " where active=true order by name";
     var result = try self.database.pool.query(query, .{});
+    try self.results.append(result);
+    var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
+    while (try result.next()) |row| {
+        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
+    }
+    return lookup_list;
+}
+
+pub fn lookupRecentClients(self: *DbContext, bro_id: i32) !std.ArrayList(LookupItem) {
+    var result = try self.database.pool.query(recent_client_query, .{bro_id});
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {

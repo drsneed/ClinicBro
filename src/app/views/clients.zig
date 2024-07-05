@@ -6,13 +6,34 @@ const log = std.log.scoped(.clients);
 pub const layout = "app";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    _ = data;
+    var db_context = DbContext.init(request.allocator, request.server.database);
+    defer db_context.deinit();
+    const session = try request.session();
+    var current_bro_id: i32 = 0;
+    if (try session.get("bro")) |bro_session| {
+        current_bro_id = @intCast(bro_session.getT(.integer, "id").?);
+    }
+    const json_clients = try data.array();
+    var root = data.value.?;
+    try root.put("clients", json_clients);
+    const clients = try db_context.lookupRecentClients(current_bro_id);
+    defer clients.deinit();
+    for (clients.items) |client| {
+        var json_client = try data.object();
+        try json_client.put("id", data.integer(client.id));
+        try json_client.put("active", data.boolean(client.active));
+        try json_client.put("name", data.string(client.name));
+        try json_client.put("selected", data.string(""));
+        try json_clients.append(json_client);
+    }
     return request.render(.ok);
 }
 pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var db_context = DbContext.init(request.allocator, request.server.database);
     defer db_context.deinit();
     const client_id = try std.fmt.parseInt(i32, id, 10);
+    if (std.mem.eql(u8, id, "recent")) {} else {}
+
     var client = Client{};
     if (client_id > 0) {
         client = try db_context.getClient(client_id) orelse client;
@@ -172,11 +193,11 @@ pub fn patch(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetz
 }
 
 pub fn delete(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
+    _ = data;
     var db_context = DbContext.init(request.allocator, request.server.database);
     defer db_context.deinit();
     const client_id = try std.fmt.parseInt(i32, id, 10);
     _ = try db_context.deleteClient(client_id);
-    _ = data;
     return request.render(.ok);
 }
 

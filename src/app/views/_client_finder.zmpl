@@ -10,17 +10,13 @@
     </summary>
     <div class="client-card-details collapsible-content">
         <div class="tab-button-bar">
-            <button id="defaultOpen" class="tab-button" onclick="openClientTab(event, 'client-recent')">Recent</button>
+            <button id="defaultOpen" class="tab-button" hx-get="/clients" hx-target="#recent-clients" hx-swap="innerHTML"
+                onclick="openClientTab(event, 'recent-clients')">Recent</button>
             <button class="tab-button" onclick="openClientTab(event, 'client-appt')"><span style="white-space: nowrap;">Appt Today</span></button>
             <button class="tab-button stretch-button" onclick="openClientTab(event, 'client-finder')">Search</button>
           </div>
-        <div id="client-recent" class="client-menu-tab">
-            <h2>Recent Clients</h2>
-            <ul>
-                <li>Smith, Charlie</li>
-                <li>Felton, Edward</li>
-                <li>Green, Samantha</li>
-            </ul>
+        <div id="recent-clients" class="client-menu-tab">
+            
         </div>
         <div id="client-appt" class="client-menu-tab">
             <h2>Appt Today</h2>

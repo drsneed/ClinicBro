@@ -5,6 +5,7 @@ create table Bro (
     password varchar(60) not null,
     color int not null,
     sees_clients boolean not null,
+    recent_clients int[],
     -- tracking columns
     date_created timestamp not null,
     date_updated timestamp not null,
@@ -84,7 +85,12 @@ create table Client (
     updated_bro_id int
 );
 
-
+create table RecentClient (
+    bro_id int not null references Bro(id),
+    client_id int not null references Client(id),
+    date_created timestamp not null,
+    unique(bro_id, client_id)
+);
 
 create table AppointmentType (
     id serial primary key,

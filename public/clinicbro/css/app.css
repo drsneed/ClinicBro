@@ -324,6 +324,12 @@ select {
     outline: none;
     border-bottom: 2px solid var(--input-border-valid);
 }
+#recent-clients-select {
+    width: 100%;
+}
+#client-delete {
+    float: right;
+}
 #address-city {
     width: 40%;
 }
