@@ -12,11 +12,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx.org/dist/ext/path-params.js"></script>
+    <script type="module" src="/clinicbro/js/cb-window.js"></script>
     {{.header_include}}
   </head>
   <body>
     <input type="checkbox" id="nav-toggle" name="nav-toggle"/>
-    <label for="nav-toggle" id="nav-toggle-label"></label>
+    <label for="nav-toggle" id="nav-toggle-label"s></label>
     <nav id="nav">
         <hr />
         <a href="/" {{.main_home}}><span class="mdi mdi-home-outline mr-2"></span>Home</a>
@@ -64,8 +65,8 @@
     </header>
     <main id="main">
         {{zmpl.content}}
+        <cb-window id="cb-window"></cb-window>
     </main>
-    
     <script src="/clinicbro/js/app.js"></script>
   </body>
 </html>

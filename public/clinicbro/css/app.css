@@ -274,15 +274,33 @@ input:not([type='checkbox']) {
     color: var(--btn-cancel-bg);
 }
 
-.address-fields {
+select {
+    padding: 4px 10px;
+}
+
+.cb-row {
+    display: flex;
+}
+
+.select-label {
+    margin: 6px 10px;
+    font-weight: bold;
+}
+
+.select-label-2 {
+    margin: 6px 10px 6px 30px;
+    font-weight: bold;
+}
+
+.groupbox {
     position: relative;
     margin: 5px 2.5px 5px 2.5px;
     border-radius: 3px;
     border: 1px solid var(--input-border);
-    padding: 10px;
-    margin: 10px 4px;
+    padding: 14px 10px 8px 10px;
+    margin: 20px 4px;
 }
-.address-fields label {
+.groupbox label:first-child {
     position: absolute;
     pointer-events: none;
     left: 15px;
@@ -292,22 +310,22 @@ input:not([type='checkbox']) {
     background-color: var(--container-bg);
     transition: 0.2s;
 }
-.address-fields input {
+.groupbox input {
     border: none;
     border-bottom: 1px solid var(--input-border);
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
-.address-fields input:valid {
+.groupbox input:valid {
     background-color: var(--container-bg);
 }
-.address-fields input:focus {
+.groupbox input:focus {
     background-color: var(--container-bg);
     outline: none;
     border-bottom: 2px solid var(--input-border-valid);
 }
 #address-city {
-    width: 50%;
+    width: 40%;
 }
 #address-state {
     padding: 6px;
@@ -318,6 +336,14 @@ input:not([type='checkbox']) {
 .text-field {
     position: relative;
     margin: 5px 2.5px 5px 2.5px;
+}
+.tf-inline {
+    display: inline-block;
+}
+
+.window-button-bar {
+    text-align: center;
+    /* margin: 10px auto; */
 }
 
 .text-field input + label {
@@ -488,7 +514,6 @@ code {
     margin-left: var(--nav-width);
     margin-top: var(--header-height);
     padding: 5px;
-    text-align: center;
     overflow-y: scroll;
     z-index: 0;
     overflow-x:hidden; 
@@ -855,13 +880,17 @@ details[open] summary {
 }
 
 .cb-label {
-    font-weight: bold;
+    font-weight: semi-bold;
     white-space: nowrap;
     margin-right: 10px;
 }
 
 .setup-item-buttons {
     /* margin-bottom: 10px; */
+}
+
+.id-field code {
+    margin-right: 10px;
 }
 
 #user_name {
@@ -872,6 +901,30 @@ details[open] summary {
     font-size: 12px;
 }
 
+#cb-window {
+    z-index: 6;
+}
+
+#first_name {
+    margin-left: 10px;
+    width: 220px;
+}
+#middle_name {
+    width: 36px;
+}
+#last_name {
+    width: 240px;
+}
+.date-container {
+    display: inline-block;
+    width: 190px;
+}
+#client_email {
+    width: 340px;
+}
+#client_phone {
+    width: 160px;
+}
 .setup-item-menu {
     /* width: 222px; */
     border-radius: 3px;
@@ -938,6 +991,10 @@ details[open] summary {
 
 .tracking ul {
     margin-left: 10px;
+}
+
+#client-form {
+    margin-bottom: 20px;
 }
 
 .client-card {

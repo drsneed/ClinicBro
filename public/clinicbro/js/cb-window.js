@@ -864,8 +864,8 @@ class DragController {
   state = "idle";
   styles = {
     position: "absolute",
-    top: "calc(50% - 128px)",
-    left: "calc(50% - 256px)"
+    top: "0px",
+    left: "0px"
   };
   constructor(host, options) {
     const {
@@ -948,68 +948,20 @@ class DragController {
   }
 }
 
-// public/clinicbro/js/util.ts
-function combineDateWithTimeString(d3, s4) {
-  let date_str = toIsoDateString(d3);
-  return new Date(date_str + "T" + s4);
-}
-function toIsoDateString(d3) {
-  return d3.toISOString().split("T")[0];
-}
-function toIsoTimeString(d3) {
-  return d3.toTimeString().substring(0, 8);
-}
-
-// public/clinicbro/js/schedule/monthview-dialog.ts
-class MonthViewDialog extends s3 {
+// public/clinicbro/js/cb-window.ts
+class CBWindow extends s3 {
   constructor() {
     super();
     this.opened = false;
     this.window_title = "Window";
-    this.appt_title = "";
-    this.appt_id = 0;
-    this.appt_date = new Date;
-    this.appt_from = new Date;
-    this.appt_to = new Date;
-  }
-  _apptTitleKeyDown(e7) {
-    if (e7.code === "Enter") {
-      this.dispatchEvent(new CustomEvent("dialog.save"));
-    }
-  }
-  apptDate() {
-    let appt_date_input = this.shadowRoot.querySelector("#appt_date");
-    return new Date(appt_date_input.value + "T00:00:00");
   }
   ready() {
-    let appt_title_input = this.shadowRoot.querySelector("#appt_title");
-    appt_title_input.value = this.appt_title;
-    let appt_date_input = this.shadowRoot.querySelector("#appt_date");
-    appt_date_input.value = toIsoDateString(this.appt_date);
-    let appt_from_input = this.shadowRoot.querySelector("#appt_from");
-    appt_from_input.value = toIsoTimeString(this.appt_from);
-    let appt_to_input = this.shadowRoot.querySelector("#appt_to");
-    appt_to_input.value = toIsoTimeString(this.appt_to);
   }
   collect() {
-    let appt_title_input = this.shadowRoot.querySelector("#appt_title");
-    this.appt_title = appt_title_input.value;
-    let appt_date_input = this.shadowRoot.querySelector("#appt_date");
-    this.appt_date = new Date(appt_date_input.value + "T00:00:00");
-    let appt_from_input = this.shadowRoot.querySelector("#appt_from");
-    this.appt_from = combineDateWithTimeString(this.apptDate(), appt_from_input.value);
-    let appt_to_input = this.shadowRoot.querySelector("#appt_to");
-    this.appt_to = combineDateWithTimeString(this.apptDate(), appt_to_input.value);
-  }
-  updateDate(new_date) {
-    this.collect();
-    this.appt_date = new_date;
-    this.ready();
   }
   updated(changedProperties) {
     if (changedProperties.has("opened")) {
       if (this.opened) {
-        this.shadowRoot.querySelector("#appt_title").focus();
       } else {
         this.drag.resetPosition();
       }
@@ -1058,11 +1010,9 @@ class MonthViewDialog extends s3 {
         border: 2px outset var(--container-border);
         border-radius: 3px;
         background-color: var(--container-bg);
-        width: 512px;
     }
     .content {
         margin: 40px 8px 10px 8px;
-        text-align: center;
     }
     .title {
         margin-top: 4px;
@@ -1203,77 +1153,27 @@ class MonthViewDialog extends s3 {
 
     `;
   render() {
-    return this.renderEvent();
-  }
-  renderEvent() {
     return x`
         <div id="window" class="${e6({ dialog: true, opened: this.opened, closed: !this.opened })}" style=${o5(this.drag.styles)}>
             <div id="draggable" class="header" data-dragging=${this.drag.state}>
                 <h4 class="title">${this.window_title}</h4>
-                <button class="closebtn" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">&times;</button>
+                <button class="closebtn" @click="${() => this.opened = false}">&times;</button>
             </div>
             <div class="content">
-                <div class="text-field">
-                    <input id="appt_title" type="text" name="type" maxlength="255" @keydown="${this._apptTitleKeyDown}"
-                        value="${this.appt_title}" required>
-                    <label for="type">Title</label>
-                </div>
-                <div class="date-container">
-                    <div class="text-field">
-                        <input id="appt_date" type="date" name="date"
-                            value="${toIsoDateString(this.appt_date)}" required>
-                        <label for="date">Date</label>
-                    </div>
-                </div>
-                <div class="time-inputs">
-                    <div class="text-field time-input">
-                        <input id="appt_from" type="time" name="from" required>
-                        <label for="from">From</label>
-                    </div>
-                    <div class="text-field time-input">
-                        <input id="appt_to" type="time" name="to" required>
-                        <label for="to">&nbsp;&nbsp;&nbsp;To</label>
-                    </div>
-                </div>
-                
-                <div class="buttons">
-                    <button type="button" class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>  
-                    <button type="button" class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>  
-                </div>
+                <slot></slot>
             </div>
         </div>`;
   }
 }
 __legacyDecorateClassTS([
   n4({ type: Boolean, reflect: true })
-], MonthViewDialog.prototype, "opened", undefined);
+], CBWindow.prototype, "opened", undefined);
 __legacyDecorateClassTS([
   n4({ type: String })
-], MonthViewDialog.prototype, "window_title", undefined);
-__legacyDecorateClassTS([
-  n4({ type: Number, reflect: true })
-], MonthViewDialog.prototype, "appt_id", undefined);
-__legacyDecorateClassTS([
-  n4({ type: String, reflect: true })
-], MonthViewDialog.prototype, "appt_title", undefined);
-__legacyDecorateClassTS([
-  n4({ converter(value) {
-    return new Date(value);
-  } })
-], MonthViewDialog.prototype, "appt_date", undefined);
-__legacyDecorateClassTS([
-  n4({ converter(value) {
-    return new Date(value);
-  } })
-], MonthViewDialog.prototype, "appt_from", undefined);
-__legacyDecorateClassTS([
-  n4({ converter(value) {
-    return new Date(value);
-  } })
-], MonthViewDialog.prototype, "appt_to", undefined);
-MonthViewDialog = __legacyDecorateClassTS([
-  t3("mv-dialog")
-], MonthViewDialog);
+], CBWindow.prototype, "window_title", undefined);
+CBWindow = __legacyDecorateClassTS([
+  t3("cb-window")
+], CBWindow);
 export {
-  MonthViewDialog
+  CBWindow
 };

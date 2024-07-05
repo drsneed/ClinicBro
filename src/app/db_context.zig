@@ -2,6 +2,7 @@ const std = @import("std");
 const jetzig = @import("jetzig");
 pub const Bro = @import("models/bro.zig");
 pub const Location = @import("models/location.zig");
+pub const Client = @import("models/client.zig");
 pub const LookupItem = @import("models/lookup_item.zig");
 const log = std.log.scoped(.DbContext);
 const DbContext = @This();
@@ -100,6 +101,21 @@ pub fn getBro(self: *DbContext, id: i32) !?Bro {
         return mapBro(row);
     }
     return null;
+}
+
+pub fn lookupProviderBros(self: *DbContext, include_inactive: bool) !std.ArrayList(LookupItem) {
+    const query = if (include_inactive)
+        bro_item_select_query ++ "where sees_clients=true order by active desc, name"
+    else
+        bro_item_select_query ++ " where sees_clients=true and active=true order by name";
+
+    var result = try self.database.pool.query(query, .{});
+    try self.results.append(result);
+    var bros = std.ArrayList(LookupItem).init(self.allocator);
+    while (try result.next()) |row| {
+        try bros.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
+    }
+    return bros;
 }
 
 pub fn lookupBros(self: *DbContext, include_all: bool) !std.ArrayList(LookupItem) {
@@ -237,4 +253,181 @@ pub fn lookupLocations(self: *DbContext, include_all: bool) !std.ArrayList(Looku
         try locs.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
     }
     return locs;
+}
+
+// ------------------------------- Client Context ------------------------------------------
+const client_select_query =
+    \\select cl.id, cl.active, cl.first_name, cl.middle_name, cl.last_name, cl.date_of_birth, cl.date_of_death, cl.email, cl.phone,
+    \\cl.address_1, cl.address_2, cl.city, cl.state, cl.zip_code,
+    \\cl.notes,cl.can_call,cl.can_text,cl.can_email,cl.location_id,cl.bro_id,
+    \\to_char(cl.date_created, 'YYYY-MM-DD at HH12:MI AM') as date_created,
+    \\to_char(cl.date_updated, 'YYYY-MM-DD at HH12:MI AM') as date_updated,
+    \\created_bro.name, updated_bro.name from Client cl
+    \\left join Bro created_bro on cl.created_bro_id=created_bro.id
+    \\left join Bro updated_bro on cl.updated_bro_id=updated_bro.id
+;
+const client_lookup_query = "select id, active, name from Client";
+const client_insert_query =
+    \\insert into Client(active,first_name,middle_name,last_name,date_of_birth,date_of_death,email,phone,address_1,address_2,city,state,zip_code,notes,can_call,can_text,can_email,location_id,bro_id,date_created,date_updated,created_bro_id,updated_bro_id)
+    \\values(true, $1, $2, $3, $4, null, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, NOW(), NOW(), $18, $18);
+;
+const client_update_query =
+    \\update Client set active=$1,first_name=$2,middle_name=$3,last_name=$4,date_of_birth=$5,date_of_death=$6,email=$7,phone=$8,
+    \\address_1=$9,address_2=$10,city=$11,state=$12,zip_code=$13,notes=$14,can_call=$15,can_text=$16,can_email=$17,
+    \\location_id=$18,bro_id=$19,date_updated=NOW(),updated_bro_id=$20
+;
+
+fn mapClient(row: jetzig.http.Database.pg.Row) Client {
+    return .{
+        .id = row.get(i32, 0),
+        .active = row.get(bool, 1),
+        .first_name = row.get([]u8, 2),
+        .middle_name = row.get([]u8, 3),
+        .last_name = row.get([]u8, 4),
+        .date_of_birth = row.get(?[]u8, 5),
+        .date_of_death = row.get(?[]u8, 6),
+        .email = row.get([]u8, 7),
+        .phone = row.get([]u8, 8),
+        .address_1 = row.get([]u8, 9),
+        .address_2 = row.get([]u8, 10),
+        .city = row.get([]u8, 11),
+        .state = row.get([]u8, 12),
+        .zip_code = row.get([]u8, 13),
+        .notes = row.get([]u8, 14),
+        .can_call = row.get(bool, 15),
+        .can_text = row.get(bool, 16),
+        .can_email = row.get(bool, 17),
+        .location_id = row.get(i32, 18),
+        .bro_id = row.get(i32, 19),
+        .date_created = row.get([]u8, 20),
+        .date_updated = row.get([]u8, 21),
+        .created_by = row.get(?[]u8, 22),
+        .updated_by = row.get(?[]u8, 23),
+    };
+}
+
+pub fn updateClient(
+    self: *DbContext,
+    id: i32,
+    active: bool,
+    first_name: []const u8,
+    middle_name: []const u8,
+    last_name: []const u8,
+    date_of_birth: ?[]const u8,
+    date_of_death: ?[]const u8,
+    email: []const u8,
+    phone: []const u8,
+    address_1: []const u8,
+    address_2: []const u8,
+    city: []const u8,
+    state: []const u8,
+    zip_code: []const u8,
+    notes: []const u8,
+    can_call: bool,
+    can_text: bool,
+    can_email: bool,
+    location_id: i32,
+    bro_id: i32,
+    updated_bro_id: i32,
+) !void {
+    _ = try self.database.pool.exec(client_update_query, .{
+        active,
+        first_name,
+        middle_name,
+        last_name,
+        date_of_birth,
+        date_of_death,
+        email,
+        phone,
+        address_1,
+        address_2,
+        city,
+        state,
+        zip_code,
+        notes,
+        can_call,
+        can_text,
+        can_email,
+        location_id,
+        bro_id,
+        updated_bro_id,
+        id,
+    });
+}
+
+pub fn createClient(
+    self: *DbContext,
+    first_name: []const u8,
+    middle_name: []const u8,
+    last_name: []const u8,
+    date_of_birth: ?[]const u8,
+    email: []const u8,
+    phone: []const u8,
+    address_1: []const u8,
+    address_2: []const u8,
+    city: []const u8,
+    state: []const u8,
+    zip_code: []const u8,
+    notes: []const u8,
+    can_call: bool,
+    can_text: bool,
+    can_email: bool,
+    location_id: i32,
+    bro_id: i32,
+    updated_bro_id: i32,
+) !i32 {
+    _ = try self.database.pool.exec(client_insert_query, .{
+        first_name,
+        middle_name,
+        last_name,
+        date_of_birth,
+        email,
+        phone,
+        address_1,
+        address_2,
+        city,
+        state,
+        zip_code,
+        notes,
+        can_call,
+        can_text,
+        can_email,
+        location_id,
+        bro_id,
+        updated_bro_id,
+    });
+    var result = try self.database.pool.query("select max(id) from Client where first_name = $1 and last_name=$2", .{ first_name, last_name });
+    try self.results.append(result);
+    if (try result.next()) |row| {
+        return row.get(i32, 0);
+    }
+    return 0;
+}
+
+pub fn deleteClient(self: *DbContext, id: i32) !bool {
+    _ = try self.database.pool.exec("delete from Client where id=$1", .{id});
+    return true;
+}
+
+pub fn getClient(self: *DbContext, id: i32) !?Client {
+    var result = try self.database.pool.query(client_select_query ++ " where cl.id=$1", .{id});
+    try self.results.append(result);
+    if (try result.next()) |row| {
+        return mapClient(row);
+    }
+    return null;
+}
+
+pub fn lookupClients(self: *DbContext, include_all: bool) !std.ArrayList(LookupItem) {
+    const query = if (include_all)
+        client_lookup_query ++ " order by active desc, name"
+    else
+        client_lookup_query ++ " where active=true order by name";
+    var result = try self.database.pool.query(query, .{});
+    try self.results.append(result);
+    var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
+    while (try result.next()) |row| {
+        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
+    }
+    return lookup_list;
 }
