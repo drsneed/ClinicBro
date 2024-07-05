@@ -61,7 +61,7 @@ create table Client (
     first_name varchar(50),
     middle_name varchar(50),
     last_name varchar(50),
-    date_of_birth date not null,
+    date_of_birth date null,
     date_of_death date null,
     email varchar(99),
     phone varchar(15),

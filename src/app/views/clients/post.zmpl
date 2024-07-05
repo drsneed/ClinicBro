@@ -83,7 +83,6 @@
     <hr />
     @zig { 
       if(id > 0) {
-      <hr />
       <div class="tracking">
           <h2>Tracking</h2>
           <ul>

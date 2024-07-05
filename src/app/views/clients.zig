@@ -172,8 +172,11 @@ pub fn patch(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetz
 }
 
 pub fn delete(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
+    var db_context = DbContext.init(request.allocator, request.server.database);
+    defer db_context.deinit();
+    const client_id = try std.fmt.parseInt(i32, id, 10);
+    _ = try db_context.deleteClient(client_id);
     _ = data;
-    _ = id;
     return request.render(.ok);
 }
 

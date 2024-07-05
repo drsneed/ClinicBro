@@ -1,3 +1,1 @@
-<div>
-  <span>Content goes here</span>
-</div>
+<cb-window id="cb-window"></cb-window>
