@@ -35,7 +35,7 @@
         <label for="abbreviation">Abbreviation</label>
       </div>
       <div class="text-field">
-        <input type="text" name="color" maxlength="4" value="{{.color}}">
+        <input type="color" name="color" value="{{.color}}">
         <label for="color">Color</label>
       </div>
       

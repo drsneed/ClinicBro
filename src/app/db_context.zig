@@ -38,9 +38,9 @@ const bro_select_query =
 const bro_item_select_query = "select id, active, name from Bro";
 const bro_insert_query =
     \\insert into Bro(active, name, password, color, sees_clients, date_created, date_updated, created_bro_id, updated_bro_id)
-    \\values(true, $1, crypt($2, gen_salt('bf')), 0, $3, NOW(), NOW(), $4, $4);
+    \\values(true, $1, crypt($2, gen_salt('bf')), $3, $4, NOW(), NOW(), $5, $5);
 ;
-
+const bro_update_query = "update Bro set active=$2, name=$3, color=$4, sees_clients=$5, date_updated = NOW(), updated_bro_id=$6 where id=$1";
 pub fn validateBroPassword(self: *DbContext, name: []const u8, password: []const u8) !?LookupItem {
     var result = try self.database.pool.query(bro_item_select_query ++ " where name=$1 and active=true and (password = crypt($2, password))", .{
         name,
@@ -53,37 +53,26 @@ pub fn validateBroPassword(self: *DbContext, name: []const u8, password: []const
     return null;
 }
 
-fn mapBro(row: jetzig.http.Database.pg.Row) Bro {
-    return .{
-        .id = row.get(i32, 0),
-        .active = row.get(bool, 1),
-        .name = row.get([]u8, 2),
-        .color = row.get(i32, 3),
-        .sees_clients = row.get(bool, 4),
-        .date_created = row.get([]u8, 5),
-        .date_updated = row.get([]u8, 6),
-        .created_by = row.get(?[]u8, 7),
-        .updated_by = row.get(?[]u8, 8),
-    };
-}
-pub fn updateBro(self: *DbContext, id: i32, name: []const u8, active: bool, sees_clients: bool, updated_bro_id: i32) !void {
-    _ = try self.database.pool.exec("update Bro set active=$1, name=$2, sees_clients=$3, date_updated = NOW(), updated_bro_id=$4 where id=$5", .{
-        active,
-        name,
-        sees_clients,
+pub fn updateBro(self: *DbContext, bro: Bro, updated_bro_id: i32) !void {
+    _ = try self.database.pool.exec(bro_update_query, .{
+        bro.id,
+        bro.active,
+        bro.name,
+        bro.color,
+        bro.sees_clients,
         updated_bro_id,
-        id,
     });
 }
 
-pub fn createBro(self: *DbContext, updated_bro_id: i32, name: []const u8, sees_clients: bool) !i32 {
+pub fn createBro(self: *DbContext, bro: Bro, created_bro_id: i32) !i32 {
     _ = try self.database.pool.exec(bro_insert_query, .{
-        name,
+        bro.name,
         "temp",
-        sees_clients,
-        updated_bro_id,
+        bro.color,
+        bro.sees_clients,
+        created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from bro where name = $1", .{name});
+    var result = try self.database.pool.query("select max(id) from bro where name = $1", .{bro.name});
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -101,7 +90,7 @@ pub fn getBro(self: *DbContext, id: i32) !?Bro {
     var result = try self.database.pool.query(bro_select_query ++ " where bro.id=$1", .{id});
     try self.results.append(result);
     if (try result.next()) |row| {
-        return mapBro(row);
+        return mapper.bro.fromDatabase(row);
     }
     return null;
 }
@@ -151,77 +140,37 @@ const location_insert_query =
     \\values(true, $1, $2, $3, $4, $5, $6, $7, NOW(), NOW(), $8, $8);
 ;
 const location_update_query =
-    \\update Location set active=$1, name=$2, phone=$3, address_1=$4, address_2=$5, city=$6, state=$7, zip_code=$8,
-    \\date_updated = NOW(), updated_bro_id=$9 where id=$10;
+    \\update Location set active=$2, name=$3, phone=$4, address_1=$5, address_2=$6, city=$7, state=$8, zip_code=$9,
+    \\date_updated = NOW(), updated_bro_id=$10 where id=$1;
 ;
 
-fn mapLocation(row: jetzig.http.Database.pg.Row) Location {
-    return .{
-        .id = row.get(i32, 0),
-        .active = row.get(bool, 1),
-        .name = row.get([]u8, 2),
-        .phone = row.get([]u8, 3),
-        .address_1 = row.get([]u8, 4),
-        .address_2 = row.get([]u8, 5),
-        .city = row.get([]u8, 6),
-        .state = row.get([]u8, 7),
-        .zip_code = row.get([]u8, 8),
-        .date_created = row.get([]u8, 9),
-        .date_updated = row.get([]u8, 10),
-        .created_by = row.get(?[]u8, 11),
-        .updated_by = row.get(?[]u8, 12),
-    };
-}
-
-pub fn updateLocation(
-    self: *DbContext,
-    id: i32,
-    active: bool,
-    name: []const u8,
-    phone: []const u8,
-    address_1: []const u8,
-    address_2: []const u8,
-    city: []const u8,
-    state: []const u8,
-    zip_code: []const u8,
-    updated_bro_id: i32,
-) !void {
+pub fn updateLocation(self: *DbContext, location: Location, updated_bro_id: i32) !void {
     _ = try self.database.pool.exec(location_update_query, .{
-        active,
-        name,
-        phone,
-        address_1,
-        address_2,
-        city,
-        state,
-        zip_code,
+        location.id,
+        location.active,
+        location.name,
+        location.phone,
+        location.address_1,
+        location.address_2,
+        location.city,
+        location.state,
+        location.zip_code,
         updated_bro_id,
-        id,
     });
 }
 
-pub fn createLocation(
-    self: *DbContext,
-    name: []const u8,
-    phone: []const u8,
-    address_1: []const u8,
-    address_2: []const u8,
-    city: []const u8,
-    state: []const u8,
-    zip_code: []const u8,
-    updated_bro_id: i32,
-) !i32 {
+pub fn createLocation(self: *DbContext, location: Location, created_bro_id: i32) !i32 {
     _ = try self.database.pool.exec(location_insert_query, .{
-        name,
-        phone,
-        address_1,
-        address_2,
-        city,
-        state,
-        zip_code,
-        updated_bro_id,
+        location.name,
+        location.phone,
+        location.address_1,
+        location.address_2,
+        location.city,
+        location.state,
+        location.zip_code,
+        created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from location where name = $1", .{name});
+    var result = try self.database.pool.query("select max(id) from location where name = $1", .{location.name});
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -238,7 +187,7 @@ pub fn getLocation(self: *DbContext, id: i32) !?Location {
     var result = try self.database.pool.query(location_select_query ++ " where loc.id=$1", .{id});
     try self.results.append(result);
     if (try result.next()) |row| {
-        return mapLocation(row);
+        return mapper.location.fromDatabase(row);
     }
     return null;
 }
@@ -442,6 +391,21 @@ pub fn lookupAppointmentTypes(self: *DbContext, include_all: bool) !std.ArrayLis
         appointment_type_lookup_query ++ " order by active desc, name"
     else
         appointment_type_lookup_query ++ " where active=true order by name";
+    var result = try self.database.pool.query(query, .{});
+    try self.results.append(result);
+    var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
+    while (try result.next()) |row| {
+        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
+    }
+    return lookup_list;
+}
+
+pub fn lookupItems(self: *DbContext, table_name: []const u8, include_all: bool) !std.ArrayList(LookupItem) {
+    var query_buffer: [256]u8 = undefined;
+    const query = try std.fmt.bufPrint(&query_buffer, "select id, active, name from {s}{s}", .{
+        table_name,
+        if (include_all) " order by active desc, name" else " where active=true order by name",
+    });
     var result = try self.database.pool.query(query, .{});
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);

@@ -1,6 +1,6 @@
 @zig {
-  const bros = zmpl.getT(.array, "bros").?;
-  const item_count = bros.len;
+  const setup_items = zmpl.getT(.array, "setup_items").?;
+  const item_count = setup_items.len;
 }
 <div id="UserSetupScreen" class="container">
   <div class="setup-screen">
@@ -38,10 +38,10 @@
           hx-target="#UserSetupContent"
           hx-swap="outerHTML">
           @zig {
-            for (bros) |bro| {
-                const id = bro.getT(.integer, "id") orelse continue;
-                const name = bro.getT(.string, "name") orelse continue;
-                const active = bro.getT(.boolean, "active") orelse continue;
+            for (setup_items) |item| {
+                const id = item.getT(.integer, "id") orelse continue;
+                const name = item.getT(.string, "name") orelse continue;
+                const active = item.getT(.boolean, "active") orelse continue;
                 const inactive_class = if(active) "" else "setup-item-inactive";
                 <option value="{{id}}" class="{{inactive_class}}">{{name}}</option>
             }

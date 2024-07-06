@@ -380,6 +380,13 @@ select {
     background-color: var(--container-bg);
 }
 
+.ml-2 {
+    margin-left: 10px;
+}
+
+input[type=color] {
+    width: 120px;
+}
 
 input[type=button], input[type=submit], input[type=reset] {
     padding: 10px 16px;

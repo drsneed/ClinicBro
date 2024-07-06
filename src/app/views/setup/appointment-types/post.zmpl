@@ -1,6 +1,8 @@
 @zig {
   const setup_items = zmpl.getT(.array, "setup_items").?;
   const item_count = setup_items.len;
+  const active = zmpl.getT(.boolean, "active") orelse true;
+  const inactive_class = if(active) "" else "setup-item-inactive";
 }
 <div id="ApptTypeSetupScreen" class="container">
   <div class="setup-screen">
@@ -47,27 +49,23 @@
             for (setup_items) |item| {
                 const id = item.getT(.integer, "id") orelse continue;
                 const name = item.getT(.string, "name") orelse continue;
-                const active = item.getT(.boolean, "active") orelse continue;
+                const this_active = item.getT(.boolean, "active") orelse continue;
+                const this_inactive_class = if(this_active) "" else "setup-item-inactive";
                 const selected = item.getT(.string, "selected") orelse continue;
-                const inactive_class = if(active) "" else "setup-item-inactive";
-                <option value="{{id}}" class="{{inactive_class}}" {{selected}}>{{name}}</option>
+                <option value="{{id}}" class="{{this_inactive_class}}" {{selected}}>{{name}}</option>
             }
           }
         </select>
       </div>
     </div>
     @zig {
-      const active = zmpl.getT(.boolean, "active") orelse true;
-      const inactive_class = if(active) "" else "setup-item-inactive";
-      const id = zmpl.getT(.integer, "id") orelse 0;
-
-      if(id > 0) {
+      if(zmpl.getT(.integer, "id")) |id| {
         <div id="ApptTypeSetupContent" class="setup-item-content {{inactive_class}}">
           <form id="appt-type-form" method="post">
-            <input id="appt-type-id-input" type="hidden" name="id" value="{{.id}}">
+            <input id="appt-type-id-input" type="hidden" name="id" value="{{id}}">
             <div class="id-field">
               <span>ID</span>
-              <code>{{.id}}</code>
+              <code>{{id}}</code>
               <label class="cb-label"><input type="checkbox" name="active" class="cbcb" value="1" {{.active_check}}>Active</label>   
             </div>
             <hr />
@@ -80,7 +78,7 @@
               <label for="abbreviation">Abbreviation</label>
             </div>
             <div class="text-field">
-              <input type="text" name="color" maxlength="4" value="{{.color}}">
+              <input type="color" name="color" value="{{.color}}">
               <label for="color">Color</label>
             </div>
             

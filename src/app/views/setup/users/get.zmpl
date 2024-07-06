@@ -31,25 +31,13 @@
         }
         <label for="name">Name</label>
       </div>
-      <label class="cb-label"><input type="checkbox" id="user_sees_clients" name="sees_clients" class="cbcb" value="1" {{.sees_clients_check}}>Sees Clients</label>
+      <label class="cb-label ml-2"><input type="checkbox" id="user_sees_clients" name="sees_clients" class="cbcb" value="1" {{.sees_clients_check}}>Sees Clients</label>
       <br />
-
-      <!-- <div class="setup-item-buttons" hx-ext="path-params">
-        <button type="button" class="btn btn-save"
-            hx-include="#user-form, #include_inactive"
-            hx-post="/setup/users"
-            hx-target="#UserSetupScreen"
-            hx-swap="outerHTML"><span class="mdi mdi-content-save mr-2"></span>Save</button>
-            @zig { 
-                if(id > 0) {
-                <button type="button" class="btn btn-delete"
-                    hx-include="#user-id-input"
-                    hx-delete="/setup/users/{id}"
-                    hx-target="#UserSetupScreen"
-                    hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span>Delete</button>  
-            }
-            }
-      </div> -->
+      <div class="text-field">
+        <input type="color" name="color" value="{{.color}}">
+        <label for="color">Color</label>
+      </div>
+      
     </form>
 @zig { 
     if(id > 0) {

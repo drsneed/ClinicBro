@@ -3,7 +3,7 @@ create table Bro (
     active boolean not null,
     name varchar(16) not null,
     password varchar(60) not null,
-    color int not null,
+    color varchar(9) not null,
     sees_clients boolean not null,
     recent_clients int[],
     -- tracking columns
@@ -97,7 +97,7 @@ create table AppointmentType (
     active boolean not null,
     name varchar(32) not null,
     abbreviation varchar(4) null,
-    color int not null,
+    color varchar(9) not null,
     -- tracking columns
     date_created timestamp not null,
     date_updated timestamp not null,

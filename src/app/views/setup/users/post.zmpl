@@ -1,6 +1,6 @@
 @zig {
-  const bros = zmpl.getT(.array, "bros").?;
-  const item_count = bros.len;
+  const setup_items = zmpl.getT(.array, "setup_items").?;
+  const item_count = setup_items.len;
   const active = zmpl.getT(.boolean, "active") orelse true;
   const inactive_class = if(active) "" else "setup-item-inactive";
 }
@@ -40,12 +40,12 @@
           hx-target="#UserSetupContent"
           hx-swap="outerHTML">
           @zig {
-            for (bros) |bro| {
-                const id = bro.getT(.integer, "id") orelse continue;
-                const name = bro.getT(.string, "name") orelse continue;
-                const this_active = bro.getT(.boolean, "active") orelse continue;
+            for (setup_items) |item| {
+                const id = item.getT(.integer, "id") orelse continue;
+                const name = item.getT(.string, "name") orelse continue;
+                const this_active = item.getT(.boolean, "active") orelse continue;
                 const this_inactive_class = if(this_active) "" else "setup-item-inactive";
-                const selected = bro.getT(.string, "selected") orelse continue;
+                const selected = item.getT(.string, "selected") orelse continue;
                 <option value="{{id}}" class="{{this_inactive_class}}" {{selected}}>{{name}}</option>
             }
           }
@@ -68,7 +68,12 @@
                   value="{{.name}}" required>
               <label for="name">Name</label>
             </div>
-            <label class="cb-label"><input type="checkbox" id="user_sees_clients" name="sees_clients" class="cbcb" value="1" {{.sees_clients_check}}>Sees Clients</label>
+            <label class="cb-label ml-2"><input type="checkbox" id="user_sees_clients" name="sees_clients" class="cbcb" value="1" {{.sees_clients_check}}>Sees Clients</label>
+            <br />
+            <div class="text-field">
+              <input type="color" name="color" value="{{.color}}">
+              <label for="color">Color</label>
+            </div>
           </form>
           <hr />
           <div class="tracking">
