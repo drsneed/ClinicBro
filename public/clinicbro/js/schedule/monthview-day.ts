@@ -120,7 +120,10 @@ export class MonthViewDay extends LitElement {
       this.current_month = false;
       this.selected = false;
       this.addEventListener('click', this._clickHandler);
-      this.addEventListener('dblclick', this._doubleClickHandler);
+      //this.addEventListener('dblclick', this._doubleClickHandler);
+    }
+
+    firstUpdated() {
     }
 
     updated(changedProperties) {
@@ -191,8 +194,7 @@ export class MonthViewDay extends LitElement {
         return html`
           <div class="${classMap({selected: this.selected, this_month: this.current_month})}" @drop="${this._drop}" @dragover="${this._allowDrop}">
             <!-- <span class="${classMap({num: true, today: sameDay(this.current_date, new Date())})}">${num}</span> -->
-            <button class="${classMap({num: true, today: sameDay(this.current_date, new Date())})}" 
-              @click="${this._gotoDayView}">${num}</button>
+            <button class="${classMap({num: true, today: sameDay(this.current_date, new Date())})}">${num}</button>
             <!-- <button type="button" class="${classMap({btn_add: true, btn_add_show: this.selected, btn_add_hide: !this.selected})}" 
               @click="${this._addAppointment}" title="Add New Event">+</button> -->
             <slot></slot>

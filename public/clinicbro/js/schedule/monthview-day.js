@@ -792,7 +792,8 @@ class MonthViewDay extends s3 {
     this.current_month = false;
     this.selected = false;
     this.addEventListener("click", this._clickHandler);
-    this.addEventListener("dblclick", this._doubleClickHandler);
+  }
+  firstUpdated() {
   }
   updated(changedProperties) {
     if (changedProperties.has("selected")) {
@@ -853,8 +854,7 @@ class MonthViewDay extends s3 {
     return x`
           <div class="${e6({ selected: this.selected, this_month: this.current_month })}" @drop="${this._drop}" @dragover="${this._allowDrop}">
             <!-- <span class="${e6({ num: true, today: sameDay(this.current_date, new Date) })}">${num}</span> -->
-            <button class="${e6({ num: true, today: sameDay(this.current_date, new Date) })}" 
-              @click="${this._gotoDayView}">${num}</button>
+            <button class="${e6({ num: true, today: sameDay(this.current_date, new Date) })}">${num}</button>
             <!-- <button type="button" class="${e6({ btn_add: true, btn_add_show: this.selected, btn_add_hide: !this.selected })}" 
               @click="${this._addAppointment}" title="Add New Event">+</button> -->
             <slot></slot>

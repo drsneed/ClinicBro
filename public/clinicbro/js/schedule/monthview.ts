@@ -3,6 +3,7 @@ import {dateAdd, months, sameDay, clearAllSelectedDays} from '../util';
 import {monthviewStyle} from './monthview-style';
 import {MonthViewAppointment} from './monthview-appt';
 import {customElement, property} from 'lit/decorators.js';
+import { toIsoDateString, dateAdd, toIsoTimeString } from '../util';
 import 'lit-icon/pkg/dist-src/lit-icon.js';
 import 'lit-icon/pkg/dist-src/lit-iconset.js';
 
@@ -44,6 +45,7 @@ export class MonthView extends LitElement {
 
 
   updated(changedProperties) {
+    htmx.process(this.shadowRoot);
     //console.log(changedProperties); // logs previous values
     if(changedProperties.has('current_date')) {
       
@@ -152,9 +154,14 @@ export class MonthView extends LitElement {
 
   renderDay(today: Date, id: string, date_of_day: Date) {
     let current_month = date_of_day.getMonth() == this.current_date.getMonth();
-    return html`<mv-day id="${id}" current_date="${date_of_day.toISOString()}" ?current_month=${current_month}>
-      ${ // @ts-ignore
-        this.appointments.filter((appt) => sameDay(appt.appt_date, date_of_day)).map((appt) => 
+    // let from = new Date();
+    // from.setSeconds(0);
+    // from.setMinutes(from.getMinutes() < 30 ? 0 : 30);
+    // let to = dateAdd(from, 'minute', 30);
+    return html`
+    <mv-day id="${id}" current_date="${date_of_day.toISOString()}" ?current_month=${current_month}
+        hx-get="/appointments/0?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" hx-trigger="dblclick">
+      ${this.appointments.filter((appt) => sameDay(appt.appt_date, date_of_day)).map((appt) => 
         html`<mv-appt appt_id="${appt.appt_id}" appt_title="${appt.appt_title}" appt_date = "${appt.appt_date.toISOString()}" 
           appt_from="${appt.appt_from.toISOString()}" appt_to="${appt.appt_to.toISOString()}"></mv-appt>`
       )}

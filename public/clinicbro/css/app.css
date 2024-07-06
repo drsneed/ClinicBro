@@ -332,7 +332,7 @@ select {
     border: 1px solid var(--container-border);
     box-shadow: inset 0.25em 0.25em 0.25em -0.25em var(--listbox-shadow);
 }
-#client-delete {
+.window-delete {
     float: right;
 }
 #address-city {
@@ -355,6 +355,32 @@ select {
 .window-button-bar {
     text-align: center;
     /* margin: 10px auto; */
+}
+
+input[type=date], input[type=time] {
+    text-indent: 35px;
+}
+
+input[type=date]:focus, input[type=date]:valid,
+input[type=time]:focus, input[type=time]:valid {
+    text-indent: 0px;
+}
+
+.time-inputs {
+    display: block;
+    width: 100%;
+    margin: 0;
+    margin-left: 1px;
+    padding: 0;
+    text-align: left;
+}
+
+.time-input {
+    /* vertical-align: middle; */
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    width: 150px;
 }
 
 .text-field input + label {

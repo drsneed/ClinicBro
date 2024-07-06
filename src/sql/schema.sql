@@ -125,6 +125,7 @@ create table Appointment (
     appt_to time not null,
     notes varchar(2500),
     client_id int references Client(id),
+    bro_id int not null references Bro(id),
     type_id int references AppointmentType(id),
     status_id int references AppointmentStatus(id),
     location_id int not null references Location(id),
@@ -133,10 +134,4 @@ create table Appointment (
     date_updated timestamp not null,
     created_bro_id int,
     updated_bro_id int
-);
-
-create table Appointment_Bro (
-    appointment_id int not null references Appointment(id),
-    bro_id int not null references Bro(id),
-    unique(appointment_id, bro_id)
 );

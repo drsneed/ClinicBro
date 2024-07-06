@@ -3,6 +3,7 @@ const jetzig = @import("jetzig");
 pub const Bro = @import("models/bro.zig");
 pub const Location = @import("models/location.zig");
 const Client = @import("models/client.zig");
+const Appointment = @import("models/appointment.zig");
 const AppointmentType = @import("models/appointment_type.zig");
 const AppointmentStatus = @import("models/appointment_status.zig");
 pub const LookupItem = @import("models/lookup_item.zig");
@@ -469,4 +470,91 @@ pub fn getAppointmentStatus(self: *DbContext, id: i32) !?AppointmentStatus {
         return mapper.appointment_status.fromDatabase(row);
     }
     return null;
+}
+
+// ------------------------------- Appointment Context ------------------------------------------
+const appointment_select_query =
+    \\select a.id, a.title, a.appt_date, a.appt_from, a.appt_to, a.notes, a.type_id, a.status_id, a.client_id, a.bro_id, a.location_id
+    \\to_char(a.date_created, 'YYYY-MM-DD at HH12:MI AM') as date_created,
+    \\to_char(a.date_updated, 'YYYY-MM-DD at HH12:MI AM') as date_updated,
+    \\created_bro.name, updated_bro.name from Appointment a
+    \\left join Bro created_bro on a.created_bro_id=created_bro.id
+    \\left join Bro updated_bro on a.updated_bro_id=updated_bro.id
+;
+const appointment_insert_query =
+    \\insert into Appointment(title,appt_date,appt_from,appt_to,notes,type_id,status_id,client_id,bro_id,location_id,date_created,date_updated,created_bro_id,updated_bro_id)
+    \\values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW(), $11, $11);
+;
+const appointment_update_query =
+    \\update Appointment set title=$2,appt_date=$3,appt_from=$4,appt_to=$5,notes=$6,type_id=$7,status_id=$8,client_id=$9,
+    \\bro_id=$10,location_id=$11,date_updated=NOW(),updated_bro_id=$12 where id=$1
+;
+
+pub fn updateAppointment(self: *DbContext, appointment: Appointment, updated_bro_id: i32) !void {
+    _ = try self.database.pool.exec(appointment_update_query, .{
+        appointment.id,
+        appointment.title,
+        appointment.appt_date,
+        appointment.appt_from,
+        appointment.appt_to,
+        appointment.notes,
+        appointment.type_id,
+        appointment.status_id,
+        appointment.client_id,
+        appointment.bro_id,
+        appointment.location_id,
+        updated_bro_id,
+    });
+}
+
+pub fn createAppointment(self: *DbContext, appointment: Appointment, created_bro_id: i32) !i32 {
+    _ = try self.database.pool.exec(appointment_insert_query, .{
+        appointment.title,
+        appointment.appt_date,
+        appointment.appt_from,
+        appointment.appt_to,
+        appointment.notes,
+        appointment.type_id,
+        appointment.status_id,
+        appointment.client_id,
+        appointment.bro_id,
+        appointment.location_id,
+        created_bro_id,
+    });
+    var result = try self.database.pool.query("select max(id) from Appointment where appt_date=$1 and appt_from=$2 and appt_to=$3 and bro_id=$4 and client_id=$5", .{
+        appointment.appt_date,
+        appointment.appt_from,
+        appointment.appt_to,
+        appointment.bro_id,
+        appointment.client_id,
+    });
+    try self.results.append(result);
+    if (try result.next()) |row| {
+        return row.get(i32, 0);
+    }
+    return 0;
+}
+
+pub fn deleteAppointment(self: *DbContext, id: i32) !bool {
+    _ = try self.database.pool.exec("delete from Appointment where id=$1", .{id});
+    return true;
+}
+
+pub fn getAppointment(self: *DbContext, id: i32) !?Appointment {
+    var result = try self.database.pool.query(appointment_select_query ++ " where a.id=$1", .{id});
+    try self.results.append(result);
+    if (try result.next()) |row| {
+        return mapper.appointment.fromDatabase(row);
+    }
+    return null;
+}
+
+pub fn getAllAppointments(self: *DbContext) !std.ArrayList(Appointment) {
+    var result = try self.database.pool.query(appointment_select_query, .{});
+    try self.results.append(result);
+    var lookup_list = std.ArrayList(Appointment).init(self.allocator);
+    while (try result.next()) |row| {
+        try lookup_list.append(mapper.appointment.fromDatabase(row));
+    }
+    return lookup_list;
 }

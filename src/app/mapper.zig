@@ -3,6 +3,7 @@ const jetzig = @import("jetzig");
 const Bro = @import("models/bro.zig");
 const Location = @import("models/location.zig");
 const Client = @import("models/client.zig");
+const Appointment = @import("models/appointment.zig");
 const AppointmentType = @import("models/appointment_type.zig");
 const AppointmentStatus = @import("models/appointment_status.zig");
 const log = std.log.scoped(.mapper);
@@ -250,6 +251,62 @@ pub const appointment_status = struct {
             .date_updated = row.get([]const u8, 5),
             .created_by = row.get(?[]const u8, 6),
             .updated_by = row.get(?[]const u8, 7),
+        };
+    }
+};
+
+pub const appointment = struct {
+    pub fn fromRequest(request: *jetzig.http.Request) !Appointment {
+        var model = Appointment{};
+        const params = try request.params();
+        model.id = @intCast(params.getT(.integer, "id") orelse 0);
+        model.title = params.getT(.string, "title") orelse "";
+        model.appt_date = params.getT(.string, "appt_date") orelse return error.MissingParam;
+        model.appt_from = params.getT(.string, "appt_from") orelse return error.MissingParam;
+        model.appt_to = params.getT(.string, "appt_to") orelse return error.MissingParam;
+        model.notes = params.getT(.string, "notes") orelse "";
+        model.type_id = @intCast(params.getT(.integer, "type_id") orelse 0);
+        model.status_id = @intCast(params.getT(.integer, "status_id") orelse 0);
+        model.client_id = @intCast(params.getT(.integer, "client_id") orelse 0);
+        model.location_id = @intCast(params.getT(.integer, "location_id") orelse 0);
+        model.bro_id = @intCast(params.getT(.integer, "bro_id") orelse 0);
+        return model;
+    }
+    pub fn toResponse(model: Appointment, data: *jetzig.Data) !void {
+        var root = data.value.?;
+        try root.put("id", data.integer(model.id));
+        try root.put("title", data.string(model.title));
+        try root.put("appt_date", data.string(model.appt_date));
+        try root.put("appt_from", data.string(model.appt_from));
+        try root.put("appt_to", data.string(model.appt_to));
+        try root.put("notes", data.string(model.notes));
+        try root.put("type_id", data.integer(model.type_id));
+        try root.put("status_id", data.integer(model.status_id));
+        try root.put("client_id", data.integer(model.client_id));
+        try root.put("bro_id", data.integer(model.bro_id));
+        try root.put("location_id", data.integer(model.location_id));
+        try root.put("date_created", data.string(model.date_created));
+        try root.put("date_updated", data.string(model.date_updated));
+        try root.put("created_by", data.string(model.created_by orelse "System"));
+        try root.put("updated_by", data.string(model.updated_by orelse "System"));
+    }
+    pub fn fromDatabase(row: jetzig.http.Database.pg.Row) Appointment {
+        return .{
+            .id = row.get(i32, 0),
+            .title = row.get([]const u8, 1),
+            .appt_date = row.get([]const u8, 2),
+            .appt_from = row.get([]const u8, 3),
+            .appt_to = row.get([]const u8, 4),
+            .notes = row.get([]const u8, 5),
+            .type_id = row.get(i32, 6),
+            .status_id = row.get(i32, 7),
+            .client_id = row.get(i32, 8),
+            .bro_id = row.get(i32, 9),
+            .location_id = row.get(i32, 10),
+            .date_created = row.get([]const u8, 11),
+            .date_updated = row.get([]const u8, 12),
+            .created_by = row.get(?[]const u8, 13),
+            .updated_by = row.get(?[]const u8, 14),
         };
     }
 };

@@ -24,6 +24,7 @@
         <hr />
         <a href="/scheduler" {{.main_schedule}}><span class="mdi mdi-calendar-account-outline mr-2"></span>Scheduler</a>
         <hr />
+        <hr />
         <details {{.setup_expander_state}}>
             <summary id="SetupExpander2" class="collapsible">
                 <span class="mdi mdi-tune mr-2"></span>Setup
