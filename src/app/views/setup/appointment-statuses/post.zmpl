@@ -70,17 +70,10 @@
             </div>
             <hr />
             <div class="text-field">
-              <input type="text" name="name" maxlength="16" value="{{.name}}" required>
+              <input type="text" name="name" maxlength="50" value="{{.name}}" required>
               <label for="name">Name</label>
             </div>
-            <div class="text-field">
-              <input type="text" name="abbreviation" maxlength="4" value="{{.abbreviation}}">
-              <label for="abbreviation">Abbreviation</label>
-            </div>
-            <div class="text-field">
-              <input type="color" name="color" value="{{.color}}">
-              <label for="color">Color</label>
-            </div>
+            <label class="cb-label ml-2"><input type="checkbox" name="show" class="cbcb" value="1" {{.show_check}}>Show</label>
             
           </form>
           <hr />
