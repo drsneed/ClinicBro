@@ -4,6 +4,7 @@ const Bro = @import("models/bro.zig");
 const Location = @import("models/location.zig");
 const Client = @import("models/client.zig");
 const AppointmentType = @import("models/appointment_type.zig");
+const AppointmentStatus = @import("models/appointment_status.zig");
 const log = std.log.scoped(.mapper);
 
 pub const bro = struct {
@@ -212,6 +213,43 @@ pub const appointment_type = struct {
             .date_updated = row.get([]const u8, 6),
             .created_by = row.get(?[]const u8, 7),
             .updated_by = row.get(?[]const u8, 8),
+        };
+    }
+};
+
+pub const appointment_status = struct {
+    pub fn fromRequest(request: *jetzig.http.Request) !AppointmentStatus {
+        var model = AppointmentStatus{};
+        const params = try request.params();
+        model.id = @intCast(params.getT(.integer, "id") orelse 0);
+        model.active = params.getT(.boolean, "active") orelse false;
+        model.name = params.getT(.string, "name") orelse return error.MissingParam;
+        model.show = params.getT(.boolean, "show") orelse false;
+        return model;
+    }
+    pub fn toResponse(model: AppointmentStatus, data: *jetzig.Data) !void {
+        var root = data.value.?;
+        try root.put("id", data.integer(model.id));
+        try root.put("name", data.string(model.name));
+        try root.put("active", data.boolean(model.active));
+        try root.put("active_check", data.string(if (model.active) "checked" else ""));
+        try root.put("show", data.boolean(model.show));
+        try root.put("show_check", data.string(if (model.show) "checked" else ""));
+        try root.put("date_created", data.string(model.date_created));
+        try root.put("date_updated", data.string(model.date_updated));
+        try root.put("created_by", data.string(model.created_by orelse "System"));
+        try root.put("updated_by", data.string(model.updated_by orelse "System"));
+    }
+    pub fn fromDatabase(row: jetzig.http.Database.pg.Row) AppointmentStatus {
+        return .{
+            .id = row.get(i32, 0),
+            .active = row.get(bool, 1),
+            .name = row.get([]const u8, 2),
+            .show = row.get(bool, 3),
+            .date_created = row.get([]const u8, 4),
+            .date_updated = row.get([]const u8, 5),
+            .created_by = row.get(?[]const u8, 6),
+            .updated_by = row.get(?[]const u8, 7),
         };
     }
 };

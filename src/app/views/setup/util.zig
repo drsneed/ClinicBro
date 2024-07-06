@@ -4,6 +4,7 @@ const DbContext = @import("../../db_context.zig");
 const Bro = @import("../../models/bro.zig");
 const Location = @import("../../models/location.zig");
 const AppointmentType = @import("../../models/appointment_type.zig");
+const AppointmentStatus = @import("../../models/appointment_status.zig");
 const mapper = @import("../../mapper.zig");
 const log = std.log.scoped(.util);
 
@@ -38,6 +39,9 @@ pub fn renderSetupList(request: *jetzig.Request, data: *jetzig.Data, db_context:
             } else if (std.mem.eql(u8, table_name, "AppointmentType")) {
                 const appointment_type = try db_context.getAppointmentType(selected_item_id) orelse AppointmentType{};
                 try mapper.appointment_type.toResponse(appointment_type, data);
+            } else if (std.mem.eql(u8, table_name, "AppointmentStatus")) {
+                const appointment_status = try db_context.getAppointmentStatus(selected_item_id) orelse AppointmentStatus{};
+                try mapper.appointment_status.toResponse(appointment_status, data);
             }
         }
     }

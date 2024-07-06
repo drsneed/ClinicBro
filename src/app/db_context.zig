@@ -4,6 +4,7 @@ pub const Bro = @import("models/bro.zig");
 pub const Location = @import("models/location.zig");
 const Client = @import("models/client.zig");
 const AppointmentType = @import("models/appointment_type.zig");
+const AppointmentStatus = @import("models/appointment_status.zig");
 pub const LookupItem = @import("models/lookup_item.zig");
 const mapper = @import("mapper.zig");
 const log = std.log.scoped(.DbContext);
@@ -413,4 +414,59 @@ pub fn lookupItems(self: *DbContext, table_name: []const u8, include_all: bool) 
         try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
     }
     return lookup_list;
+}
+
+// ------------------------------- AppointmentStatus Context ------------------------------------------
+const appointment_status_select_query =
+    \\select apt.id, apt.active, apt.name, apt.show,
+    \\to_char(apt.date_created, 'YYYY-MM-DD at HH12:MI AM') as date_created,
+    \\to_char(apt.date_updated, 'YYYY-MM-DD at HH12:MI AM') as date_updated,
+    \\created_bro.name, updated_bro.name from AppointmentStatus apt
+    \\left join Bro created_bro on apt.created_bro_id=created_bro.id
+    \\left join Bro updated_bro on apt.updated_bro_id=updated_bro.id
+;
+const appointment_status_insert_query =
+    \\insert into AppointmentStatus(active,name,show,date_created,date_updated,created_bro_id,updated_bro_id)
+    \\values(true, $1, $2, NOW(), NOW(), $3, $3);
+;
+const appointment_status_update_query =
+    \\update AppointmentStatus set active=$2,name=$3,show=$4,date_updated=NOW(),updated_bro_id=$5 where id=$1
+;
+
+pub fn updateAppointmentStatus(self: *DbContext, appointment_status: AppointmentStatus, updated_bro_id: i32) !void {
+    _ = try self.database.pool.exec(appointment_status_update_query, .{
+        appointment_status.id,
+        appointment_status.active,
+        appointment_status.name,
+        appointment_status.show,
+        updated_bro_id,
+    });
+}
+
+pub fn createAppointmentStatus(self: *DbContext, appointment_status: AppointmentStatus, created_bro_id: i32) !i32 {
+    _ = try self.database.pool.exec(appointment_status_insert_query, .{
+        appointment_status.name,
+        appointment_status.show,
+        created_bro_id,
+    });
+    var result = try self.database.pool.query("select max(id) from AppointmentStatus where name = $1", .{appointment_status.name});
+    try self.results.append(result);
+    if (try result.next()) |row| {
+        return row.get(i32, 0);
+    }
+    return 0;
+}
+
+pub fn deleteAppointmentStatus(self: *DbContext, id: i32) !bool {
+    _ = try self.database.pool.exec("delete from AppointmentStatus where id=$1", .{id});
+    return true;
+}
+
+pub fn getAppointmentStatus(self: *DbContext, id: i32) !?AppointmentStatus {
+    var result = try self.database.pool.query(appointment_status_select_query ++ " where apt.id=$1", .{id});
+    try self.results.append(result);
+    if (try result.next()) |row| {
+        return mapper.appointment_status.fromDatabase(row);
+    }
+    return null;
 }

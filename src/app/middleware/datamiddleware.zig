@@ -28,6 +28,7 @@ const RequiredFields = .{
     "setup_users",
     "setup_locations",
     "setup_appointment_types",
+    "setup_appointment_statuses",
     "setup_reports",
     "setup_system",
     "header_include",
