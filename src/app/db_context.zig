@@ -302,6 +302,16 @@ pub fn getClient(self: *DbContext, id: i32) !?Client {
     return null;
 }
 
+pub fn lookupClientItem(self: *DbContext, id: i32) !?LookupItem {
+    var result = try self.database.pool.query(client_lookup_query ++ " where id = $1", .{id});
+    try self.results.append(result);
+    while (try result.next()) |row| {
+        const client = LookupItem{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]const u8, 2) };
+        return client;
+    }
+    return null;
+}
+
 pub fn lookupClients(self: *DbContext, include_all: bool) !std.ArrayList(LookupItem) {
     const query = if (include_all)
         client_lookup_query ++ " order by active desc, name"
@@ -311,7 +321,7 @@ pub fn lookupClients(self: *DbContext, include_all: bool) !std.ArrayList(LookupI
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
-        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
+        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]const u8, 2) });
     }
     return lookup_list;
 }
@@ -321,7 +331,7 @@ pub fn lookupRecentClients(self: *DbContext, bro_id: i32) !std.ArrayList(LookupI
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
-        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
+        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]const u8, 2) });
     }
     return lookup_list;
 }
@@ -412,7 +422,7 @@ pub fn lookupItems(self: *DbContext, table_name: []const u8, include_all: bool) 
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
-        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]u8, 2) });
+        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]const u8, 2) });
     }
     return lookup_list;
 }

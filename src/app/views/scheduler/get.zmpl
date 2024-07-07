@@ -5,6 +5,7 @@
   const appt_statuses = zmpl.getT(.array, "appt_statuses").?;
   const id = zmpl.getT(.integer, "id").?;
   const client_id = zmpl.getT(.integer, "client_id").?;
+  const client_name = zmpl.getT(.string, "client_name").?;
   const autofocus = if(id == 0) "autofocus" else "";
   const window_title = if(id == 0 and client_id == 0) "Add New Event"
      else if(id > 0 and client_id == 0) "Edit Event"
@@ -14,30 +15,13 @@
 <cb-window id="cb-window" opened="" window_title="{{window_title}}">
     <form id="appointment-form" method="post">
       <input id="appointment-id-input" type="hidden" name="id" value="{{id}}">
-      <div class="text-field">
-        <input id="appt_title" type="text" name="title" maxlength="255"
-            value="{{.title}}" required {{autofocus}}>
-        <label for="title">Title</label>
-      </div>
-      <div class="date-container">
-          <div class="text-field">
-              <input id="appt_date" type="date" name="appt_date"
-                  value="{{.appt_date}}" required>
-              <label for="appt_date">Date</label>
-          </div>
-      </div>
-      <div class="time-inputs">
-          <div class="text-field time-input">
-              <input id="appt_from" type="time" name="appt_from" value="{{.appt_from}}" required>
-              <label for="appt_from">From</label>
-          </div>
-          <div class="text-field time-input">
-              <input id="appt_to" type="time" name="appt_to" value="{{.appt_to}}" required>
-              <label for="appt_to">&nbsp;&nbsp;&nbsp;To</label>
-          </div>
-      </div>
+      <input type="hidden" name="client_id" value="{{client_id}}">
       @zig {
         if(client_id > 0) {
+          <div class="id-field" hx-ext="path-params">
+            <span>Client</span>
+            <code>{{client_name}}</code>
+          </div>
           <div class="cb-row">
             <label class="select-label" for="type_id">Type</label>
             <select name="type_id">
@@ -94,8 +78,31 @@
                 }
             </select>
           </div>
+        } else {
+          <div class="text-field">
+            <input id="appt_title" type="text" name="title" maxlength="255"
+                value="{{.title}}" required {{autofocus}}>
+            <label for="title">Title</label>
+          </div>
         }
       }
+      <div class="date-container">
+          <div class="text-field">
+              <input id="appt_date" type="date" name="appt_date"
+                  value="{{.appt_date}}" required>
+              <label for="appt_date">Date</label>
+          </div>
+      </div>
+      <div class="time-inputs">
+          <div class="text-field time-input">
+              <input id="appt_from" type="time" name="appt_from" value="{{.appt_from}}" required>
+              <label for="appt_from">From</label>
+          </div>
+          <div class="text-field time-input">
+              <input id="appt_to" type="time" name="appt_to" value="{{.appt_to}}" required>
+              <label for="appt_to">&nbsp;&nbsp;&nbsp;To</label>
+          </div>
+      </div>
       
     </form>
     <hr />

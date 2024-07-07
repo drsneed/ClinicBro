@@ -7,6 +7,7 @@
           const active = client.getT(.boolean, "active") orelse continue;
           const inactive_class = if(active) "" else "setup-item-inactive";
           <option value="{{id}}" class="{{inactive_class}}" hx-get="/clients/{{id}}"
+            draggable="true" ondragstart="clientDragStart(event)" data-client-id="{{id}}"
             hx-target="#cb-window" hx-trigger="dblclick" hx-swap="outerHTML">{{name}}</option>
       }
     }

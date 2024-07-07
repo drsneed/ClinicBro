@@ -1081,14 +1081,13 @@ class MonthView extends s3 {
         </div>
     </caption>`;
   }
-  renderDay(today, id, date_of_day) {
+  renderDay(today, table_slot_id, date_of_day) {
     let current_month = date_of_day.getMonth() == this.current_date.getMonth();
     let dod = toIsoDateString(date_of_day);
     return x`
-    <mv-day id="${id}" current_date="${date_of_day}" ?current_month=${current_month}
+    <mv-day id="${table_slot_id}" current_date="${date_of_day}" ?current_month=${current_month}
         hx-get="/scheduler/{id}?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" 
-        hx-trigger="dblclick target:#${id},drop target:#${id}" hx-include="#dropped-appt-id"
-        >
+        hx-trigger="dblclick target:#${table_slot_id}, drop target:#${table_slot_id}" hx-include="#dropped-appt-id, #dropped-client-id">
         <slot name="${dod}"></slot>
     </mv-day>`;
   }
@@ -1130,6 +1129,7 @@ class MonthView extends s3 {
       </tbody>
     </table>
     <input id="dropped-appt-id" type="hidden" name="id" value="0" >
+    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
     <mv-dialog id="mv_dialog" ?opened="${this.appointment_dialog_opened}" 
                @dialog.save="${this.saveAppointment.bind(this)}"
                @dialog.cancel="${this.closeAppointmentDialog}"></mv-dialog>

@@ -146,7 +146,7 @@ export class MonthView extends LitElement {
     return html`
     <mv-day id="${table_slot_id}" current_date="${date_of_day}" ?current_month=${current_month}
         hx-get="/scheduler/{id}?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" 
-        hx-trigger="dblclick target:#${table_slot_id}, drop target:#${table_slot_id}" hx-include="#dropped-appt-id">
+        hx-trigger="dblclick target:#${table_slot_id}, drop target:#${table_slot_id}" hx-include="#dropped-appt-id, #dropped-client-id">
         <slot name="${dod}"></slot>
     </mv-day>`;
   }
@@ -191,6 +191,7 @@ export class MonthView extends LitElement {
       </tbody>
     </table>
     <input id="dropped-appt-id" type="hidden" name="id" value="0" >
+    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
     <mv-dialog id="mv_dialog" ?opened="${this.appointment_dialog_opened}" 
                @dialog.save="${this.saveAppointment.bind(this)}"
                @dialog.cancel="${this.closeAppointmentDialog}"></mv-dialog>

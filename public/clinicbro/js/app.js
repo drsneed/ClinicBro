@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", function(event) {
   });
 
 
+function clientDragStart(e) {
+    e.dataTransfer.setData("client-id", e.target.dataset.clientId);
+}
 
 function clearSetupSelectedItem() {
     var elements = document.getElementById("setup-select").options;

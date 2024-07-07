@@ -715,10 +715,6 @@ class MonthViewAppointment extends s3 {
   clicked() {
     this.selected = true;
   }
-  doubleClicked() {
-    const schedule = document.getElementById("schedule");
-    schedule.showEditAppointmentDialog(this);
-  }
   _drag(e7) {
     e7.dataTransfer.setData("appt-id", e7.target.dataset.apptId);
   }

@@ -140,6 +140,8 @@ export class MonthViewDay extends LitElement {
         let dialog = schedule.shadowRoot.querySelector("#mv_dialog");
         dialog.updateDate(this.current_date);
       }
+      let dropped_appt_id_input = schedule.shadowRoot.querySelector("#dropped-appt-id");
+      dropped_appt_id_input.value = "0";
       this.selected = true;
     }
 
@@ -174,10 +176,23 @@ export class MonthViewDay extends LitElement {
 
     private _drop(e) {
       e.preventDefault();
-      let appt_id = e.dataTransfer.getData("appt-id");
+      let appt_id = 0;
+      let client_id = 0;
+      if(e.dataTransfer) {
+        let appt_id_data_xfer = e.dataTransfer.getData("appt-id");
+        if(appt_id_data_xfer !== "") {
+          appt_id = parseInt(appt_id_data_xfer);
+        }
+        let client_id_data_xfer = e.dataTransfer.getData("client-id");
+        if(client_id_data_xfer !== "") {
+          client_id = parseInt(client_id_data_xfer);
+        }
+      }
       let schedule = document.getElementById("schedule");
       let dropped_appt_id_input = schedule.shadowRoot.querySelector("#dropped-appt-id");
       dropped_appt_id_input.value = appt_id;
+      let dropped_client_id_input = schedule.shadowRoot.querySelector("#dropped-client-id");
+      dropped_client_id_input.value = client_id;
       //schedule.moveAppointment(appt_id, this.current_date);
     }
 

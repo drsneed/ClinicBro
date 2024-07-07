@@ -3,6 +3,7 @@ const jetzig = @import("jetzig");
 const DbContext = @import("../db_context.zig");
 const mapper = @import("../mapper.zig");
 const Appointment = @import("../models/appointment.zig");
+const LookupItem = @import("../models/lookup_item.zig");
 const log = std.log.scoped(.scheduler);
 pub const layout = "app";
 
@@ -44,7 +45,9 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
     defer db_context.deinit();
     const appt_id = try std.fmt.parseInt(i32, id, 10);
     const params = try request.params();
+
     var appointment = Appointment{};
+    var client_lookup = LookupItem{};
     if (appt_id > 0) {
         appointment = try db_context.getAppointment(appt_id) orelse appointment;
     } else {
@@ -58,11 +61,14 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
     if (params.getT(.string, "date")) |date| {
         appointment.appt_date = date;
     }
+    if (params.getT(.integer, "client_id")) |client_id_128| {
+        const client_id: i32 = @intCast(client_id_128);
+        appointment.client_id = client_id;
+        client_lookup = try db_context.lookupClientItem(client_id) orelse client_lookup;
+    }
     try mapper.appointment.toResponse(appointment, data);
-
-    if (appointment.client_id > 0) {}
-
     var root = data.value.?;
+    try root.put("client_name", data.string(client_lookup.name));
     const json_locations = try data.array();
     try root.put("locations", json_locations);
     const locations = try db_context.lookupLocations(false);
