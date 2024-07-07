@@ -19,9 +19,10 @@
       @zig {
         if(client_id > 0) {
           <div class="id-field" hx-ext="path-params">
-            <span>Client</span>
+            <label class="select-label">Client</label>
             <code>{{client_name}}</code>
           </div>
+          <hr />
           <div class="cb-row">
             <label class="select-label" for="type_id">Type</label>
             <select name="type_id">
@@ -36,7 +37,9 @@
                   }
                 }
             </select>
-            <label class="select-label-2" for="status_id">Status</label>
+          </div>
+          <div class="cb-row">
+            <label class="select-label" for="status_id">Status</label>
             <select name="status_id">
                 @zig {
                   for (appt_statuses) |status| {
@@ -64,7 +67,9 @@
                   }
                 }
             </select>
-            <label class="select-label-2" for="bro_id">Provider</label>
+          </div>
+          <div class="cb-row">
+            <label class="select-label" for="bro_id">Provider</label>
             <select name="bro_id">
                 @zig {
                   for (bros) |bro| {
@@ -86,6 +91,7 @@
           </div>
         }
       }
+      <hr />
       <div class="date-container">
           <div class="text-field">
               <input id="appt_date" type="date" name="appt_date"

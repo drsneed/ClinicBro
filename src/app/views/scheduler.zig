@@ -112,8 +112,14 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
     try root.put("appt_statuses", json_appt_statuses);
     const appt_statuses = try db_context.lookupItems("AppointmentStatus", false);
     defer appt_statuses.deinit();
+    var json_appt_status = try data.object();
+    try json_appt_status.put("id", data.integer(0));
+    try json_appt_status.put("active", data.boolean(true));
+    try json_appt_status.put("name", data.string("New"));
+    try json_appt_status.put("selected", data.string(if (appointment.status_id == 0) "selected" else ""));
+    try json_appt_statuses.append(json_appt_status);
     for (appt_statuses.items) |appt_status| {
-        var json_appt_status = try data.object();
+        json_appt_status = try data.object();
         try json_appt_status.put("id", data.integer(appt_status.id));
         try json_appt_status.put("active", data.boolean(appt_status.active));
         try json_appt_status.put("name", data.string(appt_status.name));

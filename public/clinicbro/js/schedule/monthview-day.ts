@@ -142,6 +142,8 @@ export class MonthViewDay extends LitElement {
       }
       let dropped_appt_id_input = schedule.shadowRoot.querySelector("#dropped-appt-id");
       dropped_appt_id_input.value = "0";
+      let dropped_client_id_input = schedule.shadowRoot.querySelector("#dropped-client-id");
+      dropped_client_id_input.value = "0";
       this.selected = true;
     }
 
