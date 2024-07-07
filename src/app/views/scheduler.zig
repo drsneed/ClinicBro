@@ -43,20 +43,20 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
     var db_context = DbContext.init(request.allocator, request.server.database);
     defer db_context.deinit();
     const appt_id = try std.fmt.parseInt(i32, id, 10);
+    const params = try request.params();
     var appointment = Appointment{};
     if (appt_id > 0) {
         appointment = try db_context.getAppointment(appt_id) orelse appointment;
     } else {
-        const params = try request.params();
-        if (params.getT(.string, "date")) |date| {
-            appointment.appt_date = date;
-        }
         if (params.getT(.string, "from")) |appt_from| {
             appointment.appt_from = appt_from;
         }
         if (params.getT(.string, "to")) |appt_to| {
             appointment.appt_to = appt_to;
         }
+    }
+    if (params.getT(.string, "date")) |date| {
+        appointment.appt_date = date;
     }
     try mapper.appointment.toResponse(appointment, data);
 

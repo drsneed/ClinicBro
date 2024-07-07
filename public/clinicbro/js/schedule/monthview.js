@@ -643,7 +643,7 @@ function clearAllSelectedDays() {
   schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
     day.removeAttribute("selected");
   });
-  schedule.shadowRoot.querySelectorAll("mv-appt").forEach(function(appt) {
+  document.querySelectorAll("mv-appt").forEach(function(appt) {
     appt.removeAttribute("selected");
   });
 }
@@ -1086,7 +1086,9 @@ class MonthView extends s3 {
     let dod = toIsoDateString(date_of_day);
     return x`
     <mv-day id="${id}" current_date="${date_of_day}" ?current_month=${current_month}
-        hx-get="/scheduler/0?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" hx-trigger="dblclick target:#${id}">
+        hx-get="/scheduler/{id}?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" 
+        hx-trigger="dblclick target:#${id},drop target:#${id}" hx-include="#dropped-appt-id"
+        >
         <slot name="${dod}"></slot>
     </mv-day>`;
   }
@@ -1123,10 +1125,11 @@ class MonthView extends s3 {
               <th>Sat</th>
           </tr>
       </thead>
-      <tbody>
+      <tbody hx-ext="path-params">
         ${this.renderDays()} 
       </tbody>
     </table>
+    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
     <mv-dialog id="mv_dialog" ?opened="${this.appointment_dialog_opened}" 
                @dialog.save="${this.saveAppointment.bind(this)}"
                @dialog.cancel="${this.closeAppointmentDialog}"></mv-dialog>

@@ -174,10 +174,11 @@ export class MonthViewDay extends LitElement {
 
     private _drop(e) {
       e.preventDefault();
-      let appt_id_str = e.dataTransfer.getData("text");
-      let appt_id = parseInt(appt_id_str.substring(4));
+      let appt_id = e.dataTransfer.getData("appt-id");
       let schedule = document.getElementById("schedule");
-      schedule.moveAppointment(appt_id, this.current_date);
+      let dropped_appt_id_input = schedule.shadowRoot.querySelector("#dropped-appt-id");
+      dropped_appt_id_input.value = appt_id;
+      //schedule.moveAppointment(appt_id, this.current_date);
     }
 
     private _allowDrop(e) {

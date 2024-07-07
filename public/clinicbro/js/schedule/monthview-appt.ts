@@ -82,7 +82,7 @@ export class MonthViewAppointment extends LitElement {
     }
 
     private _drag(e) {
-      e.dataTransfer.setData("text", e.target.id);
+      e.dataTransfer.setData("appt-id", e.target.dataset.apptId);
     }
 
     render() {
@@ -94,7 +94,7 @@ export class MonthViewAppointment extends LitElement {
       // return html`<div id="appt${this.appt_id}" class="${classMap({selected: this.selected})}"
       //               draggable="true" @dragstart="${this._drag}"><span>${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${this.appt_title}</span></div>`
 
-      return html`<div id="appt${this.appt_id}" class="${classMap({selected: this.selected})}"
+      return html`<div data-appt-id="${this.appt_id}" class="${classMap({selected: this.selected})}"
                draggable="true" @dragstart="${this._drag}"><span class="appt-title">${this.appt_from}-${this.appt_to} ${this.appt_title}</span></div>`
                     
     }

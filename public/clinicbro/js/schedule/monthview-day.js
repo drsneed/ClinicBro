@@ -837,10 +837,10 @@ class MonthViewDay extends s3 {
   }
   _drop(e7) {
     e7.preventDefault();
-    let appt_id_str = e7.dataTransfer.getData("text");
-    let appt_id = parseInt(appt_id_str.substring(4));
+    let appt_id = e7.dataTransfer.getData("appt-id");
     let schedule = document.getElementById("schedule");
-    schedule.moveAppointment(appt_id, this.current_date);
+    let dropped_appt_id_input = schedule.shadowRoot.querySelector("#dropped-appt-id");
+    dropped_appt_id_input.value = appt_id;
   }
   _allowDrop(e7) {
     e7.preventDefault();

@@ -720,10 +720,10 @@ class MonthViewAppointment extends s3 {
     schedule.showEditAppointmentDialog(this);
   }
   _drag(e7) {
-    e7.dataTransfer.setData("text", e7.target.id);
+    e7.dataTransfer.setData("appt-id", e7.target.dataset.apptId);
   }
   render() {
-    return x`<div id="appt${this.appt_id}" class="${e6({ selected: this.selected })}"
+    return x`<div data-appt-id="${this.appt_id}" class="${e6({ selected: this.selected })}"
                draggable="true" @dragstart="${this._drag}"><span class="appt-title">${this.appt_from}-${this.appt_to} ${this.appt_title}</span></div>`;
   }
 }
