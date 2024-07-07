@@ -12,14 +12,9 @@ import 'lit-icon/pkg/dist-src/lit-iconset.js';
 export class MonthView extends LitElement {
   static styles = monthviewStyle();
     
-
   // @ts-ignore
   @property({converter(value) {return new Date(value);}, reflect: true})
   current_date: Date;
-
-  // @ts-ignore
-  @property({type: Array, attribute: false})
-  appointments = [];
 
   // @ts-ignore
   @property({type: Boolean, reflect: true})
@@ -33,14 +28,6 @@ export class MonthView extends LitElement {
     super();
     this.current_date = new Date();
     this.appointment_dialog_opened = false;
-    var appt1 = {
-      appt_id: 1,
-      appt_title: "Staff Meeting",
-      appt_date: new Date("2024-07-14T00:00:00"),
-      appt_from: new Date("2024-07-14T13:30:00"),
-      appt_to: new Date("2024-07-14T14:30:00")
-    };
-    this.appointments = [appt1];
   }
 
 
@@ -154,17 +141,11 @@ export class MonthView extends LitElement {
 
   renderDay(today: Date, id: string, date_of_day: Date) {
     let current_month = date_of_day.getMonth() == this.current_date.getMonth();
-    // let from = new Date();
-    // from.setSeconds(0);
-    // from.setMinutes(from.getMinutes() < 30 ? 0 : 30);
-    // let to = dateAdd(from, 'minute', 30);
+    let dod = toIsoDateString(date_of_day);
     return html`
-    <mv-day id="${id}" current_date="${date_of_day.toISOString()}" ?current_month=${current_month}
-        hx-get="/appointments/0?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" hx-trigger="dblclick">
-      ${this.appointments.filter((appt) => sameDay(appt.appt_date, date_of_day)).map((appt) => 
-        html`<mv-appt appt_id="${appt.appt_id}" appt_title="${appt.appt_title}" appt_date = "${appt.appt_date.toISOString()}" 
-          appt_from="${appt.appt_from.toISOString()}" appt_to="${appt.appt_to.toISOString()}"></mv-appt>`
-      )}
+    <mv-day id="${id}" current_date="${date_of_day}" ?current_month=${current_month}
+        hx-get="/scheduler/0?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" hx-trigger="dblclick target:#${id}">
+        <slot name="${dod}"></slot>
     </mv-day>`;
   }
 

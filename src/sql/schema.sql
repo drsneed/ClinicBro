@@ -119,19 +119,19 @@ create table AppointmentStatus (
 
 create table Appointment (
     id serial primary key,
-    title varchar(16),
+    title varchar(16) not null,
     appt_date date not null,
     appt_from time not null,
     appt_to time not null,
-    notes varchar(2500),
-    client_id int references Client(id),
-    bro_id int not null references Bro(id),
-    type_id int references AppointmentType(id),
-    status_id int references AppointmentStatus(id),
-    location_id int not null references Location(id),
+    notes varchar(2500) not null,
+    client_id int not null,
+    bro_id int not null,
+    type_id int not null,
+    status_id int not null,
+    location_id int not null,
     -- tracking columns
     date_created timestamp not null,
     date_updated timestamp not null,
-    created_bro_id int,
-    updated_bro_id int
+    created_bro_id int not null,
+    updated_bro_id int not null
 );

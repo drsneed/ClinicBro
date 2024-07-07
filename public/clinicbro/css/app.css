@@ -604,8 +604,11 @@ code {
     margin: 5px;
 }
 
-.pwr img,
-.pwr span,
+.breand img,
+.brand span {
+    vertical-align: super;
+}
+
 .acct span,
 a span {
     vertical-align: middle;
@@ -626,6 +629,8 @@ a span {
 
 .lc-icon {
     filter: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
+    width: 38px;
+    height: 46px;
 }
 
 

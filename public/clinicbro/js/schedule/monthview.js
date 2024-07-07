@@ -635,9 +635,6 @@ function dateAdd(date, interval, units) {
   }
   return ret;
 }
-function sameDay(d1, d22) {
-  return d1.getFullYear() === d22.getFullYear() && d1.getMonth() === d22.getMonth() && d1.getDate() === d22.getDate();
-}
 function toIsoDateString(d3) {
   return d3.toISOString().split("T")[0];
 }
@@ -986,17 +983,8 @@ class MonthView extends s3 {
   }
   constructor() {
     super();
-    this.appointments = [];
     this.current_date = new Date;
     this.appointment_dialog_opened = false;
-    var appt1 = {
-      appt_id: 1,
-      appt_title: "Staff Meeting",
-      appt_date: new Date("2024-07-14T00:00:00"),
-      appt_from: new Date("2024-07-14T13:30:00"),
-      appt_to: new Date("2024-07-14T14:30:00")
-    };
-    this.appointments = [appt1];
   }
   updated(changedProperties) {
     htmx.process(this.shadowRoot);
@@ -1095,11 +1083,11 @@ class MonthView extends s3 {
   }
   renderDay(today, id, date_of_day) {
     let current_month = date_of_day.getMonth() == this.current_date.getMonth();
+    let dod = toIsoDateString(date_of_day);
     return x`
-    <mv-day id="${id}" current_date="${date_of_day.toISOString()}" ?current_month=${current_month}
-        hx-get="/appointments/0?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" hx-trigger="dblclick">
-      ${this.appointments.filter((appt) => sameDay(appt.appt_date, date_of_day)).map((appt) => x`<mv-appt appt_id="${appt.appt_id}" appt_title="${appt.appt_title}" appt_date = "${appt.appt_date.toISOString()}" 
-          appt_from="${appt.appt_from.toISOString()}" appt_to="${appt.appt_to.toISOString()}"></mv-appt>`)}
+    <mv-day id="${id}" current_date="${date_of_day}" ?current_month=${current_month}
+        hx-get="/scheduler/0?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" hx-trigger="dblclick target:#${id}">
+        <slot name="${dod}"></slot>
     </mv-day>`;
   }
   renderDays() {
@@ -1150,9 +1138,6 @@ __legacyDecorateClassTS([
     return new Date(value);
   }, reflect: true })
 ], MonthView.prototype, "current_date", undefined);
-__legacyDecorateClassTS([
-  n4({ type: Array, attribute: false })
-], MonthView.prototype, "appointments", undefined);
 __legacyDecorateClassTS([
   n4({ type: Boolean, reflect: true })
 ], MonthView.prototype, "appointment_dialog_opened", undefined);

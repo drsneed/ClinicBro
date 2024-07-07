@@ -17,13 +17,12 @@
   </head>
   <body>
     <input type="checkbox" id="nav-toggle" name="nav-toggle"/>
-    <label for="nav-toggle" id="nav-toggle-label"s></label>
+    <label for="nav-toggle" id="nav-toggle-label"></label>
     <nav id="nav">
         <hr />
         <a href="/" {{.main_home}}><span class="mdi mdi-home-outline mr-2"></span>Home</a>
         <hr />
         <a href="/scheduler" {{.main_schedule}}><span class="mdi mdi-calendar-account-outline mr-2"></span>Scheduler</a>
-        <hr />
         <hr />
         <details {{.setup_expander_state}}>
             <summary id="SetupExpander2" class="collapsible">

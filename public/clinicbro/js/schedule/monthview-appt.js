@@ -676,48 +676,6 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
-// public/clinicbro/js/util.ts
-function dateAdd(date, interval, units) {
-  var ret = new Date(date.valueOf());
-  var checkRollover = function() {
-    if (ret.getDate() != date.getDate())
-      ret.setDate(0);
-  };
-  switch (String(interval).toLowerCase()) {
-    case "year":
-      ret.setFullYear(ret.getFullYear() + units);
-      checkRollover();
-      break;
-    case "quarter":
-      ret.setMonth(ret.getMonth() + 3 * units);
-      checkRollover();
-      break;
-    case "month":
-      ret.setMonth(ret.getMonth() + units);
-      checkRollover();
-      break;
-    case "week":
-      ret.setDate(ret.getDate() + 7 * units);
-      break;
-    case "day":
-      ret.setDate(ret.getDate() + units);
-      break;
-    case "hour":
-      ret.setTime(ret.getTime() + units * 3600000);
-      break;
-    case "minute":
-      ret.setTime(ret.getTime() + units * 60000);
-      break;
-    case "second":
-      ret.setTime(ret.getTime() + units * 1000);
-      break;
-    default:
-      ret = undefined;
-      break;
-  }
-  return ret;
-}
-
 // public/clinicbro/js/schedule/monthview-appt.ts
 class MonthViewAppointment extends s3 {
   static styles = i`
@@ -735,12 +693,15 @@ class MonthViewAppointment extends s3 {
       padding: 0px 2px;
       margin: 2px 0px;
       user-select: none;
-    }
-    div.span {
+      overflow: hidden;
       text-overflow: ellipsis;
     }
+    
     .selected {
       border: 1px solid var(--selected-border);
+    }
+    .appt-title {
+
     }
     `;
   constructor() {
@@ -748,8 +709,8 @@ class MonthViewAppointment extends s3 {
     this.appt_title = "New Appt";
     this.selected = false;
     this.appt_date = new Date;
-    this.appt_from = new Date;
-    this.appt_to = dateAdd(this.appt_from, "minute", 30);
+    this.appt_from = "00:00";
+    this.appt_to = "00:30";
   }
   clicked() {
     this.selected = true;
@@ -762,13 +723,8 @@ class MonthViewAppointment extends s3 {
     e7.dataTransfer.setData("text", e7.target.id);
   }
   render() {
-    let startHours = this.appt_from.getHours() % 12 || 12;
-    let startMinutes = ("0" + this.appt_from.getMinutes()).slice(-2);
-    let endHours = this.appt_to.getHours() % 12 || 12;
-    let endMinutes = ("0" + this.appt_to.getMinutes()).slice(-2);
-    let pm = this.appt_to.getHours() >= 12 ? "pm" : "am";
     return x`<div id="appt${this.appt_id}" class="${e6({ selected: this.selected })}"
-                    draggable="true" @dragstart="${this._drag}"><span>${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${this.appt_title}</span></div>`;
+               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${this.appt_from}-${this.appt_to} ${this.appt_title}</span></div>`;
   }
 }
 __legacyDecorateClassTS([
@@ -783,14 +739,10 @@ __legacyDecorateClassTS([
   } })
 ], MonthViewAppointment.prototype, "appt_date", undefined);
 __legacyDecorateClassTS([
-  n4({ reflect: true, converter(value) {
-    return new Date(value);
-  } })
+  n4({ reflect: true, type: String })
 ], MonthViewAppointment.prototype, "appt_from", undefined);
 __legacyDecorateClassTS([
-  n4({ reflect: true, converter(value) {
-    return new Date(value);
-  } })
+  n4({ reflect: true, type: String })
 ], MonthViewAppointment.prototype, "appt_to", undefined);
 __legacyDecorateClassTS([
   n4({ type: Boolean, reflect: true })

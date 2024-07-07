@@ -474,7 +474,9 @@ pub fn getAppointmentStatus(self: *DbContext, id: i32) !?AppointmentStatus {
 
 // ------------------------------- Appointment Context ------------------------------------------
 const appointment_select_query =
-    \\select a.id, a.title, a.appt_date, a.appt_from, a.appt_to, a.notes, a.type_id, a.status_id, a.client_id, a.bro_id, a.location_id
+    \\select a.id, a.title, to_char(a.appt_date, 'YYYY-MM-DD'), 
+    \\to_char(a.appt_from, 'HH24:MI'), to_char(a.appt_to, 'HH24:MI'),
+    \\a.notes, a.type_id, a.status_id, a.client_id, a.bro_id, a.location_id,
     \\to_char(a.date_created, 'YYYY-MM-DD at HH12:MI AM') as date_created,
     \\to_char(a.date_updated, 'YYYY-MM-DD at HH12:MI AM') as date_updated,
     \\created_bro.name, updated_bro.name from Appointment a
@@ -521,13 +523,7 @@ pub fn createAppointment(self: *DbContext, appointment: Appointment, created_bro
         appointment.location_id,
         created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from Appointment where appt_date=$1 and appt_from=$2 and appt_to=$3 and bro_id=$4 and client_id=$5", .{
-        appointment.appt_date,
-        appointment.appt_from,
-        appointment.appt_to,
-        appointment.bro_id,
-        appointment.client_id,
-    });
+    var result = try self.database.pool.query("select max(id) from Appointment", .{});
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);

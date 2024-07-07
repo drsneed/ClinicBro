@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
     document.getElementById("defaultOpen").click();
   });
 
+
+
 function clearSetupSelectedItem() {
     var elements = document.getElementById("setup-select").options;
     for(var i = 0; i < elements.length; i++){

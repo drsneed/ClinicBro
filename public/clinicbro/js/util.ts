@@ -44,7 +44,7 @@ export function clearAllSelectedDays() {
   schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
     day.removeAttribute("selected");
   });
-  schedule.shadowRoot.querySelectorAll("mv-appt").forEach(function(appt) {
+  document.querySelectorAll("mv-appt").forEach(function(appt) {
     appt.removeAttribute("selected");
   });
 }
