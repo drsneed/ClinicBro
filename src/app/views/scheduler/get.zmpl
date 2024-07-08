@@ -1,8 +1,4 @@
 @zig {
-  const locations = zmpl.getT(.array, "locations").?;
-  const bros = zmpl.getT(.array, "bros").?;
-  const appt_types = zmpl.getT(.array, "appt_types").?;
-  const appt_statuses = zmpl.getT(.array, "appt_statuses").?;
   const id = zmpl.getT(.integer, "id").?;
   const client_id = zmpl.getT(.integer, "client_id").?;
   const client_name = zmpl.getT(.string, "client_name").?;
@@ -18,6 +14,10 @@
       <input type="hidden" name="client_id" value="{{client_id}}">
       @zig {
         if(client_id > 0) {
+          const locations = zmpl.getT(.array, "locations").?;
+          const bros = zmpl.getT(.array, "bros").?;
+          const appt_types = zmpl.getT(.array, "appt_types").?;
+          const appt_statuses = zmpl.getT(.array, "appt_statuses").?;
           <div class="id-field" hx-ext="path-params">
             <label class="select-label">Client</label>
             <code>{{client_name}}</code>

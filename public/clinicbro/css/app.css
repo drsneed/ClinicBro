@@ -1154,6 +1154,10 @@ details[open] summary {
     list-style-type: none;
 }
 
+#recent-clients-listbox ul li {
+    border: 1px solid transparent;
+}
+
 #recent-clients-listbox ul li.active {
     background-color: var(--nav-link-bg-current);
     border: 1px solid var(--input-border);

@@ -79,12 +79,25 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var client = try mapper.client.fromRequest(request);
     if (client.id == 0) {
         client.id = try db_context.createClient(client, current_bro_id);
+        try db_context.addRecentClient(current_bro_id, client.id);
     } else {
         try db_context.updateClient(client, current_bro_id);
     }
-    var id_buffer: [8]u8 = undefined;
-    const id_str = try std.fmt.bufPrint(&id_buffer, "{d}", .{client.id});
-    return get(id_str, request, data);
+
+    const json_clients = try data.array();
+    var root = data.value.?;
+    try root.put("clients", json_clients);
+    const recent_clients = try db_context.lookupRecentClients(current_bro_id);
+    defer recent_clients.deinit();
+    for (recent_clients.items) |recent_client| {
+        var json_client = try data.object();
+        try json_client.put("id", data.integer(recent_client.id));
+        try json_client.put("active", data.boolean(recent_client.active));
+        try json_client.put("name", data.string(recent_client.name));
+        try json_client.put("selected", data.string(if (recent_client.id == client.id) "active" else ""));
+        try json_clients.append(json_client);
+    }
+    return request.render(.ok);
 }
 
 pub fn put(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {

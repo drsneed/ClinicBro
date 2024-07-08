@@ -676,6 +676,11 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
+// public/clinicbro/js/util.ts
+function toIsoDateString(d3) {
+  return d3.toISOString().split("T")[0];
+}
+
 // public/clinicbro/js/schedule/monthview-appt.ts
 class MonthViewAppointment extends s3 {
   static styles = i`
@@ -730,9 +735,17 @@ __legacyDecorateClassTS([
   n4({ reflect: true, type: String, reflect: true })
 ], MonthViewAppointment.prototype, "appt_title", undefined);
 __legacyDecorateClassTS([
-  n4({ reflect: true, converter(value) {
-    return new Date(value);
-  } })
+  n4({
+    reflect: true,
+    converter: {
+      fromAttribute: (value, type) => {
+        return new Date(value);
+      },
+      toAttribute: (value, type) => {
+        return toIsoDateString(value);
+      }
+    }
+  })
 ], MonthViewAppointment.prototype, "appt_date", undefined);
 __legacyDecorateClassTS([
   n4({ reflect: true, type: String })

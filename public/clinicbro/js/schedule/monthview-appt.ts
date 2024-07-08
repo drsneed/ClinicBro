@@ -1,7 +1,7 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { dateAdd } from './../util';
+import { dateAdd, toIsoDateString } from './../util';
 
 @customElement("mv-appt")
 export class MonthViewAppointment extends LitElement {
@@ -33,7 +33,7 @@ export class MonthViewAppointment extends LitElement {
     `;
     
     // @ts-ignore
-    @property({reflect: true,type: String, reflect: true})
+    @property({reflect: true, type: String, reflect: true})
     appt_id;
 
     // @ts-ignore
@@ -41,16 +41,27 @@ export class MonthViewAppointment extends LitElement {
     appt_title: string;
 
     // @ts-ignore
-    @property({reflect: true,converter(value) {return new Date(value);}})
+    @property({reflect: true,
+      converter: {
+
+        fromAttribute: (value, type) => {
+          return new Date(value);
+          // `value` is a string
+    
+          // Convert it to a value of type `type` and return it
+    
+        },
+    
+        toAttribute: (value, type) => {
+          return toIsoDateString(value);
+          // `value` is of type `type`
+    
+          // Convert it to a string and return it
+    
+        }
+    
+      }})
     appt_date: Date;
-
-    // // @ts-ignore
-    // @property({reflect: true,converter(value) {return new Date(value);}})
-    // appt_from: Date;
-
-    // // @ts-ignore
-    // @property({reflect: true,converter(value) {return new Date(value);}})
-    // appt_to: Date;
 
     // @ts-ignore
     @property({reflect: true, type: String})

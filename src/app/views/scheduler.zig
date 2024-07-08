@@ -64,11 +64,15 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
     if (params.getT(.integer, "client_id")) |client_id_128| {
         const client_id: i32 = @intCast(client_id_128);
         appointment.client_id = client_id;
-        client_lookup = try db_context.lookupClientItem(client_id) orelse client_lookup;
+        if (client_id > 0) {
+            client_lookup = try db_context.lookupClientItem(client_id) orelse client_lookup;
+        }
     }
     try mapper.appointment.toResponse(appointment, data);
     var root = data.value.?;
     try root.put("client_name", data.string(client_lookup.name));
+    if (appointment.client_id == 0)
+        return request.render(.ok);
     const json_locations = try data.array();
     try root.put("locations", json_locations);
     const locations = try db_context.lookupLocations(false);
