@@ -1,4 +1,4 @@
-<details class="client-card">
+<details class="client-card" open="">
     <summary class="client-card-header collapsible">
         <span>Clients</span>
         <button type="button" class="btn-add-client" title="Add New"

@@ -10,7 +10,7 @@
     --fg: light-dark(#18191a, #d8d8d8);
     --header-bg: light-dark(#232b3b, #232b3b); /* #1d3a4e */
     --header-fg: #f1f1e3;
-    --header-bg-hover: light-dark(red, rgb(188, 3, 3));
+    --header-bg-hover: light-dark(#bc0303, #bc0303);
     --header-fg-hover: light-dark(#f1f1e3, #f1f1e3);
     --header-border: light-dark(#444, black);
     --header-shadow: light-dark(#999, black);
@@ -34,7 +34,7 @@
     --link: light-dark(#1d3a4e, #82aac5);
     --nav-link: light-dark(#2d4159, #bebebe);
     --nav-link-bg-hover: light-dark(#d7e0e5, #3b5574);
-    --nav-link-bg-current: light-dark(#d7e0e5, #000000);
+    --nav-link-bg-current: light-dark(#eef4f8, #000000);
     --nav-link-current-sys: light-dark(invert(35%) sepia(97%) saturate(1583%) hue-rotate(116deg) brightness(100%) contrast(95%), invert(35%) sepia(97%) saturate(1583%) hue-rotate(116deg) brightness(100%) contrast(95%));
     --nav-sub-link: light-dark(#2a5674, #e7e5e5);
     --btn-primary-hover: #1d3a4e;
@@ -1034,6 +1034,10 @@ details[open] summary {
     margin-right: 10px;
 }
 
+.client-option {
+    padding: 4px 8px;
+}
+
 .setup-item-buttons {
     /* margin-bottom: 10px; */
 }
@@ -1140,6 +1144,23 @@ details[open] summary {
 
 .tracking ul {
     margin-left: 10px;
+}
+
+#recent-clients-listbox {
+    user-select: none;
+}
+
+#recent-clients-listbox ul {
+    list-style-type: none;
+}
+
+#recent-clients-listbox ul li.active {
+    background-color: var(--nav-link-bg-current);
+    border: 1px solid var(--input-border);
+}
+
+#recent-clients-listbox ul li:hover {
+    background-color: var(--nav-link-bg-hover);
 }
 
 #client-form {

@@ -1,4 +1,5 @@
-<select id="recent-clients-select" size="11" name="id">
+<div id="recent-clients-listbox">
+  <ul>
     @zig {
       const clients = zmpl.getT(.array, "clients").?;
       for (clients) |client| {
@@ -6,9 +7,11 @@
           const name = client.getT(.string, "name") orelse continue;
           const active = client.getT(.boolean, "active") orelse continue;
           const inactive_class = if(active) "" else "setup-item-inactive";
-          <option value="{{id}}" class="{{inactive_class}}" hx-get="/clients/{{id}}"
+          <li class="client-option {{inactive_class}}" hx-get="/clients/{{id}}"
             draggable="true" ondragstart="clientDragStart(event)" data-client-id="{{id}}"
-            hx-target="#cb-window" hx-trigger="dblclick" hx-swap="outerHTML">{{name}}</option>
+            hx-target="#cb-window" hx-trigger="dblclick" hx-swap="outerHTML" onclick="clientSelected(event)">
+              <span class="mdi mdi-account mr-2"></span>{{name}}</li>
       }
     }
-</select>
+  </ul>
+</div>

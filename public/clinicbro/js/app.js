@@ -12,6 +12,17 @@ function clientDragStart(e) {
     e.dataTransfer.setData("client-id", e.target.dataset.clientId);
 }
 
+function clientSelected(evt) {
+  var i;
+  // Get all elements with class="client-option" and remove the class "active"
+  clientListItems = document.getElementsByClassName("client-option");
+  for (i = 0; i < clientListItems.length; i++) {
+    clientListItems[i].className = clientListItems[i].className.replace(" active", "");
+  }
+  // add an "active" class to the selected list item
+  evt.currentTarget.className += " active";
+}
+
 function clearSetupSelectedItem() {
     var elements = document.getElementById("setup-select").options;
     for(var i = 0; i < elements.length; i++){
