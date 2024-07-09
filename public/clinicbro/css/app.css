@@ -76,6 +76,20 @@
     --tab-button-hover-fg: light-dark(#383535, #121212);
     --client-card-header-bg: light-dark(#abbcde, #232b3b);
     --listbox-shadow: light-dark(#111, #000);
+
+    --appt-border-left: light-dark(#FF000055, #CCC);
+    --appt-bg1: light-dark(#f3f0f0, #323030);
+    --appt-bg: light-dark(#e8e6e6, #222);
+    --appt-bg-alt: light-dark(#dedada, #292828);
+    --appt-fg: light-dark(#1a1a1a, #CCC);
+    --appt-selected-border: light-dark(#232323, #f5f2f2);
+
+    --calendar-number-fg: light-dark(#787777, #22);
+    --calendar-this-month-bg: light-dark(#dae2f8, #3b463b);
+    --calendar-this-month-active-bg: light-dark(#fff, #757272);
+    --calendar-month-bg: light-dark(#eeeeec, #323030);
+    --calendar-today-fg: light-dark(#155741, #adf5c5);
+    --table-fg: light-dark(#16181a, #a2b4b1);
 }
 
 * { 

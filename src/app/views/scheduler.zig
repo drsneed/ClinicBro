@@ -25,16 +25,20 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     defer db_context.deinit();
     const json_appts = try data.array();
     try root.put("appointments", json_appts);
-    const db_appts = try db_context.getAllAppointments();
+    const db_appts = try db_context.getAllAppointmentViews();
     defer db_appts.deinit();
     for (db_appts.items) |appt| {
         var json_appt = try data.object();
-        try json_appt.put("id", data.integer(appt.id));
+        try json_appt.put("appt_id", data.integer(appt.appt_id));
         try json_appt.put("title", data.string(appt.title));
+        try json_appt.put("status", data.string(appt.status));
+        try json_appt.put("client", data.string(appt.client));
+        try json_appt.put("provider", data.string(appt.provider));
+        try json_appt.put("location", data.string(appt.location));
+        try json_appt.put("color", data.string(appt.color));
         try json_appt.put("appt_date", data.string(appt.appt_date));
         try json_appt.put("appt_from", data.string(appt.appt_from));
         try json_appt.put("appt_to", data.string(appt.appt_to));
-        try json_appt.put("selected", data.string(""));
         try json_appts.append(json_appt);
     }
     return request.render(.ok);
@@ -45,12 +49,19 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
     defer db_context.deinit();
     const appt_id = try std.fmt.parseInt(i32, id, 10);
     const params = try request.params();
-
-    var appointment = Appointment{};
     var client_lookup = LookupItem{};
+    var appointment = Appointment{};
     if (appt_id > 0) {
         appointment = try db_context.getAppointment(appt_id) orelse appointment;
     } else {
+        if (params.getT(.integer, "client_id")) |client_id_128| {
+            const client_id: i32 = @intCast(client_id_128);
+            appointment.client_id = client_id;
+            if (appointment.client_id > 0) {
+                log.info("looking up client with id {d}", .{appointment.client_id});
+                client_lookup = try db_context.lookupClientItem(appointment.client_id) orelse client_lookup;
+            }
+        }
         if (params.getT(.string, "from")) |appt_from| {
             appointment.appt_from = appt_from;
         }
@@ -61,13 +72,7 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
     if (params.getT(.string, "date")) |date| {
         appointment.appt_date = date;
     }
-    if (params.getT(.integer, "client_id")) |client_id_128| {
-        const client_id: i32 = @intCast(client_id_128);
-        appointment.client_id = client_id;
-        if (client_id > 0) {
-            client_lookup = try db_context.lookupClientItem(client_id) orelse client_lookup;
-        }
-    }
+
     try mapper.appointment.toResponse(appointment, data);
     var root = data.value.?;
     try root.put("client_name", data.string(client_lookup.name));
@@ -153,16 +158,21 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var root = data.value.?;
     const json_appts = try data.array();
     try root.put("appointments", json_appts);
-    const db_appts = try db_context.getAllAppointments();
+    const db_appts = try db_context.getAllAppointmentViews();
     defer db_appts.deinit();
     for (db_appts.items) |appt| {
         var json_appt = try data.object();
-        try json_appt.put("id", data.integer(appt.id));
+        try json_appt.put("appt_id", data.integer(appt.appt_id));
         try json_appt.put("title", data.string(appt.title));
+        try json_appt.put("status", data.string(appt.status));
+        try json_appt.put("client", data.string(appt.client));
+        try json_appt.put("provider", data.string(appt.provider));
+        try json_appt.put("location", data.string(appt.location));
+        try json_appt.put("color", data.string(appt.color));
         try json_appt.put("appt_date", data.string(appt.appt_date));
         try json_appt.put("appt_from", data.string(appt.appt_from));
         try json_appt.put("appt_to", data.string(appt.appt_to));
-        try json_appt.put("selected", data.string(if (appt.id == appointment.id) "selected" else ""));
+        try json_appt.put("selected", data.string(if (appt.appt_id == appointment.id) "selected" else ""));
         try json_appts.append(json_appt);
     }
 

@@ -1,44 +1,68 @@
 import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
+import { styleMap } from 'lit/directives/style-map.js';
 import { dateAdd, toIsoDateString } from './../util';
 
 @customElement("mv-appt")
 export class MonthViewAppointment extends LitElement {
   static styles = css`
-    :host {
-    --border-left: light-dark(#FF000055, #CCC);
-    --bg: light-dark(#CCC, #222);
-    --fg: light-dark(#444, #CCC);
-    --selected-border: light-dark(#232323, #f5f2f2);
-  }
     div {
-      border-left: 4px solid var(--border-left);
       font-size: 12px;
-      background-color: var(--bg);
-      color: var(--fg);
+      color: var(--appt-fg);
       padding: 0px 2px;
       margin: 2px 0px;
       user-select: none;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    .appt {
+      background-color: var(--appt-bg1);
+    }
+
+    .event {
+      background: repeating-linear-gradient(
+        45deg,
+        var(--appt-bg),
+        var(--appt-bg) 10px,
+        var(--appt-bg-alt) 10px,
+        var(--appt-bg-alt) 20px
+      );
+    }
     
     .selected {
-      border: 1px solid var(--selected-border);
-    }
-    .appt-title {
-
+      border: 1px solid var(--appt-selected-border);
     }
     `;
     
     // @ts-ignore
-    @property({reflect: true, type: String, reflect: true})
+    @property({reflect: true, type: String})
     appt_id;
 
     // @ts-ignore
-    @property({reflect: true,type: String, reflect: true})
-    appt_title: string;
+    @property({reflect: true, type: String})
+    appt_title;
+
+    // @ts-ignore
+    @property({reflect: true, type: String})
+    status;
+
+    // @ts-ignore
+    @property({reflect: true, type: String})
+    client: string;
+
+    // @ts-ignore
+    @property({reflect: true, type: String})
+    provider: string;
+
+    // @ts-ignore
+    @property({reflect: true, type: String})
+    location: string;
+
+    // @ts-ignore
+    @property({reflect: true, type: String})
+    color: string;
 
     // @ts-ignore
     @property({reflect: true,
@@ -76,11 +100,16 @@ export class MonthViewAppointment extends LitElement {
 
     constructor() {
       super();
-      this.appt_title = "New Appt";
+      this.appt_title = "title";
+      this.client = "client";
+      this.status = "status";
+      this.provider = "provider";
+      this.location = "location";
       this.selected = false;
       this.appt_date = new Date();
       this.appt_from = "00:00";
       this.appt_to = "00:30";
+      this.color = "";
     }
 
     public clicked() {
@@ -99,9 +128,18 @@ export class MonthViewAppointment extends LitElement {
       // let pm = this.appt_to.getHours() >= 12 ? "pm" : "am";
       // return html`<div id="appt${this.appt_id}" class="${classMap({selected: this.selected})}"
       //               draggable="true" @dragstart="${this._drag}"><span>${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${this.appt_title}</span></div>`
-
-      return html`<div data-appt-id="${this.appt_id}" class="${classMap({selected: this.selected})}"
-               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${this.appt_from}-${this.appt_to} ${this.appt_title}</span></div>`;
+      let text = this.appt_title;
+      let appt = this.client.length > 0;
+      if(appt) {
+        text = text + " - " + this.client;
+      }
+      let borderLeft = "none";
+      if(this.color.length > 0)
+        borderLeft = "4px solid " + this.color + ";";
+      //let color = this.color.length > 0 ? this.color : "#FF000055";
+      return html`<div data-appt-id="${this.appt_id}" class="${classMap({selected: this.selected, appt: appt, event: !appt})}"
+               style="${styleMap({borderLeft: borderLeft})}"
+               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${this.appt_from}-${this.appt_to} ${text}</span></div>`;
                     
     }
 }

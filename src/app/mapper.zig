@@ -4,6 +4,7 @@ const Bro = @import("models/bro.zig");
 const Location = @import("models/location.zig");
 const Client = @import("models/client.zig");
 const Appointment = @import("models/appointment.zig");
+const AppointmentView = @import("models/appointment_view.zig");
 const AppointmentType = @import("models/appointment_type.zig");
 const AppointmentStatus = @import("models/appointment_status.zig");
 const log = std.log.scoped(.mapper);
@@ -307,6 +308,35 @@ pub const appointment = struct {
             .date_updated = row.get([]const u8, 12),
             .created_by = row.get(?[]const u8, 13),
             .updated_by = row.get(?[]const u8, 14),
+        };
+    }
+};
+
+pub const appointment_view = struct {
+    pub fn toResponse(model: AppointmentView, data: *jetzig.Data) !void {
+        var root = data.value.?;
+        try root.put("appt_id", data.integer(model.appt_id));
+        try root.put("status", data.string(model.status));
+        try root.put("title", data.string(model.title));
+        try root.put("client", data.string(model.client));
+        try root.put("provider", data.string(model.provider));
+        try root.put("location", data.string(model.location));
+        try root.put("appt_date", data.string(model.appt_date));
+        try root.put("appt_from", data.string(model.appt_from));
+        try root.put("appt_to", data.string(model.appt_to));
+    }
+    pub fn fromDatabase(row: jetzig.http.Database.pg.Row) AppointmentView {
+        return .{
+            .appt_id = row.get(i32, 0),
+            .title = row.get([]const u8, 1),
+            .status = row.get([]const u8, 2),
+            .client = row.get([]const u8, 3),
+            .provider = row.get([]const u8, 4),
+            .location = row.get([]const u8, 5),
+            .color = row.get([]const u8, 6),
+            .appt_date = row.get([]const u8, 7),
+            .appt_from = row.get([]const u8, 8),
+            .appt_to = row.get([]const u8, 9),
         };
     }
 };

@@ -4,6 +4,7 @@ pub const Bro = @import("models/bro.zig");
 pub const Location = @import("models/location.zig");
 const Client = @import("models/client.zig");
 const Appointment = @import("models/appointment.zig");
+const AppointmentView = @import("models/appointment_view.zig");
 const AppointmentType = @import("models/appointment_type.zig");
 const AppointmentStatus = @import("models/appointment_status.zig");
 pub const LookupItem = @import("models/lookup_item.zig");
@@ -561,6 +562,16 @@ pub fn getAllAppointments(self: *DbContext) !std.ArrayList(Appointment) {
     var lookup_list = std.ArrayList(Appointment).init(self.allocator);
     while (try result.next()) |row| {
         try lookup_list.append(mapper.appointment.fromDatabase(row));
+    }
+    return lookup_list;
+}
+
+pub fn getAllAppointmentViews(self: *DbContext) !std.ArrayList(AppointmentView) {
+    var result = try self.database.pool.query("select * from AppointmentView", .{});
+    try self.results.append(result);
+    var lookup_list = std.ArrayList(AppointmentView).init(self.allocator);
+    while (try result.next()) |row| {
+        try lookup_list.append(mapper.appointment_view.fromDatabase(row));
     }
     return lookup_list;
 }

@@ -6,15 +6,6 @@ import { classMap } from 'lit/directives/class-map.js';
 @customElement("mv-day")
 export class MonthViewDay extends LitElement {
     static styles = css`
-      :host {
-        --calendar-number-fg: light-dark(#787777, #22);
-        --calendar-this-month-bg: light-dark(#dae2f8, #3b463b);
-        --calendar-this-month-active-bg: light-dark(#fff, #000);
-        --calendar-month-bg: light-dark(#eeeeec, #323030);
-        --calendar-today-fg: light-dark(#155741, #adf5c5);
-        --table-fg: light-dark(#16181a, #a2b4b1);
-        --btn-add-fg: light-dark()
-      }
       div {
         width: 100%;
         height: 100%;

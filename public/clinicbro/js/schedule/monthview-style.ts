@@ -1,17 +1,6 @@
 import {css} from 'lit';
 export function monthviewStyle() {
     return css`
-  :host {
-    --calendar-header-fg: light-dark(#eeeeec, #9EAF91);
-    --calendar-header-bg: light-dark(#37af4d, #2e2d2f);
-    --calendar-number-fg: light-dark(#787777, #22);
-    --calendar-this-month-bg: light-dark(#dae2f8, #442d2d);
-    --calendar-this-month-active-bg: light-dark(#fff, #000);
-    --calendar-month-bg: light-dark(#eeeeec, #323030);
-    --calendar-today-fg: light-dark(#155741, #adf5c5);
-    --table-fg: light-dark(#16181a, #a2b4b1);
-  }
-  
   .month-table {
     background: var(--container-bg);
     table-layout: fixed;

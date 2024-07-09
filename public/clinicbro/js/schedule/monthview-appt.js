@@ -676,6 +676,37 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
+// node_modules/lit-html/directives/style-map.js
+var n5 = "important";
+var i5 = " !" + n5;
+var o5 = e5(class extends i4 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "style" || t5.strings?.length > 2)
+      throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
+  }
+  render(t5) {
+    return Object.keys(t5).reduce((e7, r6) => {
+      const s4 = t5[r6];
+      return s4 == null ? e7 : e7 + `${r6 = r6.includes("-") ? r6 : r6.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s4};`;
+    }, "");
+  }
+  update(e7, [r6]) {
+    const { style: s4 } = e7.element;
+    if (this.ft === undefined)
+      return this.ft = new Set(Object.keys(r6)), this.render(r6);
+    for (const t5 of this.ft)
+      r6[t5] == null && (this.ft.delete(t5), t5.includes("-") ? s4.removeProperty(t5) : s4[t5] = null);
+    for (const t5 in r6) {
+      const e8 = r6[t5];
+      if (e8 != null) {
+        this.ft.add(t5);
+        const r7 = typeof e8 == "string" && e8.endsWith(i5);
+        t5.includes("-") || r7 ? s4.setProperty(t5, r7 ? e8.slice(0, -11) : e8, r7 ? n5 : "") : s4[t5] = e8;
+      }
+    }
+    return w;
+  }
+});
 // public/clinicbro/js/util.ts
 function toIsoDateString(d3) {
   return d3.toISOString().split("T")[0];
@@ -684,38 +715,46 @@ function toIsoDateString(d3) {
 // public/clinicbro/js/schedule/monthview-appt.ts
 class MonthViewAppointment extends s3 {
   static styles = i`
-    :host {
-    --border-left: light-dark(#FF000055, #CCC);
-    --bg: light-dark(#CCC, #222);
-    --fg: light-dark(#444, #CCC);
-    --selected-border: light-dark(#232323, #f5f2f2);
-  }
     div {
-      border-left: 4px solid var(--border-left);
       font-size: 12px;
-      background-color: var(--bg);
-      color: var(--fg);
+      color: var(--appt-fg);
       padding: 0px 2px;
       margin: 2px 0px;
       user-select: none;
       overflow: hidden;
       text-overflow: ellipsis;
     }
+
+    .appt {
+      background-color: var(--appt-bg1);
+    }
+
+    .event {
+      background: repeating-linear-gradient(
+        45deg,
+        var(--appt-bg),
+        var(--appt-bg) 10px,
+        var(--appt-bg-alt) 10px,
+        var(--appt-bg-alt) 20px
+      );
+    }
     
     .selected {
-      border: 1px solid var(--selected-border);
-    }
-    .appt-title {
-
+      border: 1px solid var(--appt-selected-border);
     }
     `;
   constructor() {
     super();
-    this.appt_title = "New Appt";
+    this.appt_title = "title";
+    this.client = "client";
+    this.status = "status";
+    this.provider = "provider";
+    this.location = "location";
     this.selected = false;
     this.appt_date = new Date;
     this.appt_from = "00:00";
     this.appt_to = "00:30";
+    this.color = "";
   }
   clicked() {
     this.selected = true;
@@ -724,16 +763,40 @@ class MonthViewAppointment extends s3 {
     e7.dataTransfer.setData("appt-id", e7.target.dataset.apptId);
   }
   render() {
-    return x`<div data-appt-id="${this.appt_id}" class="${e6({ selected: this.selected })}"
-               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${this.appt_from}-${this.appt_to} ${this.appt_title}</span></div>`;
+    let text = this.appt_title;
+    let appt = this.client.length > 0;
+    if (appt) {
+      text = text + " - " + this.client;
+    }
+    let borderLeft = "none";
+    if (this.color.length > 0)
+      borderLeft = "4px solid " + this.color + ";";
+    return x`<div data-appt-id="${this.appt_id}" class="${e6({ selected: this.selected, appt, event: !appt })}"
+               style="${o5({ borderLeft })}"
+               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${this.appt_from}-${this.appt_to} ${text}</span></div>`;
   }
 }
 __legacyDecorateClassTS([
-  n4({ reflect: true, type: String, reflect: true })
+  n4({ reflect: true, type: String })
 ], MonthViewAppointment.prototype, "appt_id", undefined);
 __legacyDecorateClassTS([
-  n4({ reflect: true, type: String, reflect: true })
+  n4({ reflect: true, type: String })
 ], MonthViewAppointment.prototype, "appt_title", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], MonthViewAppointment.prototype, "status", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], MonthViewAppointment.prototype, "client", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], MonthViewAppointment.prototype, "provider", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], MonthViewAppointment.prototype, "location", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], MonthViewAppointment.prototype, "color", undefined);
 __legacyDecorateClassTS([
   n4({
     reflect: true,
