@@ -67,23 +67,12 @@ export class MonthViewAppointment extends LitElement {
     // @ts-ignore
     @property({reflect: true,
       converter: {
-
         fromAttribute: (value, type) => {
           return new Date(value);
-          // `value` is a string
-    
-          // Convert it to a value of type `type` and return it
-    
         },
-    
         toAttribute: (value, type) => {
           return toIsoDateString(value);
-          // `value` is of type `type`
-    
-          // Convert it to a string and return it
-    
         }
-    
       }})
     appt_date: Date;
 

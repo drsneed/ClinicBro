@@ -8,8 +8,7 @@ const log = std.log.scoped(.locations);
 pub const layout = "app";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     var root = data.value.?;
     try root.put("page_title", data.string("Appointment Type Setup"));
     try root.put("setup_expander_state", data.string("open"));
@@ -18,8 +17,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 }
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const session = try request.session();
     var current_bro_id: i32 = 0;
     if (try session.get("bro")) |bro_session| {
@@ -35,8 +33,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 }
 
 pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const appt_type_id = try std.fmt.parseInt(i32, id, 10);
 
     var appt_type = AppointmentType{};
@@ -44,12 +41,12 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
         appt_type = try db_context.getAppointmentType(appt_type_id) orelse appt_type;
     }
     try mapper.appointment_type.toResponse(appt_type, data);
+    try db_context.deinit();
     return request.render(.ok);
 }
 
 pub fn delete(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const appt_type_id = try std.fmt.parseInt(i32, id, 10);
     _ = try db_context.deleteAppointmentType(appt_type_id);
     return try util.renderSetupList(request, data, &db_context, "AppointmentType", 0);

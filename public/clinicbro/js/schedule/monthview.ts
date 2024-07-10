@@ -1,9 +1,8 @@
 import {html, css, LitElement} from 'lit';
-import {dateAdd, months, sameDay, clearAllSelectedDays} from '../util';
 import {monthviewStyle} from './monthview-style';
 import {MonthViewAppointment} from './monthview-appt';
 import {customElement, property} from 'lit/decorators.js';
-import { toIsoDateString, dateAdd, toIsoTimeString } from '../util';
+import { toIsoDateString, dateAdd, months, clearAllSelectedDays } from '../util';
 import 'lit-icon/pkg/dist-src/lit-icon.js';
 import 'lit-icon/pkg/dist-src/lit-iconset.js';
 
@@ -17,9 +16,8 @@ export class MonthView extends LitElement {
   current_date: Date;
 
   // @ts-ignore
-  @property({type: Boolean, reflect: true})
-  appointment_dialog_opened: boolean;
-
+  @property({type: String, reflect: true})
+  mode: string;
 
   calendarTitle() {
     return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
@@ -29,6 +27,7 @@ export class MonthView extends LitElement {
     super();
     this.current_date = new Date();
     this.appointment_dialog_opened = false;
+    this.mode == "month";
   }
 
 
@@ -38,79 +37,6 @@ export class MonthView extends LitElement {
     if(changedProperties.has('current_date')) {
       
     }
-  }
-
-  showCreateAppointmentDialog(date_clicked: Date) {
-    if(this.appointment_dialog_opened) {
-      console.log("Dialog is already open. Aborting mission :(");
-      return false;
-    }
-    let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.window_title = "New Event";
-    dialog.appt_id = 0;
-    dialog.appt_title = "";
-    dialog.appt_date = date_clicked;
-    let from = new Date();
-    from.setSeconds(0);
-    from.setMinutes(from.getMinutes() < 30 ? 0 : 30);
-    console.log("from = " + from.toLocaleTimeString());
-    dialog.appt_from = from;
-    dialog.appt_to = dateAdd(from, 'minute', 30);
-    dialog.ready();
-    this.appointment_dialog_opened = true;
-    return true;
-  }
-
-  showEditAppointmentDialog(appointment: MonthViewAppointment) {
-    if(this.appointment_dialog_opened) {
-      console.log("Dialog is already open. Aborting mission :(");
-      return false;
-    }
-    let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.window_title = "Edit Event";
-    dialog.appt_title = appointment.appt_title;
-    dialog.appt_id = appointment.appt_id;
-    dialog.appt_date = appointment.appt_date;
-    dialog.appt_from = appointment.appt_from;
-    dialog.appt_to = appointment.appt_to;
-    dialog.ready();
-    this.appointment_dialog_opened = true;
-    return true;
-  }
-
-
-  saveAppointment (e) {
-    this.closeAppointmentDialog();
-    let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.collect();
-    if(dialog.appt_id > 0) {
-      let index = this.appointments.findIndex(appt => appt.appt_id == dialog.appt_id);
-      this.appointments[index].appt_title = dialog.appt_title;
-      this.appointments[index].appt_from = dialog.appt_from;
-      this.appointments[index].appt_to = dialog.appt_to;
-      this.appointments[index].appt_date = dialog.appt_date;
-    }
-    else {
-      var id = Math.max(...this.appointments.map(o => o.appt_id)) + 1;
-      this.appointments.push({
-        appt_id: id,
-        appt_title: dialog.appt_title,
-        appt_date: dialog.appt_date,
-        appt_from: dialog.appt_from,
-        appt_to: dialog.appt_to
-      });
-    }
-  }
-
-  moveAppointment(appt_id: number, new_date: Date) {
-    let index = this.appointments.findIndex(appt => appt.appt_id == appt_id);
-    this.appointments[index].appt_date = new_date;
-    this.requestUpdate();
-  }
-
-  closeAppointmentDialog () {
-    this.appointment_dialog_opened = false;
-    clearAllSelectedDays();
   }
 
   private _prev(e: Event) {
@@ -145,7 +71,7 @@ export class MonthView extends LitElement {
     let dod = toIsoDateString(date_of_day);
     return html`
     <mv-day id="${table_slot_id}" current_date="${date_of_day}" ?current_month=${current_month}
-        hx-get="/scheduler/{id}?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" 
+        hx-get="/scheduler/{id}?date=${dod}" hx-target="global #cb-window" hx-swap="outerHTML" 
         hx-trigger="dblclick target:#${table_slot_id}, drop target:#${table_slot_id}" hx-include="#dropped-appt-id, #dropped-client-id">
         <slot name="${dod}"></slot>
     </mv-day>`;
@@ -192,9 +118,6 @@ export class MonthView extends LitElement {
     </table>
     <input id="dropped-appt-id" type="hidden" name="id" value="0" >
     <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
-    <mv-dialog id="mv_dialog" ?opened="${this.appointment_dialog_opened}" 
-               @dialog.save="${this.saveAppointment.bind(this)}"
-               @dialog.cancel="${this.closeAppointmentDialog}"></mv-dialog>
     `;
   }
 }

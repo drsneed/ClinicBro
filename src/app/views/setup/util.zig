@@ -45,5 +45,6 @@ pub fn renderSetupList(request: *jetzig.Request, data: *jetzig.Data, db_context:
             }
         }
     }
+    try db_context.deinit();
     return request.render(.ok);
 }

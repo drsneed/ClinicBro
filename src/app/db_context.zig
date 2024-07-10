@@ -13,20 +13,37 @@ const log = std.log.scoped(.DbContext);
 const DbContext = @This();
 
 allocator: std.mem.Allocator,
-results: std.ArrayList(jetzig.http.Database.pg.Result),
+results: std.ArrayList(*jetzig.http.Database.pg.Result),
+query_rows: std.ArrayList(jetzig.http.Database.pg.QueryRow),
 database: *jetzig.http.Database,
-pub fn init(allocator: std.mem.Allocator, database: *jetzig.http.Database) DbContext {
+connection: *jetzig.http.Database.pg.Conn,
+pub fn init(allocator: std.mem.Allocator, database: *jetzig.http.Database) !DbContext {
     return .{
         .allocator = allocator,
         .database = database,
-        .results = std.ArrayList(jetzig.http.Database.pg.Result).init(allocator),
+        .results = std.ArrayList(*jetzig.http.Database.pg.Result).init(allocator),
+        .query_rows = std.ArrayList(jetzig.http.Database.pg.QueryRow).init(allocator),
+        .connection = try database.pool.acquire(),
     };
 }
-pub fn deinit(self: DbContext) void {
+pub fn drain(self: *DbContext) !void {
+    for (self.results.items) |result| {
+        try result.drain();
+    }
+    for (self.query_rows.items) |*row| {
+        try row.result.drain();
+    }
+}
+pub fn deinit(self: *DbContext) !void {
     for (self.results.items) |result| {
         result.deinit();
     }
     self.results.deinit();
+    for (self.query_rows.items) |*row| {
+        try row.deinit();
+    }
+    self.query_rows.deinit();
+    self.database.pool.release(self.connection);
 }
 
 // ------------------------------- Bro Context ------------------------------------------
@@ -45,7 +62,7 @@ const bro_insert_query =
 ;
 const bro_update_query = "update Bro set active=$2, name=$3, color=$4, sees_clients=$5, date_updated = NOW(), updated_bro_id=$6 where id=$1";
 pub fn validateBroPassword(self: *DbContext, name: []const u8, password: []const u8) !?LookupItem {
-    var result = try self.database.pool.query(bro_item_select_query ++ " where name=$1 and active=true and (password = crypt($2, password))", .{
+    var result = try self.connection.query(bro_item_select_query ++ " where name=$1 and active=true and (password = crypt($2, password))", .{
         name,
         password,
     });
@@ -75,7 +92,7 @@ pub fn createBro(self: *DbContext, bro: Bro, created_bro_id: i32) !i32 {
         bro.sees_clients,
         created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from bro where name = $1", .{bro.name});
+    var result = try self.connection.query("select max(id) from bro where name = $1", .{bro.name});
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -90,7 +107,7 @@ pub fn deleteBro(self: *DbContext, id: i32) !bool {
 }
 
 pub fn getBro(self: *DbContext, id: i32) !?Bro {
-    var result = try self.database.pool.query(bro_select_query ++ " where bro.id=$1", .{id});
+    var result = try self.connection.query(bro_select_query ++ " where bro.id=$1", .{id});
     try self.results.append(result);
     if (try result.next()) |row| {
         return mapper.bro.fromDatabase(row);
@@ -104,7 +121,7 @@ pub fn lookupProviderBros(self: *DbContext, include_inactive: bool) !std.ArrayLi
     else
         bro_item_select_query ++ " where sees_clients=true and active=true order by name";
 
-    var result = try self.database.pool.query(query, .{});
+    var result = try self.connection.query(query, .{});
     try self.results.append(result);
     var bros = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
@@ -119,7 +136,7 @@ pub fn lookupBros(self: *DbContext, include_all: bool) !std.ArrayList(LookupItem
     else
         bro_item_select_query ++ " where active=true order by name";
 
-    var result = try self.database.pool.query(query, .{});
+    var result = try self.connection.query(query, .{});
     try self.results.append(result);
     var bros = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
@@ -173,7 +190,7 @@ pub fn createLocation(self: *DbContext, location: Location, created_bro_id: i32)
         location.zip_code,
         created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from location where name = $1", .{location.name});
+    var result = try self.connection.query("select max(id) from location where name = $1", .{location.name});
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -187,7 +204,7 @@ pub fn deleteLocation(self: *DbContext, id: i32) !bool {
 }
 
 pub fn getLocation(self: *DbContext, id: i32) !?Location {
-    var result = try self.database.pool.query(location_select_query ++ " where loc.id=$1", .{id});
+    var result = try self.connection.query(location_select_query ++ " where loc.id=$1", .{id});
     try self.results.append(result);
     if (try result.next()) |row| {
         return mapper.location.fromDatabase(row);
@@ -201,7 +218,7 @@ pub fn lookupLocations(self: *DbContext, include_all: bool) !std.ArrayList(Looku
     else
         location_lookup_query ++ " where active=true order by name";
 
-    var result = try self.database.pool.query(query, .{});
+    var result = try self.connection.query(query, .{});
     try self.results.append(result);
     var locs = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
@@ -280,7 +297,7 @@ pub fn createClient(self: *DbContext, client: Client, created_bro_id: i32) !i32 
         client.bro_id,
         created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from Client where first_name = $1 and last_name=$2", .{ client.first_name, client.last_name });
+    var result = try self.connection.query("select max(id) from Client where first_name = $1 and last_name=$2", .{ client.first_name, client.last_name });
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -295,21 +312,28 @@ pub fn deleteClient(self: *DbContext, id: i32) !bool {
 }
 
 pub fn getClient(self: *DbContext, id: i32) !?Client {
-    var result = try self.database.pool.query(client_select_query ++ " where cl.id=$1", .{id});
-    try self.results.append(result);
-    if (try result.next()) |row| {
-        return mapper.client.fromDatabase(row);
+    const result = try self.connection.row(client_select_query ++ " where cl.id=$1", .{id});
+    if (result) |row| {
+        try self.query_rows.append(row);
+        return mapper.client.fromDatabase(row.row);
     }
     return null;
 }
 
 pub fn lookupClientItem(self: *DbContext, id: i32) !?LookupItem {
-    var result = try self.database.pool.query(client_lookup_query ++ " where id = $1", .{id});
-    try self.results.append(result);
-    while (try result.next()) |row| {
-        const client = LookupItem{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]const u8, 2) };
-        return client;
+    const result = try self.connection.row(
+        client_lookup_query ++ " where id=$1",
+        .{id},
+    );
+
+    if (result) |row| {
+        try self.query_rows.append(row);
+        return LookupItem{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]const u8, 2) };
     }
+    //var db_mapper = result.mapper(LookupItem, .{ .dupe = true, .allocator = self.allocator });
+    // if (try db_mapper.next()) |item| {
+    //     return item;
+    // }
     return null;
 }
 
@@ -318,7 +342,7 @@ pub fn lookupClients(self: *DbContext, include_all: bool) !std.ArrayList(LookupI
         client_lookup_query ++ " order by active desc, name"
     else
         client_lookup_query ++ " where active=true order by name";
-    var result = try self.database.pool.query(query, .{});
+    var result = try self.connection.query(query, .{});
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
@@ -328,7 +352,7 @@ pub fn lookupClients(self: *DbContext, include_all: bool) !std.ArrayList(LookupI
 }
 
 pub fn lookupRecentClients(self: *DbContext, bro_id: i32) !std.ArrayList(LookupItem) {
-    var result = try self.database.pool.query(recent_client_query, .{bro_id});
+    var result = try self.connection.query(recent_client_query, .{bro_id});
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
@@ -377,7 +401,7 @@ pub fn createAppointmentType(self: *DbContext, appointment_type: AppointmentType
         appointment_type.color,
         created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from AppointmentType where name = $1", .{appointment_type.name});
+    var result = try self.connection.query("select max(id) from AppointmentType where name = $1", .{appointment_type.name});
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -391,7 +415,7 @@ pub fn deleteAppointmentType(self: *DbContext, id: i32) !bool {
 }
 
 pub fn getAppointmentType(self: *DbContext, id: i32) !?AppointmentType {
-    var result = try self.database.pool.query(appointment_type_select_query ++ " where apt.id=$1", .{id});
+    var result = try self.connection.query(appointment_type_select_query ++ " where apt.id=$1", .{id});
     try self.results.append(result);
     if (try result.next()) |row| {
         return mapper.appointment_type.fromDatabase(row);
@@ -404,7 +428,7 @@ pub fn lookupAppointmentTypes(self: *DbContext, include_all: bool) !std.ArrayLis
         appointment_type_lookup_query ++ " order by active desc, name"
     else
         appointment_type_lookup_query ++ " where active=true order by name";
-    var result = try self.database.pool.query(query, .{});
+    var result = try self.connection.query(query, .{});
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
@@ -419,7 +443,7 @@ pub fn lookupItems(self: *DbContext, table_name: []const u8, include_all: bool) 
         table_name,
         if (include_all) " order by active desc, name" else " where active=true order by name",
     });
-    var result = try self.database.pool.query(query, .{});
+    var result = try self.connection.query(query, .{});
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {
@@ -461,7 +485,7 @@ pub fn createAppointmentStatus(self: *DbContext, appointment_status: Appointment
         appointment_status.show,
         created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from AppointmentStatus where name = $1", .{appointment_status.name});
+    var result = try self.connection.query("select max(id) from AppointmentStatus where name = $1", .{appointment_status.name});
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -475,7 +499,7 @@ pub fn deleteAppointmentStatus(self: *DbContext, id: i32) !bool {
 }
 
 pub fn getAppointmentStatus(self: *DbContext, id: i32) !?AppointmentStatus {
-    var result = try self.database.pool.query(appointment_status_select_query ++ " where apt.id=$1", .{id});
+    var result = try self.connection.query(appointment_status_select_query ++ " where apt.id=$1", .{id});
     try self.results.append(result);
     if (try result.next()) |row| {
         return mapper.appointment_status.fromDatabase(row);
@@ -490,7 +514,7 @@ const appointment_select_query =
     \\a.notes, a.type_id, a.status_id, a.client_id, a.bro_id, a.location_id,
     \\to_char(a.date_created, 'YYYY-MM-DD at HH12:MI AM') as date_created,
     \\to_char(a.date_updated, 'YYYY-MM-DD at HH12:MI AM') as date_updated,
-    \\created_bro.name, updated_bro.name from Appointment a
+    \\created_bro.name as created_by, updated_bro.name as updated_by from Appointment a
     \\left join Bro created_bro on a.created_bro_id=created_bro.id
     \\left join Bro updated_bro on a.updated_bro_id=updated_bro.id
 ;
@@ -534,7 +558,7 @@ pub fn createAppointment(self: *DbContext, appointment: Appointment, created_bro
         appointment.location_id,
         created_bro_id,
     });
-    var result = try self.database.pool.query("select max(id) from Appointment", .{});
+    var result = try self.connection.query("select max(id) from Appointment", .{});
     try self.results.append(result);
     if (try result.next()) |row| {
         return row.get(i32, 0);
@@ -548,16 +572,21 @@ pub fn deleteAppointment(self: *DbContext, id: i32) !bool {
 }
 
 pub fn getAppointment(self: *DbContext, id: i32) !?Appointment {
-    var result = try self.database.pool.query(appointment_select_query ++ " where a.id=$1", .{id});
-    try self.results.append(result);
-    if (try result.next()) |row| {
-        return mapper.appointment.fromDatabase(row);
+    const result = try self.connection.row(appointment_select_query ++ " where a.id=$1", .{id});
+    if (result) |row| {
+        try self.query_rows.append(row);
+        return mapper.appointment.fromDatabase(row.row);
     }
+
+    // var db_mapper = result.mapper(Appointment, .{ .dupe = true, .allocator = self.allocator });
+    // if (try db_mapper.next()) |appointment| {
+    //     return appointment;
+    // }
     return null;
 }
 
 pub fn getAllAppointments(self: *DbContext) !std.ArrayList(Appointment) {
-    var result = try self.database.pool.query(appointment_select_query, .{});
+    var result = try self.connection.query(appointment_select_query, .{});
     try self.results.append(result);
     var lookup_list = std.ArrayList(Appointment).init(self.allocator);
     while (try result.next()) |row| {
@@ -567,11 +596,18 @@ pub fn getAllAppointments(self: *DbContext) !std.ArrayList(Appointment) {
 }
 
 pub fn getAllAppointmentViews(self: *DbContext) !std.ArrayList(AppointmentView) {
-    var result = try self.database.pool.query("select * from AppointmentView", .{});
-    try self.results.append(result);
+    var result = try self.connection.queryOpts("select * from AppointmentView", .{}, .{ .column_names = true });
+    defer result.deinit();
     var lookup_list = std.ArrayList(AppointmentView).init(self.allocator);
-    while (try result.next()) |row| {
-        try lookup_list.append(mapper.appointment_view.fromDatabase(row));
+    var db_mapper = result.mapper(AppointmentView, .{ .dupe = true, .allocator = self.allocator });
+    while (try db_mapper.next()) |appointment_view| {
+        try lookup_list.append(appointment_view);
     }
+    // var result = try self.connection.query("select * from AppointmentView", .{});
+    // try self.results.append(result);
+
+    // while (try result.next()) |row| {
+    //     try lookup_list.append(mapper.appointment_view.fromDatabase(row));
+    // }
     return lookup_list;
 }

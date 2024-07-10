@@ -8,8 +8,7 @@ const log = std.log.scoped(.locations);
 pub const layout = "app";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     var root = data.value.?;
     try root.put("page_title", data.string("Location Setup"));
     try root.put("setup_expander_state", data.string("open"));
@@ -17,8 +16,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     return try util.renderSetupList(request, data, &db_context, "Location", 0);
 }
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const session = try request.session();
     var current_bro_id: i32 = 0;
     if (try session.get("bro")) |bro_session| {
@@ -34,8 +32,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 }
 
 pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const location_id = try std.fmt.parseInt(i32, id, 10);
 
     var location = Location{};
@@ -43,12 +40,12 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
         location = try db_context.getLocation(location_id) orelse location;
     }
     try mapper.location.toResponse(location, data);
+    try db_context.deinit();
     return request.render(.ok);
 }
 
 pub fn delete(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const location_id = try std.fmt.parseInt(i32, id, 10);
     _ = try db_context.deleteLocation(location_id);
     return try util.renderSetupList(request, data, &db_context, "Location", 0);

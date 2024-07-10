@@ -1,7 +1,6 @@
 @zig {
   const id = zmpl.getT(.integer, "id").?;
   const client_id = zmpl.getT(.integer, "client_id").?;
-  const client_name = zmpl.getT(.string, "client_name").?;
   const autofocus = if(id == 0) "autofocus" else "";
   const window_title = if(id == 0 and client_id == 0) "Add New Event"
      else if(id > 0 and client_id == 0) "Edit Event"
@@ -18,6 +17,7 @@
           const bros = zmpl.getT(.array, "bros").?;
           const appt_types = zmpl.getT(.array, "appt_types").?;
           const appt_statuses = zmpl.getT(.array, "appt_statuses").?;
+          const client_name = zmpl.getT(.string, "client_name").?;
           <div class="id-field" hx-ext="path-params">
             <label class="select-label">Client</label>
             <code>{{client_name}}</code>

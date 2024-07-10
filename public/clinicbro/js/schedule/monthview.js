@@ -594,74 +594,6 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// public/clinicbro/js/util.ts
-function dateAdd(date, interval, units) {
-  var ret = new Date(date.valueOf());
-  var checkRollover = function() {
-    if (ret.getDate() != date.getDate())
-      ret.setDate(0);
-  };
-  switch (String(interval).toLowerCase()) {
-    case "year":
-      ret.setFullYear(ret.getFullYear() + units);
-      checkRollover();
-      break;
-    case "quarter":
-      ret.setMonth(ret.getMonth() + 3 * units);
-      checkRollover();
-      break;
-    case "month":
-      ret.setMonth(ret.getMonth() + units);
-      checkRollover();
-      break;
-    case "week":
-      ret.setDate(ret.getDate() + 7 * units);
-      break;
-    case "day":
-      ret.setDate(ret.getDate() + units);
-      break;
-    case "hour":
-      ret.setTime(ret.getTime() + units * 3600000);
-      break;
-    case "minute":
-      ret.setTime(ret.getTime() + units * 60000);
-      break;
-    case "second":
-      ret.setTime(ret.getTime() + units * 1000);
-      break;
-    default:
-      ret = undefined;
-      break;
-  }
-  return ret;
-}
-function toIsoDateString(d3) {
-  return d3.toISOString().split("T")[0];
-}
-function clearAllSelectedDays() {
-  var schedule = document.getElementById("schedule");
-  schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
-    day.removeAttribute("selected");
-  });
-  document.querySelectorAll("mv-appt").forEach(function(appt) {
-    appt.removeAttribute("selected");
-  });
-}
-var months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-];
-
 // public/clinicbro/js/schedule/monthview-style.ts
 function monthviewStyle() {
   return i`
@@ -676,7 +608,11 @@ function monthviewStyle() {
     color: var(--table-fg);
   }
   
-  
+  .scheduler-button-bar {
+    display: flex;
+    overflow: hidden;
+    text-align: center;
+}
   .month-table td, .month-table th {
     border: 1px solid var(--sep);
     box-shadow: none;
@@ -779,6 +715,74 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
+// public/clinicbro/js/util.ts
+function dateAdd(date, interval, units) {
+  var ret = new Date(date.valueOf());
+  var checkRollover = function() {
+    if (ret.getDate() != date.getDate())
+      ret.setDate(0);
+  };
+  switch (String(interval).toLowerCase()) {
+    case "year":
+      ret.setFullYear(ret.getFullYear() + units);
+      checkRollover();
+      break;
+    case "quarter":
+      ret.setMonth(ret.getMonth() + 3 * units);
+      checkRollover();
+      break;
+    case "month":
+      ret.setMonth(ret.getMonth() + units);
+      checkRollover();
+      break;
+    case "week":
+      ret.setDate(ret.getDate() + 7 * units);
+      break;
+    case "day":
+      ret.setDate(ret.getDate() + units);
+      break;
+    case "hour":
+      ret.setTime(ret.getTime() + units * 3600000);
+      break;
+    case "minute":
+      ret.setTime(ret.getTime() + units * 60000);
+      break;
+    case "second":
+      ret.setTime(ret.getTime() + units * 1000);
+      break;
+    default:
+      ret = undefined;
+      break;
+  }
+  return ret;
+}
+function toIsoDateString(d3) {
+  return d3.toISOString().split("T")[0];
+}
+function clearAllSelectedDays() {
+  var schedule = document.getElementById("schedule");
+  schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
+    day.removeAttribute("selected");
+  });
+  document.querySelectorAll("mv-appt").forEach(function(appt) {
+    appt.removeAttribute("selected");
+  });
+}
+var months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+
 // node_modules/lit-icon/pkg/dist-src/lit-icon.js
 class LitIcon extends HTMLElement {
   constructor() {
@@ -974,77 +978,12 @@ class MonthView extends s3 {
     super();
     this.current_date = new Date;
     this.appointment_dialog_opened = false;
+    this.mode == "month";
   }
   updated(changedProperties) {
     htmx.process(this.shadowRoot);
     if (changedProperties.has("current_date")) {
     }
-  }
-  showCreateAppointmentDialog(date_clicked) {
-    if (this.appointment_dialog_opened) {
-      console.log("Dialog is already open. Aborting mission :(");
-      return false;
-    }
-    let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.window_title = "New Event";
-    dialog.appt_id = 0;
-    dialog.appt_title = "";
-    dialog.appt_date = date_clicked;
-    let from = new Date;
-    from.setSeconds(0);
-    from.setMinutes(from.getMinutes() < 30 ? 0 : 30);
-    console.log("from = " + from.toLocaleTimeString());
-    dialog.appt_from = from;
-    dialog.appt_to = dateAdd(from, "minute", 30);
-    dialog.ready();
-    this.appointment_dialog_opened = true;
-    return true;
-  }
-  showEditAppointmentDialog(appointment) {
-    if (this.appointment_dialog_opened) {
-      console.log("Dialog is already open. Aborting mission :(");
-      return false;
-    }
-    let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.window_title = "Edit Event";
-    dialog.appt_title = appointment.appt_title;
-    dialog.appt_id = appointment.appt_id;
-    dialog.appt_date = appointment.appt_date;
-    dialog.appt_from = appointment.appt_from;
-    dialog.appt_to = appointment.appt_to;
-    dialog.ready();
-    this.appointment_dialog_opened = true;
-    return true;
-  }
-  saveAppointment(e5) {
-    this.closeAppointmentDialog();
-    let dialog = this.shadowRoot.querySelector("#mv_dialog");
-    dialog.collect();
-    if (dialog.appt_id > 0) {
-      let index = this.appointments.findIndex((appt) => appt.appt_id == dialog.appt_id);
-      this.appointments[index].appt_title = dialog.appt_title;
-      this.appointments[index].appt_from = dialog.appt_from;
-      this.appointments[index].appt_to = dialog.appt_to;
-      this.appointments[index].appt_date = dialog.appt_date;
-    } else {
-      var id = Math.max(...this.appointments.map((o5) => o5.appt_id)) + 1;
-      this.appointments.push({
-        appt_id: id,
-        appt_title: dialog.appt_title,
-        appt_date: dialog.appt_date,
-        appt_from: dialog.appt_from,
-        appt_to: dialog.appt_to
-      });
-    }
-  }
-  moveAppointment(appt_id, new_date) {
-    let index = this.appointments.findIndex((appt) => appt.appt_id == appt_id);
-    this.appointments[index].appt_date = new_date;
-    this.requestUpdate();
-  }
-  closeAppointmentDialog() {
-    this.appointment_dialog_opened = false;
-    clearAllSelectedDays();
   }
   _prev(e5) {
     this.current_date = dateAdd(this.current_date, "month", -1);
@@ -1075,7 +1014,7 @@ class MonthView extends s3 {
     let dod = toIsoDateString(date_of_day);
     return x`
     <mv-day id="${table_slot_id}" current_date="${date_of_day}" ?current_month=${current_month}
-        hx-get="/scheduler/{id}?date=${toIsoDateString(date_of_day)}" hx-target="global #cb-window" hx-swap="outerHTML" 
+        hx-get="/scheduler/{id}?date=${dod}" hx-target="global #cb-window" hx-swap="outerHTML" 
         hx-trigger="dblclick target:#${table_slot_id}, drop target:#${table_slot_id}" hx-include="#dropped-appt-id, #dropped-client-id">
         <slot name="${dod}"></slot>
     </mv-day>`;
@@ -1119,9 +1058,6 @@ class MonthView extends s3 {
     </table>
     <input id="dropped-appt-id" type="hidden" name="id" value="0" >
     <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
-    <mv-dialog id="mv_dialog" ?opened="${this.appointment_dialog_opened}" 
-               @dialog.save="${this.saveAppointment.bind(this)}"
-               @dialog.cancel="${this.closeAppointmentDialog}"></mv-dialog>
     `;
   }
 }
@@ -1131,8 +1067,8 @@ __legacyDecorateClassTS([
   }, reflect: true })
 ], MonthView.prototype, "current_date", undefined);
 __legacyDecorateClassTS([
-  n4({ type: Boolean, reflect: true })
-], MonthView.prototype, "appointment_dialog_opened", undefined);
+  n4({ type: String, reflect: true })
+], MonthView.prototype, "mode", undefined);
 MonthView = __legacyDecorateClassTS([
   t3("month-view")
 ], MonthView);

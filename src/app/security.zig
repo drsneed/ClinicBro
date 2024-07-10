@@ -11,8 +11,7 @@ pub fn validatePassword(password: []const u8, salt: []const u8, stored_key: *con
 }
 
 pub fn signin(request: *jetzig.Request, name: []const u8, password: []const u8) !bool {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     if (try db_context.validateBroPassword(name, password)) |bro_item| {
         var data = jetzig.zmpl.Data.init(request.allocator);
         var root = try data.object();
@@ -22,8 +21,10 @@ pub fn signin(request: *jetzig.Request, name: []const u8, password: []const u8) 
         try root.put("exp", data.integer(0));
         var session = try request.session();
         try session.put("bro", root);
+        try db_context.deinit();
         return true;
     }
+    try db_context.deinit();
     return false;
 }
 

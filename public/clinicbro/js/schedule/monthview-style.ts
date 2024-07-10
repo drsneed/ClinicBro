@@ -12,7 +12,11 @@ export function monthviewStyle() {
     color: var(--table-fg);
   }
   
-  
+  .scheduler-button-bar {
+    display: flex;
+    overflow: hidden;
+    text-align: center;
+}
   .month-table td, .month-table th {
     border: 1px solid var(--sep);
     box-shadow: none;

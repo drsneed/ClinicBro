@@ -7,8 +7,7 @@ const log = std.log.scoped(.clients);
 pub const layout = "app";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const session = try request.session();
     var current_bro_id: i32 = 0;
     if (try session.get("bro")) |bro_session| {
@@ -27,11 +26,11 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         try json_client.put("selected", data.string(""));
         try json_clients.append(json_client);
     }
+    try db_context.deinit();
     return request.render(.ok);
 }
 pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const client_id = try std.fmt.parseInt(i32, id, 10);
     var client = Client{};
     if (client_id > 0) {
@@ -63,13 +62,12 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
         try json_bro.put("selected", data.string(if (client.bro_id == bro.id) "selected" else ""));
         try json_bros.append(json_bro);
     }
-
+    try db_context.deinit();
     return request.render(.ok);
 }
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const session = try request.session();
     var current_bro_id: i32 = 0;
     if (try session.get("bro")) |bro_session| {
@@ -97,27 +95,16 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         try json_client.put("selected", data.string(if (recent_client.id == client.id) "active" else ""));
         try json_clients.append(json_client);
     }
-    return request.render(.ok);
-}
-
-pub fn put(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    _ = data;
-    _ = id;
-    return request.render(.ok);
-}
-
-pub fn patch(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    _ = data;
-    _ = id;
+    try db_context.deinit();
     return request.render(.ok);
 }
 
 pub fn delete(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     _ = data;
-    var db_context = DbContext.init(request.allocator, request.server.database);
-    defer db_context.deinit();
+    var db_context = try DbContext.init(request.allocator, request.server.database);
     const client_id = try std.fmt.parseInt(i32, id, 10);
     _ = try db_context.deleteClient(client_id);
+    try db_context.deinit();
     return request.render(.ok);
 }
 

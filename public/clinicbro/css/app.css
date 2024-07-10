@@ -1161,7 +1161,9 @@ details[open] summary {
 }
 
 #recent-clients-listbox {
+    height: 230px;
     user-select: none;
+    overflow-y: scroll;
 }
 
 #recent-clients-listbox ul {
@@ -1245,6 +1247,8 @@ details[open] summary {
     background-color: var(--tab-bg);
     color: var(--tab-fg);
 }
+
+
 
 .tab-button-bar button {
     background-color: inherit;
