@@ -612,7 +612,38 @@ function monthviewStyle() {
     display: flex;
     overflow: hidden;
     text-align: center;
-}
+    margin: 8px 16px;
+  }
+
+  .scheduler-button-bar span {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  .scheduler-button-bar button {
+    margin: 0px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+
+  .btn-first {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+
+  .btn-middle {
+    border-radius: 0px;
+  }
+
+  .btn-last {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
   .month-table td, .month-table th {
     border: 1px solid var(--sep);
     box-shadow: none;
@@ -677,7 +708,17 @@ function monthviewStyle() {
     padding-bottom: 1px;
     transition: none;
     height: 32px;
-  }`;
+  }
+  
+  .day-view-hour {
+        width: 100%;
+        height: 100px;
+        max-width: 100%;
+        white-space: nowrap;
+        user-select: none;
+        overflow-y: auto;
+  }
+  `;
 }
 
 // node_modules/@lit/reactive-element/decorators/custom-element.js
@@ -759,6 +800,9 @@ function dateAdd(date, interval, units) {
 function toIsoDateString(d3) {
   return d3.toISOString().split("T")[0];
 }
+function toIsoTimeString(d3) {
+  return d3.toTimeString().substring(0, 8);
+}
 function clearAllSelectedDays() {
   var schedule = document.getElementById("schedule");
   schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
@@ -768,6 +812,7 @@ function clearAllSelectedDays() {
     appt.removeAttribute("selected");
   });
 }
+var dayHeaders = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 var months = [
   "January",
   "February",
@@ -972,13 +1017,18 @@ customElements.define("lit-iconset", LitIconset);
 class MonthView extends s3 {
   static styles = monthviewStyle();
   calendarTitle() {
-    return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
+    if (this.mode == "month") {
+      return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
+    } else if (this.mode == "day") {
+      return this.current_date.toLocaleDateString();
+    } else {
+      return "Unknown Mode";
+    }
   }
   constructor() {
     super();
     this.current_date = new Date;
-    this.appointment_dialog_opened = false;
-    this.mode == "month";
+    this.mode = "month";
   }
   updated(changedProperties) {
     htmx.process(this.shadowRoot);
@@ -986,12 +1036,21 @@ class MonthView extends s3 {
     }
   }
   _prev(e5) {
-    this.current_date = dateAdd(this.current_date, "month", -1);
+    this.current_date = dateAdd(this.current_date, this.mode, -1);
     clearAllSelectedDays();
   }
   _next(e5) {
-    this.current_date = dateAdd(this.current_date, "month", 1);
+    this.current_date = dateAdd(this.current_date, this.mode, 1);
     clearAllSelectedDays();
+  }
+  _monthViewClicked(e5) {
+    this.mode = "month";
+  }
+  _weekViewClicked(e5) {
+    this.mode = "week";
+  }
+  _dayViewClicked(e5) {
+    this.mode = "day";
   }
   renderCaption() {
     return x`
@@ -1009,7 +1068,7 @@ class MonthView extends s3 {
         </div>
     </caption>`;
   }
-  renderDay(today, table_slot_id, date_of_day) {
+  renderMonthViewDay(today, table_slot_id, date_of_day) {
     let current_month = date_of_day.getMonth() == this.current_date.getMonth();
     let dod = toIsoDateString(date_of_day);
     return x`
@@ -1019,7 +1078,7 @@ class MonthView extends s3 {
         <slot name="${dod}"></slot>
     </mv-day>`;
   }
-  renderDays() {
+  renderMonthViewDays() {
     var today = new Date;
     let rows = [];
     let firstOfDaMonth = new Date(this.current_date.getFullYear(), this.current_date.getMonth(), 1);
@@ -1030,7 +1089,7 @@ class MonthView extends s3 {
       for (let day = 0;day < 7; day++) {
         let id = "d" + i4;
         let thisDaysDate = dateAdd(firstOfDaMonth, "day", i4 - d3);
-        days.push(x`<td>${this.renderDay(today, id, thisDaysDate)}</td>`);
+        days.push(x`<td>${this.renderMonthViewDay(today, id, thisDaysDate)}</td>`);
         i4++;
       }
       rows.push(x`<tr>${days}</tr>`);
@@ -1038,7 +1097,58 @@ class MonthView extends s3 {
     return x`${rows}`;
   }
   render() {
+    if (this.mode == "month") {
+      return this.renderMonthView();
+    } else if (this.mode == "day") {
+      return this.renderDayView();
+    } else {
+      return x`<p>Invalid Scheduler Mode: ${this.mode}</p>`;
+    }
+  }
+  renderDayViewDay() {
+    var today = new Date;
+    let rows = [];
+    let i4 = 0;
+    var midnight = new Date(this.current_date.valueOf());
+    midnight.setHours(0, 0, 0, 0);
+    for (let hour = 0;hour < 24; hour++) {
+      let id = "h" + i4;
+      let this_hour = dateAdd(midnight, "hour", i4);
+      rows.push(x`<tr><td><div id="${id}" class="day-view-hour">${toIsoTimeString(this_hour)}</div></td></tr>`);
+      i4++;
+    }
+    return x`${rows}`;
+  }
+  renderDayView() {
     return x`
+    ${this.renderSchedulerModesButtonBar()}
+    <table class="month-table" cellspacing="0">
+      ${this.renderCaption()}
+      <thead>
+          <tr>
+              <th>${dayHeaders[this.current_date.getDay()]}</th>
+          </tr>
+      </thead>
+      <tbody hx-ext="path-params">
+        ${this.renderDayViewDay()}
+      </tbody>
+    </table>
+    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
+    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
+    `;
+  }
+  renderSchedulerModesButtonBar() {
+    return x`
+      <div class="scheduler-button-bar">
+        <button type="button" class="btn btn-first" @click="${this._monthViewClicked}">Month</button>
+        <button type="button" class="btn btn-middle" @click="${this._weekViewClicked}">Week</button>
+        <button type="button" class="btn btn-last" @click="${this._dayViewClicked}">Day</button>
+      </div>
+    `;
+  }
+  renderMonthView() {
+    return x`
+    ${this.renderSchedulerModesButtonBar()}
     <table class="month-table" cellspacing="0">
       ${this.renderCaption()}
       <thead>
@@ -1053,7 +1163,7 @@ class MonthView extends s3 {
           </tr>
       </thead>
       <tbody hx-ext="path-params">
-        ${this.renderDays()} 
+        ${this.renderMonthViewDays()} 
       </tbody>
     </table>
     <input id="dropped-appt-id" type="hidden" name="id" value="0" >

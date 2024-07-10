@@ -16,7 +16,38 @@ export function monthviewStyle() {
     display: flex;
     overflow: hidden;
     text-align: center;
-}
+    margin: 8px 16px;
+  }
+
+  .scheduler-button-bar span {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  .scheduler-button-bar button {
+    margin: 0px;
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+
+  .btn-first {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+
+  .btn-middle {
+    border-radius: 0px;
+  }
+
+  .btn-last {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
   .month-table td, .month-table th {
     border: 1px solid var(--sep);
     box-shadow: none;
@@ -81,5 +112,15 @@ export function monthviewStyle() {
     padding-bottom: 1px;
     transition: none;
     height: 32px;
-  }`;
+  }
+  
+  .day-view-hour {
+        width: 100%;
+        height: 100px;
+        max-width: 100%;
+        white-space: nowrap;
+        user-select: none;
+        overflow-y: auto;
+  }
+  `;
 }

@@ -2,7 +2,7 @@ import {html, css, LitElement} from 'lit';
 import {monthviewStyle} from './monthview-style';
 import {MonthViewAppointment} from './monthview-appt';
 import {customElement, property} from 'lit/decorators.js';
-import { toIsoDateString, dateAdd, months, clearAllSelectedDays } from '../util';
+import { toIsoDateString, dateAdd, months, dayHeaders, clearAllSelectedDays, toIsoTimeString } from '../util';
 import 'lit-icon/pkg/dist-src/lit-icon.js';
 import 'lit-icon/pkg/dist-src/lit-iconset.js';
 
@@ -20,14 +20,20 @@ export class MonthView extends LitElement {
   mode: string;
 
   calendarTitle() {
-    return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
+    if(this.mode == 'month') {
+      return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
+    } else if(this.mode == 'day') {
+      return this.current_date.toLocaleDateString();
+    } else {
+      return 'Unknown Mode';
+    }
+    
   }
 
   constructor() {
     super();
     this.current_date = new Date();
-    this.appointment_dialog_opened = false;
-    this.mode == "month";
+    this.mode = "month";
   }
 
 
@@ -40,13 +46,25 @@ export class MonthView extends LitElement {
   }
 
   private _prev(e: Event) {
-    this.current_date = dateAdd(this.current_date, 'month', -1);
+    this.current_date = dateAdd(this.current_date, this.mode, -1);
     clearAllSelectedDays();
   }
 
   private _next(e: Event) {
-    this.current_date = dateAdd(this.current_date, 'month', 1);
+    this.current_date = dateAdd(this.current_date, this.mode, 1);
     clearAllSelectedDays();
+  }
+
+  private _monthViewClicked(e) {
+    this.mode = "month";
+  }
+
+  private _weekViewClicked(e) {
+    this.mode = "week";
+  }
+
+  private _dayViewClicked(e) {
+    this.mode = "day";
   }
 
   renderCaption() {
@@ -66,7 +84,7 @@ export class MonthView extends LitElement {
     </caption>`;
   }
 
-  renderDay(today: Date, table_slot_id: string, date_of_day: Date) {
+  renderMonthViewDay(today: Date, table_slot_id: string, date_of_day: Date) {
     let current_month = date_of_day.getMonth() == this.current_date.getMonth();
     let dod = toIsoDateString(date_of_day);
     return html`
@@ -77,7 +95,7 @@ export class MonthView extends LitElement {
     </mv-day>`;
   }
 
-  renderDays() {
+  renderMonthViewDays() {
     var today = new Date();
     let rows = [];
     // @ts-ignore
@@ -89,7 +107,7 @@ export class MonthView extends LitElement {
       for(let day = 0; day < 7; day++) {
         let id = "d" + i;
         let thisDaysDate = dateAdd(firstOfDaMonth, "day", i - d);
-        days.push(html`<td>${this.renderDay(today, id, thisDaysDate)}</td>`);
+        days.push(html`<td>${this.renderMonthViewDay(today, id, thisDaysDate)}</td>`);
         i++;
       }
       rows.push(html`<tr>${days}</tr>`);
@@ -98,7 +116,66 @@ export class MonthView extends LitElement {
   }
   
   render() {
+    if(this.mode == "month") {
+      return this.renderMonthView();
+    }
+    else if(this.mode == "day") {
+      return this.renderDayView();
+    }
+    else {
+      return html`<p>Invalid Scheduler Mode: ${this.mode}</p>`;
+    }
+  }
+
+  
+  
+  renderDayViewDay() {
+    var today = new Date();
+    let rows = [];
+    let i = 0;
+    var midnight = new Date(this.current_date.valueOf());
+    midnight.setHours(0, 0, 0, 0);
+    for (let hour = 0; hour < 24; hour++) {
+        let id = "h" + i;
+        let this_hour = dateAdd(midnight, "hour", i);
+        rows.push(html`<tr><td><div id="${id}" class="day-view-hour">${toIsoTimeString(this_hour)}</div></td></tr>`);
+        i++;
+    }
+    return html`${rows}`;
+  }
+
+  renderDayView() {
     return html`
+    ${this.renderSchedulerModesButtonBar()}
+    <table class="month-table" cellspacing="0">
+      ${this.renderCaption()}
+      <thead>
+          <tr>
+              <th>${dayHeaders[this.current_date.getDay()]}</th>
+          </tr>
+      </thead>
+      <tbody hx-ext="path-params">
+        ${this.renderDayViewDay()}
+      </tbody>
+    </table>
+    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
+    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
+    `;
+  }
+
+  renderSchedulerModesButtonBar() {
+    return html`
+      <div class="scheduler-button-bar">
+        <button type="button" class="btn btn-first" @click="${this._monthViewClicked}">Month</button>
+        <button type="button" class="btn btn-middle" @click="${this._weekViewClicked}">Week</button>
+        <button type="button" class="btn btn-last" @click="${this._dayViewClicked}">Day</button>
+      </div>
+    `;
+  }
+
+  renderMonthView() {
+    return html`
+    ${this.renderSchedulerModesButtonBar()}
     <table class="month-table" cellspacing="0">
       ${this.renderCaption()}
       <thead>
@@ -113,7 +190,7 @@ export class MonthView extends LitElement {
           </tr>
       </thead>
       <tbody hx-ext="path-params">
-        ${this.renderDays()} 
+        ${this.renderMonthViewDays()} 
       </tbody>
     </table>
     <input id="dropped-appt-id" type="hidden" name="id" value="0" >

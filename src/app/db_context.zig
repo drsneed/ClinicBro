@@ -238,7 +238,7 @@ const client_select_query =
     \\left join Bro created_bro on cl.created_bro_id=created_bro.id
     \\left join Bro updated_bro on cl.updated_bro_id=updated_bro.id
 ;
-const recent_client_query = "select cl.id, cl.active, concat(cl.last_name, ', ', cl.first_name) as name from RecentClient rc join Client cl on rc.client_id=cl.id where rc.bro_id=$1";
+const recent_client_query = "select cl.id, cl.active, concat(cl.last_name, ', ', cl.first_name) as name from RecentClient rc join Client cl on rc.client_id=cl.id where rc.bro_id=$1 order by rc.date_created desc";
 const client_lookup_query = "select id, active, concat(last_name, ', ', first_name) as name from Client";
 const client_insert_query =
     \\insert into Client(active,first_name,middle_name,last_name,date_of_birth,date_of_death,email,phone,address_1,address_2,city,state,zip_code,notes,can_call,can_text,can_email,location_id,bro_id,date_created,date_updated,created_bro_id,updated_bro_id)
