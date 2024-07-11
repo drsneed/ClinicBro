@@ -2,7 +2,7 @@ import {html, css, LitElement} from 'lit';
 import {monthviewStyle} from './monthview-style';
 import {MonthViewAppointment} from './monthview-appt';
 import {customElement, property} from 'lit/decorators.js';
-import { toIsoDateString, dateAdd, months, dayHeaders, clearAllSelectedDays, toIsoTimeString } from '../util';
+import { toIsoDateString, dateAdd, months, dayHeaders, clearAllSelectedDays, dateSuffix } from '../util';
 import 'lit-icon/pkg/dist-src/lit-icon.js';
 import 'lit-icon/pkg/dist-src/lit-iconset.js';
 
@@ -18,27 +18,6 @@ export class MonthView extends LitElement {
   // @ts-ignore
   @property({type: String, reflect: true})
   mode: string;
-
-  calendarTitle() {
-    if(this.mode == 'month') {
-      return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
-    } else if(this.mode == 'day') {
-      let num_date_str = "" + this.current_date.getDate();
-      const ending = num_date_str.slice(-1);
-      const beginning = num_date_str[0];
-      let suffix = "th";
-      if(num_date_str.length == 1 || beginning != "1") {
-        if(ending === "1") suffix = "st";
-        else if(ending === "2") suffix = "nd";
-        else if(ending === "3") suffix = "rd";
-      }
-      
-      return months[this.current_date.getMonth()] + " " + this.current_date.getDate() + suffix + ", " + this.current_date.getFullYear();
-    } else {
-      return 'Unknown Mode';
-    }
-    
-  }
 
   constructor() {
     super();
@@ -76,6 +55,31 @@ export class MonthView extends LitElement {
   private _dayViewClicked(e) {
     this.mode = "day";
   }
+
+  calendarTitle() {
+    if(this.mode == 'month') {
+      return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
+    } else if(this.mode == 'day') {
+      
+      return months[this.current_date.getMonth()] + " " + this.current_date.getDate() + dateSuffix(this.current_date) + ", " + this.current_date.getFullYear();
+    } else {
+      let firstOfDaWeek = dateAdd(this.current_date, 'day', -this.current_date.getDay());
+      let endOfDaWeek = dateAdd(firstOfDaWeek, 'day', 6);
+      // same month, same year. simplest case
+      if(firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear() && firstOfDaWeek.getMonth() == endOfDaWeek.getMonth()) {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " +
+          endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
+      } else if(firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear()) {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " +
+          months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
+      } else {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " " + firstOfDaWeek.getFullYear() + " - " +
+          months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + endOfDaWeek.getFullYear();
+      }
+    }
+    
+  }
+
 
   renderCaption() {
     return html`
@@ -131,6 +135,32 @@ export class MonthView extends LitElement {
     }
     return html`${rows}`;
   }
+
+  renderWeekViewDays() {
+    var today = new Date();
+    let rows = [];
+    let firstOfDaWeek = dateAdd(this.current_date, 'day', -this.current_date.getDay());
+    let d = firstOfDaWeek.getDay();
+    let i = 0;
+    var midnight = new Date(this.current_date.valueOf());
+    midnight.setHours(0, 0, 0, 0);
+    for (let hour = 0; hour < 24; hour++) {
+        let this_hour = dateAdd(midnight, "hour", i);
+        let time_hour = this_hour.getHours() % 12 || 12;
+        let pm = this_hour.getHours() >= 12 ? "pm" : "am";
+        var days = [];
+        //<tr><td class="time-display">${time_hour}:00 ${pm}</td><td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td></tr>
+        days.push(html`<td class="time-display">${time_hour}:00 ${pm}</td>`);
+        for(let day = 0; day < 7; day++) {
+          let id = "d" + day + "h" + hour;
+          let thisDaysDate = dateAdd(firstOfDaWeek, "day", d);
+          days.push(html`<td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td>`);
+        }
+        rows.push(html`<tr>${days}</tr>`);
+        i++;
+    }
+    return html`${rows}`;
+  }
   
   render() {
     if(this.mode == "month") {
@@ -140,7 +170,7 @@ export class MonthView extends LitElement {
       return this.renderDayView();
     }
     else {
-      return html`<p>Invalid Scheduler Mode: ${this.mode}</p>`;
+      return this.renderWeekView();
     }
   }
 
@@ -154,8 +184,10 @@ export class MonthView extends LitElement {
     midnight.setHours(0, 0, 0, 0);
     for (let hour = 0; hour < 24; hour++) {
         let id = "h" + i;
-        let this_hour = dateAdd(midnight, "hour", i);
-        rows.push(html`<tr><td><div id="${id}" class="day-view-hour">${toIsoTimeString(this_hour)} <hr class="half-hour-mark" /></div></td></tr>`);
+        let this_hour = dateAdd(midnight, "hour", i);;
+        let time_hour = this_hour.getHours() % 12 || 12;
+        let pm = this_hour.getHours() >= 12 ? "pm" : "am";
+        rows.push(html`<tr><td class="time-display">${time_hour}:00 ${pm}</td><td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td></tr>`);
         i++;
     }
     return html`${rows}`;
@@ -164,12 +196,18 @@ export class MonthView extends LitElement {
   renderDayView() {
     return html`
     <table class="month-table" cellspacing="0">
+        <colgroup>
+          <col span="1" style="width: 70px;">
+          <col span="1" style="width: 95%;">
+        </colgroup>
         <thead>
             <tr>
-              <th>
-                  ${this.renderCaption()}
-                  <div class="day-header">
-                    ${dayHeaders[this.current_date.getDay()]}
+              <th colspan="2" class="row1">
+                  <div class="sticky-header">
+                    ${this.renderCaption()}
+                    <div class="day-header">
+                      ${dayHeaders[this.current_date.getDay()]}
+                    </div>
                   </div>
               </th>
             </tr>
@@ -194,19 +232,76 @@ export class MonthView extends LitElement {
     `;
   }
 
+  renderWeekView() {
+    let sunday = dateAdd(this.current_date, 'day', -this.current_date.getDay());
+    let sundisp = "" + (sunday.getMonth()+1) + "/" + sunday.getDate();
+    let monday = dateAdd(sunday, 'day', 1);
+    let mondisp = "" + (monday.getMonth()+1) + "/" + monday.getDate();
+    let tuesday = dateAdd(monday, 'day', 1);
+    let tuedisp = "" + (tuesday.getMonth()+1) + "/" + tuesday.getDate();
+    let wednesday = dateAdd(tuesday, 'day', 1);
+    let weddisp = "" + (wednesday.getMonth()+1) + "/" + wednesday.getDate();
+    let thursday = dateAdd(wednesday, 'day', 1);
+    let thudisp = "" + (thursday.getMonth()+1) + "/" + thursday.getDate();
+    let friday = dateAdd(thursday, 'day', 1);
+    let fridisp = "" + (friday.getMonth()+1) + "/" + friday.getDate();
+    let saturday = dateAdd(friday, 'day', 1);
+    let satdisp = "" + (saturday.getMonth()+1) + "/" + saturday.getDate();
+    return html`
+    <table class="month-table" cellspacing="0">
+      <colgroup>
+          <col span="1" style="width: 70px;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+      </colgroup>
+      <thead>
+          <tr>
+              <th colspan="8" class="row1 no-border">
+                ${this.renderCaption()}
+              </th>
+          </tr>
+          <tr>
+              <th class="row2"></th>
+              <th class="row2">Sun ${sundisp}</th>
+              <th class="row2">Mon ${mondisp}</th>
+              <th class="row2">Tue ${tuedisp}</th>
+              <th class="row2">Wed ${weddisp}</th>
+              <th class="row2">Thu ${thudisp}</th>
+              <th class="row2">Fri ${fridisp}</th>
+              <th class="row2">Sat ${satdisp}</th>
+          </tr>
+      </thead>
+      <tbody hx-ext="path-params">
+        ${this.renderWeekViewDays()} 
+      </tbody>
+    </table>
+    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
+    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
+    `;
+  }
+
   renderMonthView() {
     return html`
     <table class="month-table" cellspacing="0">
-      ${this.renderCaption()}
       <thead>
           <tr>
-              <th>Sun</th>
-              <th>Mon</th>
-              <th>Tue</th>
-              <th>Wed</th>
-              <th>Thu</th>
-              <th>Fri</th>
-              <th>Sat</th>
+            <th colspan="7" class="row1 no-border">
+              ${this.renderCaption()}
+            </th>
+          </tr>
+          <tr>
+              <th class="row2">Sun</th>
+              <th class="row2">Mon</th>
+              <th class="row2">Tue</th>
+              <th class="row2">Wed</th>
+              <th class="row2">Thu</th>
+              <th class="row2">Fri</th>
+              <th class="row2">Sat</th>
           </tr>
       </thead>
       <tbody hx-ext="path-params">

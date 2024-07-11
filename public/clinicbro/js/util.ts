@@ -20,6 +20,19 @@ export function dateAdd(date, interval, units) {
     return ret;
 }
 
+export function dateSuffix(d1) {
+  let num_date_str = "" + d1.getDate();
+  const ending = num_date_str.slice(-1);
+  const beginning = num_date_str[0];
+  let suffix = "th";
+  if(num_date_str.length == 1 || beginning != "1") {
+    if(ending === "1") suffix = "st";
+    else if(ending === "2") suffix = "nd";
+    else if(ending === "3") suffix = "rd";
+  }
+  return suffix;
+}
+
 export function sameDay(d1, d2) {
   return d1.getFullYear() === d2.getFullYear() &&
     d1.getMonth() === d2.getMonth() &&

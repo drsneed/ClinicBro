@@ -771,9 +771,15 @@ class MonthViewAppointment extends s3 {
     let borderLeft = "none";
     if (this.color.length > 0)
       borderLeft = "4px solid " + this.color + ";";
+    let startHours = parseInt(this.appt_from.slice(0, 2)) % 12 || 12;
+    let startMinutes = this.appt_from.slice(-2);
+    let endHours24 = parseInt(this.appt_to.slice(0, 2));
+    let endHours = endHours24 % 12 || 12;
+    let endMinutes = this.appt_to.slice(-2);
+    let pm = endHours24 >= 12 ? "pm" : "am";
     return x`<div data-appt-id="${this.appt_id}" class="${e6({ selected: this.selected, appt, event: !appt })}"
                style="${o5({ borderLeft })}"
-               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${this.appt_from}-${this.appt_to} ${text}</span></div>`;
+               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</span></div>`;
   }
 }
 __legacyDecorateClassTS([

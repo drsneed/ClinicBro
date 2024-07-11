@@ -5,7 +5,8 @@ export function monthviewStyle() {
     background: var(--container-bg);
     table-layout: fixed;
     //height: 550px;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     padding: 0px !important;
     margin: 0px;
     width: 100%;
@@ -79,18 +80,37 @@ export function monthviewStyle() {
     padding: 0px;
   }
   
-  .month-table th {
+  .row1 {
     position: sticky;
     top: 0;
-    padding-bottom: 6px;
-    text-align: center;
-    background-color: var(--table-header-bg);
-    color: var(--table-header-fg);
-    border-bottom: 1px solid var(--table-header-fg);
-    font-weight: 900;
-    height: 30px;
-    width: 100%;
+    background-color: var(--container-bg);
     z-index: 5;
+  }
+  .row2 {
+    position: sticky;
+    background-color: var(--container-bg);
+    border-bottom: 1px solid var(--table-header-fg) !important;
+    top: 40px;
+    z-index: 5;
+  }
+
+  .month-table thead {
+    text-align: center;
+  }
+
+  .sticky-header {
+    border-bottom: 1px solid var(--table-header-fg);
+    text-align: center;
+    background-color: var(--container-bg);
+    color: var(--container-fg);
+    font-weight: 900;
+    width: 100%;
+    margin: 0;
+  }
+
+
+  .no-border {
+    border-bottom: none !important;
   }
 
   caption {
@@ -98,7 +118,6 @@ export function monthviewStyle() {
   }
 
   .month-header {
-    position: sticky;
     top: 0;
     display: flex;
     background-color: var(--header-bg);
@@ -107,8 +126,7 @@ export function monthviewStyle() {
   }
 
   .day-header {
-    padding-top: 6px;
-    padding-bottom: 6px;
+
   }
   
   .month-header h2 {
@@ -142,14 +160,18 @@ export function monthviewStyle() {
     width: 100%;
 
   }
+
   
-  .day-view-hour {
+  .day-view-hour-1, .day-view-hour-2 {
         width: 100%;
-        height: 100px;
+        height: 50px;
         max-width: 100%;
         white-space: nowrap;
         user-select: none;
         overflow-y: auto;
+  }
+  .day-view-hour-2 {
+        border-top: 1px dashed var(--input-border);
   }
   `;
 }

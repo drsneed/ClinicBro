@@ -601,7 +601,8 @@ function monthviewStyle() {
     background: var(--container-bg);
     table-layout: fixed;
     //height: 550px;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     padding: 0px !important;
     margin: 0px;
     width: 100%;
@@ -675,18 +676,37 @@ function monthviewStyle() {
     padding: 0px;
   }
   
-  .month-table th {
+  .row1 {
     position: sticky;
     top: 0;
-    padding-bottom: 6px;
-    text-align: center;
-    background-color: var(--table-header-bg);
-    color: var(--table-header-fg);
-    border-bottom: 1px solid var(--table-header-fg);
-    font-weight: 900;
-    height: 30px;
-    width: 100%;
+    background-color: var(--container-bg);
     z-index: 5;
+  }
+  .row2 {
+    position: sticky;
+    background-color: var(--container-bg);
+    border-bottom: 1px solid var(--table-header-fg) !important;
+    top: 40px;
+    z-index: 5;
+  }
+
+  .month-table thead {
+    text-align: center;
+  }
+
+  .sticky-header {
+    border-bottom: 1px solid var(--table-header-fg);
+    text-align: center;
+    background-color: var(--container-bg);
+    color: var(--container-fg);
+    font-weight: 900;
+    width: 100%;
+    margin: 0;
+  }
+
+
+  .no-border {
+    border-bottom: none !important;
   }
 
   caption {
@@ -694,7 +714,6 @@ function monthviewStyle() {
   }
 
   .month-header {
-    position: sticky;
     top: 0;
     display: flex;
     background-color: var(--header-bg);
@@ -703,8 +722,7 @@ function monthviewStyle() {
   }
 
   .day-header {
-    padding-top: 6px;
-    padding-bottom: 6px;
+
   }
   
   .month-header h2 {
@@ -738,14 +756,18 @@ function monthviewStyle() {
     width: 100%;
 
   }
+
   
-  .day-view-hour {
+  .day-view-hour-1, .day-view-hour-2 {
         width: 100%;
-        height: 100px;
+        height: 50px;
         max-width: 100%;
         white-space: nowrap;
         user-select: none;
         overflow-y: auto;
+  }
+  .day-view-hour-2 {
+        border-top: 1px dashed var(--input-border);
   }
   `;
 }
@@ -826,11 +848,23 @@ function dateAdd(date, interval, units) {
   }
   return ret;
 }
+function dateSuffix(d1) {
+  let num_date_str = "" + d1.getDate();
+  const ending = num_date_str.slice(-1);
+  const beginning = num_date_str[0];
+  let suffix = "th";
+  if (num_date_str.length == 1 || beginning != "1") {
+    if (ending === "1")
+      suffix = "st";
+    else if (ending === "2")
+      suffix = "nd";
+    else if (ending === "3")
+      suffix = "rd";
+  }
+  return suffix;
+}
 function toIsoDateString(d3) {
   return d3.toISOString().split("T")[0];
-}
-function toIsoTimeString(d3) {
-  return d3.toTimeString().substring(0, 8);
 }
 function clearAllSelectedDays() {
   var schedule = document.getElementById("schedule");
@@ -1045,27 +1079,6 @@ customElements.define("lit-iconset", LitIconset);
 // public/clinicbro/js/schedule/monthview.ts
 class MonthView extends s3 {
   static styles = monthviewStyle();
-  calendarTitle() {
-    if (this.mode == "month") {
-      return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
-    } else if (this.mode == "day") {
-      let num_date_str = "" + this.current_date.getDate();
-      const ending = num_date_str.slice(-1);
-      const beginning = num_date_str[0];
-      let suffix = "th";
-      if (num_date_str.length == 1 || beginning != "1") {
-        if (ending === "1")
-          suffix = "st";
-        else if (ending === "2")
-          suffix = "nd";
-        else if (ending === "3")
-          suffix = "rd";
-      }
-      return months[this.current_date.getMonth()] + " " + this.current_date.getDate() + suffix + ", " + this.current_date.getFullYear();
-    } else {
-      return "Unknown Mode";
-    }
-  }
   constructor() {
     super();
     this.current_date = new Date;
@@ -1092,6 +1105,23 @@ class MonthView extends s3 {
   }
   _dayViewClicked(e5) {
     this.mode = "day";
+  }
+  calendarTitle() {
+    if (this.mode == "month") {
+      return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
+    } else if (this.mode == "day") {
+      return months[this.current_date.getMonth()] + " " + this.current_date.getDate() + dateSuffix(this.current_date) + ", " + this.current_date.getFullYear();
+    } else {
+      let firstOfDaWeek = dateAdd(this.current_date, "day", -this.current_date.getDay());
+      let endOfDaWeek = dateAdd(firstOfDaWeek, "day", 6);
+      if (firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear() && firstOfDaWeek.getMonth() == endOfDaWeek.getMonth()) {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
+      } else if (firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear()) {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " + months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
+      } else {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " " + firstOfDaWeek.getFullYear() + " - " + months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + endOfDaWeek.getFullYear();
+      }
+    }
   }
   renderCaption() {
     return x`
@@ -1144,13 +1174,37 @@ class MonthView extends s3 {
     }
     return x`${rows}`;
   }
+  renderWeekViewDays() {
+    var today = new Date;
+    let rows = [];
+    let firstOfDaWeek = dateAdd(this.current_date, "day", -this.current_date.getDay());
+    let d3 = firstOfDaWeek.getDay();
+    let i4 = 0;
+    var midnight = new Date(this.current_date.valueOf());
+    midnight.setHours(0, 0, 0, 0);
+    for (let hour = 0;hour < 24; hour++) {
+      let this_hour = dateAdd(midnight, "hour", i4);
+      let time_hour = this_hour.getHours() % 12 || 12;
+      let pm = this_hour.getHours() >= 12 ? "pm" : "am";
+      var days = [];
+      days.push(x`<td class="time-display">${time_hour}:00 ${pm}</td>`);
+      for (let day = 0;day < 7; day++) {
+        let id = "d" + day + "h" + hour;
+        let thisDaysDate = dateAdd(firstOfDaWeek, "day", d3);
+        days.push(x`<td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td>`);
+      }
+      rows.push(x`<tr>${days}</tr>`);
+      i4++;
+    }
+    return x`${rows}`;
+  }
   render() {
     if (this.mode == "month") {
       return this.renderMonthView();
     } else if (this.mode == "day") {
       return this.renderDayView();
     } else {
-      return x`<p>Invalid Scheduler Mode: ${this.mode}</p>`;
+      return this.renderWeekView();
     }
   }
   renderDayViewDay() {
@@ -1162,7 +1216,9 @@ class MonthView extends s3 {
     for (let hour = 0;hour < 24; hour++) {
       let id = "h" + i4;
       let this_hour = dateAdd(midnight, "hour", i4);
-      rows.push(x`<tr><td><div id="${id}" class="day-view-hour">${toIsoTimeString(this_hour)} <hr class="half-hour-mark" /></div></td></tr>`);
+      let time_hour = this_hour.getHours() % 12 || 12;
+      let pm = this_hour.getHours() >= 12 ? "pm" : "am";
+      rows.push(x`<tr><td class="time-display">${time_hour}:00 ${pm}</td><td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td></tr>`);
       i4++;
     }
     return x`${rows}`;
@@ -1170,12 +1226,18 @@ class MonthView extends s3 {
   renderDayView() {
     return x`
     <table class="month-table" cellspacing="0">
+        <colgroup>
+          <col span="1" style="width: 70px;">
+          <col span="1" style="width: 95%;">
+        </colgroup>
         <thead>
             <tr>
-              <th>
-                  ${this.renderCaption()}
-                  <div class="day-header">
-                    ${dayHeaders[this.current_date.getDay()]}
+              <th colspan="2" class="row1">
+                  <div class="sticky-header">
+                    ${this.renderCaption()}
+                    <div class="day-header">
+                      ${dayHeaders[this.current_date.getDay()]}
+                    </div>
                   </div>
               </th>
             </tr>
@@ -1198,19 +1260,75 @@ class MonthView extends s3 {
       </div>
     `;
   }
+  renderWeekView() {
+    let sunday = dateAdd(this.current_date, "day", -this.current_date.getDay());
+    let sundisp = "" + (sunday.getMonth() + 1) + "/" + sunday.getDate();
+    let monday = dateAdd(sunday, "day", 1);
+    let mondisp = "" + (monday.getMonth() + 1) + "/" + monday.getDate();
+    let tuesday = dateAdd(monday, "day", 1);
+    let tuedisp = "" + (tuesday.getMonth() + 1) + "/" + tuesday.getDate();
+    let wednesday = dateAdd(tuesday, "day", 1);
+    let weddisp = "" + (wednesday.getMonth() + 1) + "/" + wednesday.getDate();
+    let thursday = dateAdd(wednesday, "day", 1);
+    let thudisp = "" + (thursday.getMonth() + 1) + "/" + thursday.getDate();
+    let friday = dateAdd(thursday, "day", 1);
+    let fridisp = "" + (friday.getMonth() + 1) + "/" + friday.getDate();
+    let saturday = dateAdd(friday, "day", 1);
+    let satdisp = "" + (saturday.getMonth() + 1) + "/" + saturday.getDate();
+    return x`
+    <table class="month-table" cellspacing="0">
+      <colgroup>
+          <col span="1" style="width: 70px;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+      </colgroup>
+      <thead>
+          <tr>
+              <th colspan="8" class="row1 no-border">
+                ${this.renderCaption()}
+              </th>
+          </tr>
+          <tr>
+              <th class="row2"></th>
+              <th class="row2">Sun ${sundisp}</th>
+              <th class="row2">Mon ${mondisp}</th>
+              <th class="row2">Tue ${tuedisp}</th>
+              <th class="row2">Wed ${weddisp}</th>
+              <th class="row2">Thu ${thudisp}</th>
+              <th class="row2">Fri ${fridisp}</th>
+              <th class="row2">Sat ${satdisp}</th>
+          </tr>
+      </thead>
+      <tbody hx-ext="path-params">
+        ${this.renderWeekViewDays()} 
+      </tbody>
+    </table>
+    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
+    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
+    `;
+  }
   renderMonthView() {
     return x`
     <table class="month-table" cellspacing="0">
-      ${this.renderCaption()}
       <thead>
           <tr>
-              <th>Sun</th>
-              <th>Mon</th>
-              <th>Tue</th>
-              <th>Wed</th>
-              <th>Thu</th>
-              <th>Fri</th>
-              <th>Sat</th>
+            <th colspan="7" class="row1 no-border">
+              ${this.renderCaption()}
+            </th>
+          </tr>
+          <tr>
+              <th class="row2">Sun</th>
+              <th class="row2">Mon</th>
+              <th class="row2">Tue</th>
+              <th class="row2">Wed</th>
+              <th class="row2">Thu</th>
+              <th class="row2">Fri</th>
+              <th class="row2">Sat</th>
           </tr>
       </thead>
       <tbody hx-ext="path-params">
