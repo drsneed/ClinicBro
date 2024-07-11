@@ -42,7 +42,7 @@
     --error-bg: #bb2929;
     --header-height: 38px;
     --nav-width: 280px;
-    --table-header-bg: transparent;
+    --table-header-bg: light-dark(#eeecec, #18191a);
     --table-header-fg: light-dark(#4a4d4c, #a2b4b1);
     --table-fg: light-dark(#16181a, #a2b4b1);
     --table-row-bg-alt: light-dark(#f3f3f3, #16181a);
@@ -507,9 +507,7 @@ code {
 #page-header {
     position: absolute;
     top: 0;
-    background: var(--header-bg);
     color: var(--header-fg);
-    height: var(--header-height);
     line-height: var(--header-height);
     font-weight: bold;
     z-index: 3;
@@ -657,7 +655,6 @@ code {
     padding: 5px;
     overflow-y: scroll;
     z-index: 0;
-    overflow-x:hidden; 
     -webkit-overflow-scrolling: touch;
 }
 
@@ -671,7 +668,6 @@ code {
     width: calc(100% - 10px);
     margin: 10px auto;
     text-align: left;
-    overflow-x: auto;
 }
 
 .pwr-dropdown {

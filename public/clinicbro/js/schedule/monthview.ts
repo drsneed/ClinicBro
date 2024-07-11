@@ -23,7 +23,17 @@ export class MonthView extends LitElement {
     if(this.mode == 'month') {
       return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
     } else if(this.mode == 'day') {
-      return this.current_date.toLocaleDateString();
+      let num_date_str = "" + this.current_date.getDate();
+      const ending = num_date_str.slice(-1);
+      const beginning = num_date_str[0];
+      let suffix = "th";
+      if(num_date_str.length == 1 || beginning != "1") {
+        if(ending === "1") suffix = "st";
+        else if(ending === "2") suffix = "nd";
+        else if(ending === "3") suffix = "rd";
+      }
+      
+      return months[this.current_date.getMonth()] + " " + this.current_date.getDate() + suffix + ", " + this.current_date.getFullYear();
     } else {
       return 'Unknown Mode';
     }
@@ -71,9 +81,16 @@ export class MonthView extends LitElement {
     return html`
     <caption>
         <div class="month-header">
-            <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset"></lit-icon></button>
+            <div class="header-item">
+              <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset" style="width: 20px; height: 20px;"></lit-icon></button>
+              <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset" style="width: 20px; height: 20px;"></lit-icon></button>
+            </div>
             <h2 id="month_title">${this.calendarTitle()}</h2>
-            <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset"></lit-icon></button>
+            <div class="header-item scheduler-button-bar">
+              <button type="button" class="btn btn-first" @click="${this._monthViewClicked}">Month</button>
+              <button type="button" class="btn btn-middle" @click="${this._weekViewClicked}">Week</button>
+              <button type="button" class="btn btn-last" @click="${this._dayViewClicked}">Day</button>
+            </div>
             <lit-iconset iconset="iconset">
               <svg><defs>
                 <g id="chevron_left"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></g>
@@ -138,7 +155,7 @@ export class MonthView extends LitElement {
     for (let hour = 0; hour < 24; hour++) {
         let id = "h" + i;
         let this_hour = dateAdd(midnight, "hour", i);
-        rows.push(html`<tr><td><div id="${id}" class="day-view-hour">${toIsoTimeString(this_hour)}</div></td></tr>`);
+        rows.push(html`<tr><td><div id="${id}" class="day-view-hour">${toIsoTimeString(this_hour)} <hr class="half-hour-mark" /></div></td></tr>`);
         i++;
     }
     return html`${rows}`;
@@ -146,18 +163,22 @@ export class MonthView extends LitElement {
 
   renderDayView() {
     return html`
-    ${this.renderSchedulerModesButtonBar()}
     <table class="month-table" cellspacing="0">
-      ${this.renderCaption()}
-      <thead>
-          <tr>
-              <th>${dayHeaders[this.current_date.getDay()]}</th>
-          </tr>
-      </thead>
-      <tbody hx-ext="path-params">
-        ${this.renderDayViewDay()}
-      </tbody>
+        <thead>
+            <tr>
+              <th>
+                  ${this.renderCaption()}
+                  <div class="day-header">
+                    ${dayHeaders[this.current_date.getDay()]}
+                  </div>
+              </th>
+            </tr>
+        </thead>
+        <tbody hx-ext="path-params">
+          ${this.renderDayViewDay()}
+        </tbody>
     </table>
+    
     <input id="dropped-appt-id" type="hidden" name="id" value="0" >
     <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
     `;
@@ -175,7 +196,6 @@ export class MonthView extends LitElement {
 
   renderMonthView() {
     return html`
-    ${this.renderSchedulerModesButtonBar()}
     <table class="month-table" cellspacing="0">
       ${this.renderCaption()}
       <thead>

@@ -607,22 +607,42 @@ function monthviewStyle() {
     width: 100%;
     color: var(--table-fg);
   }
+
+  .caption {
+    position: sticky;
+  }
   
+  .header-item {
+    width: 150px;
+    text-align: left;
+  }
   .scheduler-button-bar {
     display: flex;
     overflow: hidden;
-    text-align: center;
-    margin: 8px 16px;
+    margin: 6px 8px;
+    float: right;
   }
 
-  .scheduler-button-bar span {
-    font-weight: bold;
-    margin-right: 10px;
+  .btn-left {
+    margin-top: 6px;
+    margin-left: 8px;
+    margin-right: 0px;
+    margin-bottom: 6px;
   }
+  .btn-right {
+    margin: 6px 0px;
+  }
+  .btn-left, .btn-right {
+    display: inline-block;
+    padding: 4px 8px;
+    transition: none;
+    cursor: pointer;
+  }
+
 
   .scheduler-button-bar button {
     margin: 0px;
-    padding: 8px 16px;
+    padding: 4px 8px;
     cursor: pointer;
   }
 
@@ -644,6 +664,10 @@ function monthviewStyle() {
     border-bottom-right-radius: 6px;
   }
 
+  .scheduler-container {
+    overflow-y: visible;
+  }
+
   .month-table td, .month-table th {
     border: 1px solid var(--sep);
     box-shadow: none;
@@ -652,7 +676,8 @@ function monthviewStyle() {
   }
   
   .month-table th {
-    padding-top: 6px;
+    position: sticky;
+    top: 0;
     padding-bottom: 6px;
     text-align: center;
     background-color: var(--table-header-bg);
@@ -660,30 +685,34 @@ function monthviewStyle() {
     border-bottom: 1px solid var(--table-header-fg);
     font-weight: 900;
     height: 30px;
+    width: 100%;
+    z-index: 5;
   }
-  
-  .month-table .btn-left, .month-table .btn-right {
-    display: inline-block;
-    margin: 5px;
+
+  caption {
+    width: 100%;
   }
-  
-  .month-table .btn-right {
-    float: right;
-  }
-  
+
   .month-header {
+    position: sticky;
+    top: 0;
     display: flex;
     background-color: var(--header-bg);
     text-align: center;
     
   }
+
+  .day-header {
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
   
   .month-header h2 {
-    width: 100%;
+    width: 50%;
     color: var(--header-fg);
     padding: 0;
     margin: 8px auto;
-    font-size: 16px;
+    font-size: 20px;
   }
   
   .month-table td {
@@ -697,17 +726,17 @@ function monthviewStyle() {
     white-space: nowrap;
   }
 
-  .month-table .btn-left, .month-table .btn-right {
-    display: inline-block;
-    margin: 5px;
-  }
-  .btn-left, .btn-right {
-    padding-top: 1px;
-    padding-left: 0px;
-    padding-right: 0px;
-    padding-bottom: 1px;
-    transition: none;
-    height: 32px;
+  .half-hour-mark {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    border-top: 2px dashed #8d5603;
+    color: inherit;
+    background-color: inherit;
+    height: 1px;
+    width: 100%;
+
   }
   
   .day-view-hour {
@@ -1020,7 +1049,19 @@ class MonthView extends s3 {
     if (this.mode == "month") {
       return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
     } else if (this.mode == "day") {
-      return this.current_date.toLocaleDateString();
+      let num_date_str = "" + this.current_date.getDate();
+      const ending = num_date_str.slice(-1);
+      const beginning = num_date_str[0];
+      let suffix = "th";
+      if (num_date_str.length == 1 || beginning != "1") {
+        if (ending === "1")
+          suffix = "st";
+        else if (ending === "2")
+          suffix = "nd";
+        else if (ending === "3")
+          suffix = "rd";
+      }
+      return months[this.current_date.getMonth()] + " " + this.current_date.getDate() + suffix + ", " + this.current_date.getFullYear();
     } else {
       return "Unknown Mode";
     }
@@ -1056,9 +1097,16 @@ class MonthView extends s3 {
     return x`
     <caption>
         <div class="month-header">
-            <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset"></lit-icon></button>
+            <div class="header-item">
+              <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset" style="width: 20px; height: 20px;"></lit-icon></button>
+              <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset" style="width: 20px; height: 20px;"></lit-icon></button>
+            </div>
             <h2 id="month_title">${this.calendarTitle()}</h2>
-            <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset"></lit-icon></button>
+            <div class="header-item scheduler-button-bar">
+              <button type="button" class="btn btn-first" @click="${this._monthViewClicked}">Month</button>
+              <button type="button" class="btn btn-middle" @click="${this._weekViewClicked}">Week</button>
+              <button type="button" class="btn btn-last" @click="${this._dayViewClicked}">Day</button>
+            </div>
             <lit-iconset iconset="iconset">
               <svg><defs>
                 <g id="chevron_left"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></g>
@@ -1114,25 +1162,29 @@ class MonthView extends s3 {
     for (let hour = 0;hour < 24; hour++) {
       let id = "h" + i4;
       let this_hour = dateAdd(midnight, "hour", i4);
-      rows.push(x`<tr><td><div id="${id}" class="day-view-hour">${toIsoTimeString(this_hour)}</div></td></tr>`);
+      rows.push(x`<tr><td><div id="${id}" class="day-view-hour">${toIsoTimeString(this_hour)} <hr class="half-hour-mark" /></div></td></tr>`);
       i4++;
     }
     return x`${rows}`;
   }
   renderDayView() {
     return x`
-    ${this.renderSchedulerModesButtonBar()}
     <table class="month-table" cellspacing="0">
-      ${this.renderCaption()}
-      <thead>
-          <tr>
-              <th>${dayHeaders[this.current_date.getDay()]}</th>
-          </tr>
-      </thead>
-      <tbody hx-ext="path-params">
-        ${this.renderDayViewDay()}
-      </tbody>
+        <thead>
+            <tr>
+              <th>
+                  ${this.renderCaption()}
+                  <div class="day-header">
+                    ${dayHeaders[this.current_date.getDay()]}
+                  </div>
+              </th>
+            </tr>
+        </thead>
+        <tbody hx-ext="path-params">
+          ${this.renderDayViewDay()}
+        </tbody>
     </table>
+    
     <input id="dropped-appt-id" type="hidden" name="id" value="0" >
     <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
     `;
@@ -1148,7 +1200,6 @@ class MonthView extends s3 {
   }
   renderMonthView() {
     return x`
-    ${this.renderSchedulerModesButtonBar()}
     <table class="month-table" cellspacing="0">
       ${this.renderCaption()}
       <thead>

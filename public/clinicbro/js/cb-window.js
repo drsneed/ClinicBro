@@ -954,6 +954,8 @@ class CBWindow extends s3 {
     super();
     this.opened = false;
     this.window_title = "Window";
+    this.top = "0";
+    this.left = "-5px";
   }
   ready() {
   }
@@ -965,6 +967,14 @@ class CBWindow extends s3 {
       } else {
         this.drag.resetPosition();
       }
+    }
+    if (changedProperties.has("top")) {
+      this.drag.styles.top = this.top;
+      this.requestUpdate();
+    }
+    if (changedProperties.has("left")) {
+      this.drag.styles.left = this.left;
+      this.requestUpdate();
     }
   }
   drag = new DragController(this, {
@@ -1140,7 +1150,7 @@ class CBWindow extends s3 {
 
     .date-container {
         width: 306px;
-    }
+    } 
 
     ::placeholder {
         color: var(--placeholder-fg);
@@ -1154,7 +1164,8 @@ class CBWindow extends s3 {
     `;
   render() {
     return x`
-        <div id="window" class="${e6({ dialog: true, opened: this.opened, closed: !this.opened })}" style=${o5(this.drag.styles)}>
+        <div id="window" class="${e6({ dialog: true, opened: this.opened, closed: !this.opened })}"
+             style=${o5(this.drag.styles)}>
             <div id="draggable" class="header" data-dragging=${this.drag.state}>
                 <h4 class="title">${this.window_title}</h4>
                 <button class="closebtn" @click="${() => this.opened = false}">&times;</button>
@@ -1171,6 +1182,12 @@ __legacyDecorateClassTS([
 __legacyDecorateClassTS([
   n4({ type: String })
 ], CBWindow.prototype, "window_title", undefined);
+__legacyDecorateClassTS([
+  n4({ type: String, reflect: true })
+], CBWindow.prototype, "top", undefined);
+__legacyDecorateClassTS([
+  n4({ type: String, reflect: true })
+], CBWindow.prototype, "left", undefined);
 CBWindow = __legacyDecorateClassTS([
   t3("cb-window")
 ], CBWindow);

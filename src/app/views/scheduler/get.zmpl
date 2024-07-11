@@ -7,7 +7,7 @@
      else if(id == 0 and client_id > 0) "Add New Appointment"
      else "Edit Appointment";
 }
-<cb-window id="cb-window" opened="" window_title="{{window_title}}">
+<cb-window id="cb-window" opened="" window_title="{{window_title}}" top="calc(50% - 128px)" left="calc(50% - 256px)">
     <form id="appointment-form" method="post">
       <input id="appointment-id-input" type="hidden" name="id" value="{{id}}">
       <input type="hidden" name="client_id" value="{{client_id}}">

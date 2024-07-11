@@ -14,11 +14,20 @@ export class CBWindow extends LitElement {
     @property({type: String})
     window_title: string;
 
+    // @ts-ignore
+    @property({type: String, reflect: true})
+    top: string;
+
+    // @ts-ignore
+    @property({type: String, reflect: true})
+    left: string;
 
     constructor () {
         super();
         this.opened = false;
         this.window_title = "Window";
+        this.top = "0";
+        this.left = "-5px";
     }
 
 
@@ -39,6 +48,14 @@ export class CBWindow extends LitElement {
           else {
             this.drag.resetPosition();
           }
+        }
+        if(changedProperties.has("top")) {
+            this.drag.styles.top = this.top;
+            this.requestUpdate();
+        }
+        if(changedProperties.has("left")) {
+            this.drag.styles.left = this.left;
+            this.requestUpdate();
         }
     }
 
@@ -217,7 +234,7 @@ export class CBWindow extends LitElement {
 
     .date-container {
         width: 306px;
-    }
+    } 
 
     ::placeholder {
         color: var(--placeholder-fg);
@@ -233,7 +250,8 @@ export class CBWindow extends LitElement {
     render() {
         
         return html`
-        <div id="window" class="${classMap({dialog: true, opened: this.opened, closed: !this.opened})}" style=${styleMap(this.drag.styles)}>
+        <div id="window" class="${classMap({dialog: true, opened: this.opened, closed: !this.opened})}"
+             style=${styleMap(this.drag.styles)}>
             <div id="draggable" class="header" data-dragging=${this.drag.state}>
                 <h4 class="title">${this.window_title}</h4>
                 <button class="closebtn" @click="${() => this.opened = false}">&times;</button>

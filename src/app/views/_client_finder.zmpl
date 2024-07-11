@@ -1,6 +1,6 @@
 <details class="client-card" open="">
     <summary class="client-card-header collapsible">
-        <span>Clients</span>
+        <span>Patient Finder</span>
         <button type="button" class="btn-add-client" title="Add New"
             hx-get="/clients/0"
             hx-target="#cb-window"
