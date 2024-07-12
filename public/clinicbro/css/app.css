@@ -59,6 +59,7 @@
     --btn-add-fg: light-dark(#f1f1e3, #f1f1e3);
     --btn-add-bg: light-dark(#027160, #027160);
     --btn-add-hover-bg: light-dark(#03aa91, #03aa91);
+    --btn-pressed: light-dark(#B1B1B9, #5B5B66);
     --placeholder-fg: light-dark(#717123, #dfdf99);
     --setup-btnbar-bg: light-dark(#dedede, #202120); /* #1d3a4e */
     --setup-btnbar-fg: light-dark(#052e0b, #dcf0df);

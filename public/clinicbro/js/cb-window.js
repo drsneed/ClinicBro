@@ -986,6 +986,9 @@ class CBWindow extends s3 {
     return this.shadowRoot.querySelector("#draggable");
   }
   static styles = i`
+    #window {
+        z-index: 2;
+    }
     .opened {
         display: flex;
     }

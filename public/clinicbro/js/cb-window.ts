@@ -70,6 +70,9 @@ export class CBWindow extends LitElement {
     }
 
     static styles = css`
+    #window {
+        z-index: 2;
+    }
     .opened {
         display: flex;
     }

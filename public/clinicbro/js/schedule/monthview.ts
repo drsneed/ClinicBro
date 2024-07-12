@@ -93,7 +93,7 @@ export class MonthView extends LitElement {
             <div class="header-item scheduler-button-bar">
               <button type="button" class="btn btn-first" @click="${this._monthViewClicked}">Month</button>
               <button type="button" class="btn btn-middle" @click="${this._weekViewClicked}">Week</button>
-              <button type="button" class="btn btn-last" @click="${this._dayViewClicked}">Day</button>
+              <button type="button" class="btn btn-last btn-pressed" @click="${this._dayViewClicked}">Day</button>
             </div>
             <lit-iconset iconset="iconset">
               <svg><defs>
@@ -227,7 +227,7 @@ export class MonthView extends LitElement {
       <div class="scheduler-button-bar">
         <button type="button" class="btn btn-first" @click="${this._monthViewClicked}">Month</button>
         <button type="button" class="btn btn-middle" @click="${this._weekViewClicked}">Week</button>
-        <button type="button" class="btn btn-last" @click="${this._dayViewClicked}">Day</button>
+        <button type="button" class="btn btn-last btn-pressed" @click="${this._dayViewClicked}">Day</button>
       </div>
     `;
   }

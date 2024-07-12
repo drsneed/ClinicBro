@@ -37,6 +37,9 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
         client = try db_context.getClient(client_id) orelse client;
     }
     try mapper.client.toResponse(client, data);
+
+    try db_context.deinit();
+    db_context = try DbContext.init(request.allocator, request.server.database);
     var root = data.value.?;
     const json_locations = try data.array();
     try root.put("locations", json_locations);

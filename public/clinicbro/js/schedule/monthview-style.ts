@@ -43,8 +43,6 @@ export function monthviewStyle() {
     transition: none;
     cursor: pointer;
   }
-
-
   .scheduler-button-bar button {
     margin: 0px;
     padding: 4px 8px;
@@ -74,7 +72,7 @@ export function monthviewStyle() {
   }
 
   .month-table td, .month-table th {
-    border: 1px solid var(--sep);
+    border: 1px solid var(--input-border);
     box-shadow: none;
     width: auto !important;
     padding: 0px;
@@ -84,14 +82,14 @@ export function monthviewStyle() {
     position: sticky;
     top: 0;
     background-color: var(--container-bg);
-    z-index: 5;
+    z-index: 1;
   }
   .row2 {
     position: sticky;
     background-color: var(--container-bg);
     border-bottom: 1px solid var(--table-header-fg) !important;
     top: 40px;
-    z-index: 5;
+    z-index: 1;
   }
 
   .month-table thead {
@@ -108,6 +106,10 @@ export function monthviewStyle() {
     margin: 0;
   }
 
+  .btn-pressed {
+    border-style:inset;
+    background-color: var(--btn-pressed);
+  }
 
   .no-border {
     border-bottom: none !important;
@@ -138,7 +140,7 @@ export function monthviewStyle() {
   }
   
   .month-table td {
-    background-color: var(--calendar-month-bg);
+    background-color: var(--bg);
     vertical-align: top;
     height: 80px;
     overflow: hidden;
