@@ -629,6 +629,268 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
+// public/clinicbro/js/util.ts
+function dateAdd(date, interval, units) {
+  var ret = new Date(date.valueOf());
+  var checkRollover = function() {
+    if (ret.getDate() != date.getDate())
+      ret.setDate(0);
+  };
+  switch (String(interval).toLowerCase()) {
+    case "year":
+      ret.setFullYear(ret.getFullYear() + units);
+      checkRollover();
+      break;
+    case "quarter":
+      ret.setMonth(ret.getMonth() + 3 * units);
+      checkRollover();
+      break;
+    case "month":
+      ret.setMonth(ret.getMonth() + units);
+      checkRollover();
+      break;
+    case "week":
+      ret.setDate(ret.getDate() + 7 * units);
+      break;
+    case "day":
+      ret.setDate(ret.getDate() + units);
+      break;
+    case "hour":
+      ret.setTime(ret.getTime() + units * 3600000);
+      break;
+    case "minute":
+      ret.setTime(ret.getTime() + units * 60000);
+      break;
+    case "second":
+      ret.setTime(ret.getTime() + units * 1000);
+      break;
+    default:
+      ret = undefined;
+      break;
+  }
+  return ret;
+}
+function dateSuffix(d1) {
+  let num_date_str = "" + d1.getDate();
+  const ending = num_date_str.slice(-1);
+  const beginning = num_date_str[0];
+  let suffix = "th";
+  if (num_date_str.length == 1 || beginning != "1") {
+    if (ending === "1")
+      suffix = "st";
+    else if (ending === "2")
+      suffix = "nd";
+    else if (ending === "3")
+      suffix = "rd";
+  }
+  return suffix;
+}
+function clearAllSelectedDays() {
+  var schedule = document.getElementById("schedule");
+  schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
+    day.removeAttribute("selected");
+  });
+  document.querySelectorAll("mv-appt").forEach(function(appt) {
+    appt.removeAttribute("selected");
+  });
+}
+var dayHeaders = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+var months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+
+// public/clinicbro/js/schedule/monthview-style.ts
+function monthviewStyle() {
+  return i`
+  .month-table {
+    background: var(--container-bg);
+    table-layout: fixed;
+    //height: 550px;
+    border-collapse: separate;
+    border-spacing: 0;
+    padding: 0px !important;
+    margin: 0px;
+    width: 100%;
+    color: var(--table-fg);
+  }
+
+  .caption {
+    position: sticky;
+  }
+  
+  .header-item {
+    width: 150px;
+    text-align: left;
+  }
+  .scheduler-button-bar {
+    display: flex;
+    overflow: hidden;
+    margin: 6px 8px;
+    float: right;
+  }
+
+  .btn-left {
+    margin-top: 6px;
+    margin-left: 8px;
+    margin-right: 0px;
+    margin-bottom: 6px;
+  }
+  .btn-right {
+    margin: 6px 0px;
+  }
+  .btn-left, .btn-right {
+    display: inline-block;
+    padding: 4px 8px;
+    transition: none;
+    cursor: pointer;
+  }
+  .scheduler-button-bar button {
+    margin: 0px;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+
+  .btn-first {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+
+  .btn-middle {
+    border-radius: 0px;
+  }
+
+  .btn-last {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  .scheduler-container {
+    overflow-y: visible;
+  }
+
+  .month-table td, .month-table th {
+    border: 1px solid var(--input-border);
+    box-shadow: none;
+    width: auto !important;
+  }
+  
+  .row1 {
+    position: sticky;
+    top: 0;
+    background-color: var(--container-bg);
+    z-index: 1;
+  }
+  .row2 {
+    position: sticky;
+    background-color: var(--container-bg);
+    border-bottom: 1px solid var(--table-header-fg) !important;
+    top: 40px;
+    z-index: 1;
+  }
+
+  .month-table thead {
+    text-align: center;
+  }
+
+  .sticky-header {
+    border-bottom: 1px solid var(--table-header-fg);
+    text-align: center;
+    background-color: var(--container-bg);
+    color: var(--container-fg);
+    font-weight: 900;
+    width: 100%;
+    margin: 0;
+  }
+
+  .btn-pressed {
+    border-style:inset;
+    background-color: var(--btn-pressed);
+  }
+
+  .no-border {
+    border-bottom: none !important;
+  }
+
+  caption {
+    width: 100%;
+  }
+
+  .month-header {
+    top: 0;
+    display: flex;
+    background-color: var(--header-bg);
+    text-align: center;
+    
+  }
+
+  .row2, .day-header {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  
+  .month-header h2 {
+    width: 50%;
+    color: var(--header-fg);
+    padding: 0;
+    margin: 8px auto;
+    font-size: 20px;
+  }
+  
+  .month-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .month-table tr {
+    white-space: nowrap;
+  }
+
+  .half-hour-mark {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    border-top: 2px dashed #8d5603;
+    color: inherit;
+    background-color: inherit;
+    height: 1px;
+    width: 100%;
+
+  }
+
+  
+  .day-view-hour-1, .day-view-hour-2 {
+        width: 100%;
+        height: 50%;
+        max-width: 100%;
+        white-space: nowrap;
+        user-select: none;
+        overflow-y: auto;
+  }
+  .day-view-hour-2 {
+        border-top: 1px dashed var(--input-border);
+  }
+  `;
+}
+
 // node_modules/lit-html/directive.js
 var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
 var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
@@ -676,604 +938,152 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
-// node_modules/lit-html/directives/style-map.js
-var n5 = "important";
-var i5 = " !" + n5;
-var o5 = e5(class extends i4 {
-  constructor(t5) {
-    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "style" || t5.strings?.length > 2)
-      throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
-  }
-  render(t5) {
-    return Object.keys(t5).reduce((e7, r6) => {
-      const s4 = t5[r6];
-      return s4 == null ? e7 : e7 + `${r6 = r6.includes("-") ? r6 : r6.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s4};`;
-    }, "");
-  }
-  update(e7, [r6]) {
-    const { style: s4 } = e7.element;
-    if (this.ft === undefined)
-      return this.ft = new Set(Object.keys(r6)), this.render(r6);
-    for (const t5 of this.ft)
-      r6[t5] == null && (this.ft.delete(t5), t5.includes("-") ? s4.removeProperty(t5) : s4[t5] = null);
-    for (const t5 in r6) {
-      const e8 = r6[t5];
-      if (e8 != null) {
-        this.ft.add(t5);
-        const r7 = typeof e8 == "string" && e8.endsWith(i5);
-        t5.includes("-") || r7 ? s4.setProperty(t5, r7 ? e8.slice(0, -11) : e8, r7 ? n5 : "") : s4[t5] = e8;
-      }
-    }
-    return w;
-  }
-});
-// node_modules/pointer-tracker/dist/PointerTracker.mjs
-class Pointer {
-  constructor(nativePointer) {
-    this.id = -1;
-    this.nativePointer = nativePointer;
-    this.pageX = nativePointer.pageX;
-    this.pageY = nativePointer.pageY;
-    this.clientX = nativePointer.clientX;
-    this.clientY = nativePointer.clientY;
-    if (self.Touch && nativePointer instanceof Touch) {
-      this.id = nativePointer.identifier;
-    } else if (isPointerEvent(nativePointer)) {
-      this.id = nativePointer.pointerId;
-    }
-  }
-  getCoalesced() {
-    if ("getCoalescedEvents" in this.nativePointer) {
-      const events = this.nativePointer.getCoalescedEvents().map((p3) => new Pointer(p3));
-      if (events.length > 0)
-        return events;
-    }
-    return [this];
-  }
-}
-var isPointerEvent = (event) => ("pointerId" in event);
-var isTouchEvent = (event) => ("changedTouches" in event);
-var noop = () => {
-};
-
-class PointerTracker {
-  constructor(_element, { start = () => true, move = noop, end = noop, rawUpdates = false, avoidPointerEvents = false } = {}) {
-    this._element = _element;
-    this.startPointers = [];
-    this.currentPointers = [];
-    this._excludeFromButtonsCheck = new Set;
-    this._pointerStart = (event) => {
-      if (isPointerEvent(event) && event.buttons === 0) {
-        this._excludeFromButtonsCheck.add(event.pointerId);
-      } else if (!(event.buttons & 1)) {
-        return;
-      }
-      const pointer = new Pointer(event);
-      if (this.currentPointers.some((p3) => p3.id === pointer.id))
-        return;
-      if (!this._triggerPointerStart(pointer, event))
-        return;
-      if (isPointerEvent(event)) {
-        const capturingElement = event.target && "setPointerCapture" in event.target ? event.target : this._element;
-        capturingElement.setPointerCapture(event.pointerId);
-        this._element.addEventListener(this._rawUpdates ? "pointerrawupdate" : "pointermove", this._move);
-        this._element.addEventListener("pointerup", this._pointerEnd);
-        this._element.addEventListener("pointercancel", this._pointerEnd);
-      } else {
-        window.addEventListener("mousemove", this._move);
-        window.addEventListener("mouseup", this._pointerEnd);
-      }
-    };
-    this._touchStart = (event) => {
-      for (const touch of Array.from(event.changedTouches)) {
-        this._triggerPointerStart(new Pointer(touch), event);
-      }
-    };
-    this._move = (event) => {
-      if (!isTouchEvent(event) && (!isPointerEvent(event) || !this._excludeFromButtonsCheck.has(event.pointerId)) && event.buttons === 0) {
-        this._pointerEnd(event);
-        return;
-      }
-      const previousPointers = this.currentPointers.slice();
-      const changedPointers = isTouchEvent(event) ? Array.from(event.changedTouches).map((t5) => new Pointer(t5)) : [new Pointer(event)];
-      const trackedChangedPointers = [];
-      for (const pointer of changedPointers) {
-        const index = this.currentPointers.findIndex((p3) => p3.id === pointer.id);
-        if (index === -1)
-          continue;
-        trackedChangedPointers.push(pointer);
-        this.currentPointers[index] = pointer;
-      }
-      if (trackedChangedPointers.length === 0)
-        return;
-      this._moveCallback(previousPointers, trackedChangedPointers, event);
-    };
-    this._triggerPointerEnd = (pointer, event) => {
-      if (!isTouchEvent(event) && event.buttons & 1) {
-        return false;
-      }
-      const index = this.currentPointers.findIndex((p3) => p3.id === pointer.id);
-      if (index === -1)
-        return false;
-      this.currentPointers.splice(index, 1);
-      this.startPointers.splice(index, 1);
-      this._excludeFromButtonsCheck.delete(pointer.id);
-      const cancelled = !(event.type === "mouseup" || event.type === "touchend" || event.type === "pointerup");
-      this._endCallback(pointer, event, cancelled);
-      return true;
-    };
-    this._pointerEnd = (event) => {
-      if (!this._triggerPointerEnd(new Pointer(event), event))
-        return;
-      if (isPointerEvent(event)) {
-        if (this.currentPointers.length)
-          return;
-        this._element.removeEventListener(this._rawUpdates ? "pointerrawupdate" : "pointermove", this._move);
-        this._element.removeEventListener("pointerup", this._pointerEnd);
-        this._element.removeEventListener("pointercancel", this._pointerEnd);
-      } else {
-        window.removeEventListener("mousemove", this._move);
-        window.removeEventListener("mouseup", this._pointerEnd);
-      }
-    };
-    this._touchEnd = (event) => {
-      for (const touch of Array.from(event.changedTouches)) {
-        this._triggerPointerEnd(new Pointer(touch), event);
-      }
-    };
-    this._startCallback = start;
-    this._moveCallback = move;
-    this._endCallback = end;
-    this._rawUpdates = rawUpdates && "onpointerrawupdate" in window;
-    if (self.PointerEvent && !avoidPointerEvents) {
-      this._element.addEventListener("pointerdown", this._pointerStart);
-    } else {
-      this._element.addEventListener("mousedown", this._pointerStart);
-      this._element.addEventListener("touchstart", this._touchStart);
-      this._element.addEventListener("touchmove", this._move);
-      this._element.addEventListener("touchend", this._touchEnd);
-      this._element.addEventListener("touchcancel", this._touchEnd);
-    }
-  }
-  stop() {
-    this._element.removeEventListener("pointerdown", this._pointerStart);
-    this._element.removeEventListener("mousedown", this._pointerStart);
-    this._element.removeEventListener("touchstart", this._touchStart);
-    this._element.removeEventListener("touchmove", this._move);
-    this._element.removeEventListener("touchend", this._touchEnd);
-    this._element.removeEventListener("touchcancel", this._touchEnd);
-    this._element.removeEventListener(this._rawUpdates ? "pointerrawupdate" : "pointermove", this._move);
-    this._element.removeEventListener("pointerup", this._pointerEnd);
-    this._element.removeEventListener("pointercancel", this._pointerEnd);
-    window.removeEventListener("mousemove", this._move);
-    window.removeEventListener("mouseup", this._pointerEnd);
-  }
-  _triggerPointerStart(pointer, event) {
-    if (!this._startCallback(pointer, event))
-      return false;
-    this.currentPointers.push(pointer);
-    this.startPointers.push(pointer);
-    return true;
-  }
-}
-
-// public/clinicbro/js/dragcontroller.ts
-class DragController {
-  x = 0;
-  y = 0;
-  state = "idle";
-  styles = {
-    position: "absolute",
-    top: "calc(50% - 128px)",
-    left: "calc(50% - 256px)"
-  };
-  constructor(host, options) {
-    const {
-      getContainerEl = () => null,
-      getDraggableEl = () => Promise.resolve(null)
-    } = options;
-    this.host = host;
-    this.host.addController(this);
-    this.getContainerEl = getContainerEl;
-    getDraggableEl().then((el) => {
-      if (!el)
-        return;
-      this.draggableEl = el;
-      this.init();
-    });
-  }
-  resetPosition() {
-    this.x = 0;
-    this.y = 0;
-    this.updateElPosition();
-  }
-  init() {
-    this.pointerTracker = new PointerTracker(this.draggableEl, {
-      start: (pointer, event) => {
-        this.onDragStart(pointer);
-        this.state = "dragging";
-        this.host.requestUpdate();
-        return true;
-      },
-      move: (previousPointers, changedPointers, event) => {
-        this.onDrag(changedPointers[0]);
-      },
-      end: (pointer, event, cancelled) => {
-        this.state = "idle";
-        this.host.requestUpdate();
-      }
-    });
-  }
-  hostDisconnected() {
-    if (this.pointerTracker) {
-      this.pointerTracker.stop();
-    }
-  }
-  onDragStart = (pointer) => {
-    this.cursorPositionX = Math.floor(pointer.pageX);
-    this.cursorPositionY = Math.floor(pointer.pageY);
-  };
-  onDrag(pointer) {
-    const el = this.draggableEl;
-    const containerEl = this.getContainerEl();
-    if (!el || !containerEl)
-      return;
-    const oldX = this.x;
-    const oldY = this.y;
-    const parsedTop = Math.floor(pointer.pageX);
-    const parsedLeft = Math.floor(pointer.pageY);
-    const cursorPositionX = Math.floor(pointer.pageX);
-    const cursorPositionY = Math.floor(pointer.pageY);
-    const hasCursorMoved = cursorPositionX !== this.cursorPositionX || cursorPositionY !== this.cursorPositionY;
-    if (hasCursorMoved) {
-      const { bottom, height } = el.getBoundingClientRect();
-      const { right, width } = containerEl.getBoundingClientRect();
-      const xDelta = cursorPositionX - this.cursorPositionX;
-      const yDelta = cursorPositionY - this.cursorPositionY;
-      this.x = oldX + xDelta;
-      this.y = oldY + yDelta;
-      const outOfBoundsTop = this.y < 0;
-      const outOfBoundsLeft = this.x < 0;
-      const outOfBoundsBottom = bottom + yDelta > window.innerHeight;
-      const outOfBoundsRight = right + xDelta >= window.innerWidth;
-      const isOutOfBounds = outOfBoundsBottom || outOfBoundsLeft || outOfBoundsRight || outOfBoundsTop;
-      this.cursorPositionX = cursorPositionX;
-      this.cursorPositionY = cursorPositionY;
-      this.updateElPosition();
-      this.host.requestUpdate();
-    }
-  }
-  updateElPosition() {
-    this.styles.transform = `translate(${this.x}px, ${this.y}px)`;
-  }
-}
-
-// public/clinicbro/js/util.ts
-function combineDateWithTimeString(d3, s4) {
-  let date_str = toIsoDateString(d3);
-  return new Date(date_str + "T" + s4);
-}
-function toIsoDateString(d3) {
-  return d3.toISOString().split("T")[0];
-}
-function toIsoTimeString(d3) {
-  return d3.toTimeString().substring(0, 8);
-}
-
-// public/clinicbro/js/schedule/monthview-dialog.ts
-class MonthViewDialog extends s3 {
+// public/clinicbro/js/schedule/scheduler-base.ts
+class SchedulerBase extends s3 {
+  static styles = monthviewStyle();
   constructor() {
     super();
-    this.opened = false;
-    this.window_title = "Window";
-    this.appt_title = "";
-    this.appt_id = 0;
-    this.appt_date = new Date;
-    this.appt_from = new Date;
-    this.appt_to = new Date;
-  }
-  _apptTitleKeyDown(e7) {
-    if (e7.code === "Enter") {
-      this.dispatchEvent(new CustomEvent("dialog.save"));
-    }
-  }
-  apptDate() {
-    let appt_date_input = this.shadowRoot.querySelector("#appt_date");
-    return new Date(appt_date_input.value + "T00:00:00");
-  }
-  ready() {
-    let appt_title_input = this.shadowRoot.querySelector("#appt_title");
-    appt_title_input.value = this.appt_title;
-    let appt_date_input = this.shadowRoot.querySelector("#appt_date");
-    appt_date_input.value = toIsoDateString(this.appt_date);
-    let appt_from_input = this.shadowRoot.querySelector("#appt_from");
-    appt_from_input.value = toIsoTimeString(this.appt_from);
-    let appt_to_input = this.shadowRoot.querySelector("#appt_to");
-    appt_to_input.value = toIsoTimeString(this.appt_to);
-  }
-  collect() {
-    let appt_title_input = this.shadowRoot.querySelector("#appt_title");
-    this.appt_title = appt_title_input.value;
-    let appt_date_input = this.shadowRoot.querySelector("#appt_date");
-    this.appt_date = new Date(appt_date_input.value + "T00:00:00");
-    let appt_from_input = this.shadowRoot.querySelector("#appt_from");
-    this.appt_from = combineDateWithTimeString(this.apptDate(), appt_from_input.value);
-    let appt_to_input = this.shadowRoot.querySelector("#appt_to");
-    this.appt_to = combineDateWithTimeString(this.apptDate(), appt_to_input.value);
-  }
-  updateDate(new_date) {
-    this.collect();
-    this.appt_date = new_date;
-    this.ready();
+    this.current_date = new Date;
   }
   updated(changedProperties) {
-    if (changedProperties.has("opened")) {
-      if (this.opened) {
-        this.shadowRoot.querySelector("#appt_title").focus();
+    htmx.process(this.shadowRoot);
+    if (changedProperties.has("current_date")) {
+    }
+  }
+  _prev(e7) {
+    this.current_date = dateAdd(this.current_date, this.mode, -1);
+    clearAllSelectedDays();
+  }
+  _next(e7) {
+    this.current_date = dateAdd(this.current_date, this.mode, 1);
+    clearAllSelectedDays();
+  }
+  _monthViewClicked(e7) {
+    this.mode = "month";
+  }
+  _weekViewClicked(e7) {
+    this.mode = "week";
+  }
+  _dayViewClicked(e7) {
+    this.mode = "day";
+  }
+  calendarTitle() {
+    if (this.mode == "month") {
+      return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
+    } else if (this.mode == "day") {
+      return months[this.current_date.getMonth()] + " " + this.current_date.getDate() + dateSuffix(this.current_date) + ", " + this.current_date.getFullYear();
+    } else {
+      let firstOfDaWeek = dateAdd(this.current_date, "day", -this.current_date.getDay());
+      let endOfDaWeek = dateAdd(firstOfDaWeek, "day", 6);
+      if (firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear() && firstOfDaWeek.getMonth() == endOfDaWeek.getMonth()) {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
+      } else if (firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear()) {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " + months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
       } else {
-        this.drag.resetPosition();
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " " + firstOfDaWeek.getFullYear() + " - " + months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + endOfDaWeek.getFullYear();
       }
     }
   }
-  drag = new DragController(this, {
-    getContainerEl: () => this.shadowRoot.querySelector("#window"),
-    getDraggableEl: () => this.getDraggableEl()
-  });
-  async getDraggableEl() {
-    await this.updateComplete;
-    return this.shadowRoot.querySelector("#draggable");
-  }
-  static styles = i`
-    .opened {
-        display: flex;
-    }
-    .closed {
-        display: none;
-    }
-    .header {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--header-bg);
-        color: var(--header-fg);
-        height: 30px;
-        text-align: center;
-        box-shadow: 0 0 4px var(--container-shadow);
-        user-select: none;
-    }
-
-    [data-dragging="idle"] {
-      cursor: grab;
-    }
-
-    [data-dragging="dragging"] {
-      cursor: grabbing;
-    }
-
-    .dialog {
-        flex-direction: column;
-        padding: 0;
-        margin: 1em;
-        border: 2px outset var(--container-border);
-        border-radius: 3px;
-        background-color: var(--container-bg);
-        width: 512px;
-    }
-    .content {
-        margin: 40px 8px 10px 8px;
-        text-align: center;
-    }
-    .title {
-        margin-top: 4px;
-    }
-    .closebtn {
-        position: absolute;
-        top: 0px;
-        right: 0px;
-        width: 25px;
-        height: 100%;
-        padding: 0px auto;
-        border-radius: 0;
-        background-color: transparent;
-        color: var(--dialog-header-fg);
-        font-size: 16px;
-        border: none;
-    }
-
-    .closebtn:hover {
-        background-color: light-dark(darkred, red);
-        border: 1px solid var(--header-fg);
-        cursor: pointer;
-    }
-
-    .buttons {
-        display: table;
-        margin: 4px auto;
-        text-align: center;
-    }
-
-    .btn {
-        justify-content: space-around;
-        align-content: space-around;
-        padding: 8px 16px;
-        cursor: pointer;
-        border-radius: 3px;
-        border: 1px solid var(--input-border);
-        margin: 6px 2px;
-        font-weight: bold;
-    }
-
-    .btn-save {
-        background-color: var(--btn-save-bg);
-        color: var(--btn-save-fg);
-    }
-    .btn-save:hover {
-        background-color: var(--btn-save-hover-bg);
-        color: var(--btn-save-bg);
-    }
-    
-    .btn-cancel {
-        background-color: var(--btn-cancel-bg);
-        color: var(--btn-cancel-fg);
-    }
-    .btn-cancel:hover {
-        background-color: var(--btn-cancel-fg);
-        color: var(--btn-cancel-bg);
-    }
-    
-    .text-field {
-        position: relative;
-        margin: 5px 2.5px 5px 2.5px;
-    }
-
-    .text-field input + label {
-        position: absolute;
-        pointer-events: none;
-        left: 10px;
-        top: 12px;
-        transition: 0.2s;
-        color: var(--placeholder-fg);
-    }
-
-    .text-field input:focus, .text-field input:valid {
-        background-color: var(--container-bg);
-    }
-
-    .text-field input:focus + label, .text-field input:valid + label {
-        top: -6px;
-        left: 15px;
-        font-size: small;
-        padding: 0 5px 0 5px;
-        background-color: var(--container-bg);
-        color: var(--fg);
-    }
-
-        
-    input {
-        width: 100%;
-        border: 1px solid var(--input-border);
-        padding: 6px 10px;
-        margin: 6px 2px;
-        box-sizing: border-box;
-        border-radius: 3px;
-        font-size: 14px;
-        background-color: var(--bg);
-        color: var(--fg);
-    }
-
-    input[type=date], input[type=time] {
-        text-indent: 35px;
-    }
-
-    input[type=date]:focus, input[type=date]:valid,
-    input[type=time]:focus, input[type=time]:valid {
-        text-indent: 0px;
-    }
-
-    .time-inputs {
-        display: block;
-        width: 100%;
-        margin: 0;
-        margin-left: 1px;
-        padding: 0;
-        text-align: left;
-    }
-
-    .time-input {
-        /* vertical-align: middle; */
-        display: inline-block;
-        margin: 0;
-        padding: 0;
-        width: 150px;
-    }
-
-    .date-container {
-        width: 306px;
-    }
-
-    ::placeholder {
-        color: var(--placeholder-fg);
-        opacity: 1; /* Firefox */
-    }
-
-    ::-ms-input-placeholder { /* Edge 12-18 */
-        color: var(--placeholder-fg);
-    }
-
-    `;
-  render() {
-    return this.renderEvent();
-  }
-  renderEvent() {
+  renderSchedulerModesButtonBar() {
     return x`
-        <div id="window" class="${e6({ dialog: true, opened: this.opened, closed: !this.opened })}" style=${o5(this.drag.styles)}>
-            <div id="draggable" class="header" data-dragging=${this.drag.state}>
-                <h4 class="title">${this.window_title}</h4>
-                <button class="closebtn" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">&times;</button>
+      <div class="header-item scheduler-button-bar">
+        <button type="button" class="${e6({ btn: true, "btn-first": true, "btn-pressed": this.mode === "month" })}"
+            hx-get="/scheduler?mode=month" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Month</button>
+        <button type="button" class="${e6({ btn: true, "btn-middle": true, "btn-pressed": this.mode === "week" })}"
+            hx-get="/scheduler?mode=week" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Week</button>
+        <button type="button" class="${e6({ btn: true, "btn-last": true, "btn-pressed": this.mode === "day" })}"
+            hx-get="/scheduler?mode=day" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Day</button>
+      </div>
+    `;
+  }
+  renderCaption() {
+    return x`
+    <caption>
+        <div class="month-header">
+            <div class="header-item">
+              <button type="button" @click="${this._prev}" class="btn-left">&lt;</button>
+              <button type="button" @click="${this._next}" class="btn-right">&gt;</button>
             </div>
-            <div class="content">
-                <div class="text-field">
-                    <input id="appt_title" type="text" name="type" maxlength="255" @keydown="${this._apptTitleKeyDown}"
-                        value="${this.appt_title}" required>
-                    <label for="type">Title</label>
-                </div>
-                <div class="date-container">
-                    <div class="text-field">
-                        <input id="appt_date" type="date" name="date"
-                            value="${toIsoDateString(this.appt_date)}" required>
-                        <label for="date">Date</label>
-                    </div>
-                </div>
-                <div class="time-inputs">
-                    <div class="text-field time-input">
-                        <input id="appt_from" type="time" name="from" required>
-                        <label for="from">From</label>
-                    </div>
-                    <div class="text-field time-input">
-                        <input id="appt_to" type="time" name="to" required>
-                        <label for="to">&nbsp;&nbsp;&nbsp;To</label>
-                    </div>
-                </div>
-                
-                <div class="buttons">
-                    <button type="button" class="btn btn-save" @click="${() => this.dispatchEvent(new CustomEvent("dialog.save"))}">Save</button>  
-                    <button type="button" class="btn btn-cancel" @click="${() => this.dispatchEvent(new CustomEvent("dialog.cancel"))}">Cancel</button>  
-                </div>
-            </div>
-        </div>`;
+            <h2 id="month_title">${this.calendarTitle()}</h2>
+            ${this.renderSchedulerModesButtonBar()}
+        </div>
+    </caption>`;
   }
 }
 __legacyDecorateClassTS([
-  n4({ type: Boolean, reflect: true })
-], MonthViewDialog.prototype, "opened", undefined);
-__legacyDecorateClassTS([
-  n4({ type: String })
-], MonthViewDialog.prototype, "window_title", undefined);
-__legacyDecorateClassTS([
-  n4({ type: Number, reflect: true })
-], MonthViewDialog.prototype, "appt_id", undefined);
+  n4({ converter(value) {
+    if (!isNaN(Date.parse(value))) {
+      return new Date(value);
+    }
+    return new Date;
+  }, reflect: true })
+], SchedulerBase.prototype, "current_date", undefined);
 __legacyDecorateClassTS([
   n4({ type: String, reflect: true })
-], MonthViewDialog.prototype, "appt_title", undefined);
-__legacyDecorateClassTS([
-  n4({ converter(value) {
-    return new Date(value);
-  } })
-], MonthViewDialog.prototype, "appt_date", undefined);
-__legacyDecorateClassTS([
-  n4({ converter(value) {
-    return new Date(value);
-  } })
-], MonthViewDialog.prototype, "appt_from", undefined);
-__legacyDecorateClassTS([
-  n4({ converter(value) {
-    return new Date(value);
-  } })
-], MonthViewDialog.prototype, "appt_to", undefined);
-MonthViewDialog = __legacyDecorateClassTS([
-  t3("mv-dialog")
-], MonthViewDialog);
+], SchedulerBase.prototype, "mode", undefined);
+
+// public/clinicbro/js/schedule/dayview.ts
+class DayView extends SchedulerBase {
+  constructor() {
+    super();
+    this.mode = "day";
+  }
+  render() {
+    return x`
+    <table class="month-table" cellspacing="0">
+        <colgroup>
+          <col span="1" style="width: 70px;">
+          <col span="1" style="width: 95%;">
+        </colgroup>
+        <thead>
+          <tr>
+            <th colspan="2" class="row1 no-border">
+              ${this.renderCaption()}
+            </th>
+          </tr>
+          <tr>
+              <th colspan="2" class="row2">${dayHeaders[this.current_date.getDay()]}</th>
+          </tr>
+            <!-- <tr>
+              <th colspan="2" class="row1">
+                  <div class="sticky-header">
+                    ${this.renderCaption()}
+                    <div class="day-header">
+                      ${dayHeaders[this.current_date.getDay()]}
+                    </div>
+                  </div>
+              </th>
+            </tr> -->
+        </thead>
+        <tbody hx-ext="path-params">
+          ${this.renderDayViewDay()}
+        </tbody>
+    </table>
+    
+    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
+    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
+    `;
+  }
+  renderDayViewDay() {
+    var today = new Date;
+    let rows = [];
+    let i5 = 0;
+    var midnight = new Date(this.current_date.valueOf());
+    midnight.setHours(0, 0, 0, 0);
+    for (let hour = 0;hour < 24; hour++) {
+      let id = "h" + i5;
+      let this_hour = dateAdd(midnight, "hour", i5);
+      let time_hour = this_hour.getHours() % 12 || 12;
+      let pm = this_hour.getHours() >= 12 ? "pm" : "am";
+      rows.push(x`<tr><td class="time-display">${time_hour}:00 ${pm}</td><td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td></tr>`);
+      i5++;
+    }
+    return x`${rows}`;
+  }
+}
+DayView = __legacyDecorateClassTS([
+  t3("day-view")
+], DayView);
 export {
-  MonthViewDialog
+  DayView
 };

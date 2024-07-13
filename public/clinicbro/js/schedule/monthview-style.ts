@@ -75,7 +75,6 @@ export function monthviewStyle() {
     border: 1px solid var(--input-border);
     box-shadow: none;
     width: auto !important;
-    padding: 0px;
   }
   
   .row1 {
@@ -127,8 +126,9 @@ export function monthviewStyle() {
     
   }
 
-  .day-header {
-
+  .row2, .day-header {
+    padding-top: 4px;
+    padding-bottom: 4px;
   }
   
   .month-header h2 {
@@ -142,8 +142,9 @@ export function monthviewStyle() {
   .month-table td {
     background-color: var(--bg);
     vertical-align: top;
-    height: 80px;
+    height: 90px;
     overflow: hidden;
+    padding: 0;
   }
 
   .month-table tr {
@@ -166,7 +167,7 @@ export function monthviewStyle() {
   
   .day-view-hour-1, .day-view-hour-2 {
         width: 100%;
-        height: 50px;
+        height: 50%;
         max-width: 100%;
         white-space: nowrap;
         user-select: none;

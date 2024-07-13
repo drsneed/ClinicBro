@@ -14,17 +14,27 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     try root.put("header_include", data.string(
         \\ <link rel="stylesheet" href="/clinicbro/css/schedule.css">
         \\ <script type="module" src="/clinicbro/js/schedule/monthview.js"></script>
+        \\ <script type="module" src="/clinicbro/js/schedule/weekview.js"></script>
+        \\ <script type="module" src="/clinicbro/js/schedule/dayview.js"></script>
         \\ <script type="module" src="/clinicbro/js/schedule/monthview-day.js"></script>
         \\ <script type="module" src="/clinicbro/js/schedule/monthview-appt.js"></script>
-        \\ <script type="module" src="/clinicbro/js/schedule/monthview-dialog.js"></script>
         \\ <script src="/clinicbro/js/schedule.js"></script>
     ));
     try root.put("main_schedule", data.string("class=\"current\""));
     //std.time.sleep(1e+10);
+
+    const params = try request.params();
+    const mode = params.getT(.string, "mode") orelse "month";
+    try root.put("mode", data.string(mode));
+    const current_date = params.getT(.string, "cd") orelse "";
+    try root.put("current_date", data.string(current_date));
+    const date_from = params.getT(.string, "from");
+    const date_to = params.getT(.string, "to");
+
     var db_context = try DbContext.init(request.allocator, request.server.database);
     const json_appts = try data.array();
     try root.put("appointments", json_appts);
-    const db_appts = try db_context.getAllAppointmentViews();
+    const db_appts = try db_context.getAllAppointmentViews(date_from, date_to);
     defer db_appts.deinit();
     for (db_appts.items) |appt| {
         var json_appt = try data.object();
@@ -165,7 +175,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     try root.put("appointments", json_appts);
     try db_context.deinit();
     db_context = try DbContext.init(request.allocator, request.server.database);
-    const db_appts = try db_context.getAllAppointmentViews();
+    const db_appts = try db_context.getAllAppointmentViews(null, null);
     defer db_appts.deinit();
     for (db_appts.items) |appt| {
         var json_appt = try data.object();

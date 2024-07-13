@@ -595,19 +595,26 @@ pub fn getAllAppointments(self: *DbContext) !std.ArrayList(Appointment) {
     return lookup_list;
 }
 
-pub fn getAllAppointmentViews(self: *DbContext) !std.ArrayList(AppointmentView) {
-    var result = try self.connection.queryOpts("select * from AppointmentView", .{}, .{ .column_names = true });
+pub fn getAllAppointmentViews(self: *DbContext, date_from: ?[]const u8, date_to: ?[]const u8) !std.ArrayList(AppointmentView) {
+    var query_buffer: [256]u8 = undefined;
+    var stream = std.io.fixedBufferStream(&query_buffer);
+    const writer = stream.writer();
+    try writer.writeAll("select * from AppointmentView");
+    if (date_from != null and date_to != null) {
+        try writer.print(" where appt_from >= {s} and appt_from <= {s}", .{ date_from.?, date_to.? });
+    } else if (date_from) |dt_from| {
+        try writer.print(" where appt_from >= {s}", .{dt_from});
+    } else if (date_to) |dt_to| {
+        try writer.print(" where appt_from <= {s}", .{dt_to});
+    }
+    const query = stream.getWritten();
+    log.info("appt query = {s}", .{query});
+    var result = try self.connection.queryOpts(query, .{}, .{ .column_names = true });
     defer result.deinit();
     var lookup_list = std.ArrayList(AppointmentView).init(self.allocator);
     var db_mapper = result.mapper(AppointmentView, .{ .dupe = true, .allocator = self.allocator });
     while (try db_mapper.next()) |appointment_view| {
         try lookup_list.append(appointment_view);
     }
-    // var result = try self.connection.query("select * from AppointmentView", .{});
-    // try self.results.append(result);
-
-    // while (try result.next()) |row| {
-    //     try lookup_list.append(mapper.appointment_view.fromDatabase(row));
-    // }
     return lookup_list;
 }

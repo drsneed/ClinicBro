@@ -86,7 +86,7 @@
     --appt-selected-border: light-dark(#232323, #f5f2f2);
 
     --calendar-number-fg: light-dark(#787777, #22);
-    --calendar-this-month-bg: light-dark(#dae2f8, #3b463b);
+    --calendar-this-month-bg: light-dark(#dae2f8, #121527);
     --calendar-this-month-active-bg: light-dark(#fff, #757272);
     --calendar-month-bg: light-dark(#eeeeec, #323030);
     --calendar-today-fg: light-dark(#155741, #adf5c5);

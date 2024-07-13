@@ -594,186 +594,6 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// public/clinicbro/js/schedule/monthview-style.ts
-function monthviewStyle() {
-  return i`
-  .month-table {
-    background: var(--container-bg);
-    table-layout: fixed;
-    //height: 550px;
-    border-collapse: separate;
-    border-spacing: 0;
-    padding: 0px !important;
-    margin: 0px;
-    width: 100%;
-    color: var(--table-fg);
-  }
-
-  .caption {
-    position: sticky;
-  }
-  
-  .header-item {
-    width: 150px;
-    text-align: left;
-  }
-  .scheduler-button-bar {
-    display: flex;
-    overflow: hidden;
-    margin: 6px 8px;
-    float: right;
-  }
-
-  .btn-left {
-    margin-top: 6px;
-    margin-left: 8px;
-    margin-right: 0px;
-    margin-bottom: 6px;
-  }
-  .btn-right {
-    margin: 6px 0px;
-  }
-  .btn-left, .btn-right {
-    display: inline-block;
-    padding: 4px 8px;
-    transition: none;
-    cursor: pointer;
-  }
-  .scheduler-button-bar button {
-    margin: 0px;
-    padding: 4px 8px;
-    cursor: pointer;
-  }
-
-  .btn-first {
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-  }
-
-  .btn-middle {
-    border-radius: 0px;
-  }
-
-  .btn-last {
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-  }
-
-  .scheduler-container {
-    overflow-y: visible;
-  }
-
-  .month-table td, .month-table th {
-    border: 1px solid var(--input-border);
-    box-shadow: none;
-    width: auto !important;
-    padding: 0px;
-  }
-  
-  .row1 {
-    position: sticky;
-    top: 0;
-    background-color: var(--container-bg);
-    z-index: 1;
-  }
-  .row2 {
-    position: sticky;
-    background-color: var(--container-bg);
-    border-bottom: 1px solid var(--table-header-fg) !important;
-    top: 40px;
-    z-index: 1;
-  }
-
-  .month-table thead {
-    text-align: center;
-  }
-
-  .sticky-header {
-    border-bottom: 1px solid var(--table-header-fg);
-    text-align: center;
-    background-color: var(--container-bg);
-    color: var(--container-fg);
-    font-weight: 900;
-    width: 100%;
-    margin: 0;
-  }
-
-  .btn-pressed {
-    border-style:inset;
-    background-color: var(--btn-pressed);
-  }
-
-  .no-border {
-    border-bottom: none !important;
-  }
-
-  caption {
-    width: 100%;
-  }
-
-  .month-header {
-    top: 0;
-    display: flex;
-    background-color: var(--header-bg);
-    text-align: center;
-    
-  }
-
-  .day-header {
-
-  }
-  
-  .month-header h2 {
-    width: 50%;
-    color: var(--header-fg);
-    padding: 0;
-    margin: 8px auto;
-    font-size: 20px;
-  }
-  
-  .month-table td {
-    background-color: var(--bg);
-    vertical-align: top;
-    height: 80px;
-    overflow: hidden;
-  }
-
-  .month-table tr {
-    white-space: nowrap;
-  }
-
-  .half-hour-mark {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    border-top: 2px dashed #8d5603;
-    color: inherit;
-    background-color: inherit;
-    height: 1px;
-    width: 100%;
-
-  }
-
-  
-  .day-view-hour-1, .day-view-hour-2 {
-        width: 100%;
-        height: 50px;
-        max-width: 100%;
-        white-space: nowrap;
-        user-select: none;
-        overflow-y: auto;
-  }
-  .day-view-hour-2 {
-        border-top: 1px dashed var(--input-border);
-  }
-  `;
-}
-
 // node_modules/@lit/reactive-element/decorators/custom-element.js
 var t3 = (t4) => (e4, o4) => {
   o4 !== undefined ? o4.addInitializer(() => {
@@ -877,7 +697,6 @@ function clearAllSelectedDays() {
     appt.removeAttribute("selected");
   });
 }
-var dayHeaders = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 var months = [
   "January",
   "February",
@@ -893,219 +712,261 @@ var months = [
   "December"
 ];
 
-// node_modules/lit-icon/pkg/dist-src/lit-icon.js
-class LitIcon extends HTMLElement {
-  constructor() {
-    super();
-    this._icon = "";
-    const shadow = this.attachShadow({
-      mode: "open"
-    });
-    shadow.innerHTML = `
-      <style>
-        :host {
-          display: inline-block;
-          width: 24px;
-          height: 24px;
-          margin: 0 5px;
-          box-sizing: content-box;
-          vertical-align: sub;
-        }
-        .iron-icon {
-          display: -webkit-inline-flex;
-          display: inline-flex;
-          -ms-flex-align: center;
-          -webkit-align-items: center;
-          align-items: center;
-          -ms-flex-pack: center;
-          -webkit-justify-content: center;
-          justify-content: center;
-          position: relative;
-          fill: currentcolor;
-          stroke: none;
-          width: 100%;
-          height: 100%;
-        }
-        i {
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          font-style: normal;
-          height: 100%;
-          width: 100%;
-          min-width: 100%;
-        }
-      </style>
-      <i></i>
-    `;
-    this.size = "24";
-    this._icon = "";
-    this._iconset = "iconset";
-    document.iconMap = document.iconMap || {};
-    window.addEventListener("ionset-loaded", this.updateIconset.bind(this));
+// public/clinicbro/js/schedule/monthview-style.ts
+function monthviewStyle() {
+  return i`
+  .month-table {
+    background: var(--container-bg);
+    table-layout: fixed;
+    //height: 550px;
+    border-collapse: separate;
+    border-spacing: 0;
+    padding: 0px !important;
+    margin: 0px;
+    width: 100%;
+    color: var(--table-fg);
   }
-  static get observedAttributes() {
-    return ["size", "icon", "iconset"];
+
+  .caption {
+    position: sticky;
   }
-  get icon() {
-    return this._icon;
+  
+  .header-item {
+    width: 150px;
+    text-align: left;
   }
-  set icon(value) {
-    this._icon = value;
-    this.setAttribute("icon", value);
+  .scheduler-button-bar {
+    display: flex;
+    overflow: hidden;
+    margin: 6px 8px;
+    float: right;
   }
-  get iconset() {
-    return this._iconset;
+
+  .btn-left {
+    margin-top: 6px;
+    margin-left: 8px;
+    margin-right: 0px;
+    margin-bottom: 6px;
   }
-  set iconset(value) {
-    this._iconset = value;
-    this.setAttribute("iconset", value);
+  .btn-right {
+    margin: 6px 0px;
   }
-  attributeChangedCallback(name, oldValue, newValue) {
-    switch (name) {
-      case "size":
-        this.size = newValue;
-        this.shadowRoot.querySelector("i").style.height = this.size;
-        this.shadowRoot.querySelector("i").style.width = this.size;
-        break;
-      case "icon":
-        this._icon = newValue;
-        this.findIcon();
-        break;
-      case "iconset":
-        this._iconset = newValue;
-        break;
-      default:
-        break;
-    }
+  .btn-left, .btn-right {
+    display: inline-block;
+    padding: 4px 8px;
+    transition: none;
+    cursor: pointer;
   }
-  updateIconset() {
-    const iconset = document.iconMap[this._iconset];
-    if (!iconset)
-      return;
-    this.findIcon();
-    this.shadowRoot.querySelector("i").style.height = this.size;
-    this.shadowRoot.querySelector("i").style.width = this.size;
+  .scheduler-button-bar button {
+    margin: 0px;
+    padding: 4px 8px;
+    cursor: pointer;
   }
-  findIcon() {
-    const iconset = document.iconMap[this._iconset];
-    if (!iconset)
-      return;
-    const _tpl = document.createElement("template");
-    iconset.forEach((icon2) => _tpl.appendChild(icon2));
-    let icon = _tpl.querySelector(`#${this._icon}`);
-    if (!icon)
-      return console.error(`[lit-icon] Icon '${this._icon}' no found in iconset`);
-    this.shadowRoot.querySelector("i").innerHTML = "";
-    this._cloneIcon(icon);
+
+  .btn-first {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
   }
-  _cloneIcon(icon) {
-    let content = icon.cloneNode(true);
-    let svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.classList.add("iron-icon");
-    icon.classList.add("iron-icon");
-    let viewBox = content.getAttribute("viewBox") || `0 0 ${this.size} ${this.size}`;
-    let cssText = "pointer-events: none; display: block; width: 100%; height: 100%;";
-    svg.setAttribute("viewBox", viewBox);
-    svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-    svg.setAttribute("focusable", "false");
-    svg.style.cssText = cssText;
-    let clonedIcon = icon.cloneNode(true);
-    svg.appendChild(clonedIcon);
-    const i4 = this.shadowRoot.querySelector("i");
-    i4.style.height = this.size;
-    i4.style.width = this.size;
-    i4.appendChild(svg);
+
+  .btn-middle {
+    border-radius: 0px;
+  }
+
+  .btn-last {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  .scheduler-container {
+    overflow-y: visible;
+  }
+
+  .month-table td, .month-table th {
+    border: 1px solid var(--input-border);
+    box-shadow: none;
+    width: auto !important;
+  }
+  
+  .row1 {
+    position: sticky;
+    top: 0;
+    background-color: var(--container-bg);
+    z-index: 1;
+  }
+  .row2 {
+    position: sticky;
+    background-color: var(--container-bg);
+    border-bottom: 1px solid var(--table-header-fg) !important;
+    top: 40px;
+    z-index: 1;
+  }
+
+  .month-table thead {
+    text-align: center;
+  }
+
+  .sticky-header {
+    border-bottom: 1px solid var(--table-header-fg);
+    text-align: center;
+    background-color: var(--container-bg);
+    color: var(--container-fg);
+    font-weight: 900;
+    width: 100%;
+    margin: 0;
+  }
+
+  .btn-pressed {
+    border-style:inset;
+    background-color: var(--btn-pressed);
+  }
+
+  .no-border {
+    border-bottom: none !important;
+  }
+
+  caption {
+    width: 100%;
+  }
+
+  .month-header {
+    top: 0;
+    display: flex;
+    background-color: var(--header-bg);
+    text-align: center;
+    
+  }
+
+  .row2, .day-header {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  
+  .month-header h2 {
+    width: 50%;
+    color: var(--header-fg);
+    padding: 0;
+    margin: 8px auto;
+    font-size: 20px;
+  }
+  
+  .month-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .month-table tr {
+    white-space: nowrap;
+  }
+
+  .half-hour-mark {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    border-top: 2px dashed #8d5603;
+    color: inherit;
+    background-color: inherit;
+    height: 1px;
+    width: 100%;
+
+  }
+
+  
+  .day-view-hour-1, .day-view-hour-2 {
+        width: 100%;
+        height: 50%;
+        max-width: 100%;
+        white-space: nowrap;
+        user-select: none;
+        overflow-y: auto;
+  }
+  .day-view-hour-2 {
+        border-top: 1px dashed var(--input-border);
+  }
+  `;
+}
+
+// node_modules/lit-html/directive.js
+var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
+var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
+
+class i4 {
+  constructor(t5) {
+  }
+  get _$AU() {
+    return this._$AM._$AU;
+  }
+  _$AT(t5, e6, i5) {
+    this._$Ct = t5, this._$AM = e6, this._$Ci = i5;
+  }
+  _$AS(t5, e6) {
+    return this.update(t5, e6);
+  }
+  update(t5, e6) {
+    return this.render(...e6);
   }
 }
-customElements.define("lit-icon", LitIcon);
 
-// node_modules/lit-icon/pkg/dist-src/lit-iconset.js
-class LitIconset extends HTMLElement {
-  constructor() {
-    super();
-    document.iconMap = document.iconMap || {};
-    this._iconset = "iconset";
-    const shadow = this.attachShadow({
-      mode: "open"
-    });
-    shadow.innerHTML = `<style>:host{display:none;}</style><slot></slot>`;
+// node_modules/lit-html/directives/class-map.js
+var e6 = e5(class extends i4 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
+      throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
   }
-  static get observedAttributes() {
-    return ["iconset"];
+  render(t5) {
+    return " " + Object.keys(t5).filter((s4) => t5[s4]).join(" ") + " ";
   }
-  get iconset() {
-    return this._iconset;
-  }
-  set iconset(value) {
-    this._iconset = value;
-    this.setAttribute("iconset", value);
-  }
-  connectedCallback() {
-    this.setIconset();
-  }
-  setIconset() {
-    const slot = this.shadowRoot.querySelector("slot");
-    slot.addEventListener("slotchange", () => {
-      const [svg2] = slot.assignedNodes().filter((node) => node.nodeType !== Node.TEXT_NODE);
-      const icons = svg2.querySelectorAll("g");
-      if (!icons.length)
-        return false;
-      document.iconMap[this._iconset] = icons;
-      const event = new CustomEvent("ionset-loaded");
-      return window.dispatchEvent(event);
-    });
-    const [svg] = slot.assignedNodes().filter((node) => node.nodeType !== Node.TEXT_NODE);
-    if (svg) {
-      const icons = svg.querySelectorAll("g");
-      if (!icons.length)
-        return false;
-      document.iconMap[this._iconset] = icons;
-      const event = new CustomEvent("ionset-loaded");
-      return window.dispatchEvent(event);
+  update(s4, [i5]) {
+    if (this.st === undefined) {
+      this.st = new Set, s4.strings !== undefined && (this.nt = new Set(s4.strings.join(" ").split(/\s/).filter((t5) => t5 !== "")));
+      for (const t5 in i5)
+        i5[t5] && !this.nt?.has(t5) && this.st.add(t5);
+      return this.render(i5);
     }
-  }
-  attributeChangedCallback(name, oldValue, newValue) {
-    switch (name) {
-      case "iconset":
-        this._iconset = newValue;
-        this.setIconset();
-        break;
-      default:
-        break;
+    const r6 = s4.element.classList;
+    for (const t5 of this.st)
+      t5 in i5 || (r6.remove(t5), this.st.delete(t5));
+    for (const t5 in i5) {
+      const s5 = !!i5[t5];
+      s5 === this.st.has(t5) || this.nt?.has(t5) || (s5 ? (r6.add(t5), this.st.add(t5)) : (r6.remove(t5), this.st.delete(t5)));
     }
+    return w;
   }
-}
-customElements.define("lit-iconset", LitIconset);
-
-// public/clinicbro/js/schedule/monthview.ts
-class MonthView extends s3 {
+});
+// public/clinicbro/js/schedule/scheduler-base.ts
+class SchedulerBase extends s3 {
   static styles = monthviewStyle();
   constructor() {
     super();
     this.current_date = new Date;
-    this.mode = "month";
   }
   updated(changedProperties) {
     htmx.process(this.shadowRoot);
     if (changedProperties.has("current_date")) {
     }
   }
-  _prev(e5) {
+  _prev(e7) {
     this.current_date = dateAdd(this.current_date, this.mode, -1);
     clearAllSelectedDays();
   }
-  _next(e5) {
+  _next(e7) {
     this.current_date = dateAdd(this.current_date, this.mode, 1);
     clearAllSelectedDays();
   }
-  _monthViewClicked(e5) {
+  _monthViewClicked(e7) {
     this.mode = "month";
   }
-  _weekViewClicked(e5) {
+  _weekViewClicked(e7) {
     this.mode = "week";
   }
-  _dayViewClicked(e5) {
+  _dayViewClicked(e7) {
     this.mode = "day";
   }
   calendarTitle() {
@@ -1125,28 +986,49 @@ class MonthView extends s3 {
       }
     }
   }
+  renderSchedulerModesButtonBar() {
+    return x`
+      <div class="header-item scheduler-button-bar">
+        <button type="button" class="${e6({ btn: true, "btn-first": true, "btn-pressed": this.mode === "month" })}"
+            hx-get="/scheduler?mode=month" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Month</button>
+        <button type="button" class="${e6({ btn: true, "btn-middle": true, "btn-pressed": this.mode === "week" })}"
+            hx-get="/scheduler?mode=week" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Week</button>
+        <button type="button" class="${e6({ btn: true, "btn-last": true, "btn-pressed": this.mode === "day" })}"
+            hx-get="/scheduler?mode=day" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Day</button>
+      </div>
+    `;
+  }
   renderCaption() {
     return x`
     <caption>
         <div class="month-header">
             <div class="header-item">
-              <button type="button" @click="${this._prev}" class="btn-left"><lit-icon icon="chevron_left" iconset="iconset" style="width: 20px; height: 20px;"></lit-icon></button>
-              <button type="button" @click="${this._next}" class="btn-right"><lit-icon icon="chevron_right" iconset="iconset" style="width: 20px; height: 20px;"></lit-icon></button>
+              <button type="button" @click="${this._prev}" class="btn-left">&lt;</button>
+              <button type="button" @click="${this._next}" class="btn-right">&gt;</button>
             </div>
             <h2 id="month_title">${this.calendarTitle()}</h2>
-            <div class="header-item scheduler-button-bar">
-              <button type="button" class="btn btn-first" @click="${this._monthViewClicked}">Month</button>
-              <button type="button" class="btn btn-middle" @click="${this._weekViewClicked}">Week</button>
-              <button type="button" class="btn btn-last btn-pressed" @click="${this._dayViewClicked}">Day</button>
-            </div>
-            <lit-iconset iconset="iconset">
-              <svg><defs>
-                <g id="chevron_left"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path></g>
-                <g id="chevron_right"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path></g>
-              </defs></svg>
-            </lit-iconset>
+            ${this.renderSchedulerModesButtonBar()}
         </div>
     </caption>`;
+  }
+}
+__legacyDecorateClassTS([
+  n4({ converter(value) {
+    if (!isNaN(Date.parse(value))) {
+      return new Date(value);
+    }
+    return new Date;
+  }, reflect: true })
+], SchedulerBase.prototype, "current_date", undefined);
+__legacyDecorateClassTS([
+  n4({ type: String, reflect: true })
+], SchedulerBase.prototype, "mode", undefined);
+
+// public/clinicbro/js/schedule/monthview.ts
+class MonthView extends SchedulerBase {
+  constructor() {
+    super();
+    this.mode = "month";
   }
   renderMonthViewDay(today, table_slot_id, date_of_day) {
     let current_month = date_of_day.getMonth() == this.current_date.getMonth();
@@ -1163,158 +1045,20 @@ class MonthView extends s3 {
     let rows = [];
     let firstOfDaMonth = new Date(this.current_date.getFullYear(), this.current_date.getMonth(), 1);
     let d3 = firstOfDaMonth.getDay();
-    let i4 = 0;
+    let i5 = 0;
     for (let week = 0;week < 6; week++) {
       var days = [];
       for (let day = 0;day < 7; day++) {
-        let id = "d" + i4;
-        let thisDaysDate = dateAdd(firstOfDaMonth, "day", i4 - d3);
+        let id = "d" + i5;
+        let thisDaysDate = dateAdd(firstOfDaMonth, "day", i5 - d3);
         days.push(x`<td>${this.renderMonthViewDay(today, id, thisDaysDate)}</td>`);
-        i4++;
+        i5++;
       }
       rows.push(x`<tr>${days}</tr>`);
-    }
-    return x`${rows}`;
-  }
-  renderWeekViewDays() {
-    var today = new Date;
-    let rows = [];
-    let firstOfDaWeek = dateAdd(this.current_date, "day", -this.current_date.getDay());
-    let d3 = firstOfDaWeek.getDay();
-    let i4 = 0;
-    var midnight = new Date(this.current_date.valueOf());
-    midnight.setHours(0, 0, 0, 0);
-    for (let hour = 0;hour < 24; hour++) {
-      let this_hour = dateAdd(midnight, "hour", i4);
-      let time_hour = this_hour.getHours() % 12 || 12;
-      let pm = this_hour.getHours() >= 12 ? "pm" : "am";
-      var days = [];
-      days.push(x`<td class="time-display">${time_hour}:00 ${pm}</td>`);
-      for (let day = 0;day < 7; day++) {
-        let id = "d" + day + "h" + hour;
-        let thisDaysDate = dateAdd(firstOfDaWeek, "day", d3);
-        days.push(x`<td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td>`);
-      }
-      rows.push(x`<tr>${days}</tr>`);
-      i4++;
     }
     return x`${rows}`;
   }
   render() {
-    if (this.mode == "month") {
-      return this.renderMonthView();
-    } else if (this.mode == "day") {
-      return this.renderDayView();
-    } else {
-      return this.renderWeekView();
-    }
-  }
-  renderDayViewDay() {
-    var today = new Date;
-    let rows = [];
-    let i4 = 0;
-    var midnight = new Date(this.current_date.valueOf());
-    midnight.setHours(0, 0, 0, 0);
-    for (let hour = 0;hour < 24; hour++) {
-      let id = "h" + i4;
-      let this_hour = dateAdd(midnight, "hour", i4);
-      let time_hour = this_hour.getHours() % 12 || 12;
-      let pm = this_hour.getHours() >= 12 ? "pm" : "am";
-      rows.push(x`<tr><td class="time-display">${time_hour}:00 ${pm}</td><td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td></tr>`);
-      i4++;
-    }
-    return x`${rows}`;
-  }
-  renderDayView() {
-    return x`
-    <table class="month-table" cellspacing="0">
-        <colgroup>
-          <col span="1" style="width: 70px;">
-          <col span="1" style="width: 95%;">
-        </colgroup>
-        <thead>
-            <tr>
-              <th colspan="2" class="row1">
-                  <div class="sticky-header">
-                    ${this.renderCaption()}
-                    <div class="day-header">
-                      ${dayHeaders[this.current_date.getDay()]}
-                    </div>
-                  </div>
-              </th>
-            </tr>
-        </thead>
-        <tbody hx-ext="path-params">
-          ${this.renderDayViewDay()}
-        </tbody>
-    </table>
-    
-    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
-    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
-    `;
-  }
-  renderSchedulerModesButtonBar() {
-    return x`
-      <div class="scheduler-button-bar">
-        <button type="button" class="btn btn-first" @click="${this._monthViewClicked}">Month</button>
-        <button type="button" class="btn btn-middle" @click="${this._weekViewClicked}">Week</button>
-        <button type="button" class="btn btn-last btn-pressed" @click="${this._dayViewClicked}">Day</button>
-      </div>
-    `;
-  }
-  renderWeekView() {
-    let sunday = dateAdd(this.current_date, "day", -this.current_date.getDay());
-    let sundisp = "" + (sunday.getMonth() + 1) + "/" + sunday.getDate();
-    let monday = dateAdd(sunday, "day", 1);
-    let mondisp = "" + (monday.getMonth() + 1) + "/" + monday.getDate();
-    let tuesday = dateAdd(monday, "day", 1);
-    let tuedisp = "" + (tuesday.getMonth() + 1) + "/" + tuesday.getDate();
-    let wednesday = dateAdd(tuesday, "day", 1);
-    let weddisp = "" + (wednesday.getMonth() + 1) + "/" + wednesday.getDate();
-    let thursday = dateAdd(wednesday, "day", 1);
-    let thudisp = "" + (thursday.getMonth() + 1) + "/" + thursday.getDate();
-    let friday = dateAdd(thursday, "day", 1);
-    let fridisp = "" + (friday.getMonth() + 1) + "/" + friday.getDate();
-    let saturday = dateAdd(friday, "day", 1);
-    let satdisp = "" + (saturday.getMonth() + 1) + "/" + saturday.getDate();
-    return x`
-    <table class="month-table" cellspacing="0">
-      <colgroup>
-          <col span="1" style="width: 70px;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-      </colgroup>
-      <thead>
-          <tr>
-              <th colspan="8" class="row1 no-border">
-                ${this.renderCaption()}
-              </th>
-          </tr>
-          <tr>
-              <th class="row2"></th>
-              <th class="row2">Sun ${sundisp}</th>
-              <th class="row2">Mon ${mondisp}</th>
-              <th class="row2">Tue ${tuedisp}</th>
-              <th class="row2">Wed ${weddisp}</th>
-              <th class="row2">Thu ${thudisp}</th>
-              <th class="row2">Fri ${fridisp}</th>
-              <th class="row2">Sat ${satdisp}</th>
-          </tr>
-      </thead>
-      <tbody hx-ext="path-params">
-        ${this.renderWeekViewDays()} 
-      </tbody>
-    </table>
-    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
-    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
-    `;
-  }
-  renderMonthView() {
     return x`
     <table class="month-table" cellspacing="0">
       <thead>
@@ -1342,14 +1086,6 @@ class MonthView extends s3 {
     `;
   }
 }
-__legacyDecorateClassTS([
-  n4({ converter(value) {
-    return new Date(value);
-  }, reflect: true })
-], MonthView.prototype, "current_date", undefined);
-__legacyDecorateClassTS([
-  n4({ type: String, reflect: true })
-], MonthView.prototype, "mode", undefined);
 MonthView = __legacyDecorateClassTS([
   t3("month-view")
 ], MonthView);

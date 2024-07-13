@@ -1,3 +1,14 @@
+var __legacyDecorateClassTS = function(decorators, target, key, desc) {
+  var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+  if (typeof Reflect === "object" && typeof Reflect.decorate === "function")
+    r = Reflect.decorate(decorators, target, key, desc);
+  else
+    for (var i = decorators.length - 1;i >= 0; i--)
+      if (d = decorators[i])
+        r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+  return c > 3 && r && Object.defineProperty(target, key, r), r;
+};
+
 // node_modules/@lit/reactive-element/css-tag.js
 var t = globalThis;
 var e = t.ShadowRoot && (t.ShadyCSS === undefined || t.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
@@ -583,50 +594,519 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// public/clinicbro/js/schedule/appointment.ts
-class Appointment extends s3 {
-  static styles = i`
-    :host {
-    --border-left: light-dark(#FF000055, #CCC);
-    --bg: light-dark(#CCC, #222);
-    --fg: light-dark(#444, #CCC);
+// node_modules/@lit/reactive-element/decorators/custom-element.js
+var t3 = (t4) => (e4, o4) => {
+  o4 !== undefined ? o4.addInitializer(() => {
+    customElements.define(t4, e4);
+  }) : customElements.define(t4, e4);
+};
+// node_modules/@lit/reactive-element/decorators/property.js
+var n4 = function(t4) {
+  return (e4, o4) => typeof o4 == "object" ? r5(t4, e4, o4) : ((t5, e5, o5) => {
+    const r5 = e5.hasOwnProperty(o5);
+    return e5.constructor.createProperty(o5, r5 ? { ...t5, wrapped: true } : t5), r5 ? Object.getOwnPropertyDescriptor(e5, o5) : undefined;
+  })(t4, e4, o4);
+};
+var o4 = { attribute: true, type: String, converter: u, reflect: false, hasChanged: f };
+var r5 = (t4 = o4, e4, r6) => {
+  const { kind: n5, metadata: i4 } = r6;
+  let s4 = globalThis.litPropertyMetadata.get(i4);
+  if (s4 === undefined && globalThis.litPropertyMetadata.set(i4, s4 = new Map), s4.set(r6.name, t4), n5 === "accessor") {
+    const { name: o5 } = r6;
+    return { set(r7) {
+      const n6 = e4.get.call(this);
+      e4.set.call(this, r7), this.requestUpdate(o5, n6, t4);
+    }, init(e5) {
+      return e5 !== undefined && this.P(o5, undefined, t4), e5;
+    } };
   }
-    div {
-      border-left: 4px solid var(--border-left);
-      font-size: 12px;
-      background-color: var(--bg);
-      color: var(--fg);
-      padding: 0px 2px;
-      margin: 2px 0px;
-    }`;
-  static properties = {
-    name: { type: String },
-    start: {
-      reflect: true,
-      converter(value) {
-        return new Date(value);
-      }
-    },
-    end: {
-      reflect: true,
-      converter(value) {
-        return new Date(value);
-      }
-    }
+  if (n5 === "setter") {
+    const { name: o5 } = r6;
+    return function(r7) {
+      const n6 = this[o5];
+      e4.call(this, r7), this.requestUpdate(o5, n6, t4);
+    };
+  }
+  throw Error("Unsupported decorator location: " + n5);
+};
+// public/clinicbro/js/util.ts
+function dateAdd(date, interval, units) {
+  var ret = new Date(date.valueOf());
+  var checkRollover = function() {
+    if (ret.getDate() != date.getDate())
+      ret.setDate(0);
   };
-  constructor() {
-    super();
+  switch (String(interval).toLowerCase()) {
+    case "year":
+      ret.setFullYear(ret.getFullYear() + units);
+      checkRollover();
+      break;
+    case "quarter":
+      ret.setMonth(ret.getMonth() + 3 * units);
+      checkRollover();
+      break;
+    case "month":
+      ret.setMonth(ret.getMonth() + units);
+      checkRollover();
+      break;
+    case "week":
+      ret.setDate(ret.getDate() + 7 * units);
+      break;
+    case "day":
+      ret.setDate(ret.getDate() + units);
+      break;
+    case "hour":
+      ret.setTime(ret.getTime() + units * 3600000);
+      break;
+    case "minute":
+      ret.setTime(ret.getTime() + units * 60000);
+      break;
+    case "second":
+      ret.setTime(ret.getTime() + units * 1000);
+      break;
+    default:
+      ret = undefined;
+      break;
   }
-  render() {
-    let startHours = this.start.getHours() % 12 || 12;
-    let startMinutes = ("0" + this.start.getMinutes()).slice(-2);
-    let endHours = this.end.getHours() % 12 || 12;
-    let endMinutes = ("0" + this.end.getMinutes()).slice(-2);
-    let pm = this.end.getHours() >= 12 ? "pm" : "am";
-    return x`<div><span>${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${this.name}</span></div>`;
+  return ret;
+}
+function dateSuffix(d1) {
+  let num_date_str = "" + d1.getDate();
+  const ending = num_date_str.slice(-1);
+  const beginning = num_date_str[0];
+  let suffix = "th";
+  if (num_date_str.length == 1 || beginning != "1") {
+    if (ending === "1")
+      suffix = "st";
+    else if (ending === "2")
+      suffix = "nd";
+    else if (ending === "3")
+      suffix = "rd";
+  }
+  return suffix;
+}
+function clearAllSelectedDays() {
+  var schedule = document.getElementById("schedule");
+  schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
+    day.removeAttribute("selected");
+  });
+  document.querySelectorAll("mv-appt").forEach(function(appt) {
+    appt.removeAttribute("selected");
+  });
+}
+var months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December"
+];
+
+// public/clinicbro/js/schedule/monthview-style.ts
+function monthviewStyle() {
+  return i`
+  .month-table {
+    background: var(--container-bg);
+    table-layout: fixed;
+    //height: 550px;
+    border-collapse: separate;
+    border-spacing: 0;
+    padding: 0px !important;
+    margin: 0px;
+    width: 100%;
+    color: var(--table-fg);
+  }
+
+  .caption {
+    position: sticky;
+  }
+  
+  .header-item {
+    width: 150px;
+    text-align: left;
+  }
+  .scheduler-button-bar {
+    display: flex;
+    overflow: hidden;
+    margin: 6px 8px;
+    float: right;
+  }
+
+  .btn-left {
+    margin-top: 6px;
+    margin-left: 8px;
+    margin-right: 0px;
+    margin-bottom: 6px;
+  }
+  .btn-right {
+    margin: 6px 0px;
+  }
+  .btn-left, .btn-right {
+    display: inline-block;
+    padding: 4px 8px;
+    transition: none;
+    cursor: pointer;
+  }
+  .scheduler-button-bar button {
+    margin: 0px;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+
+  .btn-first {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-top-right-radius: 0px;
+    border-bottom-right-radius: 0px;
+  }
+
+  .btn-middle {
+    border-radius: 0px;
+  }
+
+  .btn-last {
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  .scheduler-container {
+    overflow-y: visible;
+  }
+
+  .month-table td, .month-table th {
+    border: 1px solid var(--input-border);
+    box-shadow: none;
+    width: auto !important;
+  }
+  
+  .row1 {
+    position: sticky;
+    top: 0;
+    background-color: var(--container-bg);
+    z-index: 1;
+  }
+  .row2 {
+    position: sticky;
+    background-color: var(--container-bg);
+    border-bottom: 1px solid var(--table-header-fg) !important;
+    top: 40px;
+    z-index: 1;
+  }
+
+  .month-table thead {
+    text-align: center;
+  }
+
+  .sticky-header {
+    border-bottom: 1px solid var(--table-header-fg);
+    text-align: center;
+    background-color: var(--container-bg);
+    color: var(--container-fg);
+    font-weight: 900;
+    width: 100%;
+    margin: 0;
+  }
+
+  .btn-pressed {
+    border-style:inset;
+    background-color: var(--btn-pressed);
+  }
+
+  .no-border {
+    border-bottom: none !important;
+  }
+
+  caption {
+    width: 100%;
+  }
+
+  .month-header {
+    top: 0;
+    display: flex;
+    background-color: var(--header-bg);
+    text-align: center;
+    
+  }
+
+  .row2, .day-header {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  
+  .month-header h2 {
+    width: 50%;
+    color: var(--header-fg);
+    padding: 0;
+    margin: 8px auto;
+    font-size: 20px;
+  }
+  
+  .month-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .month-table tr {
+    white-space: nowrap;
+  }
+
+  .half-hour-mark {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    border-top: 2px dashed #8d5603;
+    color: inherit;
+    background-color: inherit;
+    height: 1px;
+    width: 100%;
+
+  }
+
+  
+  .day-view-hour-1, .day-view-hour-2 {
+        width: 100%;
+        height: 50%;
+        max-width: 100%;
+        white-space: nowrap;
+        user-select: none;
+        overflow-y: auto;
+  }
+  .day-view-hour-2 {
+        border-top: 1px dashed var(--input-border);
+  }
+  `;
+}
+
+// node_modules/lit-html/directive.js
+var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
+var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
+
+class i4 {
+  constructor(t5) {
+  }
+  get _$AU() {
+    return this._$AM._$AU;
+  }
+  _$AT(t5, e6, i5) {
+    this._$Ct = t5, this._$AM = e6, this._$Ci = i5;
+  }
+  _$AS(t5, e6) {
+    return this.update(t5, e6);
+  }
+  update(t5, e6) {
+    return this.render(...e6);
   }
 }
-customElements.define("x-appt", Appointment);
+
+// node_modules/lit-html/directives/class-map.js
+var e6 = e5(class extends i4 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
+      throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
+  }
+  render(t5) {
+    return " " + Object.keys(t5).filter((s4) => t5[s4]).join(" ") + " ";
+  }
+  update(s4, [i5]) {
+    if (this.st === undefined) {
+      this.st = new Set, s4.strings !== undefined && (this.nt = new Set(s4.strings.join(" ").split(/\s/).filter((t5) => t5 !== "")));
+      for (const t5 in i5)
+        i5[t5] && !this.nt?.has(t5) && this.st.add(t5);
+      return this.render(i5);
+    }
+    const r6 = s4.element.classList;
+    for (const t5 of this.st)
+      t5 in i5 || (r6.remove(t5), this.st.delete(t5));
+    for (const t5 in i5) {
+      const s5 = !!i5[t5];
+      s5 === this.st.has(t5) || this.nt?.has(t5) || (s5 ? (r6.add(t5), this.st.add(t5)) : (r6.remove(t5), this.st.delete(t5)));
+    }
+    return w;
+  }
+});
+// public/clinicbro/js/schedule/scheduler-base.ts
+class SchedulerBase extends s3 {
+  static styles = monthviewStyle();
+  constructor() {
+    super();
+    this.current_date = new Date;
+  }
+  updated(changedProperties) {
+    htmx.process(this.shadowRoot);
+    if (changedProperties.has("current_date")) {
+    }
+  }
+  _prev(e7) {
+    this.current_date = dateAdd(this.current_date, this.mode, -1);
+    clearAllSelectedDays();
+  }
+  _next(e7) {
+    this.current_date = dateAdd(this.current_date, this.mode, 1);
+    clearAllSelectedDays();
+  }
+  _monthViewClicked(e7) {
+    this.mode = "month";
+  }
+  _weekViewClicked(e7) {
+    this.mode = "week";
+  }
+  _dayViewClicked(e7) {
+    this.mode = "day";
+  }
+  calendarTitle() {
+    if (this.mode == "month") {
+      return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
+    } else if (this.mode == "day") {
+      return months[this.current_date.getMonth()] + " " + this.current_date.getDate() + dateSuffix(this.current_date) + ", " + this.current_date.getFullYear();
+    } else {
+      let firstOfDaWeek = dateAdd(this.current_date, "day", -this.current_date.getDay());
+      let endOfDaWeek = dateAdd(firstOfDaWeek, "day", 6);
+      if (firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear() && firstOfDaWeek.getMonth() == endOfDaWeek.getMonth()) {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
+      } else if (firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear()) {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " + months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
+      } else {
+        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " " + firstOfDaWeek.getFullYear() + " - " + months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + endOfDaWeek.getFullYear();
+      }
+    }
+  }
+  renderSchedulerModesButtonBar() {
+    return x`
+      <div class="header-item scheduler-button-bar">
+        <button type="button" class="${e6({ btn: true, "btn-first": true, "btn-pressed": this.mode === "month" })}"
+            hx-get="/scheduler?mode=month" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Month</button>
+        <button type="button" class="${e6({ btn: true, "btn-middle": true, "btn-pressed": this.mode === "week" })}"
+            hx-get="/scheduler?mode=week" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Week</button>
+        <button type="button" class="${e6({ btn: true, "btn-last": true, "btn-pressed": this.mode === "day" })}"
+            hx-get="/scheduler?mode=day" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Day</button>
+      </div>
+    `;
+  }
+  renderCaption() {
+    return x`
+    <caption>
+        <div class="month-header">
+            <div class="header-item">
+              <button type="button" @click="${this._prev}" class="btn-left">&lt;</button>
+              <button type="button" @click="${this._next}" class="btn-right">&gt;</button>
+            </div>
+            <h2 id="month_title">${this.calendarTitle()}</h2>
+            ${this.renderSchedulerModesButtonBar()}
+        </div>
+    </caption>`;
+  }
+}
+__legacyDecorateClassTS([
+  n4({ converter(value) {
+    if (!isNaN(Date.parse(value))) {
+      return new Date(value);
+    }
+    return new Date;
+  }, reflect: true })
+], SchedulerBase.prototype, "current_date", undefined);
+__legacyDecorateClassTS([
+  n4({ type: String, reflect: true })
+], SchedulerBase.prototype, "mode", undefined);
+
+// public/clinicbro/js/schedule/weekview.ts
+class WeekView extends SchedulerBase {
+  constructor() {
+    super();
+    this.mode = "week";
+  }
+  renderWeekViewDays() {
+    var today = new Date;
+    let rows = [];
+    let firstOfDaWeek = dateAdd(this.current_date, "day", -this.current_date.getDay());
+    let d3 = firstOfDaWeek.getDay();
+    let i5 = 0;
+    var midnight = new Date(this.current_date.valueOf());
+    midnight.setHours(0, 0, 0, 0);
+    for (let hour = 0;hour < 24; hour++) {
+      let this_hour = dateAdd(midnight, "hour", i5);
+      let time_hour = this_hour.getHours() % 12 || 12;
+      let pm = this_hour.getHours() >= 12 ? "pm" : "am";
+      var days = [];
+      days.push(x`<td class="time-display">${time_hour}:00 ${pm}</td>`);
+      for (let day = 0;day < 7; day++) {
+        let id = "d" + day + "h" + hour;
+        let thisDaysDate = dateAdd(firstOfDaWeek, "day", d3);
+        days.push(x`<td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td>`);
+      }
+      rows.push(x`<tr>${days}</tr>`);
+      i5++;
+    }
+    return x`${rows}`;
+  }
+  render() {
+    let sunday = dateAdd(this.current_date, "day", -this.current_date.getDay());
+    let sundisp = "" + (sunday.getMonth() + 1) + "/" + sunday.getDate();
+    let monday = dateAdd(sunday, "day", 1);
+    let mondisp = "" + (monday.getMonth() + 1) + "/" + monday.getDate();
+    let tuesday = dateAdd(monday, "day", 1);
+    let tuedisp = "" + (tuesday.getMonth() + 1) + "/" + tuesday.getDate();
+    let wednesday = dateAdd(tuesday, "day", 1);
+    let weddisp = "" + (wednesday.getMonth() + 1) + "/" + wednesday.getDate();
+    let thursday = dateAdd(wednesday, "day", 1);
+    let thudisp = "" + (thursday.getMonth() + 1) + "/" + thursday.getDate();
+    let friday = dateAdd(thursday, "day", 1);
+    let fridisp = "" + (friday.getMonth() + 1) + "/" + friday.getDate();
+    let saturday = dateAdd(friday, "day", 1);
+    let satdisp = "" + (saturday.getMonth() + 1) + "/" + saturday.getDate();
+    return x`
+    <table class="month-table" cellspacing="0">
+      <colgroup>
+          <col span="1" style="width: 70px;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+          <col span="1" style="width: 13.95%;">
+      </colgroup>
+      <thead>
+          <tr>
+              <th colspan="8" class="row1 no-border">
+                ${this.renderCaption()}
+              </th>
+          </tr>
+          <tr>
+              <th class="row2"></th>
+              <th class="row2">Sun ${sundisp}</th>
+              <th class="row2">Mon ${mondisp}</th>
+              <th class="row2">Tue ${tuedisp}</th>
+              <th class="row2">Wed ${weddisp}</th>
+              <th class="row2">Thu ${thudisp}</th>
+              <th class="row2">Fri ${fridisp}</th>
+              <th class="row2">Sat ${satdisp}</th>
+          </tr>
+      </thead>
+      <tbody hx-ext="path-params">
+        ${this.renderWeekViewDays()} 
+      </tbody>
+    </table>
+    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
+    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
+    `;
+  }
+}
+WeekView = __legacyDecorateClassTS([
+  t3("week-view")
+], WeekView);
 export {
-  Appointment
+  WeekView
 };
