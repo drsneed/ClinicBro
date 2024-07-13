@@ -26,7 +26,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     const params = try request.params();
     const mode = params.getT(.string, "mode") orelse "month";
     try root.put("mode", data.string(mode));
-    const current_date = params.getT(.string, "cd") orelse "";
+    const current_date = params.getT(.string, "date") orelse "";
     try root.put("current_date", data.string(current_date));
     const date_from = params.getT(.string, "from");
     const date_to = params.getT(.string, "to");

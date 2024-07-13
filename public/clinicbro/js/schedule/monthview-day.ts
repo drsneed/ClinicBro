@@ -28,6 +28,13 @@ export class MonthViewDay extends LitElement {
         margin-top: 2px;
         background-color: transparent;
       }
+      .num:link, .num:visited {
+          color: var(--link);
+          text-decoration: none;
+      }
+      .num:hover {
+          color: var(--fg);
+      }
       .today {
         border: 1px solid var(--calendar-today-fg);
         color: var(--calendar-today-fg) !important;
@@ -35,61 +42,11 @@ export class MonthViewDay extends LitElement {
       .num:hover {
         font-weight: bold;
       }
-
       .this_month {
         background-color: var(--calendar-this-month-bg) !important;
       }
-
       .selected {
         background-color: var(--calendar-this-month-active-bg) !important;
-      }
-      
-
-
-      .menu {
-        position: absolute;
-        top: -20px;
-        left: 0;
-        margin: 0;
-      }
-
-      .menu_opened {
-        display: flex;
-      }
-      .menu_closed {
-        display: none;
-      }
-
-      .btn_add {
-        padding-left: 2px;
-        padding-top: 0px;
-        padding-right: 2px;
-        padding-bottom: 1px;
-        cursor: pointer;
-        border-radius: 50%;
-        /* border: 1px solid var(--btn-save-bg); */
-        border: none;
-        margin-right: 2px;
-        margin-top: 2px;
-        font-size: 11px;
-        font-weight: bold;
-        background-color: transparent;
-        color: var(--btn-save-bg);
-        float: right;
-      }
-
-      .btn_add_show {
-        display: flex;
-      }
-      .btn_add_hide {
-        display: none;
-      }
-
-      .btn_add:hover {
-        background-color: var(--btn-save-bg);
-        color: var(--btn-save-hover-bg);
-        /* text-decoration: underline; */
-        
       }
     `;
 
@@ -111,36 +68,19 @@ export class MonthViewDay extends LitElement {
       this.current_month = false;
       this.selected = false;
       this.addEventListener('click', this._clickHandler);
-      //this.addEventListener('dblclick', this._doubleClickHandler);
-    }
-
-    firstUpdated() {
-    }
-
-    updated(changedProperties) {
-      if(changedProperties.has('selected')) {
-        if(this.selected) {
-          console.log("wtf");
-        }
-      }
     }
 
     public clicked() {
       let schedule = document.querySelector("#schedule");
-      if(schedule.appointment_dialog_opened) {
-        let dialog = schedule.shadowRoot.querySelector("#mv_dialog");
-        dialog.updateDate(this.current_date);
-      }
+      // if(schedule.appointment_dialog_opened) {
+      //   let dialog = schedule.shadowRoot.querySelector("#mv_dialog");
+      //   dialog.updateDate(this.current_date);
+      // }
       let dropped_appt_id_input = schedule.shadowRoot.querySelector("#dropped-appt-id");
       dropped_appt_id_input.value = "0";
       let dropped_client_id_input = schedule.shadowRoot.querySelector("#dropped-client-id");
       dropped_client_id_input.value = "0";
       this.selected = true;
-    }
-
-    public doubleClicked() {
-      const schedule = document.getElementById("schedule");
-      schedule.showCreateAppointmentDialog(this.current_date);
     }
 
     private _clickHandler(e) {
@@ -151,20 +91,6 @@ export class MonthViewDay extends LitElement {
           e.target.clicked();
           break;
       }
-    }
-
-    private _doubleClickHandler(e) {
-      switch(e.target.localName) {
-        case 'mv-day':
-        case 'mv-appt':
-          e.target.doubleClicked();
-          break;
-      }
-    }
-
-    private _addAppointment() {
-      const schedule = document.getElementById("schedule");
-      schedule.showCreateAppointmentDialog(this.current_date);
     }
 
     private _drop(e) {
@@ -186,34 +112,23 @@ export class MonthViewDay extends LitElement {
       dropped_appt_id_input.value = appt_id;
       let dropped_client_id_input = schedule.shadowRoot.querySelector("#dropped-client-id");
       dropped_client_id_input.value = client_id;
-      //schedule.moveAppointment(appt_id, this.current_date);
     }
 
     private _allowDrop(e) {
       e.preventDefault();
     }
 
-    private _gotoDayView(e) {
-      e.preventDefault();
-      alert("Gone baby boom!");
-    }
-
     protected render() {
         let num = this.current_date.getDate();
         return html`
           <div class="${classMap({selected: this.selected, this_month: this.current_month})}" @drop="${this._drop}" @dragover="${this._allowDrop}">
-            <!-- <span class="${classMap({num: true, today: sameDay(this.current_date, new Date())})}">${num}</span> -->
-            <button class="${classMap({num: true, today: sameDay(this.current_date, new Date())})}">${num}</button>
-            <!-- <button type="button" class="${classMap({btn_add: true, btn_add_show: this.selected, btn_add_hide: !this.selected})}" 
-              @click="${this._addAppointment}" title="Add New Event">+</button> -->
+            <a href="/scheduler?mode=day&date=${this.current_date.toISOString()}" class="${classMap({num: true, today: sameDay(this.current_date, new Date())})}">${num}</a>
             <slot></slot>
           </div>
       `;
     }
 
 }
-
-// customElements.define('mv-day', MonthViewDay);
 
 // declare global {
 //   interface HTMLElementTagNameMap {

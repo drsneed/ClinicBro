@@ -25,6 +25,9 @@ export function monthviewStyle() {
     display: flex;
     overflow: hidden;
     margin: 6px 8px;
+  }
+
+  .float-right {
     float: right;
   }
 
@@ -40,11 +43,13 @@ export function monthviewStyle() {
   .btn-left, .btn-right {
     display: inline-block;
     padding: 4px 8px;
+    height: 32px;
     transition: none;
     cursor: pointer;
   }
   .scheduler-button-bar button {
     margin: 0px;
+    height: 32px;
     padding: 4px 8px;
     cursor: pointer;
   }

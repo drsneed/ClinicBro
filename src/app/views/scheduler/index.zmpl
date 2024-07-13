@@ -1,14 +1,15 @@
 <div class="container" id="scheduler">
     @zig {
-        const mode = zmpl.getT(.string, "mode") orelse "month";
+        const mode = zmpl.getT(.string, "mode").?;
+        const current_date = zmpl.getT(.string, "current_date").?;
         if(std.mem.eql(u8, mode, "month")) {
-            <month-view id="schedule">
+            <month-view id="schedule" current_date="{{current_date}}">
         }
         else if(std.mem.eql(u8, mode, "day")) {
-            <day-view id="schedule">
+            <day-view id="schedule" current_date="{{current_date}}">
         }
         else if(std.mem.eql(u8, mode, "week")) {
-            <week-view id="schedule">
+            <week-view id="schedule" current_date="{{current_date}}">
         }
         
         const appointments = zmpl.getT(.array, "appointments").?;

@@ -9,7 +9,7 @@ var __legacyDecorateClassTS = function(decorators, target, key, desc) {
   return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 
-// node_modules/@lit/reactive-element/css-tag.js
+// ../../../../node_modules/@lit/reactive-element/css-tag.js
 var t = globalThis;
 var e = t.ShadowRoot && (t.ShadyCSS === undefined || t.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
 var s = Symbol();
@@ -61,7 +61,7 @@ var c = e ? (t2) => t2 : (t2) => t2 instanceof CSSStyleSheet ? ((t3) => {
   return r(e2);
 })(t2) : t2;
 
-// node_modules/@lit/reactive-element/reactive-element.js
+// ../../../../node_modules/@lit/reactive-element/reactive-element.js
 var { is: i2, defineProperty: e2, getOwnPropertyDescriptor: r2, getOwnPropertyNames: h, getOwnPropertySymbols: o2, getPrototypeOf: n2 } = Object;
 var a = globalThis;
 var c2 = a.trustedTypes;
@@ -293,7 +293,7 @@ class b extends HTMLElement {
 }
 b.elementStyles = [], b.shadowRootOptions = { mode: "open" }, b[d("elementProperties")] = new Map, b[d("finalized")] = new Map, p?.({ ReactiveElement: b }), (a.reactiveElementVersions ??= []).push("2.0.4");
 
-// node_modules/lit-html/lit-html.js
+// ../../../../node_modules/lit-html/lit-html.js
 var C = function(t2, i3) {
   if (!Array.isArray(t2) || !t2.hasOwnProperty("raw"))
     throw Error("invalid template strings array");
@@ -567,7 +567,7 @@ var j = (t3, i4, s3) => {
   }
   return h3._$AI(t3), h3;
 };
-// node_modules/lit-element/lit-element.js
+// ../../../../node_modules/lit-element/lit-element.js
 class s3 extends b {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = undefined;
@@ -594,13 +594,13 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// node_modules/@lit/reactive-element/decorators/custom-element.js
+// ../../../../node_modules/@lit/reactive-element/decorators/custom-element.js
 var t3 = (t4) => (e4, o4) => {
   o4 !== undefined ? o4.addInitializer(() => {
     customElements.define(t4, e4);
   }) : customElements.define(t4, e4);
 };
-// node_modules/@lit/reactive-element/decorators/property.js
+// ../../../../node_modules/@lit/reactive-element/decorators/property.js
 var n4 = function(t4) {
   return (e4, o4) => typeof o4 == "object" ? r5(t4, e4, o4) : ((t5, e5, o5) => {
     const r5 = e5.hasOwnProperty(o5);
@@ -629,7 +629,7 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
-// public/clinicbro/js/util.ts
+// ../util.ts
 function dateAdd(date, interval, units) {
   var ret = new Date(date.valueOf());
   var checkRollover = function() {
@@ -685,15 +685,6 @@ function dateSuffix(d1) {
   }
   return suffix;
 }
-function clearAllSelectedDays() {
-  var schedule = document.getElementById("schedule");
-  schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
-    day.removeAttribute("selected");
-  });
-  document.querySelectorAll("mv-appt").forEach(function(appt) {
-    appt.removeAttribute("selected");
-  });
-}
 var months = [
   "January",
   "February",
@@ -709,7 +700,7 @@ var months = [
   "December"
 ];
 
-// public/clinicbro/js/schedule/monthview-style.ts
+// monthview-style.ts
 function monthviewStyle() {
   return i`
   .month-table {
@@ -736,6 +727,9 @@ function monthviewStyle() {
     display: flex;
     overflow: hidden;
     margin: 6px 8px;
+  }
+
+  .float-right {
     float: right;
   }
 
@@ -751,11 +745,13 @@ function monthviewStyle() {
   .btn-left, .btn-right {
     display: inline-block;
     padding: 4px 8px;
+    height: 32px;
     transition: none;
     cursor: pointer;
   }
   .scheduler-button-bar button {
     margin: 0px;
+    height: 32px;
     padding: 4px 8px;
     cursor: pointer;
   }
@@ -890,7 +886,7 @@ function monthviewStyle() {
   `;
 }
 
-// node_modules/lit-html/directive.js
+// ../../../../node_modules/lit-html/directive.js
 var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
 var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
 
@@ -911,7 +907,7 @@ class i4 {
   }
 }
 
-// node_modules/lit-html/directives/class-map.js
+// ../../../../node_modules/lit-html/directives/class-map.js
 var e6 = e5(class extends i4 {
   constructor(t5) {
     if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
@@ -937,7 +933,7 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
-// public/clinicbro/js/schedule/scheduler-base.ts
+// scheduler-base.ts
 class SchedulerBase extends s3 {
   static styles = monthviewStyle();
   constructor() {
@@ -949,22 +945,12 @@ class SchedulerBase extends s3 {
     if (changedProperties.has("current_date")) {
     }
   }
-  _prev(e7) {
+  _prev() {
     this.current_date = dateAdd(this.current_date, this.mode, -1);
-    clearAllSelectedDays();
+    return;
   }
-  _next(e7) {
+  _next() {
     this.current_date = dateAdd(this.current_date, this.mode, 1);
-    clearAllSelectedDays();
-  }
-  _monthViewClicked(e7) {
-    this.mode = "month";
-  }
-  _weekViewClicked(e7) {
-    this.mode = "week";
-  }
-  _dayViewClicked(e7) {
-    this.mode = "day";
   }
   calendarTitle() {
     if (this.mode == "month") {
@@ -985,13 +971,33 @@ class SchedulerBase extends s3 {
   }
   renderSchedulerModesButtonBar() {
     return x`
-      <div class="header-item scheduler-button-bar">
+      <div class="header-item scheduler-button-bar float-right">
         <button type="button" class="${e6({ btn: true, "btn-first": true, "btn-pressed": this.mode === "month" })}"
-            hx-get="/scheduler?mode=month" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Month</button>
+            hx-get="/scheduler?mode=month&date=${this.current_date.toISOString()}" hx-target="global #scheduler"
+            hx-swap="outerHTML" hx-push-url="true">Month</button>
         <button type="button" class="${e6({ btn: true, "btn-middle": true, "btn-pressed": this.mode === "week" })}"
-            hx-get="/scheduler?mode=week" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Week</button>
+            hx-get="/scheduler?mode=week&date=${this.current_date.toISOString()}" hx-target="global #scheduler"
+            hx-swap="outerHTML" hx-push-url="true">Week</button>
         <button type="button" class="${e6({ btn: true, "btn-last": true, "btn-pressed": this.mode === "day" })}"
-            hx-get="/scheduler?mode=day" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Day</button>
+            hx-get="/scheduler?mode=day&date=${this.current_date.toISOString()}" hx-target="global #scheduler"
+            hx-swap="outerHTML" hx-push-url="true">Day</button>
+      </div>
+    `;
+  }
+  renderSchedulerNavigationButtonBar() {
+    return x`
+      <div class="header-item scheduler-button-bar">
+        <button type="button" hx-get="/scheduler?mode=${this.mode}&date=${dateAdd(this.current_date, this.mode, -1).toISOString()}"
+          hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
+          hx-trigger="click, keyup[key=='ArrowLeft'] from:body"
+          class="${e6({ btn: true, "btn-first": true })}">&lt;</button>
+        <button type="button" class="${e6({ btn: true, "btn-middle": true })}"
+          hx-get="/scheduler?mode=${this.mode}&date=${new Date().toISOString()}" hx-target="global #scheduler"
+          hx-swap="outerHTML" hx-push-url="true">Today</button>
+        <button type="button" hx-get="/scheduler?mode=${this.mode}&date=${dateAdd(this.current_date, this.mode, 1).toISOString()}"
+          hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
+          hx-trigger="click, keyup[key=='ArrowRight'] from:body"
+          class="${e6({ btn: true, "btn-last": true })}">&gt;</button>
       </div>
     `;
   }
@@ -999,12 +1005,9 @@ class SchedulerBase extends s3 {
     return x`
     <caption>
         <div class="month-header">
-            <div class="header-item">
-              <button type="button" @click="${this._prev}" class="btn-left">&lt;</button>
-              <button type="button" @click="${this._next}" class="btn-right">&gt;</button>
-            </div>
-            <h2 id="month_title">${this.calendarTitle()}</h2>
-            ${this.renderSchedulerModesButtonBar()}
+          ${this.renderSchedulerNavigationButtonBar()}
+          <h2 id="month_title">${this.calendarTitle()}</h2>
+          ${this.renderSchedulerModesButtonBar()}
         </div>
     </caption>`;
   }
@@ -1021,7 +1024,7 @@ __legacyDecorateClassTS([
   n4({ type: String, reflect: true })
 ], SchedulerBase.prototype, "mode", undefined);
 
-// public/clinicbro/js/schedule/weekview.ts
+// weekview.ts
 class WeekView extends SchedulerBase {
   constructor() {
     super();

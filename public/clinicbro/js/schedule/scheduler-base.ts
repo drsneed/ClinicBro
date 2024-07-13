@@ -37,26 +37,14 @@ export class SchedulerBase extends LitElement {
     // }
   }
 
-  private _prev(e: Event) {
+  private _prev() {
     this.current_date = dateAdd(this.current_date, this.mode, -1);
-    clearAllSelectedDays();
+    return 
   }
 
-  private _next(e: Event) {
+  private _next() {
     this.current_date = dateAdd(this.current_date, this.mode, 1);
-    clearAllSelectedDays();
-  }
 
-  private _monthViewClicked(e) {
-    this.mode = "month";
-  }
-
-  private _weekViewClicked(e) {
-    this.mode = "week";
-  }
-
-  private _dayViewClicked(e) {
-    this.mode = "day";
   }
 
   calendarTitle() {
@@ -84,13 +72,34 @@ export class SchedulerBase extends LitElement {
 
   renderSchedulerModesButtonBar() {
     return html`
-      <div class="header-item scheduler-button-bar">
+      <div class="header-item scheduler-button-bar float-right">
         <button type="button" class="${classMap({btn: true, 'btn-first': true, 'btn-pressed': this.mode==='month'})}"
-            hx-get="/scheduler?mode=month" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Month</button>
+            hx-get="/scheduler?mode=month&date=${this.current_date.toISOString()}" hx-target="global #scheduler"
+            hx-swap="outerHTML" hx-push-url="true">Month</button>
         <button type="button" class="${classMap({btn: true, 'btn-middle': true, 'btn-pressed': this.mode==='week'})}"
-            hx-get="/scheduler?mode=week" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Week</button>
+            hx-get="/scheduler?mode=week&date=${this.current_date.toISOString()}" hx-target="global #scheduler"
+            hx-swap="outerHTML" hx-push-url="true">Week</button>
         <button type="button" class="${classMap({btn: true, 'btn-last': true, 'btn-pressed': this.mode==='day'})}"
-            hx-get="/scheduler?mode=day" hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true">Day</button>
+            hx-get="/scheduler?mode=day&date=${this.current_date.toISOString()}" hx-target="global #scheduler"
+            hx-swap="outerHTML" hx-push-url="true">Day</button>
+      </div>
+    `;
+  }
+
+  renderSchedulerNavigationButtonBar() {
+    return html`
+      <div class="header-item scheduler-button-bar">
+        <button type="button" hx-get="/scheduler?mode=${this.mode}&date=${dateAdd(this.current_date, this.mode, -1).toISOString()}"
+          hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
+          hx-trigger="click, keyup[key=='ArrowLeft'] from:body"
+          class="${classMap({btn: true, 'btn-first': true})}">&lt;</button>
+        <button type="button" class="${classMap({btn: true, 'btn-middle': true})}"
+          hx-get="/scheduler?mode=${this.mode}&date=${new Date().toISOString()}" hx-target="global #scheduler"
+          hx-swap="outerHTML" hx-push-url="true">Today</button>
+        <button type="button" hx-get="/scheduler?mode=${this.mode}&date=${dateAdd(this.current_date, this.mode, 1).toISOString()}"
+          hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
+          hx-trigger="click, keyup[key=='ArrowRight'] from:body"
+          class="${classMap({btn: true, 'btn-last': true})}">&gt;</button>
       </div>
     `;
   }
@@ -99,12 +108,9 @@ export class SchedulerBase extends LitElement {
     return html`
     <caption>
         <div class="month-header">
-            <div class="header-item">
-              <button type="button" @click="${this._prev}" class="btn-left">&lt;</button>
-              <button type="button" @click="${this._next}" class="btn-right">&gt;</button>
-            </div>
-            <h2 id="month_title">${this.calendarTitle()}</h2>
-            ${this.renderSchedulerModesButtonBar()}
+          ${this.renderSchedulerNavigationButtonBar()}
+          <h2 id="month_title">${this.calendarTitle()}</h2>
+          ${this.renderSchedulerModesButtonBar()}
         </div>
     </caption>`;
   }
