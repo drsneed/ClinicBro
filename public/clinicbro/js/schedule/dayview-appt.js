@@ -629,256 +629,6 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
-// ../util.ts
-function dateAdd(date, interval, units) {
-  var ret = new Date(date.valueOf());
-  var checkRollover = function() {
-    if (ret.getDate() != date.getDate())
-      ret.setDate(0);
-  };
-  switch (String(interval).toLowerCase()) {
-    case "year":
-      ret.setFullYear(ret.getFullYear() + units);
-      checkRollover();
-      break;
-    case "quarter":
-      ret.setMonth(ret.getMonth() + 3 * units);
-      checkRollover();
-      break;
-    case "month":
-      ret.setMonth(ret.getMonth() + units);
-      checkRollover();
-      break;
-    case "week":
-      ret.setDate(ret.getDate() + 7 * units);
-      break;
-    case "day":
-      ret.setDate(ret.getDate() + units);
-      break;
-    case "hour":
-      ret.setTime(ret.getTime() + units * 3600000);
-      break;
-    case "minute":
-      ret.setTime(ret.getTime() + units * 60000);
-      break;
-    case "second":
-      ret.setTime(ret.getTime() + units * 1000);
-      break;
-    default:
-      ret = undefined;
-      break;
-  }
-  return ret;
-}
-function dateSuffix(d1) {
-  let num_date_str = "" + d1.getDate();
-  const ending = num_date_str.slice(-1);
-  const beginning = num_date_str[0];
-  let suffix = "th";
-  if (num_date_str.length == 1 || beginning != "1") {
-    if (ending === "1")
-      suffix = "st";
-    else if (ending === "2")
-      suffix = "nd";
-    else if (ending === "3")
-      suffix = "rd";
-  }
-  return suffix;
-}
-function toIsoDateString(d3) {
-  return d3.toISOString().split("T")[0];
-}
-var months = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December"
-];
-
-// monthview-style.ts
-function monthviewStyle() {
-  return i`
-  .month-table {
-    background: var(--container-bg);
-    table-layout: fixed;
-    //height: 550px;
-    border-collapse: separate;
-    border-spacing: 0;
-    padding: 0px !important;
-    margin: 0px;
-    width: 100%;
-    color: var(--table-fg);
-  }
-
-  .caption {
-    position: sticky;
-  }
-  
-  .header-item {
-    width: 150px;
-    text-align: left;
-  }
-  .scheduler-button-bar {
-    display: flex;
-    overflow: hidden;
-    margin: 6px 8px;
-  }
-
-  .float-right {
-    float: right;
-  }
-
-  .btn-left {
-    margin-top: 6px;
-    margin-left: 8px;
-    margin-right: 0px;
-    margin-bottom: 6px;
-  }
-  .btn-right {
-    margin: 6px 0px;
-  }
-  .btn-left, .btn-right {
-    display: inline-block;
-    padding: 4px 8px;
-    height: 32px;
-    transition: none;
-    cursor: pointer;
-  }
-  .scheduler-button-bar button {
-    margin: 0px;
-    height: 32px;
-    padding: 4px 8px;
-    cursor: pointer;
-  }
-  .scheduler-button-bar {
-    margin-bottom: 4px;
-  }
-
-  .btn-first {
-    border-top-left-radius: 6px;
-    border-bottom-left-radius: 6px;
-    border-top-right-radius: 0px;
-    border-bottom-right-radius: 0px;
-  }
-
-  .btn-middle {
-    border-radius: 0px;
-  }
-
-  .btn-last {
-    border-top-left-radius: 0px;
-    border-bottom-left-radius: 0px;
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-  }
-
-  .scheduler-container {
-    overflow-y: visible;
-  }
-
-  .month-table td, .month-table th {
-    border: 1px solid var(--input-border);
-    box-shadow: none;
-    width: auto !important;
-  }
-  
-  .row1 {
-    position: sticky;
-    top: 0;
-    background-color: var(--container-bg);
-    z-index: 1;
-    padding: 0;
-  }
-  .row2 {
-    position: sticky;
-    background-color: var(--container-bg);
-    border-bottom: 1px solid var(--table-header-fg) !important;
-    top: 44px;
-    z-index: 1;
-  }
-
-  .month-table thead {
-    text-align: center;
-  }
-
-  .sticky-header {
-    border-bottom: 1px solid var(--table-header-fg);
-    text-align: center;
-    background-color: var(--container-bg);
-    color: var(--container-fg);
-    font-weight: 900;
-    width: 100%;
-    margin: 0;
-  }
-
-  .btn-pressed {
-    border-style:inset;
-    background-color: var(--btn-pressed);
-  }
-
-  .no-border {
-    border-bottom: none !important;
-  }
-
-  caption {
-    width: 100%;
-  }
-
-  .month-header {
-    display: flex;
-    background-color: var(--header-bg);
-    text-align: center;
-    margin: 0;
-  }
-
-  .row2, .day-header {
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
-  
-  .month-header h2 {
-    width: 50%;
-    color: var(--header-fg);
-    padding: 0;
-    margin: 8px auto;
-    font-size: 20px;
-  }
-  
-  .month-table td {
-    background-color: var(--bg);
-    vertical-align: top;
-    height: 90px;
-    overflow: hidden;
-    padding: 0;
-  }
-
-  .month-table tr {
-    white-space: nowrap;
-  }
-
-  .half-hour-mark {
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-    border: none;
-    border-top: 2px dashed #8d5603;
-    color: inherit;
-    background-color: inherit;
-    height: 1px;
-    width: 100%;
-
-  }
-  `;
-}
-
 // ../../../../node_modules/lit-html/directive.js
 var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
 var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
@@ -926,215 +676,168 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
-// scheduler-base.ts
-class SchedulerBase extends s3 {
-  static styles = monthviewStyle();
-  constructor() {
-    super();
-    this.current_date = new Date;
+// ../../../../node_modules/lit-html/directives/style-map.js
+var n5 = "important";
+var i5 = " !" + n5;
+var o5 = e5(class extends i4 {
+  constructor(t5) {
+    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "style" || t5.strings?.length > 2)
+      throw Error("The `styleMap` directive must be used in the `style` attribute and must be the only part in the attribute.");
   }
-  updated(changedProperties) {
-    htmx.process(this.shadowRoot);
-    if (changedProperties.has("current_date")) {
-    }
+  render(t5) {
+    return Object.keys(t5).reduce((e7, r6) => {
+      const s4 = t5[r6];
+      return s4 == null ? e7 : e7 + `${r6 = r6.includes("-") ? r6 : r6.replace(/(?:^(webkit|moz|ms|o)|)(?=[A-Z])/g, "-$&").toLowerCase()}:${s4};`;
+    }, "");
   }
-  _prev() {
-    this.current_date = dateAdd(this.current_date, this.mode, -1);
-    return;
-  }
-  _next() {
-    this.current_date = dateAdd(this.current_date, this.mode, 1);
-  }
-  calendarTitle() {
-    if (this.mode == "month") {
-      return months[this.current_date.getMonth()] + " " + this.current_date.getFullYear();
-    } else if (this.mode == "day") {
-      return months[this.current_date.getMonth()] + " " + this.current_date.getDate() + dateSuffix(this.current_date) + ", " + this.current_date.getFullYear();
-    } else {
-      let firstOfDaWeek = dateAdd(this.current_date, "day", -this.current_date.getDay());
-      let endOfDaWeek = dateAdd(firstOfDaWeek, "day", 6);
-      if (firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear() && firstOfDaWeek.getMonth() == endOfDaWeek.getMonth()) {
-        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
-      } else if (firstOfDaWeek.getFullYear() == endOfDaWeek.getFullYear()) {
-        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " - " + months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + this.current_date.getFullYear();
-      } else {
-        return months[firstOfDaWeek.getMonth()] + " " + firstOfDaWeek.getDate() + dateSuffix(firstOfDaWeek) + " " + firstOfDaWeek.getFullYear() + " - " + months[endOfDaWeek.getMonth()] + " " + endOfDaWeek.getDate() + dateSuffix(endOfDaWeek) + " " + endOfDaWeek.getFullYear();
+  update(e7, [r6]) {
+    const { style: s4 } = e7.element;
+    if (this.ft === undefined)
+      return this.ft = new Set(Object.keys(r6)), this.render(r6);
+    for (const t5 of this.ft)
+      r6[t5] == null && (this.ft.delete(t5), t5.includes("-") ? s4.removeProperty(t5) : s4[t5] = null);
+    for (const t5 in r6) {
+      const e8 = r6[t5];
+      if (e8 != null) {
+        this.ft.add(t5);
+        const r7 = typeof e8 == "string" && e8.endsWith(i5);
+        t5.includes("-") || r7 ? s4.setProperty(t5, r7 ? e8.slice(0, -11) : e8, r7 ? n5 : "") : s4[t5] = e8;
       }
     }
+    return w;
   }
-  _getMonthParams(base_date) {
-    let firstOfDaMonth = new Date(base_date.getFullYear(), base_date.getMonth(), 1);
-    let firstOfNextMonth = dateAdd(firstOfDaMonth, "month", 1);
-    return `date=${toIsoDateString(firstOfDaMonth)}&to=${toIsoDateString(firstOfNextMonth)}`;
-  }
-  _getWeekParams(base_date) {
-    let firstOfDaWeek = dateAdd(base_date, "day", -base_date.getDay());
-    let firstOfNextWeek = dateAdd(firstOfDaWeek, "day", 7);
-    return `date=${toIsoDateString(firstOfDaWeek)}&to=${toIsoDateString(firstOfNextWeek)}`;
-  }
-  _getDayParam(base_date) {
-    return `date=${toIsoDateString(base_date)}`;
-  }
-  _getParams(base_date) {
-    switch (this.mode) {
-      case "month":
-        return this._getMonthParams(base_date);
-      case "week":
-        return this._getWeekParams(base_date);
-      case "day":
-        return this._getDayParam(base_date);
+});
+// ../util.ts
+function toIsoDateString(d3) {
+  return d3.toISOString().split("T")[0];
+}
+
+// dayview-appt.ts
+class DayViewAppointment extends s3 {
+  static styles = i`
+    div {
+      font-size: 12px;
+      color: var(--appt-fg);
+      padding: 0px 2px;
+      margin: 2px 0px;
+      width: 90%;
+      user-select: none;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
-    return "";
-  }
-  renderSchedulerModesButtonBar() {
-    return x`
-      <div class="header-item scheduler-button-bar float-right">
-        <button type="button" class="${e6({ btn: true, "btn-first": true, "btn-pressed": this.mode === "month" })}"
-            hx-get="/scheduler?mode=month&${this._getMonthParams(this.current_date)}" hx-target="global #scheduler"
-            hx-swap="outerHTML" hx-push-url="true">Month</button>
-        <button type="button" class="${e6({ btn: true, "btn-middle": true, "btn-pressed": this.mode === "week" })}"
-            hx-get="/scheduler?mode=week&${this._getWeekParams(this.current_date)}" hx-target="global #scheduler"
-            hx-swap="outerHTML" hx-push-url="true">Week</button>
-        <button type="button" class="${e6({ btn: true, "btn-last": true, "btn-pressed": this.mode === "day" })}"
-            hx-get="/scheduler?mode=day&${this._getDayParam(this.current_date)}" hx-target="global #scheduler"
-            hx-swap="outerHTML" hx-push-url="true">Day</button>
-      </div>
+
+    .appt {
+      /* background-color: var(--appt-bg1); */
+    }
+
+    .event {
+      background: repeating-linear-gradient(
+        45deg,
+        var(--appt-bg),
+        var(--appt-bg) 10px,
+        var(--appt-bg-alt) 10px,
+        var(--appt-bg-alt) 20px
+      );
+    }
+    
+    .selected {
+      border: 1px solid var(--appt-selected-border);
+    }
     `;
+  constructor() {
+    super();
+    this.appt_title = "title";
+    this.client = "client";
+    this.status = "status";
+    this.provider = "provider";
+    this.location = "location";
+    this.selected = false;
+    this.appt_date = new Date;
+    this.appt_from = "00:00";
+    this.appt_to = "00:30";
+    this.color = "";
   }
-  renderSchedulerNavigationButtonBar() {
-    return x`
-      <div class="header-item scheduler-button-bar">
-        <button type="button" hx-get="/scheduler?mode=${this.mode}&${this._getParams(dateAdd(this.current_date, this.mode, -1))}"
-          hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
-          hx-trigger="click, keyup[key=='ArrowLeft'] from:body"
-          class="${e6({ btn: true, "btn-first": true })}">&lt;</button>
-        <button type="button" class="${e6({ btn: true, "btn-middle": true })}"
-          hx-get="/scheduler?mode=${this.mode}&${this._getParams(new Date)}" hx-target="global #scheduler"
-          hx-swap="outerHTML" hx-push-url="true">Today</button>
-        <button type="button" hx-get="/scheduler?mode=${this.mode}&${this._getParams(dateAdd(this.current_date, this.mode, 1))}"
-          hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
-          hx-trigger="click, keyup[key=='ArrowRight'] from:body"
-          class="${e6({ btn: true, "btn-last": true })}">&gt;</button>
-      </div>
-    `;
+  clicked() {
+    this.selected = true;
   }
-  renderCaption() {
-    return x`
-    <caption>
-        <div class="month-header">
-          ${this.renderSchedulerNavigationButtonBar()}
-          <h2 id="month_title">${this.calendarTitle()}</h2>
-          ${this.renderSchedulerModesButtonBar()}
-        </div>
-    </caption>`;
+  _drag(e7) {
+    e7.dataTransfer.setData("appt-id", e7.target.dataset.apptId);
+  }
+  render() {
+    let text = this.appt_title;
+    let appt = this.client.length > 0;
+    if (appt) {
+      text = text + " - " + this.client;
+    }
+    let backgroundColor = "var(--appt-bg1)";
+    if (this.color.length > 0)
+      backgroundColor = this.color;
+    let startHours24 = parseInt(this.appt_from.slice(0, 2));
+    let startHours = startHours24 % 12 || 12;
+    let startMinutes = this.appt_from.slice(-2);
+    let endHours24 = parseInt(this.appt_to.slice(0, 2));
+    let endHours = endHours24 % 12 || 12;
+    let endMinutes = this.appt_to.slice(-2);
+    let pm = endHours24 >= 12 ? "pm" : "am";
+    let startDate = new Date(this.appt_date.valueOf());
+    startDate.setHours(startHours24);
+    startDate.setMinutes(parseInt(startMinutes));
+    let endDate = new Date(this.appt_date.valueOf());
+    endDate.setHours(endHours24);
+    endDate.setMinutes(parseInt(endMinutes));
+    let duration = Math.abs(endDate - startDate) / 1000 / 60;
+    let display_height = duration * 1.5;
+    return x`<div data-appt-id="${this.appt_id}" class="${e6({ selected: this.selected, appt, event: !appt })}"
+               style="${o5({ backgroundColor, height: display_height })}"
+               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</span></div>`;
   }
 }
 __legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], DayViewAppointment.prototype, "appt_id", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], DayViewAppointment.prototype, "appt_title", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], DayViewAppointment.prototype, "status", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], DayViewAppointment.prototype, "client", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], DayViewAppointment.prototype, "provider", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], DayViewAppointment.prototype, "location", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], DayViewAppointment.prototype, "color", undefined);
+__legacyDecorateClassTS([
   n4({
+    reflect: true,
     converter: {
       fromAttribute: (value, type) => {
-        if (!isNaN(Date.parse(value))) {
-          return new Date(value);
-        }
-        return new Date;
+        return new Date(value);
       },
       toAttribute: (value, type) => {
         return toIsoDateString(value);
       }
-    },
-    reflect: true
-  })
-], SchedulerBase.prototype, "current_date", undefined);
-__legacyDecorateClassTS([
-  n4({ type: String, reflect: true })
-], SchedulerBase.prototype, "mode", undefined);
-
-// weekview.ts
-class WeekView extends SchedulerBase {
-  constructor() {
-    super();
-    this.mode = "week";
-  }
-  renderWeekViewDays() {
-    var today = new Date;
-    let rows = [];
-    let firstOfDaWeek = dateAdd(this.current_date, "day", -this.current_date.getDay());
-    let d3 = firstOfDaWeek.getDay();
-    let i5 = 0;
-    var midnight = new Date(this.current_date.valueOf());
-    midnight.setHours(0, 0, 0, 0);
-    for (let hour = 0;hour < 24; hour++) {
-      let this_hour = dateAdd(midnight, "hour", i5);
-      let time_hour = this_hour.getHours() % 12 || 12;
-      let pm = this_hour.getHours() >= 12 ? "pm" : "am";
-      var days = [];
-      days.push(x`<td class="time-display">${time_hour}:00 ${pm}</td>`);
-      for (let day = 0;day < 7; day++) {
-        let id = "d" + day + "h" + hour;
-        let thisDaysDate = dateAdd(firstOfDaWeek, "day", d3);
-        days.push(x`<td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td>`);
-      }
-      rows.push(x`<tr>${days}</tr>`);
-      i5++;
     }
-    return x`${rows}`;
-  }
-  render() {
-    let sunday = dateAdd(this.current_date, "day", -this.current_date.getDay());
-    let sundisp = "" + (sunday.getMonth() + 1) + "/" + sunday.getDate();
-    let monday = dateAdd(sunday, "day", 1);
-    let mondisp = "" + (monday.getMonth() + 1) + "/" + monday.getDate();
-    let tuesday = dateAdd(monday, "day", 1);
-    let tuedisp = "" + (tuesday.getMonth() + 1) + "/" + tuesday.getDate();
-    let wednesday = dateAdd(tuesday, "day", 1);
-    let weddisp = "" + (wednesday.getMonth() + 1) + "/" + wednesday.getDate();
-    let thursday = dateAdd(wednesday, "day", 1);
-    let thudisp = "" + (thursday.getMonth() + 1) + "/" + thursday.getDate();
-    let friday = dateAdd(thursday, "day", 1);
-    let fridisp = "" + (friday.getMonth() + 1) + "/" + friday.getDate();
-    let saturday = dateAdd(friday, "day", 1);
-    let satdisp = "" + (saturday.getMonth() + 1) + "/" + saturday.getDate();
-    return x`
-    <table class="month-table" cellspacing="0">
-      <colgroup>
-          <col span="1" style="width: 70px;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-          <col span="1" style="width: 13.95%;">
-      </colgroup>
-      <thead>
-          <tr>
-              <th colspan="8" class="row1 no-border">
-                ${this.renderCaption()}
-              </th>
-          </tr>
-          <tr>
-              <th class="row2"></th>
-              <th class="row2">Sun ${sundisp}</th>
-              <th class="row2">Mon ${mondisp}</th>
-              <th class="row2">Tue ${tuedisp}</th>
-              <th class="row2">Wed ${weddisp}</th>
-              <th class="row2">Thu ${thudisp}</th>
-              <th class="row2">Fri ${fridisp}</th>
-              <th class="row2">Sat ${satdisp}</th>
-          </tr>
-      </thead>
-      <tbody hx-ext="path-params">
-        ${this.renderWeekViewDays()} 
-      </tbody>
-    </table>
-    <input id="dropped-appt-id" type="hidden" name="id" value="0" >
-    <input id="dropped-client-id" type="hidden" name="client_id" value="0" >
-    `;
-  }
-}
-WeekView = __legacyDecorateClassTS([
-  t3("week-view")
-], WeekView);
+  })
+], DayViewAppointment.prototype, "appt_date", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], DayViewAppointment.prototype, "appt_from", undefined);
+__legacyDecorateClassTS([
+  n4({ reflect: true, type: String })
+], DayViewAppointment.prototype, "appt_to", undefined);
+__legacyDecorateClassTS([
+  n4({ type: Boolean, reflect: true })
+], DayViewAppointment.prototype, "selected", undefined);
+DayViewAppointment = __legacyDecorateClassTS([
+  t3("dv-appt")
+], DayViewAppointment);
 export {
-  WeekView
+  DayViewAppointment
 };

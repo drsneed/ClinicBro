@@ -4,6 +4,7 @@ const DbContext = @import("../db_context.zig");
 const mapper = @import("../mapper.zig");
 const Appointment = @import("../models/appointment.zig");
 const LookupItem = @import("../models/lookup_item.zig");
+const zdt = @import("zdt");
 const log = std.log.scoped(.scheduler);
 pub const layout = "app";
 
@@ -14,10 +15,12 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     try root.put("header_include", data.string(
         \\ <link rel="stylesheet" href="/clinicbro/css/schedule.css">
         \\ <script type="module" src="/clinicbro/js/schedule/monthview.js"></script>
-        \\ <script type="module" src="/clinicbro/js/schedule/weekview.js"></script>
-        \\ <script type="module" src="/clinicbro/js/schedule/dayview.js"></script>
         \\ <script type="module" src="/clinicbro/js/schedule/monthview-day.js"></script>
         \\ <script type="module" src="/clinicbro/js/schedule/monthview-appt.js"></script>
+        \\ <script type="module" src="/clinicbro/js/schedule/weekview.js"></script>
+        \\ <script type="module" src="/clinicbro/js/schedule/dayview.js"></script>
+        \\ <script type="module" src="/clinicbro/js/schedule/dayview-halfhour.js"></script>
+        \\ <script type="module" src="/clinicbro/js/schedule/dayview-appt.js"></script>
         \\ <script src="/clinicbro/js/schedule.js"></script>
     ));
     try root.put("main_schedule", data.string("class=\"current\""));
@@ -26,16 +29,43 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     const params = try request.params();
     const mode = params.getT(.string, "mode") orelse "month";
     try root.put("mode", data.string(mode));
-    const current_date = params.getT(.string, "date") orelse "";
+    var current_date_buffer: [64]u8 = undefined;
+    var query_date_to_buffer: [64]u8 = undefined;
+    var current_date: []const u8 = "";
+    var query_date_from: []const u8 = undefined;
+    var query_date_to: ?[]const u8 = params.getT(.string, "to");
+    if (params.getT(.string, "date")) |date| {
+        current_date = try std.fmt.bufPrint(&current_date_buffer, "{s}T00:00:00.000", .{date});
+        query_date_from = current_date[0..10];
+    } else {
+        // only month mode is allowed to omit date param for initial scheduler view
+        std.debug.assert(std.mem.eql(u8, mode, "month"));
+        var from_date = zdt.Datetime.now(zdt.Timezone.UTC);
+        from_date.day = 1;
+        _ = try std.fmt.bufPrint(&current_date_buffer, "{s}", .{from_date});
+        query_date_from = current_date_buffer[0..10];
+        var to_date = from_date;
+        to_date.month += 1;
+        if (to_date.month > 12) {
+            to_date.month = 1;
+            to_date.year += 1;
+        }
+        _ = try std.fmt.bufPrint(&query_date_to_buffer, "{s}", .{to_date});
+        query_date_to = query_date_to_buffer[0..10];
+    }
     try root.put("current_date", data.string(current_date));
-    const date_from = params.getT(.string, "from");
-    const date_to = params.getT(.string, "to");
+    log.info("current_date = {s}", .{current_date});
+    log.info("query_date_from = {s}", .{query_date_from});
+    if (query_date_to) |qry_dt_to| {
+        log.info("query_date_to = {s}", .{qry_dt_to});
+    }
 
     var db_context = try DbContext.init(request.allocator, request.server.database);
     const json_appts = try data.array();
     try root.put("appointments", json_appts);
-    const db_appts = try db_context.getAllAppointmentViews(date_from, date_to);
+    const db_appts = try db_context.getAllAppointmentViews(query_date_from, query_date_to);
     defer db_appts.deinit();
+    try root.put("appointment_count", data.integer(db_appts.items.len));
     for (db_appts.items) |appt| {
         var json_appt = try data.object();
         try json_appt.put("appt_id", data.integer(appt.appt_id));

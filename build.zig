@@ -12,21 +12,11 @@ pub fn build(b: *std.Build) !void {
         .optimize = optimize,
     });
 
-    const zqlite_a = b.dependency("zqlite", .{
+    const zdt = b.dependency("zdt", .{
         .target = target,
         .optimize = optimize,
     });
-    const zqlite = zqlite_a.module("zqlite");
-    zqlite.addIncludePath(zqlite_a.path("lib/sqlite3/"));
-    exe.root_module.addImport("zqlite", zqlite);
-    exe.addLibraryPath(b.path("./"));
-    exe.linkSystemLibrary("sqlite3");
-
-    // const pg = b.dependency("pg", .{
-    //     .target = target,
-    //     .optimize = optimize,
-    // });
-    // exe.root_module.addImport("pg", pg.module("pg"));
+    exe.root_module.addImport("zdt", zdt.module("zdt"));
 
     // ^ Add all dependencies before `jetzig.jetzigInit()` ^
 

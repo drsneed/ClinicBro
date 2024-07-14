@@ -601,11 +601,9 @@ pub fn getAllAppointmentViews(self: *DbContext, date_from: ?[]const u8, date_to:
     const writer = stream.writer();
     try writer.writeAll("select * from AppointmentView");
     if (date_from != null and date_to != null) {
-        try writer.print(" where appt_from >= {s} and appt_from <= {s}", .{ date_from.?, date_to.? });
+        try writer.print(" where appt_date >= '{s}' and appt_date < '{s}'", .{ date_from.?, date_to.? });
     } else if (date_from) |dt_from| {
-        try writer.print(" where appt_from >= {s}", .{dt_from});
-    } else if (date_to) |dt_to| {
-        try writer.print(" where appt_from <= {s}", .{dt_to});
+        try writer.print(" where appt_date = '{s}'", .{dt_from});
     }
     const query = stream.getWritten();
     log.info("appt query = {s}", .{query});

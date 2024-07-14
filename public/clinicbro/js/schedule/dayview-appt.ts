@@ -12,6 +12,7 @@ export class DayViewAppointment extends LitElement {
       color: var(--appt-fg);
       padding: 0px 2px;
       margin: 2px 0px;
+      width: 90%;
       user-select: none;
       overflow: hidden;
       text-overflow: ellipsis;

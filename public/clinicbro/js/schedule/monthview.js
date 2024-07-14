@@ -758,6 +758,9 @@ function monthviewStyle() {
     padding: 4px 8px;
     cursor: pointer;
   }
+  .scheduler-button-bar {
+    margin-bottom: 4px;
+  }
 
   .btn-first {
     border-top-left-radius: 6px;
@@ -792,12 +795,13 @@ function monthviewStyle() {
     top: 0;
     background-color: var(--container-bg);
     z-index: 1;
+    padding: 0;
   }
   .row2 {
     position: sticky;
     background-color: var(--container-bg);
     border-bottom: 1px solid var(--table-header-fg) !important;
-    top: 40px;
+    top: 44px;
     z-index: 1;
   }
 
@@ -829,11 +833,10 @@ function monthviewStyle() {
   }
 
   .month-header {
-    top: 0;
     display: flex;
     background-color: var(--header-bg);
     text-align: center;
-    
+    margin: 0;
   }
 
   .row2, .day-header {
@@ -872,19 +875,6 @@ function monthviewStyle() {
     height: 1px;
     width: 100%;
 
-  }
-
-  
-  .day-view-hour-1, .day-view-hour-2 {
-        width: 100%;
-        height: 50%;
-        max-width: 100%;
-        white-space: nowrap;
-        user-select: none;
-        overflow-y: auto;
-  }
-  .day-view-hour-2 {
-        border-top: 1px dashed var(--input-border);
   }
   `;
 }
@@ -972,17 +962,41 @@ class SchedulerBase extends s3 {
       }
     }
   }
+  _getMonthParams(base_date) {
+    let firstOfDaMonth = new Date(base_date.getFullYear(), base_date.getMonth(), 1);
+    let firstOfNextMonth = dateAdd(firstOfDaMonth, "month", 1);
+    return `date=${toIsoDateString(firstOfDaMonth)}&to=${toIsoDateString(firstOfNextMonth)}`;
+  }
+  _getWeekParams(base_date) {
+    let firstOfDaWeek = dateAdd(base_date, "day", -base_date.getDay());
+    let firstOfNextWeek = dateAdd(firstOfDaWeek, "day", 7);
+    return `date=${toIsoDateString(firstOfDaWeek)}&to=${toIsoDateString(firstOfNextWeek)}`;
+  }
+  _getDayParam(base_date) {
+    return `date=${toIsoDateString(base_date)}`;
+  }
+  _getParams(base_date) {
+    switch (this.mode) {
+      case "month":
+        return this._getMonthParams(base_date);
+      case "week":
+        return this._getWeekParams(base_date);
+      case "day":
+        return this._getDayParam(base_date);
+    }
+    return "";
+  }
   renderSchedulerModesButtonBar() {
     return x`
       <div class="header-item scheduler-button-bar float-right">
         <button type="button" class="${e6({ btn: true, "btn-first": true, "btn-pressed": this.mode === "month" })}"
-            hx-get="/scheduler?mode=month&date=${this.current_date.toISOString()}" hx-target="global #scheduler"
+            hx-get="/scheduler?mode=month&${this._getMonthParams(this.current_date)}" hx-target="global #scheduler"
             hx-swap="outerHTML" hx-push-url="true">Month</button>
         <button type="button" class="${e6({ btn: true, "btn-middle": true, "btn-pressed": this.mode === "week" })}"
-            hx-get="/scheduler?mode=week&date=${this.current_date.toISOString()}" hx-target="global #scheduler"
+            hx-get="/scheduler?mode=week&${this._getWeekParams(this.current_date)}" hx-target="global #scheduler"
             hx-swap="outerHTML" hx-push-url="true">Week</button>
         <button type="button" class="${e6({ btn: true, "btn-last": true, "btn-pressed": this.mode === "day" })}"
-            hx-get="/scheduler?mode=day&date=${this.current_date.toISOString()}" hx-target="global #scheduler"
+            hx-get="/scheduler?mode=day&${this._getDayParam(this.current_date)}" hx-target="global #scheduler"
             hx-swap="outerHTML" hx-push-url="true">Day</button>
       </div>
     `;
@@ -990,14 +1004,14 @@ class SchedulerBase extends s3 {
   renderSchedulerNavigationButtonBar() {
     return x`
       <div class="header-item scheduler-button-bar">
-        <button type="button" hx-get="/scheduler?mode=${this.mode}&date=${dateAdd(this.current_date, this.mode, -1).toISOString()}"
+        <button type="button" hx-get="/scheduler?mode=${this.mode}&${this._getParams(dateAdd(this.current_date, this.mode, -1))}"
           hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
           hx-trigger="click, keyup[key=='ArrowLeft'] from:body"
           class="${e6({ btn: true, "btn-first": true })}">&lt;</button>
         <button type="button" class="${e6({ btn: true, "btn-middle": true })}"
-          hx-get="/scheduler?mode=${this.mode}&date=${new Date().toISOString()}" hx-target="global #scheduler"
+          hx-get="/scheduler?mode=${this.mode}&${this._getParams(new Date)}" hx-target="global #scheduler"
           hx-swap="outerHTML" hx-push-url="true">Today</button>
-        <button type="button" hx-get="/scheduler?mode=${this.mode}&date=${dateAdd(this.current_date, this.mode, 1).toISOString()}"
+        <button type="button" hx-get="/scheduler?mode=${this.mode}&${this._getParams(dateAdd(this.current_date, this.mode, 1))}"
           hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
           hx-trigger="click, keyup[key=='ArrowRight'] from:body"
           class="${e6({ btn: true, "btn-last": true })}">&gt;</button>
@@ -1016,12 +1030,20 @@ class SchedulerBase extends s3 {
   }
 }
 __legacyDecorateClassTS([
-  n4({ converter(value) {
-    if (!isNaN(Date.parse(value))) {
-      return new Date(value);
-    }
-    return new Date;
-  }, reflect: true })
+  n4({
+    converter: {
+      fromAttribute: (value, type) => {
+        if (!isNaN(Date.parse(value))) {
+          return new Date(value);
+        }
+        return new Date;
+      },
+      toAttribute: (value, type) => {
+        return toIsoDateString(value);
+      }
+    },
+    reflect: true
+  })
 ], SchedulerBase.prototype, "current_date", undefined);
 __legacyDecorateClassTS([
   n4({ type: String, reflect: true })

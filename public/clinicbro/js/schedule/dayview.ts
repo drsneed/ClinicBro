@@ -40,19 +40,35 @@ export class DayView extends SchedulerBase {
   }
 
   renderDayViewDay() {
-    var today = new Date();
     let rows = [];
     let i = 0;
     var midnight = new Date(this.current_date.valueOf());
     midnight.setHours(0, 0, 0, 0);
     for (let hour = 0; hour < 24; hour++) {
-        let id = "h" + i;
-        let this_hour = dateAdd(midnight, "hour", i);;
+        let id1 = "h" + i;
+        let id2 = "h" + i + "m30";
+        let this_hour = dateAdd(midnight, "hour", i);
+        let this_hour_half = dateAdd(this_hour, "minute", 30);
         let time_hour = this_hour.getHours() % 12 || 12;
         let pm = this_hour.getHours() >= 12 ? "pm" : "am";
-        rows.push(html`<tr><td class="time-display">${time_hour}:00 ${pm}</td><td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td></tr>`);
+
+        let slot_name_1 = "" + this_hour.getHours() + ":00";
+        if(slot_name_1.length == 4) {
+          slot_name_1 = "0" + slot_name_1;
+        }
+        let slot_name_2 = slot_name_1.slice(0, 2) + ":30";
+        rows.push(html`
+        <tr>
+          <td class="time-display">${time_hour}:00 ${pm}</td>
+          <td>
+              <dv-half id="${id1}" current_date="${this_hour.toISOString()}"><slot name="${slot_name_1}"></slot></dv-half>
+              <dv-half id="${id2}" current_date="${this_hour_half.toISOString()}"><slot name="${slot_name_2}"></slot></dv-half>
+          </td>
+        </tr>`);
         i++;
     }
     return html`${rows}`;
   }
 }
+
+/* <div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div> */

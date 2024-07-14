@@ -1,6 +1,5 @@
 @args address_1: *ZmplValue, address_2: *ZmplValue, city: *ZmplValue, state: *ZmplValue, zip_code: *ZmplValue
 
-
 <div class="groupbox">
     <label>Address</label>
     <input id="address-line-1" type="text" name="address_1" maxlength="128" value="{{address_1}}" placeholder="Address Line 1">

@@ -31,9 +31,9 @@
         //     .url = "https://github.com/drsneed/jetzig/archive/179b5e77c3a79ca3506e318e91e8e1ade698ba30.tar.gz",
         //     .hash = "12201d3f4e053def21a60518e5b1dabbd019da9abfed67120145ea333cc9764873ac",
         // },
-        .zqlite = .{
-            .url = "git+https://github.com/karlseguin/zqlite.zig#master",
-            .hash = "12205e11bd7e60af91e3fe96b7fd90c2bfd73bdae778dbee9d243a5027e06fc3c101",
+        .zdt = .{
+            .url = "git+https://codeberg.org/FObersteiner/zdt.git#main",
+            .hash = "122082985669cff6c3fcb55b3359d7deb4099241f49afc5a069dd36853bb95d57493",
         },
 
         // .pg = .{

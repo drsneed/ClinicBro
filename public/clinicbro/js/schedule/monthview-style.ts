@@ -53,6 +53,9 @@ export function monthviewStyle() {
     padding: 4px 8px;
     cursor: pointer;
   }
+  .scheduler-button-bar {
+    margin-bottom: 4px;
+  }
 
   .btn-first {
     border-top-left-radius: 6px;
@@ -87,12 +90,13 @@ export function monthviewStyle() {
     top: 0;
     background-color: var(--container-bg);
     z-index: 1;
+    padding: 0;
   }
   .row2 {
     position: sticky;
     background-color: var(--container-bg);
     border-bottom: 1px solid var(--table-header-fg) !important;
-    top: 40px;
+    top: 44px;
     z-index: 1;
   }
 
@@ -124,11 +128,10 @@ export function monthviewStyle() {
   }
 
   .month-header {
-    top: 0;
     display: flex;
     background-color: var(--header-bg);
     text-align: center;
-    
+    margin: 0;
   }
 
   .row2, .day-header {
@@ -167,19 +170,6 @@ export function monthviewStyle() {
     height: 1px;
     width: 100%;
 
-  }
-
-  
-  .day-view-hour-1, .day-view-hour-2 {
-        width: 100%;
-        height: 50%;
-        max-width: 100%;
-        white-space: nowrap;
-        user-select: none;
-        overflow-y: auto;
-  }
-  .day-view-hour-2 {
-        border-top: 1px dashed var(--input-border);
   }
   `;
 }
