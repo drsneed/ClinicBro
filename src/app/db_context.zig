@@ -452,6 +452,18 @@ pub fn lookupItems(self: *DbContext, table_name: []const u8, include_all: bool) 
     return lookup_list;
 }
 
+pub fn lookupItemName(self: *DbContext, table_name: []const u8, id: i32) !?[]const u8 {
+    var query_buffer: [256]u8 = undefined;
+    const query = try std.fmt.bufPrint(&query_buffer, "select name from {s}{s}", .{ table_name, id });
+    var result = try self.connection.query(query, .{});
+    try self.results.append(result);
+    var name: ?[]const u8 = null;
+    while (try result.next()) |row| {
+        name = row.get([]const u8, 0);
+    }
+    return name;
+}
+
 // ------------------------------- AppointmentStatus Context ------------------------------------------
 const appointment_status_select_query =
     \\select apt.id, apt.active, apt.name, apt.show,
@@ -615,4 +627,16 @@ pub fn getAllAppointmentViews(self: *DbContext, date_from: ?[]const u8, date_to:
         try lookup_list.append(appointment_view);
     }
     return lookup_list;
+}
+
+pub fn getAppointmentView(self: *DbContext, appt_id: i32) !?AppointmentView {
+    const query = "select * from AppointmentView where appt_id = $1";
+    var result = try self.connection.queryOpts(query, .{appt_id}, .{ .column_names = true });
+    defer result.deinit();
+    var db_mapper = result.mapper(AppointmentView, .{ .dupe = true, .allocator = self.allocator });
+    var appointment_view: ?AppointmentView = null;
+    while (try db_mapper.next()) |view| {
+        appointment_view = view;
+    }
+    return appointment_view;
 }

@@ -27,7 +27,7 @@
     --lgn-icon-light-scheme: invert(8%) sepia(7%) saturate(377%) hue-rotate(169deg) brightness(97%) contrast(95%);
     --pwr-light-scheme: invert(22%) sepia(11%) saturate(1957%) hue-rotate(162deg) brightness(92%) contrast(99%);
     --pwr-light-scheme-pressed: invert(100%) sepia(8%) saturate(887%) hue-rotate(175deg) brightness(95%) contrast(90%);
-    --input-border: light-dark(#838282, #444);
+    --input-border: light-dark(#838282, #9d9c9c);
     --input-border-valid: light-dark(#325bd6, #17358e);
     --sep: light-dark(#cecdcd, black);
     --sep-border: light-dark(#ffffff, #3a3a3a);
@@ -87,7 +87,7 @@
 
     --calendar-number-fg: light-dark(#787777, #22);
     --calendar-this-month-bg: light-dark(#dae2f8, #121527);
-    --calendar-this-month-active-bg: light-dark(#fff, #1e1b1b);
+    --calendar-this-month-active-bg: light-dark(#fff, #000);
     --calendar-month-bg: light-dark(#eeeeec, #323030);
     --calendar-today-fg: light-dark(#155741, #adf5c5);
     --table-fg: light-dark(#16181a, #a2b4b1);
@@ -115,6 +115,10 @@ body {
     margin: 0;
     background: var(--bg);
     color: var(--fg);
+}
+
+.hidden {
+    display: none;
 }
 
 .lc {
@@ -323,17 +327,18 @@ select {
     padding: 14px 10px 8px 10px;
     margin: 20px 4px;
 }
-.groupbox label:first-child {
+.groupbox .gb-header {
     position: absolute;
     pointer-events: none;
     left: 15px;
     top: -12px;
     font-size: small;
+    font-weight: bold;
     padding: 0 5px 0 5px;
     background-color: var(--container-bg);
     transition: 0.2s;
 }
-.groupbox input {
+.groupbox input[type=text] {
     border: none;
     border-bottom: 1px solid var(--input-border);
     border-bottom-left-radius: 0;
@@ -411,6 +416,8 @@ input[type=time]:focus, input[type=time]:valid {
     left: 10px;
     top: 12px;
     transition: 0.2s;
+    font-weight: bold;
+    font-size: small;
 }
 
 .text-field input:focus, .text-field input:valid, .text-field input[type=checkbox] {
@@ -1082,6 +1089,7 @@ details[open] summary {
 .date-container {
     display: inline-block;
     width: 190px;
+    margin-top: 4px;
 }
 #client_email {
     width: 340px;
@@ -1274,6 +1282,18 @@ details[open] summary {
     background-color: var(--selected-tab-bg);
     color: var(--selected-tab-fg);
 }
+
+#appointment-details {
+    margin: 16px 4px;
+}
+
+.display-field label {
+    font-weight: bold;
+    margin-right: 16px;
+    text-align: center;
+    width: 60px;
+}
+
 .client-card {
     /* background-color: var(--selected-tab-bg); */
 }

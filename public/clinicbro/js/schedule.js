@@ -1,4 +1,4 @@
-// public/clinicbro/js/util.ts
+// util.ts
 function dateAdd(date, interval, units) {
   var ret = new Date(date.valueOf());
   var checkRollover = function() {
@@ -43,7 +43,7 @@ function toIsoTimeString(d) {
   return d.toTimeString().substring(0, 8);
 }
 
-// public/clinicbro/js/schedule.ts
+// schedule.ts
 document.addEventListener("htmx:configRequest", function(evt) {
   if (evt.detail.elt.nodeName == "MV-DAY") {
     var from_date = new Date;
@@ -52,6 +52,8 @@ document.addEventListener("htmx:configRequest", function(evt) {
     var to_date = dateAdd(from_date, "minute", 30);
     evt.detail.parameters["from"] = toIsoTimeString(from_date);
     evt.detail.parameters["to"] = toIsoTimeString(to_date);
+  } else if (evt.detail.elt.nodeName == "MV-APPT" && evt.detail.triggeringEvent.type === "click") {
+    evt.detail.path = evt.detail.path.replace("scheduler", "appointment-details");
   }
 });
 document.addEventListener("htmx:afterRequest", function(evt) {

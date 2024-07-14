@@ -9,7 +9,7 @@ var __legacyDecorateClassTS = function(decorators, target, key, desc) {
   return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 
-// ../../../../node_modules/@lit/reactive-element/css-tag.js
+// node_modules/@lit/reactive-element/css-tag.js
 var t = globalThis;
 var e = t.ShadowRoot && (t.ShadyCSS === undefined || t.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
 var s = Symbol();
@@ -61,7 +61,7 @@ var c = e ? (t2) => t2 : (t2) => t2 instanceof CSSStyleSheet ? ((t3) => {
   return r(e2);
 })(t2) : t2;
 
-// ../../../../node_modules/@lit/reactive-element/reactive-element.js
+// node_modules/@lit/reactive-element/reactive-element.js
 var { is: i2, defineProperty: e2, getOwnPropertyDescriptor: r2, getOwnPropertyNames: h, getOwnPropertySymbols: o2, getPrototypeOf: n2 } = Object;
 var a = globalThis;
 var c2 = a.trustedTypes;
@@ -293,7 +293,7 @@ class b extends HTMLElement {
 }
 b.elementStyles = [], b.shadowRootOptions = { mode: "open" }, b[d("elementProperties")] = new Map, b[d("finalized")] = new Map, p?.({ ReactiveElement: b }), (a.reactiveElementVersions ??= []).push("2.0.4");
 
-// ../../../../node_modules/lit-html/lit-html.js
+// node_modules/lit-html/lit-html.js
 var C = function(t2, i3) {
   if (!Array.isArray(t2) || !t2.hasOwnProperty("raw"))
     throw Error("invalid template strings array");
@@ -567,7 +567,7 @@ var j = (t3, i4, s3) => {
   }
   return h3._$AI(t3), h3;
 };
-// ../../../../node_modules/lit-element/lit-element.js
+// node_modules/lit-element/lit-element.js
 class s3 extends b {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = undefined;
@@ -594,13 +594,13 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// ../../../../node_modules/@lit/reactive-element/decorators/custom-element.js
+// node_modules/@lit/reactive-element/decorators/custom-element.js
 var t3 = (t4) => (e4, o4) => {
   o4 !== undefined ? o4.addInitializer(() => {
     customElements.define(t4, e4);
   }) : customElements.define(t4, e4);
 };
-// ../../../../node_modules/@lit/reactive-element/decorators/property.js
+// node_modules/@lit/reactive-element/decorators/property.js
 var n4 = function(t4) {
   return (e4, o4) => typeof o4 == "object" ? r5(t4, e4, o4) : ((t5, e5, o5) => {
     const r5 = e5.hasOwnProperty(o5);
@@ -629,7 +629,7 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
-// ../util.ts
+// public/clinicbro/js/util.ts
 function dateAdd(date, interval, units) {
   var ret = new Date(date.valueOf());
   var checkRollover = function() {
@@ -706,7 +706,7 @@ var months = [
   "December"
 ];
 
-// monthview-style.ts
+// public/clinicbro/js/schedule/monthview-style.ts
 function monthviewStyle() {
   return i`
   .month-table {
@@ -910,7 +910,7 @@ function monthviewStyle() {
   `;
 }
 
-// ../../../../node_modules/lit-html/directive.js
+// node_modules/lit-html/directive.js
 var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
 var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
 
@@ -931,7 +931,7 @@ class i4 {
   }
 }
 
-// ../../../../node_modules/lit-html/directives/class-map.js
+// node_modules/lit-html/directives/class-map.js
 var e6 = e5(class extends i4 {
   constructor(t5) {
     if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
@@ -957,7 +957,7 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
-// scheduler-base.ts
+// public/clinicbro/js/schedule/scheduler-base.ts
 class SchedulerBase extends s3 {
   static styles = monthviewStyle();
   constructor() {
@@ -1080,7 +1080,7 @@ __legacyDecorateClassTS([
   n4({ type: String, reflect: true })
 ], SchedulerBase.prototype, "mode", undefined);
 
-// monthview.ts
+// public/clinicbro/js/schedule/monthview.ts
 class MonthView extends SchedulerBase {
   constructor() {
     super();

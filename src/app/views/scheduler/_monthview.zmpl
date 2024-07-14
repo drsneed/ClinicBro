@@ -17,7 +17,7 @@
                 appt_date="{{appt_date}}" appt_from="{{appt_from}}" appt_to="{{appt_to}}" color="{{color}}"
                 status="{{status}}" client="{{client}}" provider="{{provider}}" location="{{location}}"
                 hx-get="/scheduler/{{appt_id}}" hx-target="global #cb-window" 
-                hx-swap="outerHTML" hx-trigger="dblclick target:mv-appt"></mv-appt>
+                hx-swap="outerHTML" hx-trigger="click target:mv-appt, dblclick target:mv-appt"></mv-appt>
         }
     }
 </month-view>

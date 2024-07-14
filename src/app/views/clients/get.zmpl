@@ -53,7 +53,7 @@
         <label for="email">Email</label>
       </div>
       <div class="groupbox">
-        <label>Communication Preferences</label>
+        <label class="gb-header">Communication Preferences</label>
         <label class="cb-label"><input type="checkbox" name="can_call" class="cbcb" value="1" {{can_call_check}}>Can Call</label>
         <label class="cb-label"><input type="checkbox" name="can_text" class="cbcb" value="1" {{can_text_check}}>Can Text</label>
         <label class="cb-label"><input type="checkbox" name="can_email" class="cbcb" value="1" {{can_email_check}}>Can Email</label>
