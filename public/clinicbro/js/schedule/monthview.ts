@@ -1,12 +1,11 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { toIsoDateString, dateAdd } from '../util';
+import { toIsoDateString, dateAdd, sameDay } from '../util';
 import { SchedulerBase } from './scheduler-base';
-
+import { classMap } from 'lit/directives/class-map.js';
 
 @customElement("month-view")
 export class MonthView extends SchedulerBase {
-    
   constructor() {
     super();
     this.mode = "month";
@@ -19,6 +18,9 @@ export class MonthView extends SchedulerBase {
     <mv-day id="${table_slot_id}" current_date="${date_of_day}" ?current_month=${current_month}
         hx-get="/scheduler/{id}?date=${dod}" hx-target="global #cb-window" hx-swap="outerHTML" 
         hx-trigger="dblclick target:#${table_slot_id}, drop target:#${table_slot_id}" hx-include="#dropped-appt-id, #dropped-client-id">
+        <a hx-get="/scheduler?mode=day&date=${dod}" hx-target="global #scheduler"
+              hx-swap="outerHTML" hx-push-url="true"
+              class="${classMap({num: true, today: sameDay(date_of_day, new Date())})}">${date_of_day.getDate()}</a>
         <slot name="${dod}"></slot>
     </mv-day>`;
   }

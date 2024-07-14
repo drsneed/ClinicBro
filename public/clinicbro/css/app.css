@@ -87,7 +87,7 @@
 
     --calendar-number-fg: light-dark(#787777, #22);
     --calendar-this-month-bg: light-dark(#dae2f8, #121527);
-    --calendar-this-month-active-bg: light-dark(#fff, #757272);
+    --calendar-this-month-active-bg: light-dark(#fff, #1e1b1b);
     --calendar-month-bg: light-dark(#eeeeec, #323030);
     --calendar-today-fg: light-dark(#155741, #adf5c5);
     --table-fg: light-dark(#16181a, #a2b4b1);

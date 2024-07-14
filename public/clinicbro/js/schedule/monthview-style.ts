@@ -171,5 +171,33 @@ export function monthviewStyle() {
     width: 100%;
 
   }
+
+  .num {
+    font-size: 10px;
+    padding-left: 4px;
+    padding-top: 2px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    margin-left: 2px;
+    margin-top: 2px;
+    background-color: transparent;
+  }
+  .num:link, .num:visited {
+      color: var(--link);
+      text-decoration: none;
+  }
+  .num:hover {
+      color: var(--fg);
+  }
+  .today {
+    border: 1px solid var(--calendar-today-fg);
+    color: var(--calendar-today-fg) !important;
+  }
+  .num:hover {
+    font-weight: bold;
+  }
   `;
 }

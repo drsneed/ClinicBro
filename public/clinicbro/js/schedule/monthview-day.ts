@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit-element';
-import {sameDay, clearAllSelectedDays} from '../util';
+import {sameDay, clearAllSelectedDays, toIsoDateString} from '../util';
 import {customElement, property} from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
@@ -15,33 +15,7 @@ export class MonthViewDay extends LitElement {
         overflow-y: auto;
       }
       
-      .num {
-        font-size: 10px;
-        padding-left: 4px;
-        padding-top: 2px;
-        padding-right: 4px;
-        padding-bottom: 2px;
-        cursor: pointer;
-        border-radius: 50%;
-        border: none;
-        margin-left: 2px;
-        margin-top: 2px;
-        background-color: transparent;
-      }
-      .num:link, .num:visited {
-          color: var(--link);
-          text-decoration: none;
-      }
-      .num:hover {
-          color: var(--fg);
-      }
-      .today {
-        border: 1px solid var(--calendar-today-fg);
-        color: var(--calendar-today-fg) !important;
-      }
-      .num:hover {
-        font-weight: bold;
-      }
+      
       .this_month {
         background-color: var(--calendar-this-month-bg) !important;
       }
@@ -68,6 +42,10 @@ export class MonthViewDay extends LitElement {
       this.current_month = false;
       this.selected = false;
       this.addEventListener('click', this._clickHandler);
+    }
+
+    updated(changedProperties) {
+      htmx.process(this.shadowRoot);
     }
 
     public clicked() {
@@ -122,7 +100,7 @@ export class MonthViewDay extends LitElement {
         let num = this.current_date.getDate();
         return html`
           <div class="${classMap({selected: this.selected, this_month: this.current_month})}" @drop="${this._drop}" @dragover="${this._allowDrop}">
-            <a href="/scheduler?mode=day&date=${this.current_date.toISOString()}" class="${classMap({num: true, today: sameDay(this.current_date, new Date())})}">${num}</a>
+
             <slot></slot>
           </div>
       `;

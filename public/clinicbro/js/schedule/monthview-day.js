@@ -594,9 +594,6 @@ var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
 // ../util.ts
-function sameDay(d1, d22) {
-  return d1.getFullYear() === d22.getFullYear() && d1.getMonth() === d22.getMonth() && d1.getDate() === d22.getDate();
-}
 function clearAllSelectedDays() {
   var schedule = document.getElementById("schedule");
   schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
@@ -701,33 +698,7 @@ class MonthViewDay extends s3 {
         overflow-y: auto;
       }
       
-      .num {
-        font-size: 10px;
-        padding-left: 4px;
-        padding-top: 2px;
-        padding-right: 4px;
-        padding-bottom: 2px;
-        cursor: pointer;
-        border-radius: 50%;
-        border: none;
-        margin-left: 2px;
-        margin-top: 2px;
-        background-color: transparent;
-      }
-      .num:link, .num:visited {
-          color: var(--link);
-          text-decoration: none;
-      }
-      .num:hover {
-          color: var(--fg);
-      }
-      .today {
-        border: 1px solid var(--calendar-today-fg);
-        color: var(--calendar-today-fg) !important;
-      }
-      .num:hover {
-        font-weight: bold;
-      }
+      
       .this_month {
         background-color: var(--calendar-this-month-bg) !important;
       }
@@ -740,6 +711,9 @@ class MonthViewDay extends s3 {
     this.current_month = false;
     this.selected = false;
     this.addEventListener("click", this._clickHandler);
+  }
+  updated(changedProperties) {
+    htmx.process(this.shadowRoot);
   }
   clicked() {
     let schedule = document.querySelector("#schedule");
@@ -785,7 +759,7 @@ class MonthViewDay extends s3 {
     let num = this.current_date.getDate();
     return x`
           <div class="${e6({ selected: this.selected, this_month: this.current_month })}" @drop="${this._drop}" @dragover="${this._allowDrop}">
-            <a href="/scheduler?mode=day&date=${this.current_date.toISOString()}" class="${e6({ num: true, today: sameDay(this.current_date, new Date) })}">${num}</a>
+
             <slot></slot>
           </div>
       `;

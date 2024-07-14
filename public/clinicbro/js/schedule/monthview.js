@@ -685,6 +685,9 @@ function dateSuffix(d1) {
   }
   return suffix;
 }
+function sameDay(d1, d22) {
+  return d1.getFullYear() === d22.getFullYear() && d1.getMonth() === d22.getMonth() && d1.getDate() === d22.getDate();
+}
 function toIsoDateString(d3) {
   return d3.toISOString().split("T")[0];
 }
@@ -876,6 +879,34 @@ function monthviewStyle() {
     width: 100%;
 
   }
+
+  .num {
+    font-size: 10px;
+    padding-left: 4px;
+    padding-top: 2px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    margin-left: 2px;
+    margin-top: 2px;
+    background-color: transparent;
+  }
+  .num:link, .num:visited {
+      color: var(--link);
+      text-decoration: none;
+  }
+  .num:hover {
+      color: var(--fg);
+  }
+  .today {
+    border: 1px solid var(--calendar-today-fg);
+    color: var(--calendar-today-fg) !important;
+  }
+  .num:hover {
+    font-weight: bold;
+  }
   `;
 }
 
@@ -1062,6 +1093,9 @@ class MonthView extends SchedulerBase {
     <mv-day id="${table_slot_id}" current_date="${date_of_day}" ?current_month=${current_month}
         hx-get="/scheduler/{id}?date=${dod}" hx-target="global #cb-window" hx-swap="outerHTML" 
         hx-trigger="dblclick target:#${table_slot_id}, drop target:#${table_slot_id}" hx-include="#dropped-appt-id, #dropped-client-id">
+        <a hx-get="/scheduler?mode=day&date=${dod}" hx-target="global #scheduler"
+              hx-swap="outerHTML" hx-push-url="true"
+              class="${e6({ num: true, today: sameDay(date_of_day, new Date) })}">${date_of_day.getDate()}</a>
         <slot name="${dod}"></slot>
     </mv-day>`;
   }
