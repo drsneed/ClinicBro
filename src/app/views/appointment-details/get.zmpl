@@ -10,7 +10,7 @@
   @zig {
     if(is_appointment) {
       <div class="cb-row display-field" hx-ext="path-params">
-        <label>Client</label>
+        <label>Patient</label>
         <span>{{client}}</code>
       </div>
       <div class="cb-row display-field" hx-ext="path-params">

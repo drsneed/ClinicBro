@@ -19,7 +19,7 @@
           const appt_statuses = zmpl.getT(.array, "appt_statuses").?;
           const client_name = zmpl.getT(.string, "client_name").?;
           <div class="id-field" hx-ext="path-params">
-            <label class="select-label">Client</label>
+            <label class="select-label">Patient</label>
             <code>{{client_name}}</code>
           </div>
           <hr />

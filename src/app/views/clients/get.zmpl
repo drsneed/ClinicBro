@@ -5,7 +5,7 @@
   const inactive_class = if(active) "" else "setup-item-inactive";
   const id = zmpl.getT(.integer, "id").?;
   const autofocus = if(id == 0) "autofocus" else "";
-  const window_title = if(id == 0) "Add New Client" else "Edit Client";
+  const window_title = if(id == 0) "Add New Patient" else "Edit Patient";
   const can_call = zmpl.getT(.boolean, "can_call") orelse false;
   const can_text = zmpl.getT(.boolean, "can_text") orelse false;
   const can_email = zmpl.getT(.boolean, "can_email") orelse false;
