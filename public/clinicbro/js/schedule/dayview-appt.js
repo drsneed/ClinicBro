@@ -811,6 +811,8 @@ class DayViewAppointment extends s3 {
       if (grayscale < 128) {
         foregroundColor = "var(--day-appt-fg-alt)";
       }
+    } else {
+      foregroundColor = "var(--appt-fg)";
     }
     let startHours24 = parseInt(this.appt_from.slice(0, 2));
     let startHours = startHours24 % 12 || 12;

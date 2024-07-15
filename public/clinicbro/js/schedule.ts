@@ -7,10 +7,21 @@ document.addEventListener('htmx:configRequest', function(evt) {
     var to_date = dateAdd(from_date, 'minute', 30);
     evt.detail.parameters['from'] = toIsoTimeString(from_date);
     evt.detail.parameters['to'] = toIsoTimeString(to_date); 
-  } else if(evt.detail.elt.nodeName == "MV-APPT" && evt.detail.triggeringEvent.type === 'click') {
-    
-    evt.detail.path = evt.detail.path.replace("scheduler", "appointment-details");
-    
+  } else if(evt.detail.elt.id == "appt-save-button") {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    if(urlParams.has("mode")) {
+      evt.detail.parameters['mode'] = urlParams.get("mode");
+    }
+    if(urlParams.has("date")) {
+      evt.detail.parameters['date'] = urlParams.get("date");
+    }
+    if(urlParams.has("from")) {
+      evt.detail.parameters['from'] = urlParams.get("from");
+    }
+    if(urlParams.has("to")) {
+      evt.detail.parameters['to'] = urlParams.get("to");
+    }
   }
 });
 

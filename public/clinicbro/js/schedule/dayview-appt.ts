@@ -156,6 +156,8 @@ export class DayViewAppointment extends LitElement {
           foregroundColor = "var(--day-appt-fg-alt)";
         }
         //0.299 ∙ Red + 0.587 ∙ Green + 0.114 ∙ Blue
+      } else {
+        foregroundColor = "var(--appt-fg)";
       }
         
       let startHours24 = parseInt(this.appt_from.slice(0,2));

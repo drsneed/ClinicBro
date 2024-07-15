@@ -29,6 +29,8 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     } else {
         try db_context.updateAppointmentStatus(appointment_status, current_bro_id);
     }
+    try db_context.deinit();
+    db_context = try DbContext.init(request.allocator, request.server.database);
     return try util.renderSetupList(request, data, &db_context, "AppointmentStatus", appointment_status.id);
 }
 

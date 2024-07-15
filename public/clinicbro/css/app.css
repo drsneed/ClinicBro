@@ -1054,7 +1054,7 @@ details[open] summary {
     margin-right: 10px;
 }
 
-.client-option {
+.client-option, .setup-option {
     padding: 4px 8px;
 }
 
@@ -1147,20 +1147,34 @@ details[open] summary {
     font-size: 8;
     border-radius: 3px 3px 0px 0px;
 }
-.setup-item-list {
-    background-color: var(--setup-btnbar-bg);
-    border-left: 1px solid #9A9A9A;
-    border-right: 1px solid #9A9A9A;
+.setup-list-info h2 {
+    margin-bottom: 6px;
+}
+.setup-item-listbox {
+    border: 1px solid var(--input-border);
+    height: 450px;
+    user-select: none;
+    overflow-y: scroll;
+    margin-bottom: 30px;
+    border-bottom-left-radius: 3px;
+    border-bottom-right-radius: 3px;
 }
 
-.setup-item-list {
-
-    /* border-radius: 3px; */
-    /* border: 1px solid #9A9A9A; */
-    padding: 0;
-}
-.setup-item-list ul {
+.setup-item-listbox ul {
     list-style-type: none;
+}
+
+.setup-item-listbox ul li {
+    border: 1px solid transparent;
+}
+
+.setup-item-listbox ul li.active {
+    background-color: var(--nav-link-bg-current);
+    border: 1px solid var(--input-border);
+}
+
+.setup-item-listbox ul li:hover {
+    background-color: var(--nav-link-bg-hover);
 }
 
 .tracking ul {

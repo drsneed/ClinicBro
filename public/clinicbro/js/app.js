@@ -22,7 +22,16 @@ function clientSelected(evt) {
   // add an "active" class to the selected list item
   evt.currentTarget.className += " active";
 }
-
+function setupItemSelected(evt) {
+  var i;
+  // Get all elements with class="client-option" and remove the class "active"
+  setupListItems = document.getElementsByClassName("setup-option");
+  for (i = 0; i < setupListItems.length; i++) {
+    setupListItems[i].className = setupListItems[i].className.replace(" active", "");
+  }
+  // add an "active" class to the selected list item
+  evt.currentTarget.className += " active";
+}
 function clearSetupSelectedItem() {
     var elements = document.getElementById("setup-select").options;
     for(var i = 0; i < elements.length; i++){

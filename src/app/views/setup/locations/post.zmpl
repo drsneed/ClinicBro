@@ -8,6 +8,7 @@
   <div class="setup-screen">
     <div class="setup-item-menu">
       <div class="setup-list-info">
+        <h2><span class="mdi mdi-map-marker-multiple mr-2"></span>Locations</h2>
         <span class="cb-label">Items: {{item_count}}</span>
         <label class="cb-label"><input type="checkbox" id="include_inactive" name="include_inactive" class="cbcb" value="1"
           hx-get="/setup/locations"
@@ -33,23 +34,19 @@
             hx-target="#LocationSetupScreen"
             hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span></button>  
       </div>
-      <div class="setup-item-list" hx-ext="path-params">
-        <select id="setup-select" size="20"
-          name="id"
-          hx-get="/setup/locations/{id}"
-          hx-target="#LocationSetupContent"
-          hx-swap="outerHTML">
+      <div class="setup-item-listbox">
+        <ul>
           @zig {
             for (setup_items) |item| {
-                const id = item.getT(.integer, "id") orelse continue;
-                const name = item.getT(.string, "name") orelse continue;
-                const this_active = item.getT(.boolean, "active") orelse continue;
-                const this_inactive_class = if(this_active) "" else "setup-item-inactive";
-                const selected = item.getT(.string, "selected") orelse continue;
-                <option value="{{id}}" class="{{this_inactive_class}}" {{selected}}>{{name}}</option>
+              const id = item.getT(.integer, "id") orelse continue;
+              const name = item.getT(.string, "name") orelse continue;
+              const selected = item.getT(.string, "selected") orelse continue;
+                <li class="setup-option {{inactive_class}} {{selected}}" hx-get="/setup/locations/{{id}}"
+                  hx-target="#LocationSetupContent" hx-trigger="click" hx-swap="outerHTML" onclick="setupItemSelected(event)">
+                  <span class="mdi mdi-map-marker mr-2"></span>{{name}}</li>
             }
           }
-        </select>
+        </ul>
       </div>
     </div>
     <div id="LocationSetupContent" class="setup-item-content {{inactive_class}}">

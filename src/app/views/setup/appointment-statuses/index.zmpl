@@ -37,22 +37,20 @@
               <span class="mdi mdi-trash-can"></span>
           </button>  
       </div>
-      <div class="setup-item-list" hx-ext="path-params">
-        <select id="setup-select" size="20"
-          name="id"
-          hx-get="/setup/appointment-statuses/{id}"
-          hx-target="#ApptStatusSetupContent"
-          hx-swap="outerHTML">
+      <div class="setup-item-listbox">
+        <ul>
           @zig {
             for (setup_items) |item| {
-                const id = item.getT(.integer, "id") orelse continue;
-                const name = item.getT(.string, "name") orelse continue;
-                const active = item.getT(.boolean, "active") orelse continue;
-                const inactive_class = if(active) "" else "setup-item-inactive";
-                <option value="{{id}}" class="{{inactive_class}}">{{name}}</option>
+              const id = item.getT(.integer, "id") orelse continue;
+              const name = item.getT(.string, "name") orelse continue;
+              const active = item.getT(.boolean, "active") orelse continue;
+              const inactive_class = if(active) "" else "setup-item-inactive";
+                <li class="setup-option {{inactive_class}}" hx-get="/setup/appointment-statuses/{{id}}"
+                  hx-target="#ApptStatusSetupContent" hx-trigger="click" hx-swap="outerHTML" onclick="setupItemSelected(event)">
+                  <span class="mdi mdi-application-brackets-outline mr-2"></span>{{name}}</li>
             }
           }
-        </select>
+        </ul>
       </div>
     </div>
     <div id="ApptStatusSetupContent" class="setup-item-content">

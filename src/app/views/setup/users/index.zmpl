@@ -6,6 +6,7 @@
   <div class="setup-screen">
     <div class="setup-item-menu">
       <div class="setup-list-info">
+        <h2><span class="mdi mdi-account-multiple mr-2"></span>Users</h2>
         <span class="cb-label">Items: {{item_count}}</span>
         <label class="cb-label"><input type="checkbox" id="include_inactive" name="include_inactive" class="cbcb" value="1"
           hx-get="/setup/users"
@@ -31,22 +32,20 @@
             hx-target="#UserSetupScreen"
             hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span></button>  
       </div>
-      <div class="setup-item-list" hx-ext="path-params">
-        <select id="setup-select" size="20"
-          name="id"
-          hx-get="/setup/users/{id}"
-          hx-target="#UserSetupContent"
-          hx-swap="outerHTML">
+      <div class="setup-item-listbox">
+        <ul>
           @zig {
             for (setup_items) |item| {
-                const id = item.getT(.integer, "id") orelse continue;
-                const name = item.getT(.string, "name") orelse continue;
-                const active = item.getT(.boolean, "active") orelse continue;
-                const inactive_class = if(active) "" else "setup-item-inactive";
-                <option value="{{id}}" class="{{inactive_class}}">{{name}}</option>
+              const id = item.getT(.integer, "id") orelse continue;
+              const name = item.getT(.string, "name") orelse continue;
+              const active = item.getT(.boolean, "active") orelse continue;
+              const inactive_class = if(active) "" else "setup-item-inactive";
+                <li class="setup-option {{inactive_class}}" hx-get="/setup/users/{{id}}"
+                  hx-target="#UserSetupContent" hx-trigger="click" hx-swap="outerHTML" onclick="setupItemSelected(event)">
+                  <span class="mdi mdi mdi-account mr-2"></span>{{name}}</li>
             }
           }
-        </select>
+        </ul>
       </div>
     </div>
     <div id="UserSetupContent" class="setup-item-content">
