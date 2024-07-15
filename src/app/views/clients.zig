@@ -85,6 +85,8 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         try db_context.updateClient(client, current_bro_id);
     }
 
+    try db_context.deinit();
+    db_context = try DbContext.init(request.allocator, request.server.database);
     const json_clients = try data.array();
     var root = data.value.?;
     try root.put("clients", json_clients);

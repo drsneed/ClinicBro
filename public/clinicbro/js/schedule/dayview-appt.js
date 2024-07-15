@@ -9,7 +9,7 @@ var __legacyDecorateClassTS = function(decorators, target, key, desc) {
   return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 
-// ../../../../node_modules/@lit/reactive-element/css-tag.js
+// node_modules/@lit/reactive-element/css-tag.js
 var t = globalThis;
 var e = t.ShadowRoot && (t.ShadyCSS === undefined || t.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
 var s = Symbol();
@@ -61,7 +61,7 @@ var c = e ? (t2) => t2 : (t2) => t2 instanceof CSSStyleSheet ? ((t3) => {
   return r(e2);
 })(t2) : t2;
 
-// ../../../../node_modules/@lit/reactive-element/reactive-element.js
+// node_modules/@lit/reactive-element/reactive-element.js
 var { is: i2, defineProperty: e2, getOwnPropertyDescriptor: r2, getOwnPropertyNames: h, getOwnPropertySymbols: o2, getPrototypeOf: n2 } = Object;
 var a = globalThis;
 var c2 = a.trustedTypes;
@@ -293,7 +293,7 @@ class b extends HTMLElement {
 }
 b.elementStyles = [], b.shadowRootOptions = { mode: "open" }, b[d("elementProperties")] = new Map, b[d("finalized")] = new Map, p?.({ ReactiveElement: b }), (a.reactiveElementVersions ??= []).push("2.0.4");
 
-// ../../../../node_modules/lit-html/lit-html.js
+// node_modules/lit-html/lit-html.js
 var C = function(t2, i3) {
   if (!Array.isArray(t2) || !t2.hasOwnProperty("raw"))
     throw Error("invalid template strings array");
@@ -567,7 +567,7 @@ var j = (t3, i4, s3) => {
   }
   return h3._$AI(t3), h3;
 };
-// ../../../../node_modules/lit-element/lit-element.js
+// node_modules/lit-element/lit-element.js
 class s3 extends b {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = undefined;
@@ -594,13 +594,13 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// ../../../../node_modules/@lit/reactive-element/decorators/custom-element.js
+// node_modules/@lit/reactive-element/decorators/custom-element.js
 var t3 = (t4) => (e4, o4) => {
   o4 !== undefined ? o4.addInitializer(() => {
     customElements.define(t4, e4);
   }) : customElements.define(t4, e4);
 };
-// ../../../../node_modules/@lit/reactive-element/decorators/property.js
+// node_modules/@lit/reactive-element/decorators/property.js
 var n4 = function(t4) {
   return (e4, o4) => typeof o4 == "object" ? r5(t4, e4, o4) : ((t5, e5, o5) => {
     const r5 = e5.hasOwnProperty(o5);
@@ -629,7 +629,7 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
-// ../../../../node_modules/lit-html/directive.js
+// node_modules/lit-html/directive.js
 var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
 var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
 
@@ -650,7 +650,7 @@ class i4 {
   }
 }
 
-// ../../../../node_modules/lit-html/directives/class-map.js
+// node_modules/lit-html/directives/class-map.js
 var e6 = e5(class extends i4 {
   constructor(t5) {
     if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
@@ -676,7 +676,7 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
-// ../../../../node_modules/lit-html/directives/style-map.js
+// node_modules/lit-html/directives/style-map.js
 var n5 = "important";
 var i5 = " !" + n5;
 var o5 = e5(class extends i4 {
@@ -707,23 +707,37 @@ var o5 = e5(class extends i4 {
     return w;
   }
 });
-// ../util.ts
+// public/clinicbro/js/util.ts
 function toIsoDateString(d3) {
-  return d3.toISOString().split("T")[0];
+  var month = d3.getMonth() + 1;
+  var day = d3.getDate();
+  var month_str = month < 10 ? "0" + month : month;
+  var day_str = day < 10 ? "0" + day : day;
+  return `${d3.getFullYear()}-${month_str}-${day_str}`;
+}
+function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
 }
 
-// dayview-appt.ts
+// public/clinicbro/js/schedule/dayview-appt.ts
 class DayViewAppointment extends s3 {
   static styles = i`
     div {
+      box-sizing: border-box;
+      flex: 1;
       font-size: 12px;
-      color: var(--appt-fg);
       padding: 0px 2px;
-      margin: 2px 0px;
-      width: 90%;
+      margin: 0px;
+      width: 100%;
       user-select: none;
-      overflow: hidden;
+      overflow: visible;
       text-overflow: ellipsis;
+      border: 1px solid var(--input-border);
     }
 
     .appt {
@@ -741,7 +755,7 @@ class DayViewAppointment extends s3 {
     }
     
     .selected {
-      border: 1px solid var(--appt-selected-border);
+      border: 2px solid var(--appt-selected-border);
     }
     `;
   constructor() {
@@ -759,6 +773,25 @@ class DayViewAppointment extends s3 {
   }
   clicked() {
     this.selected = true;
+    let is_appt = this.client.length > 0;
+    document.getElementById("appt-details-header").innerHTML = is_appt ? "Appointment Details" : "Event Details";
+    document.getElementById("appt-details-title-label").innerHTML = is_appt ? "Type" : "Title";
+    let display_style = is_appt ? "block" : "none";
+    document.getElementById("appt-details-client").style.display = display_style;
+    document.getElementById("appt-details-status").style.display = display_style;
+    document.getElementById("appt-details-location").style.display = display_style;
+    document.getElementById("appt-details-provider").style.display = display_style;
+    document.getElementById("appt-details-title-span").innerHTML = this.appt_title;
+    if (is_appt) {
+      document.getElementById("appt-details-client-span").innerHTML = this.client;
+      document.getElementById("appt-details-status-span").innerHTML = this.status;
+      document.getElementById("appt-details-location-span").innerHTML = this.location;
+      document.getElementById("appt-details-provider-span").innerHTML = this.provider;
+    }
+    document.getElementById("appt-details-date").value = toIsoDateString(this.appt_date);
+    document.getElementById("appt-details-from").value = this.appt_from;
+    document.getElementById("appt-details-to").value = this.appt_to;
+    document.getElementById("appointment-details").classList.remove("hidden");
   }
   _drag(e7) {
     e7.dataTransfer.setData("appt-id", e7.target.dataset.apptId);
@@ -770,8 +803,15 @@ class DayViewAppointment extends s3 {
       text = text + " - " + this.client;
     }
     let backgroundColor = "var(--appt-bg1)";
-    if (this.color.length > 0)
-      backgroundColor = this.color;
+    let foregroundColor = "var(--day-appt-fg)";
+    if (this.color.length > 0) {
+      backgroundColor = this.color + "CC";
+      let rgb = hexToRgb(this.color);
+      let grayscale = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
+      if (grayscale < 128) {
+        foregroundColor = "var(--day-appt-fg-alt)";
+      }
+    }
     let startHours24 = parseInt(this.appt_from.slice(0, 2));
     let startHours = startHours24 % 12 || 12;
     let startMinutes = this.appt_from.slice(-2);
@@ -786,9 +826,9 @@ class DayViewAppointment extends s3 {
     endDate.setHours(endHours24);
     endDate.setMinutes(parseInt(endMinutes));
     let duration = Math.abs(endDate - startDate) / 1000 / 60;
-    let display_height = duration * 1.5;
+    let display_height = "" + duration * 1.5 + "px;";
     return x`<div data-appt-id="${this.appt_id}" class="${e6({ selected: this.selected, appt, event: !appt })}"
-               style="${o5({ backgroundColor, height: display_height })}"
+               style="${o5({ backgroundColor, height: display_height, color: foregroundColor })}"
                draggable="true" @dragstart="${this._drag}"><span class="appt-title">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</span></div>`;
   }
 }

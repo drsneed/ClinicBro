@@ -1,5 +1,4 @@
 <div class="container" id="scheduler">
-    <p>Count: {{.appointment_count}}</p>
     @zig {
         const mode = zmpl.getT(.string, "mode").?;
         if(std.mem.eql(u8, mode, "month")) {

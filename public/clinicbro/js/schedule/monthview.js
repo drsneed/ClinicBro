@@ -689,7 +689,11 @@ function sameDay(d1, d22) {
   return d1.getFullYear() === d22.getFullYear() && d1.getMonth() === d22.getMonth() && d1.getDate() === d22.getDate();
 }
 function toIsoDateString(d3) {
-  return d3.toISOString().split("T")[0];
+  var month = d3.getMonth() + 1;
+  var day = d3.getDate();
+  var month_str = month < 10 ? "0" + month : month;
+  var day_str = day < 10 ? "0" + day : day;
+  return `${d3.getFullYear()}-${month_str}-${day_str}`;
 }
 var months = [
   "January",
@@ -709,7 +713,7 @@ var months = [
 // public/clinicbro/js/schedule/monthview-style.ts
 function monthviewStyle() {
   return i`
-  .month-table {
+  .month-table, .day-table {
     background: var(--container-bg);
     table-layout: fixed;
     //height: 550px;
@@ -719,6 +723,36 @@ function monthviewStyle() {
     margin: 0px;
     width: 100%;
     color: var(--table-fg);
+  }
+
+  .month-table td, .month-table th, .day-table td, .day-table th {
+    border: 1px solid var(--input-border);
+    box-shadow: none;
+    width: auto !important;
+  }
+
+  .month-table thead, .day-table thead {
+    text-align: center;
+  }
+
+  .month-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .month-table tr, .day-table tr {
+    white-space: nowrap;
+  }
+  
+  .day-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow-y: visible;
+    padding: 0;
   }
 
   .caption {
@@ -786,12 +820,6 @@ function monthviewStyle() {
   .scheduler-container {
     overflow-y: visible;
   }
-
-  .month-table td, .month-table th {
-    border: 1px solid var(--input-border);
-    box-shadow: none;
-    width: auto !important;
-  }
   
   .row1 {
     position: sticky;
@@ -808,9 +836,7 @@ function monthviewStyle() {
     z-index: 1;
   }
 
-  .month-table thead {
-    text-align: center;
-  }
+
 
   .sticky-header {
     border-bottom: 1px solid var(--table-header-fg);
@@ -853,18 +879,6 @@ function monthviewStyle() {
     padding: 0;
     margin: 8px auto;
     font-size: 20px;
-  }
-  
-  .month-table td {
-    background-color: var(--bg);
-    vertical-align: top;
-    height: 90px;
-    overflow: hidden;
-    padding: 0;
-  }
-
-  .month-table tr {
-    white-space: nowrap;
   }
 
   .half-hour-mark {
@@ -1004,7 +1018,8 @@ class SchedulerBase extends s3 {
     return `date=${toIsoDateString(firstOfDaWeek)}&to=${toIsoDateString(firstOfNextWeek)}`;
   }
   _getDayParam(base_date) {
-    return `date=${toIsoDateString(base_date)}`;
+    let param_str = `date=${toIsoDateString(base_date)}`;
+    return param_str;
   }
   _getParams(base_date) {
     switch (this.mode) {

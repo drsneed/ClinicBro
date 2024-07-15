@@ -686,7 +686,11 @@ function dateSuffix(d1) {
   return suffix;
 }
 function toIsoDateString(d3) {
-  return d3.toISOString().split("T")[0];
+  var month = d3.getMonth() + 1;
+  var day = d3.getDate();
+  var month_str = month < 10 ? "0" + month : month;
+  var day_str = day < 10 ? "0" + day : day;
+  return `${d3.getFullYear()}-${month_str}-${day_str}`;
 }
 var months = [
   "January",
@@ -876,6 +880,34 @@ function monthviewStyle() {
     width: 100%;
 
   }
+
+  .num {
+    font-size: 10px;
+    padding-left: 4px;
+    padding-top: 2px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    margin-left: 2px;
+    margin-top: 2px;
+    background-color: transparent;
+  }
+  .num:link, .num:visited {
+      color: var(--link);
+      text-decoration: none;
+  }
+  .num:hover {
+      color: var(--fg);
+  }
+  .today {
+    border: 1px solid var(--calendar-today-fg);
+    color: var(--calendar-today-fg) !important;
+  }
+  .num:hover {
+    font-weight: bold;
+  }
   `;
 }
 
@@ -973,7 +1005,8 @@ class SchedulerBase extends s3 {
     return `date=${toIsoDateString(firstOfDaWeek)}&to=${toIsoDateString(firstOfNextWeek)}`;
   }
   _getDayParam(base_date) {
-    return `date=${toIsoDateString(base_date)}`;
+    let param_str = `date=${toIsoDateString(base_date)}`;
+    return param_str;
   }
   _getParams(base_date) {
     switch (this.mode) {

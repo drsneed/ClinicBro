@@ -59,6 +59,7 @@ export class MonthViewDay extends LitElement {
       let dropped_client_id_input = schedule.shadowRoot.querySelector("#dropped-client-id");
       dropped_client_id_input.value = "0";
       this.selected = true;
+      document.getElementById("appointment-details").classList.add("hidden");
     }
 
     private _clickHandler(e) {

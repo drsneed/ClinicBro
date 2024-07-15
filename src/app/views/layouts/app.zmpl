@@ -37,9 +37,7 @@
             </details>
         </div>
         @partial client_finder
-        <div id="appointment-details" class="groupbox hidden">
-            <Label>Appointment Details</Label>
-        </div>
+        @partial scheduler/appointment_details
     </nav>
     <!-- <div id="pwr-dropdown" class="pwr-dropdown" tabindex="1">
         <input type="checkbox" id="pwr-toggle" name="pwr-toggle"/>

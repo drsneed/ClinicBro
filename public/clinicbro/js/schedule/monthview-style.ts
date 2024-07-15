@@ -1,7 +1,7 @@
 import {css} from 'lit';
 export function monthviewStyle() {
     return css`
-  .month-table {
+  .month-table, .day-table {
     background: var(--container-bg);
     table-layout: fixed;
     //height: 550px;
@@ -11,6 +11,36 @@ export function monthviewStyle() {
     margin: 0px;
     width: 100%;
     color: var(--table-fg);
+  }
+
+  .month-table td, .month-table th, .day-table td, .day-table th {
+    border: 1px solid var(--input-border);
+    box-shadow: none;
+    width: auto !important;
+  }
+
+  .month-table thead, .day-table thead {
+    text-align: center;
+  }
+
+  .month-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .month-table tr, .day-table tr {
+    white-space: nowrap;
+  }
+  
+  .day-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow-y: visible;
+    padding: 0;
   }
 
   .caption {
@@ -78,12 +108,6 @@ export function monthviewStyle() {
   .scheduler-container {
     overflow-y: visible;
   }
-
-  .month-table td, .month-table th {
-    border: 1px solid var(--input-border);
-    box-shadow: none;
-    width: auto !important;
-  }
   
   .row1 {
     position: sticky;
@@ -100,9 +124,7 @@ export function monthviewStyle() {
     z-index: 1;
   }
 
-  .month-table thead {
-    text-align: center;
-  }
+
 
   .sticky-header {
     border-bottom: 1px solid var(--table-header-fg);
@@ -145,18 +167,6 @@ export function monthviewStyle() {
     padding: 0;
     margin: 8px auto;
     font-size: 20px;
-  }
-  
-  .month-table td {
-    background-color: var(--bg);
-    vertical-align: top;
-    height: 90px;
-    overflow: hidden;
-    padding: 0;
-  }
-
-  .month-table tr {
-    white-space: nowrap;
   }
 
   .half-hour-mark {

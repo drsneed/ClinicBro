@@ -1,6 +1,6 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import { dateAdd, dayHeaders } from '../util';
+import { dateAdd, dayHeaders, toIsoDateString } from '../util';
 import { SchedulerBase } from './scheduler-base';
 
 
@@ -14,7 +14,7 @@ export class DayView extends SchedulerBase {
   
   render() {
     return html`
-    <table class="month-table" cellspacing="0">
+    <table class="day-table" cellspacing="0">
         <colgroup>
           <col span="1" style="width: 70px;">
           <col span="1" style="width: 95%;">
@@ -53,6 +53,10 @@ export class DayView extends SchedulerBase {
         let pm = this_hour.getHours() >= 12 ? "pm" : "am";
 
         let slot_name_1 = "" + this_hour.getHours() + ":00";
+        let to = "" + dateAdd(this_hour, 'hour', 1).getHours() + ":00";
+        if(to.length == 4) {
+          to = "0" + to;
+        }
         if(slot_name_1.length == 4) {
           slot_name_1 = "0" + slot_name_1;
         }
@@ -61,8 +65,12 @@ export class DayView extends SchedulerBase {
         <tr>
           <td class="time-display">${time_hour}:00 ${pm}</td>
           <td>
-              <dv-half id="${id1}" current_date="${this_hour.toISOString()}"><slot name="${slot_name_1}"></slot></dv-half>
-              <dv-half id="${id2}" current_date="${this_hour_half.toISOString()}"><slot name="${slot_name_2}"></slot></dv-half>
+              <dv-half id="${id1}" current_date="${this_hour.toISOString()}"
+                hx-get="/scheduler/{id}?date=${toIsoDateString(this.current_date)}&from=${slot_name_1}&to=${slot_name_2}" hx-target="global #cb-window" hx-swap="outerHTML" 
+                hx-trigger="dblclick target:#${id1}, drop target:#${id1}" hx-include="#dropped-appt-id, #dropped-client-id"><slot name="${slot_name_1}"></slot></dv-half>
+              <dv-half id="${id2}" current_date="${this_hour_half.toISOString()}"
+                hx-get="/scheduler/{id}?date=${toIsoDateString(this.current_date)}&from=${slot_name_2}&to=${to}" hx-target="global #cb-window" hx-swap="outerHTML" 
+                hx-trigger="dblclick target:#${id2}, drop target:#${id2}" hx-include="#dropped-appt-id, #dropped-client-id"><slot name="${slot_name_2}"></slot></dv-half>
           </td>
         </tr>`);
         i++;

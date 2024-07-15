@@ -2,20 +2,22 @@ import {html, css, LitElement} from 'lit';
 import {customElement, property} from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { styleMap } from 'lit/directives/style-map.js';
-import { dateAdd, toIsoDateString } from './../util';
+import { hexToRgb, toIsoDateString, toIsoTimeString } from './../util';
 
 @customElement("dv-appt")
 export class DayViewAppointment extends LitElement {
   static styles = css`
     div {
+      box-sizing: border-box;
+      flex: 1;
       font-size: 12px;
-      color: var(--appt-fg);
       padding: 0px 2px;
-      margin: 2px 0px;
-      width: 90%;
+      margin: 0px;
+      width: 100%;
       user-select: none;
-      overflow: hidden;
+      overflow: visible;
       text-overflow: ellipsis;
+      border: 1px solid var(--input-border);
     }
 
     .appt {
@@ -33,7 +35,7 @@ export class DayViewAppointment extends LitElement {
     }
     
     .selected {
-      border: 1px solid var(--appt-selected-border);
+      border: 2px solid var(--appt-selected-border);
     }
     `;
     
@@ -104,6 +106,27 @@ export class DayViewAppointment extends LitElement {
 
     public clicked() {
       this.selected = true;
+      let is_appt = this.client.length > 0;
+      document.getElementById("appt-details-header").innerHTML = is_appt ? "Appointment Details" : "Event Details";
+      document.getElementById("appt-details-title-label").innerHTML = is_appt ? "Type" : "Title";
+      let display_style = is_appt ? "block" : "none";
+      document.getElementById("appt-details-client").style.display = display_style;
+      document.getElementById("appt-details-status").style.display = display_style;
+      document.getElementById("appt-details-location").style.display = display_style;
+      document.getElementById("appt-details-provider").style.display = display_style;
+      document.getElementById("appt-details-title-span").innerHTML = this.appt_title;
+      if(is_appt) {
+        document.getElementById("appt-details-client-span").innerHTML = this.client;
+        document.getElementById("appt-details-status-span").innerHTML = this.status;
+        document.getElementById("appt-details-location-span").innerHTML = this.location;
+        document.getElementById("appt-details-provider-span").innerHTML = this.provider;
+      }
+      document.getElementById("appt-details-date").value = toIsoDateString(this.appt_date);
+      document.getElementById("appt-details-from").value = this.appt_from;
+      document.getElementById("appt-details-to").value = this.appt_to;
+
+      document.getElementById("appointment-details").classList.remove("hidden");
+
     }
 
     private _drag(e) {
@@ -124,8 +147,17 @@ export class DayViewAppointment extends LitElement {
         text = text + " - " + this.client;
       }
       let backgroundColor = "var(--appt-bg1)";
-      if(this.color.length > 0)
-        backgroundColor = this.color;
+      let foregroundColor = "var(--day-appt-fg)";
+      if(this.color.length > 0) {
+        backgroundColor = this.color + "CC";
+        let rgb = hexToRgb(this.color);
+        let grayscale = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
+        if(grayscale < 128.0) {
+          foregroundColor = "var(--day-appt-fg-alt)";
+        }
+        //0.299 ∙ Red + 0.587 ∙ Green + 0.114 ∙ Blue
+      }
+        
       let startHours24 = parseInt(this.appt_from.slice(0,2));
       let startHours = startHours24 % 12 || 12;
       let startMinutes = this.appt_from.slice(-2);
@@ -140,11 +172,11 @@ export class DayViewAppointment extends LitElement {
       endDate.setHours(endHours24);
       endDate.setMinutes(parseInt(endMinutes));
       let duration = (Math.abs(endDate - startDate)/1000)/60;
-      let display_height = duration * 1.5;
+      let display_height = "" + (duration * 1.5) + "px;";
 
       //let color = this.color.length > 0 ? this.color : "#FF000055";
       return html`<div data-appt-id="${this.appt_id}" class="${classMap({selected: this.selected, appt: appt, event: !appt})}"
-               style="${styleMap({backgroundColor: backgroundColor, height: display_height})}"
+               style="${styleMap({backgroundColor: backgroundColor, height: display_height, color: foregroundColor})}"
                draggable="true" @dragstart="${this._drag}"><span class="appt-title">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</span></div>`;
                     
     }

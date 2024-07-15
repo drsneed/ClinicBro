@@ -14,12 +14,12 @@
             const appt_from = appt.getT(.string, "appt_from") orelse continue;
             const appt_to = appt.getT(.string, "appt_to") orelse continue;
             var slot_buffer: [5]u8 = undefined;
-            const slot_name = try std.fmt.bufPrint(&slot_buffer, "{s}:{s}", .{appt_from[0..2], if(appt_from[2]>'2') "30" else "00"});
+            const slot_name = try std.fmt.bufPrint(&slot_buffer, "{s}:{s}", .{appt_from[0..2], if(appt_from[3]>'2') "30" else "00"});
             <dv-appt slot="{{slot_name}}" appt_id="{{appt_id}}" appt_title="{{title}}"
                 appt_date="{{appt_date}}" appt_from="{{appt_from}}" appt_to="{{appt_to}}" color="{{color}}"
                 status="{{status}}" client="{{client}}" provider="{{provider}}" location="{{location}}"
                 hx-get="/scheduler/{{appt_id}}" hx-target="global #cb-window" 
-                hx-swap="outerHTML" hx-trigger="dblclick target:dv-appt"></dv-appt>
+                hx-swap="outerHTML" hx-trigger="dblclick target:dv-appt" style="flex: 1;"></dv-appt>
         }
     }
 </day-view>

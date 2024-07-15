@@ -45,7 +45,12 @@ export function combineDateWithTimeString(d: Date, s: string) {
 }
 
 export function toIsoDateString(d: Date) {
-  return d.toISOString().split('T')[0];
+  var month = d.getMonth() + 1;
+  var day = d.getDate();
+  var month_str = month < 10 ? "0" + month : month;
+  var day_str = day < 10 ? "0" + day: day;
+  return `${d.getFullYear()}-${month_str}-${day_str}`;
+  //return d.toISOString().split('T')[0];
 }
 
 export function toIsoTimeString(d: Date) {
@@ -60,4 +65,23 @@ export function clearAllSelectedDays() {
   document.querySelectorAll("mv-appt").forEach(function(appt) {
     appt.removeAttribute("selected");
   });
+}
+
+export function clearAllSelectedHours() {
+  var schedule = document.getElementById("schedule");
+  schedule.shadowRoot.querySelectorAll("dv-half").forEach(function(half_hour) {
+    half_hour.removeAttribute("selected");
+  });
+  document.querySelectorAll("dv-appt").forEach(function(appt) {
+    appt.removeAttribute("selected");
+  });
+}
+
+export function hexToRgb(hex) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
 }

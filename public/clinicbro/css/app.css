@@ -83,7 +83,9 @@
     --appt-bg: light-dark(#e8e6e6, #222);
     --appt-bg-alt: light-dark(#dedada, #292828);
     --appt-fg: light-dark(#1a1a1a, #CCC);
-    --appt-selected-border: light-dark(#232323, #f5f2f2);
+    --day-appt-fg: #1a1a1a;
+    --day-appt-fg-alt: #DDD;
+    --appt-selected-border: light-dark(#1275f7, #f5f2f2);
 
     --calendar-number-fg: light-dark(#787777, #22);
     --calendar-this-month-bg: light-dark(#dae2f8, #121527);
@@ -270,7 +272,7 @@ input:not([type='checkbox']) {
 }
 .btn-save:hover {
     background-color: var(--btn-save-hover-bg);
-    /* color: var(--btn-save-bg); */
+    color: var(--btn-save-bg);
 }
 
 .btn-add {
@@ -1288,6 +1290,7 @@ details[open] summary {
 }
 
 .display-field label {
+    display: inline-block;
     font-weight: bold;
     margin-right: 16px;
     text-align: center;

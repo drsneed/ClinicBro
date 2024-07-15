@@ -9,7 +9,7 @@ var __legacyDecorateClassTS = function(decorators, target, key, desc) {
   return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 
-// ../../../../node_modules/@lit/reactive-element/css-tag.js
+// node_modules/@lit/reactive-element/css-tag.js
 var t = globalThis;
 var e = t.ShadowRoot && (t.ShadyCSS === undefined || t.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
 var s = Symbol();
@@ -61,7 +61,7 @@ var c = e ? (t2) => t2 : (t2) => t2 instanceof CSSStyleSheet ? ((t3) => {
   return r(e2);
 })(t2) : t2;
 
-// ../../../../node_modules/@lit/reactive-element/reactive-element.js
+// node_modules/@lit/reactive-element/reactive-element.js
 var { is: i2, defineProperty: e2, getOwnPropertyDescriptor: r2, getOwnPropertyNames: h, getOwnPropertySymbols: o2, getPrototypeOf: n2 } = Object;
 var a = globalThis;
 var c2 = a.trustedTypes;
@@ -293,7 +293,7 @@ class b extends HTMLElement {
 }
 b.elementStyles = [], b.shadowRootOptions = { mode: "open" }, b[d("elementProperties")] = new Map, b[d("finalized")] = new Map, p?.({ ReactiveElement: b }), (a.reactiveElementVersions ??= []).push("2.0.4");
 
-// ../../../../node_modules/lit-html/lit-html.js
+// node_modules/lit-html/lit-html.js
 var C = function(t2, i3) {
   if (!Array.isArray(t2) || !t2.hasOwnProperty("raw"))
     throw Error("invalid template strings array");
@@ -567,7 +567,7 @@ var j = (t3, i4, s3) => {
   }
   return h3._$AI(t3), h3;
 };
-// ../../../../node_modules/lit-element/lit-element.js
+// node_modules/lit-element/lit-element.js
 class s3 extends b {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = undefined;
@@ -594,13 +594,13 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// ../../../../node_modules/@lit/reactive-element/decorators/custom-element.js
+// node_modules/@lit/reactive-element/decorators/custom-element.js
 var t3 = (t4) => (e4, o4) => {
   o4 !== undefined ? o4.addInitializer(() => {
     customElements.define(t4, e4);
   }) : customElements.define(t4, e4);
 };
-// ../../../../node_modules/@lit/reactive-element/decorators/property.js
+// node_modules/@lit/reactive-element/decorators/property.js
 var n4 = function(t4) {
   return (e4, o4) => typeof o4 == "object" ? r5(t4, e4, o4) : ((t5, e5, o5) => {
     const r5 = e5.hasOwnProperty(o5);
@@ -629,7 +629,7 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
-// ../util.ts
+// public/clinicbro/js/util.ts
 function dateAdd(date, interval, units) {
   var ret = new Date(date.valueOf());
   var checkRollover = function() {
@@ -686,7 +686,11 @@ function dateSuffix(d1) {
   return suffix;
 }
 function toIsoDateString(d3) {
-  return d3.toISOString().split("T")[0];
+  var month = d3.getMonth() + 1;
+  var day = d3.getDate();
+  var month_str = month < 10 ? "0" + month : month;
+  var day_str = day < 10 ? "0" + day : day;
+  return `${d3.getFullYear()}-${month_str}-${day_str}`;
 }
 var dayHeaders = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 var months = [
@@ -704,10 +708,10 @@ var months = [
   "December"
 ];
 
-// monthview-style.ts
+// public/clinicbro/js/schedule/monthview-style.ts
 function monthviewStyle() {
   return i`
-  .month-table {
+  .month-table, .day-table {
     background: var(--container-bg);
     table-layout: fixed;
     //height: 550px;
@@ -717,6 +721,36 @@ function monthviewStyle() {
     margin: 0px;
     width: 100%;
     color: var(--table-fg);
+  }
+
+  .month-table td, .month-table th, .day-table td, .day-table th {
+    border: 1px solid var(--input-border);
+    box-shadow: none;
+    width: auto !important;
+  }
+
+  .month-table thead, .day-table thead {
+    text-align: center;
+  }
+
+  .month-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .month-table tr, .day-table tr {
+    white-space: nowrap;
+  }
+  
+  .day-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow-y: visible;
+    padding: 0;
   }
 
   .caption {
@@ -784,12 +818,6 @@ function monthviewStyle() {
   .scheduler-container {
     overflow-y: visible;
   }
-
-  .month-table td, .month-table th {
-    border: 1px solid var(--input-border);
-    box-shadow: none;
-    width: auto !important;
-  }
   
   .row1 {
     position: sticky;
@@ -806,9 +834,7 @@ function monthviewStyle() {
     z-index: 1;
   }
 
-  .month-table thead {
-    text-align: center;
-  }
+
 
   .sticky-header {
     border-bottom: 1px solid var(--table-header-fg);
@@ -852,18 +878,6 @@ function monthviewStyle() {
     margin: 8px auto;
     font-size: 20px;
   }
-  
-  .month-table td {
-    background-color: var(--bg);
-    vertical-align: top;
-    height: 90px;
-    overflow: hidden;
-    padding: 0;
-  }
-
-  .month-table tr {
-    white-space: nowrap;
-  }
 
   .half-hour-mark {
     position: relative;
@@ -877,10 +891,38 @@ function monthviewStyle() {
     width: 100%;
 
   }
+
+  .num {
+    font-size: 10px;
+    padding-left: 4px;
+    padding-top: 2px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    margin-left: 2px;
+    margin-top: 2px;
+    background-color: transparent;
+  }
+  .num:link, .num:visited {
+      color: var(--link);
+      text-decoration: none;
+  }
+  .num:hover {
+      color: var(--fg);
+  }
+  .today {
+    border: 1px solid var(--calendar-today-fg);
+    color: var(--calendar-today-fg) !important;
+  }
+  .num:hover {
+    font-weight: bold;
+  }
   `;
 }
 
-// ../../../../node_modules/lit-html/directive.js
+// node_modules/lit-html/directive.js
 var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
 var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
 
@@ -901,7 +943,7 @@ class i4 {
   }
 }
 
-// ../../../../node_modules/lit-html/directives/class-map.js
+// node_modules/lit-html/directives/class-map.js
 var e6 = e5(class extends i4 {
   constructor(t5) {
     if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
@@ -927,7 +969,7 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
-// scheduler-base.ts
+// public/clinicbro/js/schedule/scheduler-base.ts
 class SchedulerBase extends s3 {
   static styles = monthviewStyle();
   constructor() {
@@ -974,7 +1016,8 @@ class SchedulerBase extends s3 {
     return `date=${toIsoDateString(firstOfDaWeek)}&to=${toIsoDateString(firstOfNextWeek)}`;
   }
   _getDayParam(base_date) {
-    return `date=${toIsoDateString(base_date)}`;
+    let param_str = `date=${toIsoDateString(base_date)}`;
+    return param_str;
   }
   _getParams(base_date) {
     switch (this.mode) {
@@ -1050,7 +1093,7 @@ __legacyDecorateClassTS([
   n4({ type: String, reflect: true })
 ], SchedulerBase.prototype, "mode", undefined);
 
-// dayview.ts
+// public/clinicbro/js/schedule/dayview.ts
 class DayView extends SchedulerBase {
   constructor() {
     super();
@@ -1058,7 +1101,7 @@ class DayView extends SchedulerBase {
   }
   render() {
     return x`
-    <table class="month-table" cellspacing="0">
+    <table class="day-table" cellspacing="0">
         <colgroup>
           <col span="1" style="width: 70px;">
           <col span="1" style="width: 95%;">
@@ -1095,6 +1138,10 @@ class DayView extends SchedulerBase {
       let time_hour = this_hour.getHours() % 12 || 12;
       let pm = this_hour.getHours() >= 12 ? "pm" : "am";
       let slot_name_1 = "" + this_hour.getHours() + ":00";
+      let to = "" + dateAdd(this_hour, "hour", 1).getHours() + ":00";
+      if (to.length == 4) {
+        to = "0" + to;
+      }
       if (slot_name_1.length == 4) {
         slot_name_1 = "0" + slot_name_1;
       }
@@ -1103,8 +1150,12 @@ class DayView extends SchedulerBase {
         <tr>
           <td class="time-display">${time_hour}:00 ${pm}</td>
           <td>
-              <dv-half id="${id1}" current_date="${this_hour.toISOString()}"><slot name="${slot_name_1}"></slot></dv-half>
-              <dv-half id="${id2}" current_date="${this_hour_half.toISOString()}"><slot name="${slot_name_2}"></slot></dv-half>
+              <dv-half id="${id1}" current_date="${this_hour.toISOString()}"
+                hx-get="/scheduler/{id}?date=${toIsoDateString(this.current_date)}&from=${slot_name_1}&to=${slot_name_2}" hx-target="global #cb-window" hx-swap="outerHTML" 
+                hx-trigger="dblclick target:#${id1}, drop target:#${id1}" hx-include="#dropped-appt-id, #dropped-client-id"><slot name="${slot_name_1}"></slot></dv-half>
+              <dv-half id="${id2}" current_date="${this_hour_half.toISOString()}"
+                hx-get="/scheduler/{id}?date=${toIsoDateString(this.current_date)}&from=${slot_name_2}&to=${to}" hx-target="global #cb-window" hx-swap="outerHTML" 
+                hx-trigger="dblclick target:#${id2}, drop target:#${id2}" hx-include="#dropped-appt-id, #dropped-client-id"><slot name="${slot_name_2}"></slot></dv-half>
           </td>
         </tr>`);
       i5++;

@@ -87,7 +87,8 @@ export class SchedulerBase extends LitElement {
     return `date=${toIsoDateString(firstOfDaWeek)}&to=${toIsoDateString(firstOfNextWeek)}`;
   }
   private _getDayParam(base_date: Date) {
-    return `date=${toIsoDateString(base_date)}`;
+    let param_str = `date=${toIsoDateString(base_date)}`;
+    return param_str;
   }
 
   private _getParams(base_date: Date) {

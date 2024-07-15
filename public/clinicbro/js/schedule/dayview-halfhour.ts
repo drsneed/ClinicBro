@@ -1,5 +1,5 @@
 import { LitElement, html, css } from 'lit-element';
-import {sameDay, clearAllSelectedDays} from '../util';
+import {clearAllSelectedHours} from '../util';
 import {customElement, property} from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 
@@ -7,12 +7,14 @@ import { classMap } from 'lit/directives/class-map.js';
 export class DayViewHalfHour extends LitElement {
     static styles = css`
       div {
+        display: flex;
+        align-items: stretch;
         width: 100%;
         height: 50%;
         max-width: 100%;
         white-space: nowrap;
         user-select: none;
-        overflow-y: auto;
+        overflow-y: visible;
       }
       .half_hour {
         border-top: 1px dashed var(--input-border);
@@ -48,10 +50,10 @@ export class DayViewHalfHour extends LitElement {
     }
 
     private _clickHandler(e) {
-      clearAllSelectedDays();
+      clearAllSelectedHours();
       switch(e.target.localName) {
         case 'dv-half':
-        case 'mv-appt':
+        case 'dv-appt':
           e.target.clicked();
           break;
       }

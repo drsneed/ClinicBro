@@ -594,12 +594,12 @@ var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
 // public/clinicbro/js/util.ts
-function clearAllSelectedDays() {
+function clearAllSelectedHours() {
   var schedule = document.getElementById("schedule");
-  schedule.shadowRoot.querySelectorAll("mv-day").forEach(function(day) {
-    day.removeAttribute("selected");
+  schedule.shadowRoot.querySelectorAll("dv-half").forEach(function(half_hour) {
+    half_hour.removeAttribute("selected");
   });
-  document.querySelectorAll("mv-appt").forEach(function(appt) {
+  document.querySelectorAll("dv-appt").forEach(function(appt) {
     appt.removeAttribute("selected");
   });
 }
@@ -690,12 +690,14 @@ var e6 = e5(class extends i4 {
 class DayViewHalfHour extends s3 {
   static styles = i`
       div {
+        display: flex;
+        align-items: stretch;
         width: 100%;
         height: 50%;
         max-width: 100%;
         white-space: nowrap;
         user-select: none;
-        overflow-y: auto;
+        overflow-y: visible;
       }
       .half_hour {
         border-top: 1px dashed var(--input-border);
@@ -718,10 +720,10 @@ class DayViewHalfHour extends s3 {
     this.selected = true;
   }
   _clickHandler(e7) {
-    clearAllSelectedDays();
+    clearAllSelectedHours();
     switch (e7.target.localName) {
       case "dv-half":
-      case "mv-appt":
+      case "dv-appt":
         e7.target.clicked();
         break;
     }

@@ -719,7 +719,7 @@ class MonthViewAppointment extends s3 {
       font-size: 12px;
       color: var(--appt-fg);
       padding: 0px 2px;
-      margin: 2px 0px;
+      margin: 2px;
       user-select: none;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -727,6 +727,19 @@ class MonthViewAppointment extends s3 {
 
     .appt {
       background-color: var(--appt-bg1);
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .appt span {
+      padding-bottom: 4px;
+    }
+
+    .appt-color {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      padding: 0;
+      margin: 4px 0px 0px 0px;
     }
 
     .event {
@@ -740,7 +753,7 @@ class MonthViewAppointment extends s3 {
     }
     
     .selected {
-      border: 1px solid var(--appt-selected-border);
+      border: 2px solid var(--appt-selected-border);
     }
     `;
   constructor() {
@@ -758,6 +771,25 @@ class MonthViewAppointment extends s3 {
   }
   clicked() {
     this.selected = true;
+    let is_appt = this.client.length > 0;
+    document.getElementById("appt-details-header").innerHTML = is_appt ? "Appointment Details" : "Event Details";
+    document.getElementById("appt-details-title-label").innerHTML = is_appt ? "Type" : "Title";
+    let display_style = is_appt ? "block" : "none";
+    document.getElementById("appt-details-client").style.display = display_style;
+    document.getElementById("appt-details-status").style.display = display_style;
+    document.getElementById("appt-details-location").style.display = display_style;
+    document.getElementById("appt-details-provider").style.display = display_style;
+    document.getElementById("appt-details-title-span").innerHTML = this.appt_title;
+    if (is_appt) {
+      document.getElementById("appt-details-client-span").innerHTML = this.client;
+      document.getElementById("appt-details-status-span").innerHTML = this.status;
+      document.getElementById("appt-details-location-span").innerHTML = this.location;
+      document.getElementById("appt-details-provider-span").innerHTML = this.provider;
+    }
+    document.getElementById("appt-details-date").value = toIsoDateString(this.appt_date);
+    document.getElementById("appt-details-from").value = this.appt_from;
+    document.getElementById("appt-details-to").value = this.appt_to;
+    document.getElementById("appointment-details").classList.remove("hidden");
   }
   _drag(e7) {
     e7.dataTransfer.setData("appt-id", e7.target.dataset.apptId);
@@ -768,18 +800,16 @@ class MonthViewAppointment extends s3 {
     if (appt) {
       text = text + " - " + this.client;
     }
-    let borderLeft = "none";
-    if (this.color.length > 0)
-      borderLeft = "4px solid " + this.color + ";";
     let startHours = parseInt(this.appt_from.slice(0, 2)) % 12 || 12;
     let startMinutes = this.appt_from.slice(-2);
     let endHours24 = parseInt(this.appt_to.slice(0, 2));
     let endHours = endHours24 % 12 || 12;
     let endMinutes = this.appt_to.slice(-2);
     let pm = endHours24 >= 12 ? "pm" : "am";
-    return x`<div data-appt-id="${this.appt_id}" class="${e6({ selected: this.selected, appt, event: !appt })}"
-               style="${o5({ borderLeft })}"
-               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</span></div>`;
+    return x`<div data-appt-id="${this.appt_id}" class="${e6({ selected: this.selected, appt, event: !appt })}" draggable="true" @dragstart="${this._drag}">
+                <div class="appt-color" style="${o5({ backgroundColor: this.color })}"></div>
+                <span class="appt-title">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</span>
+              </div>`;
   }
 }
 __legacyDecorateClassTS([
