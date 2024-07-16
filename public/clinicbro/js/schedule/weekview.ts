@@ -3,7 +3,7 @@ import {monthviewStyle} from './monthview-style';
 import {MonthViewAppointment} from './monthview-appt';
 import { classMap } from 'lit/directives/class-map.js';
 import {customElement, property} from 'lit/decorators.js';
-import { toIsoDateString, dateAdd, months, dayHeaders, clearAllSelectedDays, dateSuffix } from '../util';
+import { toIsoDateString, dateAdd, sameDay, dayHeaders, clearAllSelectedDays, dateSuffix } from '../util';
 import { SchedulerBase } from './scheduler-base';
 
 
@@ -64,22 +64,28 @@ export class WeekView extends SchedulerBase {
     }
     return html`${rows}`;
   }
+
+  private _link(date_of_day, text) {
+    return html`<a hx-get="/scheduler?mode=day&date=${toIsoDateString(date_of_day)}" hx-target="global #scheduler"
+       hx-swap="outerHTML" hx-push-url="true"
+    class="${classMap({weekheader: true, weekheadertoday: sameDay(date_of_day, new Date())})}">${text}</a>`;
+  }
   
   render() {
     let sunday = dateAdd(this.current_date, 'day', -this.current_date.getDay());
-    let sundisp = "" + (sunday.getMonth()+1) + "/" + sunday.getDate();
+    let sundisp = "Sun " + (sunday.getMonth()+1) + "/" + sunday.getDate();
     let monday = dateAdd(sunday, 'day', 1);
-    let mondisp = "" + (monday.getMonth()+1) + "/" + monday.getDate();
+    let mondisp = "Mon " + (monday.getMonth()+1) + "/" + monday.getDate();
     let tuesday = dateAdd(monday, 'day', 1);
-    let tuedisp = "" + (tuesday.getMonth()+1) + "/" + tuesday.getDate();
+    let tuedisp = "Tue " + (tuesday.getMonth()+1) + "/" + tuesday.getDate();
     let wednesday = dateAdd(tuesday, 'day', 1);
-    let weddisp = "" + (wednesday.getMonth()+1) + "/" + wednesday.getDate();
+    let weddisp = "Wed " + (wednesday.getMonth()+1) + "/" + wednesday.getDate();
     let thursday = dateAdd(wednesday, 'day', 1);
-    let thudisp = "" + (thursday.getMonth()+1) + "/" + thursday.getDate();
+    let thudisp = "Thu " + (thursday.getMonth()+1) + "/" + thursday.getDate();
     let friday = dateAdd(thursday, 'day', 1);
-    let fridisp = "" + (friday.getMonth()+1) + "/" + friday.getDate();
+    let fridisp = "Sat " + (friday.getMonth()+1) + "/" + friday.getDate();
     let saturday = dateAdd(friday, 'day', 1);
-    let satdisp = "" + (saturday.getMonth()+1) + "/" + saturday.getDate();
+    let satdisp = "Sun " + (saturday.getMonth()+1) + "/" + saturday.getDate();
     return html`
     <table class="month-table" cellspacing="0">
       <colgroup>
@@ -100,13 +106,13 @@ export class WeekView extends SchedulerBase {
           </tr>
           <tr>
               <th class="row2"></th>
-              <th class="row2">Sun ${sundisp}</th>
-              <th class="row2">Mon ${mondisp}</th>
-              <th class="row2">Tue ${tuedisp}</th>
-              <th class="row2">Wed ${weddisp}</th>
-              <th class="row2">Thu ${thudisp}</th>
-              <th class="row2">Fri ${fridisp}</th>
-              <th class="row2">Sat ${satdisp}</th>
+              <th class="row2">${this._link(sunday, sundisp)}</th>
+              <th class="row2">${this._link(monday, mondisp)}</th>
+              <th class="row2">${this._link(tuesday, tuedisp)}</th>
+              <th class="row2">${this._link(wednesday, weddisp)}</th>
+              <th class="row2">${this._link(thursday, thudisp)}</th>
+              <th class="row2">${this._link(friday, fridisp)}</th>
+              <th class="row2">${this._link(saturday, satdisp)}</th>
           </tr>
       </thead>
       <tbody hx-ext="path-params">

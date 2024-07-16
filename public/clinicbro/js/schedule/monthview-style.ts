@@ -201,13 +201,35 @@ export function monthviewStyle() {
   }
   .num:hover {
       color: var(--fg);
+      font-weight: bold;
   }
   .today {
     border: 1px solid var(--calendar-today-fg);
     color: var(--calendar-today-fg) !important;
   }
-  .num:hover {
+  .weekheader {
+    font-size: 14px;
+    padding-left: 4px;
+    padding-top: 2px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    margin-left: 2px;
+    margin-top: 2px;
+    background-color: transparent;
     font-weight: bold;
+  }
+  .weekheader:link, .weekheader:visited {
+      color: var(--link);
+      text-decoration: none;
+  }
+  .weekheader:hover {
+      color: var(--fg);
+  }
+  .weekheadertoday {
+    color: var(--calendar-today-fg) !important;
   }
   `;
 }

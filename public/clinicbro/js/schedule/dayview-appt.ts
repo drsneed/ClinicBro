@@ -19,6 +19,7 @@ export class DayViewAppointment extends LitElement {
       text-overflow: ellipsis;
       opacity: 0.85;
       border: 1px solid var(--input-border);
+      resize: vertical;
     }
 
     div:hover {

@@ -594,37 +594,84 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
+// node_modules/lit-html/directive.js
+var t3 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
+var e4 = (t4) => (...e5) => ({ _$litDirective$: t4, values: e5 });
+
+class i4 {
+  constructor(t4) {
+  }
+  get _$AU() {
+    return this._$AM._$AU;
+  }
+  _$AT(t4, e5, i5) {
+    this._$Ct = t4, this._$AM = e5, this._$Ci = i5;
+  }
+  _$AS(t4, e5) {
+    return this.update(t4, e5);
+  }
+  update(t4, e5) {
+    return this.render(...e5);
+  }
+}
+
+// node_modules/lit-html/directives/class-map.js
+var e5 = e4(class extends i4 {
+  constructor(t4) {
+    if (super(t4), t4.type !== t3.ATTRIBUTE || t4.name !== "class" || t4.strings?.length > 2)
+      throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
+  }
+  render(t4) {
+    return " " + Object.keys(t4).filter((s4) => t4[s4]).join(" ") + " ";
+  }
+  update(s4, [i5]) {
+    if (this.st === undefined) {
+      this.st = new Set, s4.strings !== undefined && (this.nt = new Set(s4.strings.join(" ").split(/\s/).filter((t4) => t4 !== "")));
+      for (const t4 in i5)
+        i5[t4] && !this.nt?.has(t4) && this.st.add(t4);
+      return this.render(i5);
+    }
+    const r5 = s4.element.classList;
+    for (const t4 of this.st)
+      t4 in i5 || (r5.remove(t4), this.st.delete(t4));
+    for (const t4 in i5) {
+      const s5 = !!i5[t4];
+      s5 === this.st.has(t4) || this.nt?.has(t4) || (s5 ? (r5.add(t4), this.st.add(t4)) : (r5.remove(t4), this.st.delete(t4)));
+    }
+    return w;
+  }
+});
 // node_modules/@lit/reactive-element/decorators/custom-element.js
-var t3 = (t4) => (e4, o4) => {
+var t4 = (t5) => (e6, o4) => {
   o4 !== undefined ? o4.addInitializer(() => {
-    customElements.define(t4, e4);
-  }) : customElements.define(t4, e4);
+    customElements.define(t5, e6);
+  }) : customElements.define(t5, e6);
 };
 // node_modules/@lit/reactive-element/decorators/property.js
-var n4 = function(t4) {
-  return (e4, o4) => typeof o4 == "object" ? r5(t4, e4, o4) : ((t5, e5, o5) => {
-    const r5 = e5.hasOwnProperty(o5);
-    return e5.constructor.createProperty(o5, r5 ? { ...t5, wrapped: true } : t5), r5 ? Object.getOwnPropertyDescriptor(e5, o5) : undefined;
-  })(t4, e4, o4);
+var n4 = function(t5) {
+  return (e6, o4) => typeof o4 == "object" ? r5(t5, e6, o4) : ((t6, e7, o5) => {
+    const r5 = e7.hasOwnProperty(o5);
+    return e7.constructor.createProperty(o5, r5 ? { ...t6, wrapped: true } : t6), r5 ? Object.getOwnPropertyDescriptor(e7, o5) : undefined;
+  })(t5, e6, o4);
 };
 var o4 = { attribute: true, type: String, converter: u, reflect: false, hasChanged: f };
-var r5 = (t4 = o4, e4, r6) => {
-  const { kind: n5, metadata: i4 } = r6;
-  let s4 = globalThis.litPropertyMetadata.get(i4);
-  if (s4 === undefined && globalThis.litPropertyMetadata.set(i4, s4 = new Map), s4.set(r6.name, t4), n5 === "accessor") {
+var r5 = (t5 = o4, e6, r6) => {
+  const { kind: n5, metadata: i5 } = r6;
+  let s4 = globalThis.litPropertyMetadata.get(i5);
+  if (s4 === undefined && globalThis.litPropertyMetadata.set(i5, s4 = new Map), s4.set(r6.name, t5), n5 === "accessor") {
     const { name: o5 } = r6;
     return { set(r7) {
-      const n6 = e4.get.call(this);
-      e4.set.call(this, r7), this.requestUpdate(o5, n6, t4);
-    }, init(e5) {
-      return e5 !== undefined && this.P(o5, undefined, t4), e5;
+      const n6 = e6.get.call(this);
+      e6.set.call(this, r7), this.requestUpdate(o5, n6, t5);
+    }, init(e7) {
+      return e7 !== undefined && this.P(o5, undefined, t5), e7;
     } };
   }
   if (n5 === "setter") {
     const { name: o5 } = r6;
     return function(r7) {
       const n6 = this[o5];
-      e4.call(this, r7), this.requestUpdate(o5, n6, t4);
+      e6.call(this, r7), this.requestUpdate(o5, n6, t5);
     };
   }
   throw Error("Unsupported decorator location: " + n5);
@@ -684,6 +731,9 @@ function dateSuffix(d1) {
       suffix = "rd";
   }
   return suffix;
+}
+function sameDay(d1, d22) {
+  return d1.getFullYear() === d22.getFullYear() && d1.getMonth() === d22.getMonth() && d1.getDate() === d22.getDate();
 }
 function toIsoDateString(d3) {
   var month = d3.getMonth() + 1;
@@ -910,64 +960,39 @@ function monthviewStyle() {
   }
   .num:hover {
       color: var(--fg);
+      font-weight: bold;
   }
   .today {
     border: 1px solid var(--calendar-today-fg);
     color: var(--calendar-today-fg) !important;
   }
-  .num:hover {
+  .weekheader {
+    font-size: 14px;
+    padding-left: 4px;
+    padding-top: 2px;
+    padding-right: 4px;
+    padding-bottom: 2px;
+    cursor: pointer;
+    border-radius: 50%;
+    border: none;
+    margin-left: 2px;
+    margin-top: 2px;
+    background-color: transparent;
     font-weight: bold;
+  }
+  .weekheader:link, .weekheader:visited {
+      color: var(--link);
+      text-decoration: none;
+  }
+  .weekheader:hover {
+      color: var(--fg);
+  }
+  .weekheadertoday {
+    color: var(--calendar-today-fg) !important;
   }
   `;
 }
 
-// node_modules/lit-html/directive.js
-var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
-var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
-
-class i4 {
-  constructor(t5) {
-  }
-  get _$AU() {
-    return this._$AM._$AU;
-  }
-  _$AT(t5, e6, i5) {
-    this._$Ct = t5, this._$AM = e6, this._$Ci = i5;
-  }
-  _$AS(t5, e6) {
-    return this.update(t5, e6);
-  }
-  update(t5, e6) {
-    return this.render(...e6);
-  }
-}
-
-// node_modules/lit-html/directives/class-map.js
-var e6 = e5(class extends i4 {
-  constructor(t5) {
-    if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
-      throw Error("`classMap()` can only be used in the `class` attribute and must be the only part in the attribute.");
-  }
-  render(t5) {
-    return " " + Object.keys(t5).filter((s4) => t5[s4]).join(" ") + " ";
-  }
-  update(s4, [i5]) {
-    if (this.st === undefined) {
-      this.st = new Set, s4.strings !== undefined && (this.nt = new Set(s4.strings.join(" ").split(/\s/).filter((t5) => t5 !== "")));
-      for (const t5 in i5)
-        i5[t5] && !this.nt?.has(t5) && this.st.add(t5);
-      return this.render(i5);
-    }
-    const r6 = s4.element.classList;
-    for (const t5 of this.st)
-      t5 in i5 || (r6.remove(t5), this.st.delete(t5));
-    for (const t5 in i5) {
-      const s5 = !!i5[t5];
-      s5 === this.st.has(t5) || this.nt?.has(t5) || (s5 ? (r6.add(t5), this.st.add(t5)) : (r6.remove(t5), this.st.delete(t5)));
-    }
-    return w;
-  }
-});
 // public/clinicbro/js/schedule/scheduler-base.ts
 class SchedulerBase extends s3 {
   static styles = monthviewStyle();
@@ -1032,13 +1057,13 @@ class SchedulerBase extends s3 {
   renderSchedulerModesButtonBar() {
     return x`
       <div class="header-item scheduler-button-bar float-right">
-        <button type="button" class="${e6({ btn: true, "btn-first": true, "btn-pressed": this.mode === "month" })}"
+        <button type="button" class="${e5({ btn: true, "btn-first": true, "btn-pressed": this.mode === "month" })}"
             hx-get="/scheduler?mode=month&${this._getMonthParams(this.current_date)}" hx-target="global #scheduler"
             hx-swap="outerHTML" hx-push-url="true">Month</button>
-        <button type="button" class="${e6({ btn: true, "btn-middle": true, "btn-pressed": this.mode === "week" })}"
+        <button type="button" class="${e5({ btn: true, "btn-middle": true, "btn-pressed": this.mode === "week" })}"
             hx-get="/scheduler?mode=week&${this._getWeekParams(this.current_date)}" hx-target="global #scheduler"
             hx-swap="outerHTML" hx-push-url="true">Week</button>
-        <button type="button" class="${e6({ btn: true, "btn-last": true, "btn-pressed": this.mode === "day" })}"
+        <button type="button" class="${e5({ btn: true, "btn-last": true, "btn-pressed": this.mode === "day" })}"
             hx-get="/scheduler?mode=day&${this._getDayParam(this.current_date)}" hx-target="global #scheduler"
             hx-swap="outerHTML" hx-push-url="true">Day</button>
       </div>
@@ -1050,14 +1075,14 @@ class SchedulerBase extends s3 {
         <button type="button" hx-get="/scheduler?mode=${this.mode}&${this._getParams(dateAdd(this.current_date, this.mode, -1))}"
           hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
           hx-trigger="click, keyup[key=='ArrowLeft'] from:body"
-          class="${e6({ btn: true, "btn-first": true })}">&lt;</button>
-        <button type="button" class="${e6({ btn: true, "btn-middle": true })}"
+          class="${e5({ btn: true, "btn-first": true })}">&lt;</button>
+        <button type="button" class="${e5({ btn: true, "btn-middle": true })}"
           hx-get="/scheduler?mode=${this.mode}&${this._getParams(new Date)}" hx-target="global #scheduler"
           hx-swap="outerHTML" hx-push-url="true">Today</button>
         <button type="button" hx-get="/scheduler?mode=${this.mode}&${this._getParams(dateAdd(this.current_date, this.mode, 1))}"
           hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true"
           hx-trigger="click, keyup[key=='ArrowRight'] from:body"
-          class="${e6({ btn: true, "btn-last": true })}">&gt;</button>
+          class="${e5({ btn: true, "btn-last": true })}">&gt;</button>
       </div>
     `;
   }
@@ -1145,21 +1170,26 @@ class WeekView extends SchedulerBase {
     }
     return x`${rows}`;
   }
+  _link(date_of_day, text) {
+    return x`<a hx-get="/scheduler?mode=day&date=${toIsoDateString(date_of_day)}" hx-target="global #scheduler"
+       hx-swap="outerHTML" hx-push-url="true"
+    class="${e5({ weekheader: true, weekheadertoday: sameDay(date_of_day, new Date) })}">${text}</a>`;
+  }
   render() {
     let sunday = dateAdd(this.current_date, "day", -this.current_date.getDay());
-    let sundisp = "" + (sunday.getMonth() + 1) + "/" + sunday.getDate();
+    let sundisp = "Sun " + (sunday.getMonth() + 1) + "/" + sunday.getDate();
     let monday = dateAdd(sunday, "day", 1);
-    let mondisp = "" + (monday.getMonth() + 1) + "/" + monday.getDate();
+    let mondisp = "Mon " + (monday.getMonth() + 1) + "/" + monday.getDate();
     let tuesday = dateAdd(monday, "day", 1);
-    let tuedisp = "" + (tuesday.getMonth() + 1) + "/" + tuesday.getDate();
+    let tuedisp = "Tue " + (tuesday.getMonth() + 1) + "/" + tuesday.getDate();
     let wednesday = dateAdd(tuesday, "day", 1);
-    let weddisp = "" + (wednesday.getMonth() + 1) + "/" + wednesday.getDate();
+    let weddisp = "Wed " + (wednesday.getMonth() + 1) + "/" + wednesday.getDate();
     let thursday = dateAdd(wednesday, "day", 1);
-    let thudisp = "" + (thursday.getMonth() + 1) + "/" + thursday.getDate();
+    let thudisp = "Thu " + (thursday.getMonth() + 1) + "/" + thursday.getDate();
     let friday = dateAdd(thursday, "day", 1);
-    let fridisp = "" + (friday.getMonth() + 1) + "/" + friday.getDate();
+    let fridisp = "Sat " + (friday.getMonth() + 1) + "/" + friday.getDate();
     let saturday = dateAdd(friday, "day", 1);
-    let satdisp = "" + (saturday.getMonth() + 1) + "/" + saturday.getDate();
+    let satdisp = "Sun " + (saturday.getMonth() + 1) + "/" + saturday.getDate();
     return x`
     <table class="month-table" cellspacing="0">
       <colgroup>
@@ -1180,13 +1210,13 @@ class WeekView extends SchedulerBase {
           </tr>
           <tr>
               <th class="row2"></th>
-              <th class="row2">Sun ${sundisp}</th>
-              <th class="row2">Mon ${mondisp}</th>
-              <th class="row2">Tue ${tuedisp}</th>
-              <th class="row2">Wed ${weddisp}</th>
-              <th class="row2">Thu ${thudisp}</th>
-              <th class="row2">Fri ${fridisp}</th>
-              <th class="row2">Sat ${satdisp}</th>
+              <th class="row2">${this._link(sunday, sundisp)}</th>
+              <th class="row2">${this._link(monday, mondisp)}</th>
+              <th class="row2">${this._link(tuesday, tuedisp)}</th>
+              <th class="row2">${this._link(wednesday, weddisp)}</th>
+              <th class="row2">${this._link(thursday, thudisp)}</th>
+              <th class="row2">${this._link(friday, fridisp)}</th>
+              <th class="row2">${this._link(saturday, satdisp)}</th>
           </tr>
       </thead>
       <tbody hx-ext="path-params">
@@ -1199,7 +1229,7 @@ class WeekView extends SchedulerBase {
   }
 }
 WeekView = __legacyDecorateClassTS([
-  t3("week-view")
+  t4("week-view")
 ], WeekView);
 export {
   WeekView
