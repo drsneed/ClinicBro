@@ -13,7 +13,7 @@
   const can_text_check = if (can_text) "checked" else "";
   const can_email_check = if (can_email) "checked" else "";
 }
-<cb-window id="cb-window" opened="" window_title="{{window_title}}">
+<cb-window id="cb-window" opened="" window_title="{{window_title}}" top="60px" left="350px">
     <form id="client-form" method="post" class="{{inactive_class}}">
       <input id="client-id-input" type="hidden" name="id" value="{{id}}">
       <div class="id-field" hx-ext="path-params">

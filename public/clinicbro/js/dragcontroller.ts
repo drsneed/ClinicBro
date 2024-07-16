@@ -6,8 +6,8 @@ export class DragController {
     state = "idle";
 
     styles = {
-        position: "absolute",
-        top: "0px",
+        position: "fixed",
+        top: "0",
         left: "-5px",
         // top: "calc(50% - 128px)",
         //left: "calc(50% - 256px)",

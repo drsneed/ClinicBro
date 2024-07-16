@@ -11,6 +11,7 @@
             const location = appt.getT(.string, "location") orelse continue;
             const color = appt.getT(.string, "color") orelse continue;
             const appt_date = appt.getT(.string, "appt_date") orelse continue;
+            std.debug.print("appt_date = {s}\n", .{appt_date});
             const appt_from = appt.getT(.string, "appt_from") orelse continue;
             const appt_to = appt.getT(.string, "appt_to") orelse continue;
             var slot_buffer: [5]u8 = undefined;

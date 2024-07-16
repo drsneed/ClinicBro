@@ -737,7 +737,12 @@ class DayViewAppointment extends s3 {
       user-select: none;
       overflow: visible;
       text-overflow: ellipsis;
+      opacity: 0.85;
       border: 1px solid var(--input-border);
+    }
+
+    div:hover {
+      font-weight: bold;
     }
 
     .appt {
@@ -756,6 +761,7 @@ class DayViewAppointment extends s3 {
     
     .selected {
       border: 2px solid var(--appt-selected-border);
+      font-weight: bold;
     }
     `;
   constructor() {
@@ -805,7 +811,7 @@ class DayViewAppointment extends s3 {
     let backgroundColor = "var(--appt-bg1)";
     let foregroundColor = "var(--day-appt-fg)";
     if (this.color.length > 0) {
-      backgroundColor = this.color + "CC";
+      backgroundColor = this.color;
       let rgb = hexToRgb(this.color);
       let grayscale = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
       if (grayscale < 128) {
@@ -860,7 +866,7 @@ __legacyDecorateClassTS([
     reflect: true,
     converter: {
       fromAttribute: (value, type) => {
-        return new Date(value);
+        return new Date(value.replace(/-/g, "/"));
       },
       toAttribute: (value, type) => {
         return toIsoDateString(value);

@@ -709,7 +709,11 @@ var o5 = e5(class extends i4 {
 });
 // public/clinicbro/js/util.ts
 function toIsoDateString(d3) {
-  return d3.toISOString().split("T")[0];
+  var month = d3.getMonth() + 1;
+  var day = d3.getDate();
+  var month_str = month < 10 ? "0" + month : month;
+  var day_str = day < 10 ? "0" + day : day;
+  return `${d3.getFullYear()}-${month_str}-${day_str}`;
 }
 
 // public/clinicbro/js/schedule/monthview-appt.ts

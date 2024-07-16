@@ -863,8 +863,8 @@ class DragController {
   y = 0;
   state = "idle";
   styles = {
-    position: "absolute",
-    top: "0px",
+    position: "fixed",
+    top: "300px",
     left: "-5px"
   };
   constructor(host, options) {

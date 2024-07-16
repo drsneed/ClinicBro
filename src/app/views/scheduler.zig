@@ -100,15 +100,15 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
             const client_id: i32 = @intCast(client_id_128);
             appointment.client_id = client_id;
         }
-        if (params.getT(.string, "from")) |appt_from| {
-            appointment.appt_from = appt_from;
-        }
-        if (params.getT(.string, "to")) |appt_to| {
-            appointment.appt_to = appt_to;
-        }
     }
     if (params.getT(.string, "date")) |date| {
         appointment.appt_date = date;
+    }
+    if (params.getT(.string, "from")) |appt_from| {
+        appointment.appt_from = appt_from;
+    }
+    if (params.getT(.string, "to")) |appt_to| {
+        appointment.appt_to = appt_to;
     }
     try mapper.appointment.toResponse(appointment, data);
     try db_context.deinit();

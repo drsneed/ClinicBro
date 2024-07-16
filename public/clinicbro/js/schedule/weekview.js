@@ -9,7 +9,7 @@ var __legacyDecorateClassTS = function(decorators, target, key, desc) {
   return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 
-// ../../../../node_modules/@lit/reactive-element/css-tag.js
+// node_modules/@lit/reactive-element/css-tag.js
 var t = globalThis;
 var e = t.ShadowRoot && (t.ShadyCSS === undefined || t.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype;
 var s = Symbol();
@@ -61,7 +61,7 @@ var c = e ? (t2) => t2 : (t2) => t2 instanceof CSSStyleSheet ? ((t3) => {
   return r(e2);
 })(t2) : t2;
 
-// ../../../../node_modules/@lit/reactive-element/reactive-element.js
+// node_modules/@lit/reactive-element/reactive-element.js
 var { is: i2, defineProperty: e2, getOwnPropertyDescriptor: r2, getOwnPropertyNames: h, getOwnPropertySymbols: o2, getPrototypeOf: n2 } = Object;
 var a = globalThis;
 var c2 = a.trustedTypes;
@@ -293,7 +293,7 @@ class b extends HTMLElement {
 }
 b.elementStyles = [], b.shadowRootOptions = { mode: "open" }, b[d("elementProperties")] = new Map, b[d("finalized")] = new Map, p?.({ ReactiveElement: b }), (a.reactiveElementVersions ??= []).push("2.0.4");
 
-// ../../../../node_modules/lit-html/lit-html.js
+// node_modules/lit-html/lit-html.js
 var C = function(t2, i3) {
   if (!Array.isArray(t2) || !t2.hasOwnProperty("raw"))
     throw Error("invalid template strings array");
@@ -567,7 +567,7 @@ var j = (t3, i4, s3) => {
   }
   return h3._$AI(t3), h3;
 };
-// ../../../../node_modules/lit-element/lit-element.js
+// node_modules/lit-element/lit-element.js
 class s3 extends b {
   constructor() {
     super(...arguments), this.renderOptions = { host: this }, this._$Do = undefined;
@@ -594,13 +594,13 @@ s3._$litElement$ = true, s3["finalized", "finalized"] = true, globalThis.litElem
 var r4 = globalThis.litElementPolyfillSupport;
 r4?.({ LitElement: s3 });
 (globalThis.litElementVersions ??= []).push("4.0.6");
-// ../../../../node_modules/@lit/reactive-element/decorators/custom-element.js
+// node_modules/@lit/reactive-element/decorators/custom-element.js
 var t3 = (t4) => (e4, o4) => {
   o4 !== undefined ? o4.addInitializer(() => {
     customElements.define(t4, e4);
   }) : customElements.define(t4, e4);
 };
-// ../../../../node_modules/@lit/reactive-element/decorators/property.js
+// node_modules/@lit/reactive-element/decorators/property.js
 var n4 = function(t4) {
   return (e4, o4) => typeof o4 == "object" ? r5(t4, e4, o4) : ((t5, e5, o5) => {
     const r5 = e5.hasOwnProperty(o5);
@@ -629,7 +629,7 @@ var r5 = (t4 = o4, e4, r6) => {
   }
   throw Error("Unsupported decorator location: " + n5);
 };
-// ../util.ts
+// public/clinicbro/js/util.ts
 function dateAdd(date, interval, units) {
   var ret = new Date(date.valueOf());
   var checkRollover = function() {
@@ -707,10 +707,10 @@ var months = [
   "December"
 ];
 
-// monthview-style.ts
+// public/clinicbro/js/schedule/monthview-style.ts
 function monthviewStyle() {
   return i`
-  .month-table {
+  .month-table, .day-table {
     background: var(--container-bg);
     table-layout: fixed;
     //height: 550px;
@@ -720,6 +720,36 @@ function monthviewStyle() {
     margin: 0px;
     width: 100%;
     color: var(--table-fg);
+  }
+
+  .month-table td, .month-table th, .day-table td, .day-table th {
+    border: 1px solid var(--input-border);
+    box-shadow: none;
+    width: auto !important;
+  }
+
+  .month-table thead, .day-table thead {
+    text-align: center;
+  }
+
+  .month-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow: hidden;
+    padding: 0;
+  }
+
+  .month-table tr, .day-table tr {
+    white-space: nowrap;
+  }
+  
+  .day-table td {
+    background-color: var(--bg);
+    vertical-align: top;
+    height: 90px;
+    overflow-y: visible;
+    padding: 0;
   }
 
   .caption {
@@ -787,12 +817,6 @@ function monthviewStyle() {
   .scheduler-container {
     overflow-y: visible;
   }
-
-  .month-table td, .month-table th {
-    border: 1px solid var(--input-border);
-    box-shadow: none;
-    width: auto !important;
-  }
   
   .row1 {
     position: sticky;
@@ -809,9 +833,7 @@ function monthviewStyle() {
     z-index: 1;
   }
 
-  .month-table thead {
-    text-align: center;
-  }
+
 
   .sticky-header {
     border-bottom: 1px solid var(--table-header-fg);
@@ -854,18 +876,6 @@ function monthviewStyle() {
     padding: 0;
     margin: 8px auto;
     font-size: 20px;
-  }
-  
-  .month-table td {
-    background-color: var(--bg);
-    vertical-align: top;
-    height: 90px;
-    overflow: hidden;
-    padding: 0;
-  }
-
-  .month-table tr {
-    white-space: nowrap;
   }
 
   .half-hour-mark {
@@ -911,7 +921,7 @@ function monthviewStyle() {
   `;
 }
 
-// ../../../../node_modules/lit-html/directive.js
+// node_modules/lit-html/directive.js
 var t4 = { ATTRIBUTE: 1, CHILD: 2, PROPERTY: 3, BOOLEAN_ATTRIBUTE: 4, EVENT: 5, ELEMENT: 6 };
 var e5 = (t5) => (...e6) => ({ _$litDirective$: t5, values: e6 });
 
@@ -932,7 +942,7 @@ class i4 {
   }
 }
 
-// ../../../../node_modules/lit-html/directives/class-map.js
+// node_modules/lit-html/directives/class-map.js
 var e6 = e5(class extends i4 {
   constructor(t5) {
     if (super(t5), t5.type !== t4.ATTRIBUTE || t5.name !== "class" || t5.strings?.length > 2)
@@ -958,7 +968,7 @@ var e6 = e5(class extends i4 {
     return w;
   }
 });
-// scheduler-base.ts
+// public/clinicbro/js/schedule/scheduler-base.ts
 class SchedulerBase extends s3 {
   static styles = monthviewStyle();
   constructor() {
@@ -1082,7 +1092,7 @@ __legacyDecorateClassTS([
   n4({ type: String, reflect: true })
 ], SchedulerBase.prototype, "mode", undefined);
 
-// weekview.ts
+// public/clinicbro/js/schedule/weekview.ts
 class WeekView extends SchedulerBase {
   constructor() {
     super();
@@ -1098,14 +1108,37 @@ class WeekView extends SchedulerBase {
     midnight.setHours(0, 0, 0, 0);
     for (let hour = 0;hour < 24; hour++) {
       let this_hour = dateAdd(midnight, "hour", i5);
+      let this_hour_half = dateAdd(this_hour, "minute", 30);
       let time_hour = this_hour.getHours() % 12 || 12;
       let pm = this_hour.getHours() >= 12 ? "pm" : "am";
+      let first_half_hour = "" + this_hour.getHours() + ":00";
+      let to = "" + dateAdd(this_hour, "hour", 1).getHours() + ":00";
+      if (to.length == 4) {
+        to = "0" + to;
+      }
+      if (first_half_hour.length == 4) {
+        first_half_hour = "0" + first_half_hour;
+      }
+      let second_half_hour = first_half_hour.slice(0, 2) + ":30";
       var days = [];
       days.push(x`<td class="time-display">${time_hour}:00 ${pm}</td>`);
       for (let day = 0;day < 7; day++) {
-        let id = "d" + day + "h" + hour;
-        let thisDaysDate = dateAdd(firstOfDaWeek, "day", d3);
-        days.push(x`<td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td>`);
+        let id1 = "d" + day + "h" + i5;
+        let id2 = "d" + day + "h" + i5 + "m30";
+        let thisDaysDate = dateAdd(firstOfDaWeek, "day", day);
+        thisDaysDate.setHours(this_hour.getHours(), 0, 0, 0);
+        let thisDaysDate2 = dateAdd(thisDaysDate, "minute", 30);
+        let this_first_half_hour = toIsoDateString(thisDaysDate) + "T" + first_half_hour;
+        let this_second_half_hour = toIsoDateString(thisDaysDate) + "T" + second_half_hour;
+        days.push(x`
+          <td>
+              <dv-half id="${id1}" current_date="${thisDaysDate.toISOString()}"
+                hx-get="/scheduler/{id}?date=${toIsoDateString(thisDaysDate)}&from=${first_half_hour}&to=${second_half_hour}" hx-target="global #cb-window" hx-swap="outerHTML" 
+                hx-trigger="dblclick target:#${id1}, drop target:#${id1}" hx-include="#dropped-appt-id, #dropped-client-id"><slot name="${this_first_half_hour}"></slot></dv-half>
+              <dv-half id="${id2}" current_date="${thisDaysDate2.toISOString()}"
+                hx-get="/scheduler/{id}?date=${toIsoDateString(thisDaysDate)}&from=${second_half_hour}&to=${to}" hx-target="global #cb-window" hx-swap="outerHTML" 
+                hx-trigger="dblclick target:#${id2}, drop target:#${id2}" hx-include="#dropped-appt-id, #dropped-client-id"><slot name="${this_second_half_hour}"></slot></dv-half>
+          </td>`);
       }
       rows.push(x`<tr>${days}</tr>`);
       i5++;

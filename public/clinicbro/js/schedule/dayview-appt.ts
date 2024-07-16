@@ -17,7 +17,12 @@ export class DayViewAppointment extends LitElement {
       user-select: none;
       overflow: visible;
       text-overflow: ellipsis;
+      opacity: 0.85;
       border: 1px solid var(--input-border);
+    }
+
+    div:hover {
+      font-weight: bold;
     }
 
     .appt {
@@ -36,6 +41,7 @@ export class DayViewAppointment extends LitElement {
     
     .selected {
       border: 2px solid var(--appt-selected-border);
+      font-weight: bold;
     }
     `;
     
@@ -71,7 +77,7 @@ export class DayViewAppointment extends LitElement {
     @property({reflect: true,
       converter: {
         fromAttribute: (value, type) => {
-          return new Date(value);
+          return new Date(value.replace(/-/g, '\/'));
         },
         toAttribute: (value, type) => {
           return toIsoDateString(value);
@@ -149,7 +155,7 @@ export class DayViewAppointment extends LitElement {
       let backgroundColor = "var(--appt-bg1)";
       let foregroundColor = "var(--day-appt-fg)";
       if(this.color.length > 0) {
-        backgroundColor = this.color + "CC";
+        backgroundColor = this.color; // + "CC";
         let rgb = hexToRgb(this.color);
         let grayscale = 0.299 * rgb.r + 0.587 * rgb.g + 0.114 * rgb.b;
         if(grayscale < 128.0) {

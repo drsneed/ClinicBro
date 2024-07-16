@@ -24,19 +24,43 @@ export class WeekView extends SchedulerBase {
     var midnight = new Date(this.current_date.valueOf());
     midnight.setHours(0, 0, 0, 0);
     for (let hour = 0; hour < 24; hour++) {
-        let this_hour = dateAdd(midnight, "hour", i);
-        let time_hour = this_hour.getHours() % 12 || 12;
-        let pm = this_hour.getHours() >= 12 ? "pm" : "am";
-        var days = [];
-        //<tr><td class="time-display">${time_hour}:00 ${pm}</td><td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td></tr>
-        days.push(html`<td class="time-display">${time_hour}:00 ${pm}</td>`);
-        for(let day = 0; day < 7; day++) {
-          let id = "d" + day + "h" + hour;
-          let thisDaysDate = dateAdd(firstOfDaWeek, "day", d);
-          days.push(html`<td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td>`);
-        }
-        rows.push(html`<tr>${days}</tr>`);
-        i++;
+      let this_hour = dateAdd(midnight, "hour", i);
+      let this_hour_half = dateAdd(this_hour, "minute", 30);
+      let time_hour = this_hour.getHours() % 12 || 12;
+      let pm = this_hour.getHours() >= 12 ? "pm" : "am";
+
+      let first_half_hour = "" + this_hour.getHours() + ":00";
+      let to = "" + dateAdd(this_hour, 'hour', 1).getHours() + ":00";
+      if(to.length == 4) {
+        to = "0" + to;
+      }
+      if(first_half_hour.length == 4) {
+        first_half_hour = "0" + first_half_hour;
+      }
+      let second_half_hour = first_half_hour.slice(0, 2) + ":30";
+      var days = [];
+      //<tr><td class="time-display">${time_hour}:00 ${pm}</td><td><div id="${id}" class="day-view-hour-1"></div><div class="day-view-hour-2"></div></td></tr>
+      days.push(html`<td class="time-display">${time_hour}:00 ${pm}</td>`);
+      for(let day = 0; day < 7; day++) {
+        let id1 = "d" + day + "h" + i;
+        let id2 = "d" + day + "h" + i + "m30";
+        let thisDaysDate = dateAdd(firstOfDaWeek, "day", day);
+        thisDaysDate.setHours(this_hour.getHours(), 0, 0, 0);
+        let thisDaysDate2 = dateAdd(thisDaysDate, 'minute', 30);
+        let this_first_half_hour = toIsoDateString(thisDaysDate) + "T" + first_half_hour;
+        let this_second_half_hour = toIsoDateString(thisDaysDate) + "T" + second_half_hour;
+        days.push(html`
+          <td>
+              <dv-half id="${id1}" current_date="${thisDaysDate.toISOString()}"
+                hx-get="/scheduler/{id}?date=${toIsoDateString(thisDaysDate)}&from=${first_half_hour}&to=${second_half_hour}" hx-target="global #cb-window" hx-swap="outerHTML" 
+                hx-trigger="dblclick target:#${id1}, drop target:#${id1}" hx-include="#dropped-appt-id, #dropped-client-id"><slot name="${this_first_half_hour}"></slot></dv-half>
+              <dv-half id="${id2}" current_date="${thisDaysDate2.toISOString()}"
+                hx-get="/scheduler/{id}?date=${toIsoDateString(thisDaysDate)}&from=${second_half_hour}&to=${to}" hx-target="global #cb-window" hx-swap="outerHTML" 
+                hx-trigger="dblclick target:#${id2}, drop target:#${id2}" hx-include="#dropped-appt-id, #dropped-client-id"><slot name="${this_second_half_hour}"></slot></dv-half>
+          </td>`);
+      }
+      rows.push(html`<tr>${days}</tr>`);
+      i++;
     }
     return html`${rows}`;
   }
