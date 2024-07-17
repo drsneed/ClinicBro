@@ -105,8 +105,8 @@
       <button type="button" class="btn btn-save" title="Save"
           hx-include="#client-form"
           hx-post="/clients"
-          hx-target="#recent-clients-listbox"
-          hx-swap="outerHTML"
+          hx-target="#recent-clients"
+          hx-swap="innerHTML"
           onclick="document.getElementById('cb-window').opened=false;">Save</button>
         <button type="button" class="btn btn-cancel" title="Close"
           onclick="document.getElementById('cb-window').opened=false;">Close</button>

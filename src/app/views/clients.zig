@@ -61,6 +61,7 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
     if (client_id > 0) {
         client = try db_context.getClient(client_id) orelse client;
     }
+    log.info("client dob = {s}", .{client.date_of_birth orelse ""});
     try mapper.client.toResponse(client, data);
 
     try db_context.deinit();
@@ -114,6 +115,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     db_context = try DbContext.init(request.allocator, request.server.database);
     const json_clients = try data.array();
     var root = data.value.?;
+    try root.put("target_div", data.string("recent-clients-listbox"));
     try root.put("clients", json_clients);
     const recent_clients = try db_context.lookupRecentClients(current_bro_id);
     defer recent_clients.deinit();

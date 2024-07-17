@@ -120,8 +120,8 @@ pub const client = struct {
         model.zip_code = params.getT(.string, "zip_code") orelse "";
         //model.notes = params.getT(.string, "notes") orelse "";
         model.can_call = params.getT(.boolean, "can_call") orelse false;
-        model.can_text = params.getT(.boolean, "can_call") orelse false;
-        model.can_email = params.getT(.boolean, "can_call") orelse false;
+        model.can_text = params.getT(.boolean, "can_text") orelse false;
+        model.can_email = params.getT(.boolean, "can_email") orelse false;
         model.location_id = @intCast(params.getT(.integer, "location_id") orelse 0);
         model.bro_id = @intCast(params.getT(.integer, "bro_id") orelse 0);
         return model;

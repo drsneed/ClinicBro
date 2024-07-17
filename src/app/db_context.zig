@@ -229,7 +229,8 @@ pub fn lookupLocations(self: *DbContext, include_all: bool) !std.ArrayList(Looku
 
 // ------------------------------- Client Context ------------------------------------------
 const client_select_query =
-    \\select cl.id, cl.active, cl.first_name, cl.middle_name, cl.last_name, cl.date_of_birth, cl.date_of_death, cl.email, cl.phone,
+    \\select cl.id, cl.active, cl.first_name, cl.middle_name, cl.last_name, 
+    \\to_char(cl.date_of_birth, 'YYYY-MM-DD'), to_char(cl.date_of_death, 'YYYY-MM-DD'), cl.email, cl.phone,
     \\cl.address_1, cl.address_2, cl.city, cl.state, cl.zip_code,
     \\cl.notes,cl.can_call,cl.can_text,cl.can_email,cl.location_id,cl.bro_id,
     \\to_char(cl.date_created, 'YYYY-MM-DD at HH12:MI AM') as date_created,
