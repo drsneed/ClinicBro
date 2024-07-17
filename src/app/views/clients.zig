@@ -3,12 +3,15 @@ const jetzig = @import("jetzig");
 const DbContext = @import("../db_context.zig");
 const mapper = @import("../mapper.zig");
 const Client = @import("../models/client.zig");
+const LookupItem = @import("../models/lookup_item.zig");
 const log = std.log.scoped(.clients);
 pub const layout = "app";
 
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var db_context = try DbContext.init(request.allocator, request.server.database);
     const session = try request.session();
+    const params = try request.params();
+
     var current_bro_id: i32 = 0;
     if (try session.get("bro")) |bro_session| {
         current_bro_id = @intCast(bro_session.getT(.integer, "id").?);
@@ -16,8 +19,30 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     const json_clients = try data.array();
     var root = data.value.?;
     try root.put("clients", json_clients);
-    const clients = try db_context.lookupRecentClients(current_bro_id);
+
+    var clients = std.ArrayList(LookupItem).init(request.allocator);
     defer clients.deinit();
+    const mode = params.getT(.string, "mode") orelse "recent";
+    //try root.put("mode", data.string(mode));
+    if (std.mem.eql(u8, mode, "recent")) {
+        try root.put("target_div", data.string("recent-clients-listbox"));
+        clients = try db_context.lookupRecentClients(current_bro_id);
+        log.info("Found {d} recent clients", .{clients.items.len});
+    } else if (std.mem.eql(u8, mode, "appt-today")) {
+        try root.put("target_div", data.string("appt-today-listbox"));
+        clients = try db_context.lookupClientsWithAppointmentToday(current_bro_id);
+        log.info("Found {d} clients with appt today", .{clients.items.len});
+    } else if (std.mem.eql(u8, mode, "search")) {
+        try root.put("target_div", data.string("search-clients-listbox"));
+        const query = params.getT(.string, "q") orelse "";
+        if (query.len > 0) {
+            clients = try db_context.searchClients(query);
+        }
+        log.info("Found {d} clients with search term {s}", .{ clients.items.len, query });
+    } else {
+        log.info("Invalid mode param for endpoint /clients: {s}", .{mode});
+    }
+
     for (clients.items) |client| {
         var json_client = try data.object();
         try json_client.put("id", data.integer(client.id));

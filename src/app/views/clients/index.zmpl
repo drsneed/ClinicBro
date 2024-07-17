@@ -1,4 +1,4 @@
-<div id="recent-clients-listbox">
+<div id="{{.target_div}}" class="item-listbox">
   <ul>
     @zig {
       const clients = zmpl.getT(.array, "clients").?;

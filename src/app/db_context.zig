@@ -239,6 +239,9 @@ const client_select_query =
     \\left join Bro updated_bro on cl.updated_bro_id=updated_bro.id
 ;
 const recent_client_query = "select cl.id, cl.active, concat(cl.last_name, ', ', cl.first_name) as name from RecentClient rc join Client cl on rc.client_id=cl.id where rc.bro_id=$1 order by rc.date_created desc";
+const client_appt_today_query = "select cl.id, cl.active, concat(cl.last_name, ', ', cl.first_name) as name from Appointment a join Client cl on a.client_id=cl.id where a.bro_id=$1 and a.appt_date=CURRENT_DATE order by a.appt_from";
+const client_search_query = "select id, active, concat(last_name, ', ', first_name) as name from Client where first_name ilike $1 or last_name like $1 or middle_name like $1";
+
 const client_lookup_query = "select id, active, concat(last_name, ', ', first_name) as name from Client";
 const client_insert_query =
     \\insert into Client(active,first_name,middle_name,last_name,date_of_birth,date_of_death,email,phone,address_1,address_2,city,state,zip_code,notes,can_call,can_text,can_email,location_id,bro_id,date_created,date_updated,created_bro_id,updated_bro_id)
@@ -343,6 +346,28 @@ pub fn lookupClients(self: *DbContext, include_all: bool) !std.ArrayList(LookupI
     else
         client_lookup_query ++ " where active=true order by name";
     var result = try self.connection.query(query, .{});
+    try self.results.append(result);
+    var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
+    while (try result.next()) |row| {
+        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]const u8, 2) });
+    }
+    return lookup_list;
+}
+
+pub fn searchClients(self: *DbContext, query: []const u8) !std.ArrayList(LookupItem) {
+    const preparedQuery = try std.fmt.allocPrint(self.allocator, "%{s}%", .{query});
+    defer self.allocator.free(preparedQuery);
+    var result = try self.connection.query(client_search_query, .{preparedQuery});
+    try self.results.append(result);
+    var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
+    while (try result.next()) |row| {
+        try lookup_list.append(.{ .id = row.get(i32, 0), .active = row.get(bool, 1), .name = row.get([]const u8, 2) });
+    }
+    return lookup_list;
+}
+
+pub fn lookupClientsWithAppointmentToday(self: *DbContext, bro_id: i32) !std.ArrayList(LookupItem) {
+    var result = try self.connection.query(client_appt_today_query, .{bro_id});
     try self.results.append(result);
     var lookup_list = std.ArrayList(LookupItem).init(self.allocator);
     while (try result.next()) |row| {

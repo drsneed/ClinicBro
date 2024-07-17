@@ -12,6 +12,10 @@ function clientDragStart(e) {
     e.dataTransfer.setData("client-id", e.target.dataset.clientId);
 }
 
+function tabRefreshClicked(e) {
+  console.log("Refresh button " + e.currentTarget.id + " clicked");
+}
+
 function clientSelected(evt) {
   var i;
   // Get all elements with class="client-option" and remove the class "active"
@@ -68,10 +72,32 @@ function openClientTab(evt, tabName) {
     tablinks[i].className = tablinks[i].className.replace(" active", "");
   }
 
+  tablinks = document.getElementsByClassName("stretch-button");
+  for (i = 0; i < tablinks.length; i++) {
+    tablinks[i].className = tablinks[i].className.replace(" active", "");
+  }
+
   // Show the current tab, and add an "active" class to the button that opened the tab
   document.getElementById(tabName).style.display = "block";
   evt.currentTarget.className += " active";
-} 
+
+  var tab = document.getElementById(tabName);
+  var divChild = tab.childNodes[0];
+  if(!divChild.hasChildNodes()) {
+
+    if(!initializedTabs.includes(tabName)) {
+      initializedTabs.push(tabName);
+      var innerButton = evt.currentTarget.querySelector(".tab-inner-button");
+      if(innerButton) {
+        innerButton.click();
+      }
+
+    }
+
+  }
+}
+
+var initializedTabs = [];
 
 // document.addEventListener('htmx:afterRequest', function(evt) {
 //     if(evt.detail.xhr.status == 404){
