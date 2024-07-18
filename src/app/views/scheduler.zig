@@ -21,6 +21,7 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
         \\ <script type="module" src="/clinicbro/js/schedule/dayview.js"></script>
         \\ <script type="module" src="/clinicbro/js/schedule/dayview-halfhour.js"></script>
         \\ <script type="module" src="/clinicbro/js/schedule/dayview-appt.js"></script>
+        \\ <script type="module" src="/clinicbro/js/schedule/day-picker.js"></script>
         \\ <script src="/clinicbro/js/schedule.js"></script>
     ));
     try root.put("main_schedule", data.string("class=\"current\""));
