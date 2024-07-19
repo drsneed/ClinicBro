@@ -73,7 +73,7 @@ export function monthviewStyle() {
   .btn-left, .btn-right {
     display: inline-block;
     padding: 4px 8px;
-    height: 32px;
+    height: 25px;
     transition: none;
     cursor: pointer;
   }

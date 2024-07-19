@@ -13,6 +13,7 @@
     <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx-ext-path-params@2.0.0/path-params.js"></script>
     <script type="module" src="/clinicbro/js/cb-window.js"></script>
+    <script type="module" src="/clinicbro/js/schedule/date-picker.js"></script>
     {{.header_include}}
   </head>
   <body>
@@ -39,6 +40,12 @@
         @partial client_finder
         @partial scheduler/appointment_details
     </nav>
+    <button id="" onclick="toggleFlyout">Toggle</button>
+    <input type="checkbox" id="right-flyout-toggle" name="right-flyout-toggle"/>
+    <label for="right-flyout-toggle" id="right-flyout-toggle-label"><span class="mdi mdi-calendar-cursor"></span></label>
+    <div id="right-flyout">
+        <date-picker id="date-picker"></date-picker>
+    </div>
     <!-- <div id="pwr-dropdown" class="pwr-dropdown" tabindex="1">
         <input type="checkbox" id="pwr-toggle" name="pwr-toggle"/>
         <label for="pwr-toggle" class="pwr" id="pwr">

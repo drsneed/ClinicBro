@@ -17,7 +17,7 @@ export class SchedulerBase extends LitElement {
         return new Date();
       },
       toAttribute: (value, type) => {
-        return value.toIsoDateString();
+        return toIsoDateString(value);
       }
     }, reflect: true})
   current_date: Date;
