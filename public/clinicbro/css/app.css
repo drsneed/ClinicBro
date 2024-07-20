@@ -9,6 +9,7 @@
     --bg: light-dark(#eeecec, #18191a);
     --fg: light-dark(#18191a, #d8d8d8);
     --header-bg: light-dark(#020402, #14141b); /* #1d3a4e */
+    --date-picker-header-bg: light-dark(#ccc, #14141b);
     --header-fg: #f1f1e3;
     --header-bg-hover: light-dark(#bc0303, #bc0303);
     --header-fg-hover: light-dark(#f1f1e3, #f1f1e3);
@@ -89,12 +90,14 @@
     --day-appt-fg-alt: #DDD;
     --appt-selected-border: light-dark(#1275f7, #f5f2f2);
 
-    --calendar-number-fg: light-dark(#787777, #22);
+    --calendar-number-fg: light-dark(#787777, #222);
     --calendar-this-month-bg: light-dark(#becaec, #232b5a);
     --calendar-this-month-active-bg: light-dark(#fff, #000);
-    --calendar-month-bg: light-dark(#eeeeec, #323030);
-    --calendar-today-fg: light-dark(#687101, #adf5c5);
+    --calendar-other-month-fg: light-dark(#aaa, #555454);
+    --calendar-month-bg: light-dark(#eeeeec, #464545);
+    --calendar-today-fg: light-dark(#00a808, #00a808);
     --table-fg: light-dark(#16181a, #a2b4b1);
+    --date-picker-has-appt-fg: light-darklight-dark(#480303, #fff);
 }
 
 * { 

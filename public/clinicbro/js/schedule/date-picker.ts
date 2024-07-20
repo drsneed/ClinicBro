@@ -1,7 +1,12 @@
 import { html, css, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { dateAdd, months, toIsoDateString, sameDay } from '../util';
 import { classMap } from 'lit/directives/class-map.js';
+import {Task} from '@lit/task';
+
+class DateList{
+  dates: [string];
+}
 
 @customElement("date-picker")
 export class DatePicker extends LitElement {
@@ -18,7 +23,8 @@ export class DatePicker extends LitElement {
   }
 
   .day-picker-table td, .day-picker-table th {
-    border: 1px solid var(--input-border);
+    /* border: 1px solid var(--input-border); */
+    border: none;
     box-shadow: none;
     width: auto !important;
     text-align: center;
@@ -31,7 +37,7 @@ export class DatePicker extends LitElement {
   }
 
   .day-picker-table td {
-    background-color: var(--bg);
+    background-color: var(--container-bg);
     vertical-align: top;
     overflow: hidden;
   }
@@ -84,20 +90,20 @@ export class DatePicker extends LitElement {
 
   .day-picker-header {
     display: flex;
-    background-color: var(--header-bg);
+    background-color: var(--date-picker-header-bg);
     text-align: center;
     margin: 0;
   }
   
   .day-picker-header h2 {
-    color: var(--header-fg);
+    color: var(--fg);
     padding: 0;
     margin: 4px auto;
     font-size: 14px;
   }
   .num {
     font-size: 14px;
-    padding: 0px;
+    padding: 4px;
     cursor: pointer;
     border: none;
     margin: 0;
@@ -109,49 +115,68 @@ export class DatePicker extends LitElement {
   }
   .num:hover {
       color: var(--fg);
-      font-weight: bold;
   }
   .today {
-    //background-color: var(--calendar-today-fg);
-    color: var(--calendar-today-fg) !important;
-    text-decoration: underline;
+    color: var(--calendar-today-fg);
+    
   }
   .current-month, .other-month {
     margin: 0;
     padding: 4px;
   }
+
+  .has_appt {
+    font-weight: bolder;
+    /* text-shadow: 1px 1px 1px black; */
+  }
+  
   .current-month {
-        background-color: var(--calendar-this-month-bg) !important;
+       //color: var(--calendar-this-month-bg) !important;
+  }
+  .other-month {
+    color: var(--calendar-other-month-fg);
   }`;
 
-  // @ts-ignore
-  // @property({reflect: true,
-  //   converter: {
-  //     fromAttribute: (value, type) => {
-  //       return new Date(value.replace(/-/g, '\/'));
-  //     },
-  //     toAttribute: (value, type) => {
-  //       return toIsoDateString(value);
-  //     }
-  //   }})
+  //@ts-ignore
+  @property({reflect: true,
+    converter: {
+      fromAttribute: (value, type) => {
+        return new Date(value.replace(/-/g, '\/'));
+      },
+      toAttribute: (value, type) => {
+        return toIsoDateString(value);
+      }
+    }})
   current_date: Date;
+
+  appt_dates: [string];
 
   constructor() {
     super();
     this.current_date = new Date();
+    this.appt_dates = [''];
   }
 
   renderMonthViewDay(current_date: Date, table_slot_id: string, date_of_day: Date) {
+    
     let current_month = date_of_day.getMonth() == current_date.getMonth() ? "current-month" : "other-month";
     let dod = toIsoDateString(date_of_day);
+    let has_appt = date_of_day.getMonth() == current_date.getMonth() && this.appt_dates.includes(dod);
     return html`
-    <div id="${table_slot_id}" class="${current_month}"
-         hx-target="global #cb-window" hx-swap="outerHTML" 
-        hx-trigger="dblclick target:#${table_slot_id}">
+    <div id="${table_slot_id}" class="${current_month}">
         <a hx-get="/scheduler?mode=day&date=${dod}" hx-target="global #scheduler"
               hx-swap="outerHTML" hx-push-url="true"
-              class="${classMap({num: true, today: sameDay(date_of_day, new Date())})}">${date_of_day.getDate()}</a>
+              class="${classMap({num: true, has_appt, today: sameDay(date_of_day, new Date())})}">${date_of_day.getDate()}</a>
     </div>`;
+    
+  }
+
+  private _prev() {
+    this.current_date = dateAdd(this.current_date, 'month', -1);
+  }
+
+  private _next() {
+    this.current_date = dateAdd(this.current_date, 'month', 1);
   }
 
   updated(changedProperties) {
@@ -190,18 +215,84 @@ export class DatePicker extends LitElement {
   calendarTitle(d: Date) {
     return months[d.getMonth()] + " " + d.getFullYear();
   }
-  
+
+  private _apptDatesTask = new Task(this, {
+
+    task: async ([current_date], {signal}) => {
+      let firstOfDaMonth = new Date(this.current_date.getFullYear(), this.current_date.getMonth(), 1);
+      let from = dateAdd(firstOfDaMonth, 'month', -1);
+      let to = dateAdd(from, 'month', 3);
+      const response = await fetch(`/date-picker.json?from=${toIsoDateString(from)}&to=${toIsoDateString(to)}`, {signal});
+
+      if (!response.ok) { throw new Error(response.status); }
+
+      return response.json() as DateList;
+
+    },
+
+    args: () => [this.current_date]
+
+  });
+
+
   render() {
+
+    return this._apptDatesTask.render({
+
+      pending: () => html`<p>Loading dates...</p>`,
+
+      complete: (response_data) => {
+        this.appt_dates = response_data.dates.map(date => date.date);
+        return this.renderWithData();
+      },
+
+      error: (e) => html`<p>Error: ${e}</p>`
+
+    });
+
+  }
+  
+  renderWithData() {
     return html`
     <div class='day-picker-nav'>
-        <button type="button" hx-get="/scheduler?mode=day-picker&${this._getParams(dateAdd(this.current_date, 'month', -1))}"
+      <button type="button" @click=${this._prev}
+            class="${classMap({btn: true})}">&lt;</button>
+            <h3>Months</h3>
+        <button type="button" @click=${this._next}
+            class="${classMap({btn: true})}">&gt;</button>
+        <!-- <button type="button" hx-get="/scheduler?mode=day-picker&${this._getParams(dateAdd(this.current_date, 'month', -1))}"
             hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true" hx-trigger="click"
             class="${classMap({btn: true})}">&lt;</button>
             <h3>Months</h3>
         <button type="button" hx-get="/scheduler?mode=day-picker&${this._getParams(dateAdd(this.current_date, 'month', 1))}"
             hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true" hx-trigger="click"
-            class="${classMap({btn: true})}">&gt;</button>
+            class="${classMap({btn: true})}">&gt;</button> -->
     </div>
+    <table class="day-picker-table" cellspacing="0">
+      <thead>
+          <tr>
+            <th colspan="7" class="row1 no-border">
+              <caption>
+                <div class="day-picker-header">
+                  <h2 id="month_title">${this.calendarTitle(dateAdd(this.current_date, 'month', -1))}</h2>
+                </div>
+              </caption>
+            </th>
+          </tr>
+          <tr>
+              <th class="row2">Su</th>
+              <th class="row2">Mo</th>
+              <th class="row2">Tu</th>
+              <th class="row2">We</th>
+              <th class="row2">Th</th>
+              <th class="row2">Fr</th>
+              <th class="row2">Sa</th>
+          </tr>
+      </thead>
+      <tbody hx-ext="path-params">
+        ${this.renderMonthViewDays(dateAdd(this.current_date, 'month', -1))} 
+      </tbody>
+    </table>
     <table class="day-picker-table" cellspacing="0">
       <thead>
           <tr>
@@ -250,31 +341,6 @@ export class DatePicker extends LitElement {
       </thead>
       <tbody hx-ext="path-params">
         ${this.renderMonthViewDays(dateAdd(this.current_date, 'month', 1))} 
-      </tbody>
-    </table>
-    <table class="day-picker-table" cellspacing="0">
-      <thead>
-          <tr>
-            <th colspan="7" class="row1 no-border">
-              <caption>
-                <div class="day-picker-header">
-                  <h2 id="month_title">${this.calendarTitle(dateAdd(this.current_date, 'month', 2))}</h2>
-                </div>
-              </caption>
-            </th>
-          </tr>
-          <tr>
-              <th class="row2">Su</th>
-              <th class="row2">Mo</th>
-              <th class="row2">Tu</th>
-              <th class="row2">We</th>
-              <th class="row2">Th</th>
-              <th class="row2">Fr</th>
-              <th class="row2">Sa</th>
-          </tr>
-      </thead>
-      <tbody hx-ext="path-params">
-        ${this.renderMonthViewDays(dateAdd(this.current_date, 'month', 2))} 
       </tbody>
     </table>
     `;

@@ -600,6 +600,35 @@ var t3 = (t4) => (e4, o4) => {
     customElements.define(t4, e4);
   }) : customElements.define(t4, e4);
 };
+// node_modules/@lit/reactive-element/decorators/property.js
+var n4 = function(t4) {
+  return (e4, o4) => typeof o4 == "object" ? r5(t4, e4, o4) : ((t5, e5, o5) => {
+    const r5 = e5.hasOwnProperty(o5);
+    return e5.constructor.createProperty(o5, r5 ? { ...t5, wrapped: true } : t5), r5 ? Object.getOwnPropertyDescriptor(e5, o5) : undefined;
+  })(t4, e4, o4);
+};
+var o4 = { attribute: true, type: String, converter: u, reflect: false, hasChanged: f };
+var r5 = (t4 = o4, e4, r6) => {
+  const { kind: n5, metadata: i4 } = r6;
+  let s4 = globalThis.litPropertyMetadata.get(i4);
+  if (s4 === undefined && globalThis.litPropertyMetadata.set(i4, s4 = new Map), s4.set(r6.name, t4), n5 === "accessor") {
+    const { name: o5 } = r6;
+    return { set(r7) {
+      const n6 = e4.get.call(this);
+      e4.set.call(this, r7), this.requestUpdate(o5, n6, t4);
+    }, init(e5) {
+      return e5 !== undefined && this.P(o5, undefined, t4), e5;
+    } };
+  }
+  if (n5 === "setter") {
+    const { name: o5 } = r6;
+    return function(r7) {
+      const n6 = this[o5];
+      e4.call(this, r7), this.requestUpdate(o5, n6, t4);
+    };
+  }
+  throw Error("Unsupported decorator location: " + n5);
+};
 // public/clinicbro/js/util.ts
 function dateAdd(date, interval, units) {
   var ret = new Date(date.valueOf());
@@ -703,16 +732,109 @@ var e6 = e5(class extends i4 {
         i5[t5] && !this.nt?.has(t5) && this.st.add(t5);
       return this.render(i5);
     }
-    const r5 = s4.element.classList;
+    const r6 = s4.element.classList;
     for (const t5 of this.st)
-      t5 in i5 || (r5.remove(t5), this.st.delete(t5));
+      t5 in i5 || (r6.remove(t5), this.st.delete(t5));
     for (const t5 in i5) {
       const s5 = !!i5[t5];
-      s5 === this.st.has(t5) || this.nt?.has(t5) || (s5 ? (r5.add(t5), this.st.add(t5)) : (r5.remove(t5), this.st.delete(t5)));
+      s5 === this.st.has(t5) || this.nt?.has(t5) || (s5 ? (r6.add(t5), this.st.add(t5)) : (r6.remove(t5), this.st.delete(t5)));
     }
     return w;
   }
 });
+// node_modules/@lit/task/task.js
+var i5 = Symbol();
+
+class h3 {
+  get taskComplete() {
+    return this.t || (this.i === 1 ? this.t = new Promise((t5, s4) => {
+      this.o = t5, this.h = s4;
+    }) : this.i === 3 ? this.t = Promise.reject(this.l) : this.t = Promise.resolve(this.u)), this.t;
+  }
+  constructor(t5, s4, i6) {
+    this.p = 0, this.i = 0, (this._ = t5).addController(this);
+    const h4 = typeof s4 == "object" ? s4 : { task: s4, args: i6 };
+    this.v = h4.task, this.j = h4.args, this.m = h4.argsEqual ?? r6, this.k = h4.onComplete, this.A = h4.onError, this.autoRun = h4.autoRun ?? true, "initialValue" in h4 && (this.u = h4.initialValue, this.i = 2, this.O = this.T?.());
+  }
+  hostUpdate() {
+    this.autoRun === true && this.S();
+  }
+  hostUpdated() {
+    this.autoRun === "afterUpdate" && this.S();
+  }
+  T() {
+    if (this.j === undefined)
+      return;
+    const t5 = this.j();
+    if (!Array.isArray(t5))
+      throw Error("The args function must return an array");
+    return t5;
+  }
+  async S() {
+    const t5 = this.T(), s4 = this.O;
+    this.O = t5, t5 === s4 || t5 === undefined || s4 !== undefined && this.m(s4, t5) || await this.run(t5);
+  }
+  async run(t5) {
+    let s4, h4;
+    t5 ??= this.T(), this.O = t5, this.i === 1 ? this.q?.abort() : (this.t = undefined, this.o = undefined, this.h = undefined), this.i = 1, this.autoRun === "afterUpdate" ? queueMicrotask(() => this._.requestUpdate()) : this._.requestUpdate();
+    const r6 = ++this.p;
+    this.q = new AbortController;
+    let e7 = false;
+    try {
+      s4 = await this.v(t5, { signal: this.q.signal });
+    } catch (t6) {
+      e7 = true, h4 = t6;
+    }
+    if (this.p === r6) {
+      if (s4 === i5)
+        this.i = 0;
+      else {
+        if (e7 === false) {
+          try {
+            this.k?.(s4);
+          } catch {
+          }
+          this.i = 2, this.o?.(s4);
+        } else {
+          try {
+            this.A?.(h4);
+          } catch {
+          }
+          this.i = 3, this.h?.(h4);
+        }
+        this.u = s4, this.l = h4;
+      }
+      this._.requestUpdate();
+    }
+  }
+  abort(t5) {
+    this.i === 1 && this.q?.abort(t5);
+  }
+  get value() {
+    return this.u;
+  }
+  get error() {
+    return this.l;
+  }
+  get status() {
+    return this.i;
+  }
+  render(t5) {
+    switch (this.i) {
+      case 0:
+        return t5.initial?.();
+      case 1:
+        return t5.pending?.();
+      case 2:
+        return t5.complete?.(this.value);
+      case 3:
+        return t5.error?.(this.error);
+      default:
+        throw Error("Unexpected status: " + this.i);
+    }
+  }
+}
+var r6 = (s4, i6) => s4 === i6 || s4.length === i6.length && s4.every((s5, h4) => !f(s5, i6[h4]));
 // public/clinicbro/js/schedule/date-picker.ts
 class DatePicker extends s3 {
   static styles = i`
@@ -728,7 +850,8 @@ class DatePicker extends s3 {
   }
 
   .day-picker-table td, .day-picker-table th {
-    border: 1px solid var(--input-border);
+    /* border: 1px solid var(--input-border); */
+    border: none;
     box-shadow: none;
     width: auto !important;
     text-align: center;
@@ -741,7 +864,7 @@ class DatePicker extends s3 {
   }
 
   .day-picker-table td {
-    background-color: var(--bg);
+    background-color: var(--container-bg);
     vertical-align: top;
     overflow: hidden;
   }
@@ -794,20 +917,20 @@ class DatePicker extends s3 {
 
   .day-picker-header {
     display: flex;
-    background-color: var(--header-bg);
+    background-color: var(--date-picker-header-bg);
     text-align: center;
     margin: 0;
   }
   
   .day-picker-header h2 {
-    color: var(--header-fg);
+    color: var(--fg);
     padding: 0;
     margin: 4px auto;
     font-size: 14px;
   }
   .num {
     font-size: 14px;
-    padding: 0px;
+    padding: 4px;
     cursor: pointer;
     border: none;
     margin: 0;
@@ -819,36 +942,49 @@ class DatePicker extends s3 {
   }
   .num:hover {
       color: var(--fg);
-      font-weight: bold;
   }
   .today {
-    //background-color: var(--calendar-today-fg);
-    color: var(--calendar-today-fg) !important;
-    text-decoration: underline;
+    color: var(--calendar-today-fg);
+    
   }
   .current-month, .other-month {
     margin: 0;
     padding: 4px;
   }
+
+  .has_appt {
+    font-weight: bolder;
+    /* text-shadow: 1px 1px 1px black; */
+  }
+  
   .current-month {
-        background-color: var(--calendar-this-month-bg) !important;
+       //color: var(--calendar-this-month-bg) !important;
+  }
+  .other-month {
+    color: var(--calendar-other-month-fg);
   }`;
-  current_date;
+  appt_dates;
   constructor() {
     super();
     this.current_date = new Date;
+    this.appt_dates = [""];
   }
   renderMonthViewDay(current_date, table_slot_id, date_of_day) {
     let current_month = date_of_day.getMonth() == current_date.getMonth() ? "current-month" : "other-month";
     let dod = toIsoDateString(date_of_day);
+    let has_appt = date_of_day.getMonth() == current_date.getMonth() && this.appt_dates.includes(dod);
     return x`
-    <div id="${table_slot_id}" class="${current_month}"
-         hx-target="global #cb-window" hx-swap="outerHTML" 
-        hx-trigger="dblclick target:#${table_slot_id}">
+    <div id="${table_slot_id}" class="${current_month}">
         <a hx-get="/scheduler?mode=day&date=${dod}" hx-target="global #scheduler"
               hx-swap="outerHTML" hx-push-url="true"
-              class="${e6({ num: true, today: sameDay(date_of_day, new Date) })}">${date_of_day.getDate()}</a>
+              class="${e6({ num: true, has_appt, today: sameDay(date_of_day, new Date) })}">${date_of_day.getDate()}</a>
     </div>`;
+  }
+  _prev() {
+    this.current_date = dateAdd(this.current_date, "month", -1);
+  }
+  _next() {
+    this.current_date = dateAdd(this.current_date, "month", 1);
   }
   updated(changedProperties) {
     htmx.process(this.shadowRoot);
@@ -857,17 +993,17 @@ class DatePicker extends s3 {
     let rows = [];
     let firstOfDaMonth = new Date(d3.getFullYear(), d3.getMonth(), 1);
     let first_day = firstOfDaMonth.getDay();
-    let i5 = 0;
+    let i6 = 0;
     for (let week = 0;week < 6; week++) {
       var days = [];
       for (let day = 0;day < 7; day++) {
-        let id = "d" + i5;
-        let thisDaysDate = dateAdd(firstOfDaMonth, "day", i5 - first_day);
+        let id = "d" + i6;
+        let thisDaysDate = dateAdd(firstOfDaMonth, "day", i6 - first_day);
         if (week == 5 && day == 0 && thisDaysDate.getMonth() != d3.getMonth()) {
           break;
         }
         days.push(x`<td>${this.renderMonthViewDay(d3, id, thisDaysDate)}</td>`);
-        i5++;
+        i6++;
       }
       rows.push(x`<tr>${days}</tr>`);
     }
@@ -881,17 +1017,70 @@ class DatePicker extends s3 {
   calendarTitle(d3) {
     return months[d3.getMonth()] + " " + d3.getFullYear();
   }
+  _apptDatesTask = new h3(this, {
+    task: async ([current_date], { signal }) => {
+      let firstOfDaMonth = new Date(this.current_date.getFullYear(), this.current_date.getMonth(), 1);
+      let from = dateAdd(firstOfDaMonth, "month", -1);
+      let to = dateAdd(from, "month", 3);
+      const response = await fetch(`/date-picker.json?from=${toIsoDateString(from)}&to=${toIsoDateString(to)}`, { signal });
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+      return response.json();
+    },
+    args: () => [this.current_date]
+  });
   render() {
+    return this._apptDatesTask.render({
+      pending: () => x`<p>Loading dates...</p>`,
+      complete: (response_data) => {
+        this.appt_dates = response_data.dates.map((date) => date.date);
+        return this.renderWithData();
+      },
+      error: (e7) => x`<p>Error: ${e7}</p>`
+    });
+  }
+  renderWithData() {
     return x`
     <div class='day-picker-nav'>
-        <button type="button" hx-get="/scheduler?mode=day-picker&${this._getParams(dateAdd(this.current_date, "month", -1))}"
+      <button type="button" @click=${this._prev}
+            class="${e6({ btn: true })}">&lt;</button>
+            <h3>Months</h3>
+        <button type="button" @click=${this._next}
+            class="${e6({ btn: true })}">&gt;</button>
+        <!-- <button type="button" hx-get="/scheduler?mode=day-picker&${this._getParams(dateAdd(this.current_date, "month", -1))}"
             hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true" hx-trigger="click"
             class="${e6({ btn: true })}">&lt;</button>
             <h3>Months</h3>
         <button type="button" hx-get="/scheduler?mode=day-picker&${this._getParams(dateAdd(this.current_date, "month", 1))}"
             hx-target="global #scheduler" hx-swap="outerHTML" hx-push-url="true" hx-trigger="click"
-            class="${e6({ btn: true })}">&gt;</button>
+            class="${e6({ btn: true })}">&gt;</button> -->
     </div>
+    <table class="day-picker-table" cellspacing="0">
+      <thead>
+          <tr>
+            <th colspan="7" class="row1 no-border">
+              <caption>
+                <div class="day-picker-header">
+                  <h2 id="month_title">${this.calendarTitle(dateAdd(this.current_date, "month", -1))}</h2>
+                </div>
+              </caption>
+            </th>
+          </tr>
+          <tr>
+              <th class="row2">Su</th>
+              <th class="row2">Mo</th>
+              <th class="row2">Tu</th>
+              <th class="row2">We</th>
+              <th class="row2">Th</th>
+              <th class="row2">Fr</th>
+              <th class="row2">Sa</th>
+          </tr>
+      </thead>
+      <tbody hx-ext="path-params">
+        ${this.renderMonthViewDays(dateAdd(this.current_date, "month", -1))} 
+      </tbody>
+    </table>
     <table class="day-picker-table" cellspacing="0">
       <thead>
           <tr>
@@ -942,34 +1131,22 @@ class DatePicker extends s3 {
         ${this.renderMonthViewDays(dateAdd(this.current_date, "month", 1))} 
       </tbody>
     </table>
-    <table class="day-picker-table" cellspacing="0">
-      <thead>
-          <tr>
-            <th colspan="7" class="row1 no-border">
-              <caption>
-                <div class="day-picker-header">
-                  <h2 id="month_title">${this.calendarTitle(dateAdd(this.current_date, "month", 2))}</h2>
-                </div>
-              </caption>
-            </th>
-          </tr>
-          <tr>
-              <th class="row2">Su</th>
-              <th class="row2">Mo</th>
-              <th class="row2">Tu</th>
-              <th class="row2">We</th>
-              <th class="row2">Th</th>
-              <th class="row2">Fr</th>
-              <th class="row2">Sa</th>
-          </tr>
-      </thead>
-      <tbody hx-ext="path-params">
-        ${this.renderMonthViewDays(dateAdd(this.current_date, "month", 2))} 
-      </tbody>
-    </table>
     `;
   }
 }
+__legacyDecorateClassTS([
+  n4({
+    reflect: true,
+    converter: {
+      fromAttribute: (value, type) => {
+        return new Date(value.replace(/-/g, "/"));
+      },
+      toAttribute: (value, type) => {
+        return toIsoDateString(value);
+      }
+    }
+  })
+], DatePicker.prototype, "current_date", undefined);
 DatePicker = __legacyDecorateClassTS([
   t3("date-picker")
 ], DatePicker);

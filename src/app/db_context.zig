@@ -5,6 +5,7 @@ pub const Location = @import("models/location.zig");
 const Client = @import("models/client.zig");
 const Appointment = @import("models/appointment.zig");
 const AppointmentView = @import("models/appointment_view.zig");
+const AppointmentDate = @import("models/appointment_date.zig");
 const AppointmentType = @import("models/appointment_type.zig");
 const AppointmentStatus = @import("models/appointment_status.zig");
 pub const LookupItem = @import("models/lookup_item.zig");
@@ -556,6 +557,7 @@ const appointment_select_query =
     \\left join Bro created_bro on a.created_bro_id=created_bro.id
     \\left join Bro updated_bro on a.updated_bro_id=updated_bro.id
 ;
+
 const appointment_insert_query =
     \\insert into Appointment(title,appt_date,appt_from,appt_to,notes,type_id,status_id,client_id,bro_id,location_id,date_created,date_updated,created_bro_id,updated_bro_id)
     \\values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW(), $11, $11);
@@ -629,6 +631,41 @@ pub fn getAllAppointments(self: *DbContext) !std.ArrayList(Appointment) {
     var lookup_list = std.ArrayList(Appointment).init(self.allocator);
     while (try result.next()) |row| {
         try lookup_list.append(mapper.appointment.fromDatabase(row));
+    }
+    return lookup_list;
+}
+
+const appointment_dates_query = "select distinct(to_char(appt_date, 'YYYY-MM-DD')) from Appointment where appt_date >= '{s}' and appt_date < '{s}'";
+
+pub fn getAppointmentDates(self: *DbContext, date_from: []const u8, date_to: []const u8) !std.ArrayList(AppointmentDate) {
+    var query_buffer: [256]u8 = undefined;
+    var stream = std.io.fixedBufferStream(&query_buffer);
+    const writer = stream.writer();
+    try writer.print(appointment_dates_query, .{ date_from, date_to });
+    const query = stream.getWritten();
+    log.info("appt dates query = {s}", .{query});
+    var result = try self.connection.queryOpts(query, .{}, .{ .column_names = true });
+    defer result.deinit();
+    var lookup_list = std.ArrayList(AppointmentDate).init(self.allocator);
+    var db_mapper = result.mapper(AppointmentDate, .{ .dupe = true, .allocator = self.allocator });
+    while (try db_mapper.next()) |date| {
+        log.info("appending date {s}", .{date.date});
+        try lookup_list.append(date);
+    }
+    return lookup_list;
+}
+
+pub fn getAppointmentDates2(self: *DbContext, date_from: []const u8, date_to: []const u8) !std.ArrayList(AppointmentDate) {
+    var query_buffer: [256]u8 = undefined;
+    const query = try std.fmt.bufPrint(&query_buffer, appointment_dates_query, .{
+        date_from,
+        date_to,
+    });
+    var result = try self.connection.query(query, .{});
+    try self.results.append(result);
+    var lookup_list = std.ArrayList(AppointmentDate).init(self.allocator);
+    while (try result.next()) |row| {
+        try lookup_list.append(.{ .date = row.get([]const u8, 0) });
     }
     return lookup_list;
 }

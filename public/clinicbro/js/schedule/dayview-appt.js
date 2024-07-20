@@ -742,9 +742,9 @@ class DayViewAppointment extends s3 {
       resize: vertical;
     }
 
-    div:hover {
+    /* div:hover {
       font-weight: bold;
-    }
+    } */
 
     .appt {
       /* background-color: var(--appt-bg1); */

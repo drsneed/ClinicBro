@@ -22,9 +22,9 @@ export class DayViewAppointment extends LitElement {
       resize: vertical;
     }
 
-    div:hover {
+    /* div:hover {
       font-weight: bold;
-    }
+    } */
 
     .appt {
       /* background-color: var(--appt-bg1); */
