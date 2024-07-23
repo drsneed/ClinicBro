@@ -1235,7 +1235,7 @@ details[open] summary {
     border: 1px solid transparent;
 }
 
-.setup-item-listbox ul li.active {
+.setup-item-listbox ul li.selected {
     background-color: var(--nav-link-bg-current);
     border: 1px solid var(--input-border);
 }

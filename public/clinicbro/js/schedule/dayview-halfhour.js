@@ -696,6 +696,8 @@ class DayViewHalfHour extends s3 {
         height: 50%;
         max-width: 100%;
         white-space: nowrap;
+        text-overflow: wrap;
+        overflow-x: wrap;
         user-select: none;
         overflow-y: visible;
       }

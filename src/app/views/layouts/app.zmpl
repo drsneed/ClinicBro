@@ -30,7 +30,7 @@
                 <div class="collapsible-content">
                     <a href="/setup/users" {{.setup_users}}><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
                     <a href="/setup/locations" {{.setup_locations}}><span class="mdi mdi-map-marker-multiple mr-2"></span>Locations</a>
-                    <a href="/setup/appointment-types" {{.setup_appointment_types}}><span class="mdi mdi-tag-multiple mr-2"></span>Appointment Types</a>
+                    <a href="/setup/appointment-types" {{.setup_appointment_types}}><span class="mdi mdi-label-multiple mr-2"></span>Appointment Types</a>
                     <a href="/setup/appointment-statuses" {{.setup_appointment_statuses}}><span class="mdi mdi-application-brackets-outline mr-2"></span>Appointment Statuses</a>
                     <a href="/setup/reports" {{.setup_reports}}><span class="mdi mdi-file-chart mr-2"></span>Reports</a>
                     <a href="/setup/system" {{.setup_system}}><img src="/clinicbro/img/logo.svg" alt="ClinicBro" class="sys-icon"/>System</a>
@@ -72,7 +72,7 @@
             <div class="nav-dropdown-content">
                 <a href="/setup/users" {{.setup_users}}><span class="mdi mdi-account-multiple mr-2"></span>Users</a>
                 <a href="/setup/locations" {{.setup_locations}}><span class="mdi mdi-map-marker-multiple mr-2"></span>Locations</a>
-                <a href="/setup/appointment-types" {{.setup_appointment_types}}><span class="mdi mdi-tag-multiple mr-2"></span>Appointment Types</a>
+                <a href="/setup/appointment-types" {{.setup_appointment_types}}><span class="mdi mdi-label-multiple mr-2"></span>Appointment Types</a>
                 <a href="/setup/appointment-statuses" {{.setup_appointment_statuses}}><span class="mdi mdi-application-brackets-outline mr-2"></span>Appointment Statuses</a>
                 <!-- <a href="/setup/reports" {{.setup_reports}}><span class="mdi mdi-file-chart mr-2"></span>Reports</a>
                 <a href="/setup/system" {{.setup_system}}><img src="/clinicbro/img/logo.svg" alt="ClinicBro" class="sys-icon"/>System</a> -->

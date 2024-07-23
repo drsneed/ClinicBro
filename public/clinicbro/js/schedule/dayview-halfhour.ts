@@ -13,6 +13,8 @@ export class DayViewHalfHour extends LitElement {
         height: 50%;
         max-width: 100%;
         white-space: nowrap;
+        text-overflow: wrap;
+        overflow-x: wrap;
         user-select: none;
         overflow-y: visible;
       }

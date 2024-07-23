@@ -31,28 +31,35 @@ function setupItemSelected(evt) {
   // Get all elements with class="client-option" and remove the class "active"
   setupListItems = document.getElementsByClassName("setup-option");
   for (i = 0; i < setupListItems.length; i++) {
-    setupListItems[i].className = setupListItems[i].className.replace(" active", "");
+    setupListItems[i].className = setupListItems[i].className.replace(" selected", "");
   }
   // add an "active" class to the selected list item
-  evt.currentTarget.className += " active";
+  evt.currentTarget.className += " selected";
 }
 function clearSetupSelectedItem() {
-    var elements = document.getElementById("setup-select").options;
-    for(var i = 0; i < elements.length; i++){
-      elements[i].selected = false;
-    }
+  setupListItems = document.getElementsByClassName("setup-option");
+  for (i = 0; i < setupListItems.length; i++) {
+    setupListItems[i].className = setupListItems[i].className.replace(" selected", "");
+  }
 }
 
 function addSetupBlankItem() {
   clearSetupSelectedItem();
-  var selectElement = document.getElementById("setup-select");
-  if(selectElement.firstChild.value !== "0") {
-    var opt = document.createElement('option');
-    opt.value = 0;
-    opt.selected = true;
-    selectElement.insertBefore(opt, selectElement.firstChild);
+  var setupListContainer = document.querySelector("#setup-list-container");
+  if(setupListContainer.firstElementChild.dataset.id !== "0") {
+    var listItem = document.createElement('li');
+    listItem.setAttribute('data-id', '0');
+    listItem.className = "setup-option selected";
+    listItem.setAttribute('hx-get', '/setup/appointment-types/0');
+    listItem.setAttribute('hx-trigger', 'click');
+    listItem.setAttribute('hx-swap', 'outerHTML');
+    listItem.setAttribute('hx-target', '#SetupContent');
+    listItem.setAttribute('onclick', 'setupItemSelected(event)');
+    listItem.innerHTML = "&nbsp;";
+    setupListContainer.insertBefore(listItem, setupListContainer.firstChild);
+    htmx.process(listItem);
   } else {
-    selectElement.firstChild.selected = true;
+    setupListContainer.firstElementChild.classList.add("selected");
   }
 }
 

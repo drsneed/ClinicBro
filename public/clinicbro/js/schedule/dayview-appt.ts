@@ -15,11 +15,17 @@ export class DayViewAppointment extends LitElement {
       margin: 0px;
       width: 100%;
       user-select: none;
-      overflow: visible;
+      overflow: hidden;
+      text-wrap: wrap;
       text-overflow: ellipsis;
       opacity: 0.85;
       border: 1px solid var(--input-border);
       resize: vertical;
+      z-index: 1;
+    }
+
+    .appt-title {
+      text-overflow: wrap;
     }
 
     /* div:hover {
@@ -186,7 +192,7 @@ export class DayViewAppointment extends LitElement {
       //let color = this.color.length > 0 ? this.color : "#FF000055";
       return html`<div data-appt-id="${this.appt_id}" class="${classMap({selected: this.selected, appt: appt, event: !appt})}"
                style="${styleMap({backgroundColor: backgroundColor, height: display_height, color: foregroundColor})}"
-               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</span></div>`;
+               draggable="true" @dragstart="${this._drag}">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</div>`;
                     
     }
 }

@@ -1,0 +1,1 @@
+update AppointmentType set active=$2,name=$3,abbreviation=$4,color=$5,date_updated=NOW(),updated_bro_id=$6 where id=$1

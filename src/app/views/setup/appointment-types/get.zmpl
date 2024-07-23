@@ -3,7 +3,7 @@
   const inactive_class = if(active) "" else "setup-item-inactive";
   const id = zmpl.getT(.integer, "id").?;
 }
-<div id="ApptTypeSetupContent" class="setup-item-content {{inactive_class}}">
+<div id="SetupContent" class="setup-item-content {{inactive_class}}">
     <form id="appt-type-form" method="post">
       <input id="appt-type-id-input" type="hidden" name="id" value="{{.id}}">
       <div class="id-field">

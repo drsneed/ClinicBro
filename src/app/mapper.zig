@@ -69,6 +69,7 @@ pub const location = struct {
     pub fn fromRequest(request: *jetzig.http.Request) !Location {
         var model = Location{};
         const params = try request.params();
+        model.id = @intCast(params.getT(.integer, "id") orelse 0);
         model.name = params.getT(.string, "name") orelse return error.MissingParam;
         model.active = params.getT(.boolean, "active") orelse false;
         model.phone = params.getT(.string, "phone") orelse "";

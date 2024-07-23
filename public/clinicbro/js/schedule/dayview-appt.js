@@ -735,11 +735,17 @@ class DayViewAppointment extends s3 {
       margin: 0px;
       width: 100%;
       user-select: none;
-      overflow: visible;
+      overflow: hidden;
+      text-wrap: wrap;
       text-overflow: ellipsis;
       opacity: 0.85;
       border: 1px solid var(--input-border);
       resize: vertical;
+      z-index: 1;
+    }
+
+    .appt-title {
+      text-overflow: wrap;
     }
 
     /* div:hover {
@@ -838,7 +844,7 @@ class DayViewAppointment extends s3 {
     let display_height = "" + duration * 1.5 + "px;";
     return x`<div data-appt-id="${this.appt_id}" class="${e6({ selected: this.selected, appt, event: !appt })}"
                style="${o5({ backgroundColor, height: display_height, color: foregroundColor })}"
-               draggable="true" @dragstart="${this._drag}"><span class="appt-title">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</span></div>`;
+               draggable="true" @dragstart="${this._drag}">${startHours}:${startMinutes}-${endHours}:${endMinutes}${pm} ${text}</div>`;
   }
 }
 __legacyDecorateClassTS([

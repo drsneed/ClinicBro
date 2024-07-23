@@ -7,6 +7,10 @@ const AppointmentType = @import("../../models/appointment_type.zig");
 const log = std.log.scoped(.locations);
 pub const layout = "app";
 
+const appointment_type_single_query = @embedFile("../../../sql/appointment_type_single.sql");
+const appointment_type_insert_query = @embedFile("../../../sql/appointment_type_insert.sql");
+const appointment_type_update_query = @embedFile("../../../sql/appointment_type_update.sql");
+
 pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     var db_context = try DbContext.init(request.allocator, request.server.database);
     var root = data.value.?;
@@ -17,33 +21,59 @@ pub fn index(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 }
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = try DbContext.init(request.allocator, request.server.database);
     const session = try request.session();
     var current_bro_id: i32 = 0;
     if (try session.get("bro")) |bro_session| {
         current_bro_id = @intCast(bro_session.getT(.integer, "id").?);
     }
+    // open db connection
+    var conn = try request.server.database.pool.acquire();
+    defer conn.release();
+
     var appointment_type = try mapper.appointment_type.fromRequest(request);
     if (appointment_type.id == 0) {
-        appointment_type.id = try db_context.createAppointmentType(appointment_type, current_bro_id);
+        // active is not a form field on a new entry, so it defaults to false further down if we don't set it properly here
+        appointment_type.active = true;
+        var row = (try conn.row(appointment_type_insert_query, .{
+            appointment_type.name,
+            appointment_type.abbreviation,
+            appointment_type.color,
+            current_bro_id,
+        })) orelse unreachable;
+        defer row.deinit() catch {};
+        appointment_type.id = row.get(i32, 0);
     } else {
-        try db_context.updateAppointmentType(appointment_type, current_bro_id);
+        _ = conn.exec(appointment_type_update_query, .{
+            appointment_type.id,
+            appointment_type.active,
+            appointment_type.name,
+            appointment_type.abbreviation,
+            appointment_type.color,
+            current_bro_id,
+        }) catch |err| {
+            if (conn.err) |pg_err| {
+                log.err("update failure: {s}", .{pg_err.message});
+            }
+            return err;
+        };
     }
-    try db_context.deinit();
-    db_context = try DbContext.init(request.allocator, request.server.database);
-    return try util.renderSetupList(request, data, &db_context, "AppointmentType", appointment_type.id);
+    if (try util.renderSetupList2(request, data, conn, "AppointmentType", appointment_type.id)) {
+        try mapper.appointment_type.toResponse(appointment_type, data);
+    }
+    return request.render(.ok);
 }
 
 pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = try DbContext.init(request.allocator, request.server.database);
-    const appt_type_id = try std.fmt.parseInt(i32, id, 10);
-
-    var appt_type = AppointmentType{};
-    if (appt_type_id > 0) {
-        appt_type = try db_context.getAppointmentType(appt_type_id) orelse appt_type;
+    const appointment_type_id = try std.fmt.parseInt(i32, id, 10);
+    if (appointment_type_id > 0) {
+        var row = (try request.server.database.pool.row(appointment_type_single_query, .{appointment_type_id})) orelse unreachable;
+        defer row.deinit() catch {};
+        const appointment_type = try row.to(AppointmentType, .{});
+        try mapper.appointment_type.toResponse(appointment_type, data);
+    } else {
+        const appointment_type = AppointmentType{};
+        try mapper.appointment_type.toResponse(appointment_type, data);
     }
-    try mapper.appointment_type.toResponse(appt_type, data);
-    try db_context.deinit();
     return request.render(.ok);
 }
 

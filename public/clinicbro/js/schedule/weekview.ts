@@ -87,7 +87,7 @@ export class WeekView extends SchedulerBase {
     let saturday = dateAdd(friday, 'day', 1);
     let satdisp = "Sun " + (saturday.getMonth()+1) + "/" + saturday.getDate();
     return html`
-    <table class="month-table" cellspacing="0">
+    <table class="day-table" cellspacing="0">
       <colgroup>
           <col span="1" style="width: 70px;">
           <col span="1" style="width: 13.95%;">

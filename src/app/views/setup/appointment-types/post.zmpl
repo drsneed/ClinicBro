@@ -3,12 +3,13 @@
   const item_count = setup_items.len;
   const active = zmpl.getT(.boolean, "active") orelse true;
   const inactive_class = if(active) "" else "setup-item-inactive";
+  std.debug.print("inactive_class = {s}\n", .{inactive_class});
 }
 <div id="ApptTypeSetupScreen" class="container">
   <div class="setup-screen">
     <div class="setup-item-menu">
       <div class="setup-list-info">
-        <h2><span class="mdi mdi-tag-multiple mr-2"></span>Appointment Types</h2>
+        <h2><span class="mdi mdi-label-multiple mr-2"></span>Appointment Types</h2>
         <span class="cb-label">Items: {{item_count}}</span>
         <label class="cb-label"><input type="checkbox" id="include_inactive" name="include_inactive" class="cbcb" value="1"
           hx-get="/setup/appointment-types"
@@ -20,7 +21,7 @@
       <div class="setup-button-bar" hx-ext="path-params">
         <button type="button" class="btn" title="Add New"
           hx-get="/setup/appointment-types/0"
-          hx-target="#ApptTypeSetupContent"
+          hx-target="#SetupContent"
           hx-swap="outerHTML"
           onclick="addSetupBlankItem();">
             <span class="mdi mdi-plus"></span>
@@ -41,15 +42,17 @@
           </button>  
       </div>
       <div class="setup-item-listbox">
-        <ul>
+        <ul id="setup-list-container">
           @zig {
             for (setup_items) |item| {
               const id = item.getT(.integer, "id") orelse continue;
               const name = item.getT(.string, "name") orelse continue;
               const selected = item.getT(.string, "selected") orelse continue;
-                <li class="setup-option {{inactive_class}} {{selected}}" hx-get="/setup/appointment-types/{{id}}"
-                  hx-target="#ApptTypeSetupContent" hx-trigger="click" hx-swap="outerHTML" onclick="setupItemSelected(event)">
-                  <span class="mdi mdi-tag mr-2"></span>{{name}}</li>
+              const this_active = item.getT(.boolean, "active") orelse true;
+              const this_inactive_class = if(this_active) "" else "setup-item-inactive";
+                <li class="setup-option {{this_inactive_class}} {{selected}}" hx-get="/setup/appointment-types/{{id}}"
+                  hx-target="#SetupContent" hx-trigger="click" hx-swap="outerHTML" onclick="setupItemSelected(event)">
+                  <span class="mdi mdi-label mr-2"></span>{{name}}</li>
             }
           }
         </ul>
@@ -57,7 +60,7 @@
     </div>
     @zig {
       if(zmpl.getT(.integer, "id")) |id| {
-        <div id="ApptTypeSetupContent" class="setup-item-content {{inactive_class}}">
+        <div id="SetupContent" class="setup-item-content {{inactive_class}}">
           <form id="appt-type-form" method="post">
             <input id="appt-type-id-input" type="hidden" name="id" value="{{id}}">
             <div class="id-field">

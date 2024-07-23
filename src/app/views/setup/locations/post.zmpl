@@ -22,17 +22,23 @@
           hx-get="/setup/locations/0"
           hx-target="#LocationSetupContent"
           hx-swap="outerHTML"
-          onclick="addSetupBlankItem();"><span class="mdi mdi-plus mr-2"></span></button>
-            <button type="button" class="btn" title="Save"
+          onclick="addSetupBlankItem();">
+            <span class="mdi mdi-plus mr-2"></span>
+        </button>
+        <button type="button" class="btn" title="Save"
             hx-include="#location-form, #include_inactive"
             hx-post="/setup/locations"
             hx-target="#LocationSetupScreen"
-            hx-swap="outerHTML"><span class="mdi mdi-content-save mr-2"></span></button>
-            <button type="button" class="btn" title="Delete"
+            hx-swap="outerHTML">
+              <span class="mdi mdi-content-save mr-2"></span>
+          </button>
+        <button type="button" class="btn" title="Delete"
             hx-include="#location-id-input"
             hx-delete="/setup/locations/{id}"
             hx-target="#LocationSetupScreen"
-            hx-swap="outerHTML"><span class="mdi mdi-trash-can mr-2"></span></button>  
+            hx-swap="outerHTML">
+              <span class="mdi mdi-trash-can mr-2"></span>
+          </button>  
       </div>
       <div class="setup-item-listbox">
         <ul>
@@ -40,8 +46,9 @@
             for (setup_items) |item| {
               const id = item.getT(.integer, "id") orelse continue;
               const name = item.getT(.string, "name") orelse continue;
-              const selected = item.getT(.string, "selected") orelse continue;
-                <li class="setup-option {{inactive_class}} {{selected}}" hx-get="/setup/locations/{{id}}"
+              const this_active = item.getT(.boolean, "active") orelse continue;
+              const this_inactive_class = if(this_active) "" else "setup-item-inactive";
+                <li class="setup-option {{this_inactive_class}}" hx-get="/setup/locations/{{id}}"
                   hx-target="#LocationSetupContent" hx-trigger="click" hx-swap="outerHTML" onclick="setupItemSelected(event)">
                   <span class="mdi mdi-map-marker mr-2"></span>{{name}}</li>
             }
@@ -81,9 +88,6 @@
           </div> 
         }
       }
-      
-      
     </div>
   </div>
 </div>
-
