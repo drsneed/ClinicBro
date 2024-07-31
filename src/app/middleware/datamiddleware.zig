@@ -51,6 +51,13 @@ pub fn afterRequest(self: *DataMiddleware, request: *jetzig.http.Request) !void 
         inline for (RequiredFields) |required_field| {
             try root.put(required_field, request.response_data.string(""));
         }
+
+        // cache system settings if they are not there
+        // if (try request.cache.get("client_title")) |client_title| {
+        //     try root.put("client_title", .{client_title});
+        // }
+
+        // try root.put("client_title", try request.cache.get("client_title"));
     }
 }
 

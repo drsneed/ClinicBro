@@ -394,7 +394,7 @@ pub fn addRecentClient(self: *DbContext, bro_id: i32, client_id: i32) !void {
 
 // ------------------------------- AppointmentType Context ------------------------------------------
 const appointment_type_select_query =
-    \\select apt.id, apt.active, apt.name, apt.abbreviation, apt.color,
+    \\select apt.id, apt.active, apt.name, apt.description, apt.color,
     \\to_char(apt.date_created, 'YYYY-MM-DD at HH12:MI AM') as date_created,
     \\to_char(apt.date_updated, 'YYYY-MM-DD at HH12:MI AM') as date_updated,
     \\created_bro.name, updated_bro.name from AppointmentType apt
@@ -403,11 +403,11 @@ const appointment_type_select_query =
 ;
 const appointment_type_lookup_query = "select id, active, name from AppointmentType";
 const appointment_type_insert_query =
-    \\insert into AppointmentType(active,name,abbreviation,color,date_created,date_updated,created_bro_id,updated_bro_id)
+    \\insert into AppointmentType(active,name,description,color,date_created,date_updated,created_bro_id,updated_bro_id)
     \\values(true, $1, $2, $3, NOW(), NOW(), $4, $4);
 ;
 const appointment_type_update_query =
-    \\update AppointmentType set active=$2,name=$3,abbreviation=$4,color=$5,date_updated=NOW(),updated_bro_id=$6 where id=$1
+    \\update AppointmentType set active=$2,name=$3,description=$4,color=$5,date_updated=NOW(),updated_bro_id=$6 where id=$1
 ;
 
 pub fn updateAppointmentType(self: *DbContext, appointment_type: AppointmentType, updated_bro_id: i32) !void {
@@ -415,7 +415,7 @@ pub fn updateAppointmentType(self: *DbContext, appointment_type: AppointmentType
         appointment_type.id,
         appointment_type.active,
         appointment_type.name,
-        appointment_type.abbreviation,
+        appointment_type.description,
         appointment_type.color,
         updated_bro_id,
     });
@@ -424,7 +424,7 @@ pub fn updateAppointmentType(self: *DbContext, appointment_type: AppointmentType
 pub fn createAppointmentType(self: *DbContext, appointment_type: AppointmentType, created_bro_id: i32) !i32 {
     _ = try self.database.pool.exec(appointment_type_insert_query, .{
         appointment_type.name,
-        appointment_type.abbreviation,
+        appointment_type.description,
         appointment_type.color,
         created_bro_id,
     });

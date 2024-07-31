@@ -2,6 +2,7 @@
   const active = zmpl.getT(.boolean, "active") orelse true;
   const inactive_class = if(active) "" else "setup-item-inactive";
   const id = zmpl.getT(.integer, "id").?;
+  const autofocus = if(id == 0) "autofocus" else "";
 }
 <div id="SetupContent" class="setup-item-content {{inactive_class}}">
     <form id="appt-type-form" method="post">
@@ -18,21 +19,12 @@
       <hr />
       
       <div class="text-field">
-        @zig {
-            if(id > 0) {
-            <input type="text" name="name" maxlength="16"
-                value="{{.name}}" required>
-        }
-        else {
-            <input type="text" name="name" maxlength="50"
-                value="{{.name}}" required autofocus>
-        }
-        }
+        <input type="text" name="name" maxlength="50" value="{{.name}}" required {{autofocus}}>
         <label for="name">Name</label>
       </div>
       <div class="text-field">
-        <input type="text" name="abbreviation" maxlength="4" value="{{.abbreviation}}">
-        <label for="abbreviation">Abbreviation</label>
+        <input type="text" name="description" maxlength="256" value="{{.description}}">
+        <label for="description">Description</label>
       </div>
       <div class="text-field">
         <input type="color" name="color" value="{{.color}}">

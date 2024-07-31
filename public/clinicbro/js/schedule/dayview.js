@@ -1086,13 +1086,11 @@ class SchedulerBase extends s3 {
   }
   renderCaption() {
     return x`
-    <caption>
-        <div class="month-header">
-          ${this.renderSchedulerNavigationButtonBar()}
-          <h2 id="month_title">${this.calendarTitle()}</h2>
-          ${this.renderSchedulerModesButtonBar()}
-        </div>
-    </caption>`;
+      <div class="month-header">
+        ${this.renderSchedulerNavigationButtonBar()}
+        <h2 id="month_title">${this.calendarTitle()}</h2>
+        ${this.renderSchedulerModesButtonBar()}
+      </div>`;
   }
 }
 __legacyDecorateClassTS([

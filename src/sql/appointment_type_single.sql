@@ -1,4 +1,4 @@
-select apt.id, apt.active, apt.name, apt.abbreviation, apt.color,
+select apt.id, apt.active, apt.name, apt.description, apt.color,
     to_char(apt.date_created, 'YYYY-MM-DD at HH12:MI AM') as date_created,
     to_char(apt.date_updated, 'YYYY-MM-DD at HH12:MI AM') as date_updated,
     created_bro.name, updated_bro.name from AppointmentType apt

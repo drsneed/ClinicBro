@@ -53,3 +53,5 @@ INSERT INTO Appointment_Bro(appointment_id, bro_id) VALUES((select id from Appoi
 INSERT INTO Appointment_Bro(appointment_id, bro_id) VALUES((select id from Appointment where title='Staff Meeting'), (select id from Bro where name='Rupert'));
 
 INSERT INTO Appointment_Bro(appointment_id, bro_id) VALUES((select id from Appointment where title is NULL), (select id from Bro where name='Dustin'));
+
+INSERT INTO SystemConfig DEFAULT VALUES;

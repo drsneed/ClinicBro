@@ -234,11 +234,14 @@ input:not([type='checkbox']) {
     justify-content: space-around;
     align-content: space-around;
     padding: 4px 8px;
-    cursor: pointer;
     border-radius: 3px;
     border: 1px solid var(--btn-border);
     margin: 6px 2px;
     font-weight: bold;
+}
+
+.btn:not(:disabled) {
+    cursor: pointer;
 }
 
 .tab-inner-button {
@@ -422,7 +425,7 @@ input[type=time]:focus, input[type=time]:valid {
     position: absolute;
     pointer-events: none;
     left: 10px;
-    top: 12px;
+    top: 14px;
     transition: 0.2s;
     font-weight: bold;
     font-size: small;
@@ -734,7 +737,7 @@ code {
     margin-left: var(--nav-width);
     margin-top: var(--header-height);
     padding: 5px;
-    overflow-y: scroll;
+    overflow-y: auto;
     z-index: 0;
     -webkit-overflow-scrolling: touch;
 }
@@ -1221,7 +1224,7 @@ details[open] summary {
     border: 1px solid var(--input-border);
     height: 450px;
     user-select: none;
-    overflow-y: scroll;
+    overflow-y: auto;
     margin-bottom: 30px;
     border-bottom-left-radius: 3px;
     border-bottom-right-radius: 3px;

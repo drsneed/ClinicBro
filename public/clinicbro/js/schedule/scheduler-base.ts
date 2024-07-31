@@ -139,12 +139,10 @@ export class SchedulerBase extends LitElement {
 
   renderCaption() {
     return html`
-    <caption>
-        <div class="month-header">
-          ${this.renderSchedulerNavigationButtonBar()}
-          <h2 id="month_title">${this.calendarTitle()}</h2>
-          ${this.renderSchedulerModesButtonBar()}
-        </div>
-    </caption>`;
+      <div class="month-header">
+        ${this.renderSchedulerNavigationButtonBar()}
+        <h2 id="month_title">${this.calendarTitle()}</h2>
+        ${this.renderSchedulerModesButtonBar()}
+      </div>`;
   }
 }

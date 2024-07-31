@@ -31,12 +31,13 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     defer conn.release();
 
     var appointment_type = try mapper.appointment_type.fromRequest(request);
+    log.info("appt type = {s}", .{appointment_type.description});
     if (appointment_type.id == 0) {
         // active is not a form field on a new entry, so it defaults to false further down if we don't set it properly here
         appointment_type.active = true;
         var row = (try conn.row(appointment_type_insert_query, .{
             appointment_type.name,
-            appointment_type.abbreviation,
+            appointment_type.description,
             appointment_type.color,
             current_bro_id,
         })) orelse unreachable;
@@ -47,7 +48,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
             appointment_type.id,
             appointment_type.active,
             appointment_type.name,
-            appointment_type.abbreviation,
+            appointment_type.description,
             appointment_type.color,
             current_bro_id,
         }) catch |err| {
@@ -66,7 +67,7 @@ pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
 pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
     const appointment_type_id = try std.fmt.parseInt(i32, id, 10);
     if (appointment_type_id > 0) {
-        var row = (try request.server.database.pool.row(appointment_type_single_query, .{appointment_type_id})) orelse unreachable;
+        var row = (try request.server.database.pool.rowOpts(appointment_type_single_query, .{appointment_type_id}, .{ .column_names = true })) orelse unreachable;
         defer row.deinit() catch {};
         const appointment_type = try row.to(AppointmentType, .{});
         try mapper.appointment_type.toResponse(appointment_type, data);
@@ -78,8 +79,12 @@ pub fn get(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig
 }
 
 pub fn delete(id: []const u8, request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {
-    var db_context = try DbContext.init(request.allocator, request.server.database);
     const appt_type_id = try std.fmt.parseInt(i32, id, 10);
-    _ = try db_context.deleteAppointmentType(appt_type_id);
-    return try util.renderSetupList(request, data, &db_context, "AppointmentType", 0);
+    var conn = try request.server.database.pool.acquire();
+    defer conn.release();
+    if (appt_type_id > 0) {
+        _ = try conn.exec("delete from AppointmentType where id=$1", .{appt_type_id});
+    }
+    _ = try util.renderSetupList2(request, data, conn, "AppointmentType", 0);
+    return request.render(.ok);
 }

@@ -30,12 +30,15 @@
             hx-swap="outerHTML">
               <span class="mdi mdi-content-save"></span>
           </button>
-        <button type="button" class="btn" title="Delete"
-            hx-include="#appt-type-id-input, #include_inactive"
-            hx-delete="/setup/appointment-types/{id}"
-            hx-target="#ApptTypeSetupScreen"
-            hx-swap="outerHTML">
-              <span class="mdi mdi-trash-can"></span>
+          <button id="setup-delete-btn" type="button" class="btn" title="Delete
+              autocomplete="off"
+              hx-include="#appt-type-id-input, #include_inactive"
+              hx-delete="/setup/appointment-types/{id}"
+              hx-target="#ApptTypeSetupScreen"
+              hx-swap="outerHTML"
+              hx-trigger="confirmed"
+              onClick="confirmDelete(event)" disabled>
+                <span class="mdi mdi-trash-can"></span>
           </button>  
       </div>
       <div class="setup-item-listbox">

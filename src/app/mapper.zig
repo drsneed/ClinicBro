@@ -188,7 +188,7 @@ pub const appointment_type = struct {
         model.id = @intCast(params.getT(.integer, "id") orelse 0);
         model.active = params.getT(.boolean, "active") orelse false;
         model.name = params.getT(.string, "name") orelse return error.MissingParam;
-        model.abbreviation = params.getT(.string, "abbreviation") orelse "";
+        model.description = params.getT(.string, "description") orelse "";
         model.color = params.getT(.string, "color") orelse "";
         return model;
     }
@@ -196,7 +196,7 @@ pub const appointment_type = struct {
         var root = data.value.?;
         try root.put("id", data.integer(model.id));
         try root.put("name", data.string(model.name));
-        try root.put("abbreviation", data.string(model.abbreviation));
+        try root.put("description", data.string(model.description));
         try root.put("active", data.boolean(model.active));
         try root.put("active_check", data.string(if (model.active) "checked" else ""));
         try root.put("color", data.string(model.color));
@@ -210,7 +210,7 @@ pub const appointment_type = struct {
             .id = row.get(i32, 0),
             .active = row.get(bool, 1),
             .name = row.get([]const u8, 2),
-            .abbreviation = row.get([]const u8, 3),
+            .description = row.get([]const u8, 3),
             .color = row.get([]const u8, 4),
             .date_created = row.get([]const u8, 5),
             .date_updated = row.get([]const u8, 6),

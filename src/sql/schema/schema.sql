@@ -96,7 +96,7 @@ create table AppointmentType (
     id serial primary key,
     active boolean not null,
     name varchar(32) not null,
-    abbreviation varchar(4) null,
+    description varchar(256) null,
     color varchar(9) not null,
     -- tracking columns
     date_created timestamp not null,
@@ -109,6 +109,7 @@ create table AppointmentStatus (
     id serial primary key,
     active boolean not null,
     name varchar(32) not null,
+    description varchar(256) null,
     show boolean not null,
     -- tracking columns
     date_created timestamp not null,
@@ -154,3 +155,8 @@ create view AppointmentView as
   left join appointmenttype appt_type on appt_type.id=a.type_id
   left join appointmentstatus appt_status on appt_status.id=a.status_id
   order by a.appt_date, a.appt_from;
+
+
+create table SystemConfig
+    (x char(1) not null unique default ('X') check (x = 'X'),
+    client_title varchar(32) not null default ('Client'));

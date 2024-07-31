@@ -8,6 +8,33 @@ document.addEventListener("DOMContentLoaded", function(event) {
   });
 
 
+  // document.addEventListener("htmx:confirm", function(e) {
+  //   e.preventDefault();
+  //   Swal.fire({
+  //     title: "Proceed?",
+  //     text: `I ask you... ${e.detail.question}`
+  //   }).then(function(result) {
+  //     if(result.isConfirmed) e.detail.issueRequest(true) // use true to skip window.confirm
+  //   });
+  // });
+
+function confirmDelete(evt) {
+  Swal.fire({
+    title: "Are you sure?", 
+    text:"You won't be able to revert this!",
+    icon: "warning", 
+    showCancelButton: true,
+    confirmButtonColor: "var(--btn-delete-bg)",
+    cancelButtonColor: "var(--btn-cancel-bg)",
+    backgroundColor: "var(--bg)",
+    confirmButtonText: "Yes, delete it!"
+  }).then((result) => {
+    if(result.isConfirmed) {
+      htmx.trigger(evt.target, "confirmed");
+    }
+  });
+}
+
 function clientDragStart(e) {
     e.dataTransfer.setData("client-id", e.target.dataset.clientId);
 }
@@ -35,11 +62,28 @@ function setupItemSelected(evt) {
   }
   // add an "active" class to the selected list item
   evt.currentTarget.className += " selected";
+  toggleSetupDeleteButtonEnablement();
 }
 function clearSetupSelectedItem() {
   setupListItems = document.getElementsByClassName("setup-option");
   for (i = 0; i < setupListItems.length; i++) {
     setupListItems[i].className = setupListItems[i].className.replace(" selected", "");
+  }
+}
+
+function toggleSetupDeleteButtonEnablement() {
+  setupListItems = document.getElementsByClassName("setup-option");
+  var hasSelection = false;
+  for (i = 0; i < setupListItems.length; i++) {
+    if(setupListItems[i].classList.contains("selected")) {
+      hasSelection = true;
+      break;
+    }
+  }
+  if(hasSelection) {
+    document.getElementById("setup-delete-btn").removeAttribute("disabled");
+  } else {
+    document.getElementById("setup-delete-btn").setAttribute("disabled", "");
   }
 }
 

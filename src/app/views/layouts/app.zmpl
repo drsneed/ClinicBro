@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ClinicBro</title>
     <link rel="shortcut icon" type="image/x-icon" href="/clinicbro/img/favicon.svg">
     <link rel="stylesheet" href="/clinicbro/css/app.css">
@@ -12,6 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/htmx.org@2.0.0" integrity="sha384-wS5l5IKJBvK6sPTKa2WZ1js3d947pvWXbPJ1OmWfEuxLgeHcEbjUUA5i9V5ZkpCw" crossorigin="anonymous"></script>
     <script src="https://unpkg.com/htmx-ext-path-params@2.0.0/path-params.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module" src="/clinicbro/js/cb-window.js"></script>
     <script type="module" src="/clinicbro/js/schedule/date-picker.js"></script>
     {{.header_include}}
