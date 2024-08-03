@@ -75,7 +75,10 @@ class MaximizeWindowButton extends StatelessWidget {
     return IconButton(
       icon: Icon(FluentIcons.chrome_full_screen, size: 12),
       onPressed: () async {
-        await windowManager.setFullScreen(!await windowManager.isFullScreen());
+        if (await windowManager.isMaximized())
+          await windowManager.restore();
+        else
+          await windowManager.maximize();
       },
     );
   }

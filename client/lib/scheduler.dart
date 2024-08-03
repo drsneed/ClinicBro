@@ -1,7 +1,4 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/material.dart' as mat
-    show Colors, FloatingActionButton, CircleBorder, ButtonStyle;
 
 class SchedulingControl extends StatefulWidget {
   final bool isFlyoutVisible;
@@ -15,24 +12,15 @@ class SchedulingControl extends StatefulWidget {
 class _SchedulingControlState extends State<SchedulingControl> {
   late PageController _pageController;
   late DateTime _centerDate;
-  late bool _isFlyoutVisible;
 
   @override
   void initState() {
     super.initState();
-    _isFlyoutVisible = false;
     _centerDate = DateTime.now();
     _pageController = PageController(
-      initialPage:
-          1000, // Start at a large number to allow "infinite" scrolling
+      initialPage: 1000,
       viewportFraction: 1.0,
     );
-  }
-
-  void _toggleFlyout() {
-    setState(() {
-      _isFlyoutVisible = !_isFlyoutVisible;
-    });
   }
 
   @override
@@ -47,134 +35,22 @@ class _SchedulingControlState extends State<SchedulingControl> {
     });
   }
 
-  final List<String> items = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'];
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width > 600;
-    return Stack(
+    return Column(
       children: [
-        Row(
-          children: [
-            if (isDesktop) _buildFlyout(),
-            Expanded(
-              child: Column(
-                children: [
-                  _buildDateHeader(),
-                  Expanded(
-                    child: PageView.builder(
-                      controller: _pageController,
-                      onPageChanged: _onPageChanged,
-                      itemBuilder: (context, index) {
-                        final date =
-                            DateTime.now().add(Duration(days: index - 1000));
-                        return _buildDaySchedule(date);
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        _buildDateHeader(),
+        Expanded(
+          child: PageView.builder(
+            controller: _pageController,
+            onPageChanged: _onPageChanged,
+            itemBuilder: (context, index) {
+              final date = DateTime.now().add(Duration(days: index - 1000));
+              return _buildDaySchedule(date);
+            },
+          ),
         ),
-        if (!isDesktop) _buildMobileFlyout(),
-        _buildFloatingActionButton(), // Add this line
       ],
-    );
-  }
-
-  Widget _buildMobileFlyout() {
-    return AnimatedPositioned(
-      duration: Duration(milliseconds: 300),
-      left: 0,
-      right: 0,
-      bottom: _isFlyoutVisible ? 0 : -200,
-      height: 200,
-      child: Container(
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).micaBackgroundColor,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: Offset(0, -2),
-            ),
-          ],
-        ),
-        child: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            return _buildDraggableItem(items[index]);
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildFlyout() {
-    return AnimatedContainer(
-      duration: Duration(milliseconds: 300),
-      width: widget.isFlyoutVisible ? 200 : 0,
-      child: Container(
-        color: FluentTheme.of(context).micaBackgroundColor,
-        child: widget.isFlyoutVisible
-            ? ListView.builder(
-                itemCount: items.length,
-                itemBuilder: (context, index) {
-                  return _buildDraggableItem(items[index]);
-                },
-              )
-            : null,
-      ),
-    );
-  }
-
-  Widget _buildDraggableItem(String itemName) {
-    return Draggable<String>(
-      data: itemName,
-      child: Container(
-        margin: EdgeInsets.all(8),
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(itemName),
-      ),
-      feedback: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).cardColor.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(itemName),
-      ),
-      childWhenDragging: Container(
-        margin: EdgeInsets.all(8),
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).inactiveBackgroundColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(itemName),
-      ),
-    );
-  }
-
-  Widget _buildFloatingActionButton() {
-    return Positioned(
-      right: 16,
-      bottom: 16,
-      child: mat.FloatingActionButton(
-        child: Icon(
-          _isFlyoutVisible ? FluentIcons.chevron_down : FluentIcons.people,
-          color: Colors.white,
-        ),
-        backgroundColor: mat.Colors.blue,
-        shape: mat.CircleBorder(),
-        onPressed: _toggleFlyout,
-        tooltip: _isFlyoutVisible ? 'Hide patients' : 'Show patients',
-      ),
     );
   }
 
