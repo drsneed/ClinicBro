@@ -1,6 +1,6 @@
 const std = @import("std");
 const jetzig = @import("jetzig");
-const security = @import("../../security.zig");
+const security = @import("../security.zig");
 const log = std.log.scoped(.client_api);
 
 pub fn post(request: *jetzig.Request, data: *jetzig.Data) !jetzig.View {

@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'scheduler_screen.dart';
+import 'schedule_screen.dart';
 import 'settings_screen.dart';
-import 'custom_title_bar.dart';
+import '../widgets/custom_title_bar.dart';
 import 'dart:io' show Platform;
 
 class HomeScreen extends StatefulWidget {
@@ -31,6 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
+          userAvatarUrl: "",
         ),
         automaticallyImplyLeading: false,
       ),
@@ -46,8 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           PaneItem(
             icon: Icon(FluentIcons.calendar),
-            title: Text('Scheduler'),
-            body: SchedulerScreen(),
+            title: Text('Schedule'),
+            body: ScheduleScreen(),
           ),
           PaneItem(
             icon: Icon(FluentIcons.settings),

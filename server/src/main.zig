@@ -185,7 +185,7 @@ pub const jetzig_options = struct {
 
 pub fn init(app: *jetzig.App) !void {
     _ = app;
-    //app.route(.POST, "/client-api/authenticate", @import("app/views/client-api/authenticate.zig"), .post);
+
     // Example custom route:
     // app.route(.GET, "/custom/:id/foo/bar", @import("app/views/custom/foo.zig"), .bar);
 }
@@ -197,7 +197,7 @@ pub fn main() !void {
 
     var app = try jetzig.init(allocator);
     defer app.deinit();
-
+    app.route(.POST, "/client-api/authenticate", @import("app/client-api/authenticate.zig"), .post);
     try app.start(routes, .{});
 }
 

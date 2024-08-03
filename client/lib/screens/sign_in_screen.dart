@@ -1,7 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'custom_title_bar.dart';
-import 'themed_icon.dart';
-import 'data_service.dart'; // Import your API service
+import '../widgets/custom_title_bar.dart';
+import '../widgets/themed_icon.dart';
+import '../services/data_service.dart';
+import 'dart:io' show Platform;
 
 class SignInScreen extends StatefulWidget {
   @override
@@ -38,14 +39,18 @@ class _SignInScreenState extends State<SignInScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = Platform.isAndroid || Platform.isIOS;
     return NavigationView(
-      appBar: NavigationAppBar(
-        title: CustomTitleBar(
-          showBackButton: false,
-          title: Text('Sign In'),
-        ),
-        automaticallyImplyLeading: false,
-      ),
+      appBar: isMobile
+          ? null
+          : NavigationAppBar(
+              title: CustomTitleBar(
+                showBackButton: false,
+                title: Text('Sign In'),
+                userAvatarUrl: '',
+              ),
+              automaticallyImplyLeading: false,
+            ),
       content: ScaffoldPage(
         content: Center(
           child: Container(

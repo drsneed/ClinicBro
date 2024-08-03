@@ -1,14 +1,14 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as mat
     show Colors, FloatingActionButton, CircleBorder;
-import 'scheduler.dart';
+import '../widgets/scheduler.dart';
 
-class SchedulerScreen extends StatefulWidget {
+class ScheduleScreen extends StatefulWidget {
   @override
-  _SchedulerScreenState createState() => _SchedulerScreenState();
+  _ScheduleScreenState createState() => _ScheduleScreenState();
 }
 
-class _SchedulerScreenState extends State<SchedulerScreen> {
+class _ScheduleScreenState extends State<ScheduleScreen> {
   bool _isFlyoutVisible = false;
   final List<String> items = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'];
 
@@ -26,7 +26,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
       children: [
         ScaffoldPage(
           header: PageHeader(
-            title: Text('Scheduler'),
+            title: Text('Schedule'),
           ),
           content: SchedulingControl(isFlyoutVisible: _isFlyoutVisible),
         ),

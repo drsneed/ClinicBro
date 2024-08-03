@@ -1,4 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' show PopupMenuButton, PopupMenuItem;
 import 'package:window_manager/window_manager.dart';
 import 'themed_icon.dart';
 import 'dart:io' show Platform;
@@ -7,17 +8,20 @@ class CustomTitleBar extends StatelessWidget {
   final bool showBackButton;
   final Widget? title;
   final List<Widget>? actions;
+  final String userAvatarUrl; // New parameter for user avatar URL
 
   const CustomTitleBar({
     Key? key,
     this.showBackButton = false,
     this.title,
     this.actions,
+    required this.userAvatarUrl, // Initialize userAvatarUrl
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
+
     return GestureDetector(
       onPanStart: (details) {
         windowManager.startDragging();
@@ -29,8 +33,6 @@ class CustomTitleBar extends StatelessWidget {
           children: [
             SizedBox(width: isMobile ? 0 : 8),
             ThemedIcon(svgPath: 'assets/icon/app_icon.svg'),
-            // Image.asset('assets/icon/app_icon.png',
-            //     height: 20, width: 20), // Add your app icon here
             SizedBox(width: 8),
             if (showBackButton)
               IconButton(
@@ -41,21 +43,51 @@ class CustomTitleBar extends StatelessWidget {
               ),
             if (title != null)
               Expanded(
-                  child: Align(alignment: Alignment.centerLeft, child: title!)),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: title!,
+                ),
+              ),
             if (actions != null) ...actions!,
             if (!isMobile) ...[
               MinimizeWindowButton(),
               MaximizeWindowButton(),
               CloseWindowButton(),
             ],
+            // Spacer(),
+            // // Avatar Button with Popup Menu
+            // PopupMenuButton<String>(
+            //   onSelected: (String value) {
+            //     // Handle the selected option
+            //     if (value == 'settings') {
+            //       // Navigate to account settings
+            //     } else if (value == 'sign_out') {
+            //       // Sign out logic
+            //     }
+            //   },
+            //   itemBuilder: (BuildContext context) {
+            //     return [
+            //       PopupMenuItem<String>(
+            //         value: 'settings',
+            //         child: Text('Account Settings'),
+            //       ),
+            //       PopupMenuItem<String>(
+            //         value: 'sign_out',
+            //         child: Text('Sign Out'),
+            //       ),
+            //     ];
+            //   },
+            //   child: CircleAvatar(
+            //     backgroundImage: NetworkImage(userAvatarUrl),
+            //     radius: 16, // Adjust size as needed
+            //   ),
+            // ),
           ],
         ),
       ),
     );
   }
 }
-
-// ... (keep the MinimizeWindowButton, MaximizeWindowButton, and CloseWindowButton classes as they were)
 
 class MinimizeWindowButton extends StatelessWidget {
   @override

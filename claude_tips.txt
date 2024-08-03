@@ -1,0 +1,37 @@
+Structuring Your Codebase:
+To better structure your codebase for adding more database models, consider the following approach:
+a. Create a models directory:
+
+Place all your model classes (like User) in this directory.
+Each model should have its own file, e.g., user.dart, patient.dart, etc.
+
+b. Create a services directory:
+
+Place your DataService in this directory.
+As your app grows, you might want to split the DataService into multiple service classes, each responsible for a specific model or group of related models.
+
+c. Create a repositories directory:
+
+Implement repository classes that act as an abstraction layer between your data source (API) and the rest of your application.
+Each repository would use the DataService but provide a more domain-specific interface.
+
+d. Use dependency injection:
+
+Consider using a dependency injection framework like get_it to manage your service and repository instances.
+
+
+
+Here's an example of how your project structure might look:
+lib/
+├── models/
+│   ├── user.dart
+│   └── patient.dart
+├── services/
+│   └── data_service.dart
+├── repositories/
+│   ├── user_repository.dart
+│   └── patient_repository.dart
+├── screens/
+│   ├── user_list_screen.dart
+│   └── patient_detail_screen.dart
+└── main.dart
