@@ -1,8 +1,10 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter/material.dart' as mat
+    show Colors, FloatingActionButton, CircleBorder, ButtonStyle;
 
 class SchedulingControl extends StatefulWidget {
   final bool isFlyoutVisible;
-
   const SchedulingControl({Key? key, required this.isFlyoutVisible})
       : super(key: key);
 
@@ -11,35 +13,101 @@ class SchedulingControl extends StatefulWidget {
 }
 
 class _SchedulingControlState extends State<SchedulingControl> {
-  final List<String> items = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'];
-  DateTime currentDate = DateTime.now();
+  late PageController _pageController;
+  late DateTime _centerDate;
+  late bool _isFlyoutVisible;
 
-  void _previousDay() {
-    setState(() {
-      currentDate = currentDate.subtract(Duration(days: 1));
-    });
+  @override
+  void initState() {
+    super.initState();
+    _isFlyoutVisible = false;
+    _centerDate = DateTime.now();
+    _pageController = PageController(
+      initialPage:
+          1000, // Start at a large number to allow "infinite" scrolling
+      viewportFraction: 1.0,
+    );
   }
 
-  void _nextDay() {
+  void _toggleFlyout() {
     setState(() {
-      currentDate = currentDate.add(Duration(days: 1));
+      _isFlyoutVisible = !_isFlyoutVisible;
     });
   }
 
   @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onPageChanged(int page) {
+    setState(() {
+      _centerDate = DateTime.now().add(Duration(days: page - 1000));
+    });
+  }
+
+  final List<String> items = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'];
+  @override
   Widget build(BuildContext context) {
-    return Row(
+    final isDesktop = MediaQuery.of(context).size.width > 600;
+    return Stack(
       children: [
-        _buildFlyout(),
-        Expanded(
-          child: Column(
-            children: [
-              _buildDateHeader(),
-              Expanded(child: _buildDaySchedule()),
-            ],
-          ),
+        Row(
+          children: [
+            if (isDesktop) _buildFlyout(),
+            Expanded(
+              child: Column(
+                children: [
+                  _buildDateHeader(),
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: _onPageChanged,
+                      itemBuilder: (context, index) {
+                        final date =
+                            DateTime.now().add(Duration(days: index - 1000));
+                        return _buildDaySchedule(date);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
+        if (!isDesktop) _buildMobileFlyout(),
+        _buildFloatingActionButton(), // Add this line
       ],
+    );
+  }
+
+  Widget _buildMobileFlyout() {
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: 300),
+      left: 0,
+      right: 0,
+      bottom: _isFlyoutVisible ? 0 : -200,
+      height: 200,
+      child: Container(
+        decoration: BoxDecoration(
+          color: FluentTheme.of(context).micaBackgroundColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: ListView.builder(
+          itemCount: items.length,
+          itemBuilder: (context, index) {
+            return _buildDraggableItem(items[index]);
+          },
+        ),
+      ),
     );
   }
 
@@ -93,6 +161,23 @@ class _SchedulingControlState extends State<SchedulingControl> {
     );
   }
 
+  Widget _buildFloatingActionButton() {
+    return Positioned(
+      right: 16,
+      bottom: 16,
+      child: mat.FloatingActionButton(
+        child: Icon(
+          _isFlyoutVisible ? FluentIcons.chevron_down : FluentIcons.people,
+          color: Colors.white,
+        ),
+        backgroundColor: mat.Colors.blue,
+        shape: mat.CircleBorder(),
+        onPressed: _toggleFlyout,
+        tooltip: _isFlyoutVisible ? 'Hide patients' : 'Show patients',
+      ),
+    );
+  }
+
   Widget _buildDateHeader() {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
@@ -101,22 +186,28 @@ class _SchedulingControlState extends State<SchedulingControl> {
         children: [
           IconButton(
             icon: Icon(FluentIcons.chevron_left),
-            onPressed: _previousDay,
+            onPressed: () => _pageController.previousPage(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            ),
           ),
           Text(
-            '${currentDate.year}-${currentDate.month.toString().padLeft(2, '0')}-${currentDate.day.toString().padLeft(2, '0')}',
+            '${_centerDate.year}-${_centerDate.month.toString().padLeft(2, '0')}-${_centerDate.day.toString().padLeft(2, '0')}',
             style: FluentTheme.of(context).typography.subtitle,
           ),
           IconButton(
             icon: Icon(FluentIcons.chevron_right),
-            onPressed: _nextDay,
+            onPressed: () => _pageController.nextPage(
+              duration: Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDaySchedule() {
+  Widget _buildDaySchedule(DateTime date) {
     return Container(
       color: FluentTheme.of(context).cardColor,
       child: DragTarget<String>(
@@ -182,7 +273,7 @@ class _SchedulingControlState extends State<SchedulingControl> {
         },
         onAcceptWithDetails: (item) {
           // TODO: Handle item drop
-          print('Dropped ${item.data}');
+          print('Dropped ${item.data} on ${date.toString()}');
         },
       ),
     );
