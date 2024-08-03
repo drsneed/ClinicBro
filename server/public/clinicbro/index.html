@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamScape VR - Experience Your Dreams</title>
+    <style>
+        @property --angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+        }
+
+        :root {
+            --primary-color: #4a0e78;
+            --secondary-color: #8a2be2;
+            --text-color: #333;
+            --background-color: #f0f0f0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero {
+            background-image: url('https://example.com/dreamscape-vr-hero.jpg');
+            background-size: cover;
+            background-position: center;
+            height: 500px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .features {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .feature {
+            margin-bottom: 2rem;
+        }
+
+		.card {
+			margin: 50px auto;
+			padding: 2em;
+			width: 300px;
+			background: #1c1f2b;
+			text-align: center;
+			border-radius: 10px;
+			position: relative;
+		}
+
+		@property --angle {
+			syntax: "<angle>";
+			initial-value: 0deg;
+			inherits: false;
+		}
+
+		.card::after, .card::before {
+			--angle 0deg;
+			content: '';
+			position: absolute;
+			height: 100%;
+			width: 100%;
+			background-image: conic-gradient(from var(--angle), var(--primary-color), #CCC, var(--primary-color));
+			top: 50%;
+			left: 50%;
+			translate: -50% -50%;
+			z-index: -1;
+			padding: 3px;
+			border-radius: 10px;
+			animation: 3s spin linear infinite;
+		}
+
+		.card::before {
+			filter: blur(1.5em);
+			opacity: 0.5;
+		}
+
+		@keyframes spin {
+			from {
+				--angle: 0deg;
+			}
+			to {
+				--angle: 360deg;
+			}
+		}
+
+        .testimonials {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 4rem 0;
+        }
+
+        .testimonial {
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            text-align: center;
+        }
+
+        .pricing {
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .price-panel {
+            display: inline-block;
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .button {
+            display: inline-block;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #7b27c7;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>DreamScape VR</h1>
+            <p>Experience Your Dreams Like Never Before</p>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h2>Step Into Your Dreams</h2>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="container">
+            <h2>Product Features</h2>
+            <div class="feature">
+                <h3>Immersive Dream Technology</h3>
+                <p>Our patented DreamSync™ algorithm translates your brain waves into vivid virtual experiences.</p>
+            </div>
+            <div class="feature card">
+                <h3>Lucid Dream Control</h3>
+                <p>Take control of your dreams with our advanced lucid dreaming interface.</p>
+            </div>
+            <div class="feature">
+                <h3>Comfort-First Design</h3>
+                <p>Lightweight and ergonomic, designed for hours of comfortable use.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <div class="container">
+            <h2>What Our Dreamers Say</h2>
+            <div class="testimonial">
+                <p>"DreamScape VR has completely transformed my nights. I can't imagine sleeping without it now!"</p>
+                <p>- Sarah J., Dream Enthusiast</p>
+            </div>
+            <div class="testimonial">
+                <p>"As a lucid dreamer, DreamScape VR has taken my practice to a whole new level. It's incredible!"</p>
+                <p>- Mike T., Lucid Dreaming Coach</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <div class="container">
+            <h2>Choose Your Dream Package</h2>
+            <div class="price-panel">
+                <h3>Dreamer</h3>
+                <p class="price">$299</p>
+                <ul>
+                    <li>Basic DreamScape VR Headset</li>
+                    <li>1-year warranty</li>
+                    <li>Access to Dream Library</li>
+                </ul>
+            </div>
+            <div class="price-panel card">
+                <h3>Lucid Dreamer</h3>
+                <p class="price">$499</p>
+                <ul>
+                    <li>Advanced DreamScape VR Headset</li>
+                    <li>2-year warranty</li>
+                    <li>Unlimited access to Dream Library</li>
+                    <li>Lucid Dreaming Training Program</li>
+                </ul>
+            </div>
+            <div class="price-panel">
+                <h3>Dream Master</h3>
+                <p class="price">$799</p>
+                <ul>
+                    <li>Premium DreamScape VR Headset</li>
+                    <li>3-year warranty</li>
+                    <li>Unlimited access to Dream Library</li>
+                    <li>Advanced Lucid Dreaming Tools</li>
+                    <li>Personal Dream Coach</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <div class="container">
+            <h2>Ready to Transform Your Dreams?</h2>
+            <p>Start your journey to incredible dream experiences today!</p>
+            <a href="#" class="button">Order Your DreamScape VR Now</a>
+        </div>
+    </section>
+</body>
+</html>
