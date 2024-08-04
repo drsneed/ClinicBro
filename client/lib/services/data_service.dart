@@ -1,94 +1,125 @@
-import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:http/http.dart' as http;
-import '../models/user.dart';
+import 'dart:convert';
 
 class DataService {
-  final String baseUrl;
-  DataService(this.baseUrl);
+  static final DataService _instance = DataService._internal();
+  static const String baseUrl = 'http://192.168.1.34:33420';
+  factory DataService() => _instance;
+  DataService._internal();
 
-  Future<String?> authenticateUser(String username, String password) async {
-    final url = Uri.parse('$baseUrl/client-api/authenticate');
-    final response = await http.post(
-      url,
-      headers: {'Accept': 'application/json'},
-      body: jsonEncode({
-        'name': username,
-        'password': password,
-      }),
-    );
-    if (response.statusCode == 200) {
-      if (response.body.isNotEmpty) {
-        final data = jsonDecode(response.body);
-        return data['token']; // Adjust based on your response structure
-      }
-      return null;
-    } else {
-      // Handle errors or throw exceptions
-      return null;
+  String? _jwtToken;
+  String? get jwtToken => _jwtToken;
+  void setToken(String? token) {
+    _jwtToken = token;
+  }
+
+  Future<http.Response> post(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    return request('post', path, body: body);
+  }
+
+  Future<http.Response> get(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    return request('get', path, body: body);
+  }
+
+  Future<http.Response> put(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    return request('put', path, body: body);
+  }
+
+  Future<http.Response> delete(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    return request('delete', path, body: body);
+  }
+
+  Future<http.Response> request(
+    String method,
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+  }) async {
+    final url = Uri.parse('$baseUrl$path');
+    final requestHeaders = {
+      'Content-Type': 'application/json',
+      if (_jwtToken != null) 'Authorization': 'Bearer $_jwtToken',
+      ...?headers,
+    };
+
+    switch (method.toUpperCase()) {
+      case 'GET':
+        return await http.get(url, headers: requestHeaders);
+      case 'POST':
+        return await http.post(url, headers: requestHeaders, body: body);
+      case 'PUT':
+        return await http.put(url, headers: requestHeaders, body: body);
+      case 'DELETE':
+        return await http.delete(url, headers: requestHeaders);
+      default:
+        throw Exception('Unsupported HTTP method');
     }
   }
 
-  // Create a new user
-  Future<User?> createUser(User user) async {
-    final url = Uri.parse('$baseUrl/client-api/user');
-    final response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(user.toJson()),
-    );
-    if (response.statusCode == 201) {
-      return User.fromJson(jsonDecode(response.body));
-    } else {
-      // Handle errors or throw exceptions
-      return null;
+  Future<http.Response> postFile(
+    String path, {
+    required Uint8List file,
+    required String filename,
+    Map<String, String>? fields,
+  }) async {
+    final url = Uri.parse('$baseUrl$path');
+    var request = http.MultipartRequest('POST', url);
+
+    request.files.add(http.MultipartFile.fromBytes(
+      'file',
+      file,
+      filename: filename,
+    ));
+
+    if (fields != null) {
+      request.fields.addAll(fields);
     }
+
+    request.headers.addAll({
+      'Authorization': 'Bearer $_jwtToken',
+    });
+
+    final streamedResponse = await request.send();
+    return await http.Response.fromStream(streamedResponse);
   }
 
-  // Read a user by ID
-  Future<User?> getUser(int id) async {
-    final url = Uri.parse('$baseUrl/client-api/users/$id');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
-    } else {
-      // Handle errors or throw exceptions
-      return null;
-    }
-  }
+  Future<http.Response> putFile(
+    String path, {
+    required Uint8List file,
+    required String filename,
+  }) async {
+    final url = Uri.parse('$baseUrl$path');
+    var request = http.MultipartRequest('PUT', url);
 
-  // Update a user
-  Future<User?> updateUser(User user) async {
-    final url = Uri.parse('$baseUrl/client-api/users/${user.id}');
-    final response = await http.put(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode(user.toJson()),
-    );
-    if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
-    } else {
-      // Handle errors or throw exceptions
-      return null;
-    }
-  }
+    request.files.add(http.MultipartFile.fromBytes(
+      'file',
+      file,
+      filename: filename,
+    ));
 
-  // Delete a user
-  Future<bool> deleteUser(int id) async {
-    final url = Uri.parse('$baseUrl/client-api/users/$id');
-    final response = await http.delete(url);
-    return response.statusCode == 204;
-  }
+    request.headers.addAll({
+      'Authorization': 'Bearer $_jwtToken',
+    });
 
-  // Get all users
-  Future<List<User>> getAllUsers() async {
-    final url = Uri.parse('$baseUrl/client-api/users');
-    final response = await http.get(url);
-    if (response.statusCode == 200) {
-      List<dynamic> usersJson = jsonDecode(response.body);
-      return usersJson.map((json) => User.fromJson(json)).toList();
-    } else {
-      // Handle errors or throw exceptions
-      return [];
-    }
+    final streamedResponse = await request.send();
+    return await http.Response.fromStream(streamedResponse);
   }
 }

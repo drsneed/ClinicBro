@@ -1,4 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import '../managers/user_manager.dart';
+import '../services/auth_service.dart';
 import 'schedule_screen.dart';
 import 'settings_screen.dart';
 import '../widgets/custom_title_bar.dart';
@@ -23,15 +25,16 @@ class _HomeScreenState extends State<HomeScreen> {
     return NavigationView(
       appBar: NavigationAppBar(
         title: CustomTitleBar(
-          showBackButton: !isMobile,
-          title: Text(
-            'ClinicBro',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          userAvatarUrl: "",
+          showBackButton: true,
+          showAvatarButton: true,
+          title: const Text('ClinicBro'),
+          onAccountSettings: () {
+            // Navigate to account settings page
+          },
+          onSignOut: () {
+            AuthService().signOut();
+            Navigator.of(context).pushReplacementNamed('/');
+          },
         ),
         automaticallyImplyLeading: false,
       ),
@@ -63,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHomeContent() {
     return ScaffoldPage(
       content: Center(
-        child: Text('Welcome to the Fluent UI Demo App!'),
+        child: Text('Welcome ${UserManager().currentUser?.name ?? 'User'}!'),
       ),
     );
   }

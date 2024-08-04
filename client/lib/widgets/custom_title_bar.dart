@@ -1,21 +1,27 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' show PopupMenuButton, PopupMenuItem;
 import 'package:window_manager/window_manager.dart';
+import '../repositories/user_repository.dart';
+import 'avatar_button.dart';
 import 'themed_icon.dart';
 import 'dart:io' show Platform;
 
 class CustomTitleBar extends StatelessWidget {
   final bool showBackButton;
+  final bool showAvatarButton;
   final Widget? title;
   final List<Widget>? actions;
-  final String userAvatarUrl; // New parameter for user avatar URL
+  final VoidCallback onAccountSettings;
+  final VoidCallback onSignOut;
 
   const CustomTitleBar({
     Key? key,
     this.showBackButton = false,
+    this.showAvatarButton = false,
     this.title,
     this.actions,
-    required this.userAvatarUrl, // Initialize userAvatarUrl
+    required this.onAccountSettings,
+    required this.onSignOut,
   }) : super(key: key);
 
   @override
@@ -48,40 +54,17 @@ class CustomTitleBar extends StatelessWidget {
                   child: title!,
                 ),
               ),
+            if (showAvatarButton)
+              AvatarButton(
+                onAccountSettings: onAccountSettings,
+                onSignOut: onSignOut,
+              ),
             if (actions != null) ...actions!,
             if (!isMobile) ...[
               MinimizeWindowButton(),
               MaximizeWindowButton(),
               CloseWindowButton(),
             ],
-            // Spacer(),
-            // // Avatar Button with Popup Menu
-            // PopupMenuButton<String>(
-            //   onSelected: (String value) {
-            //     // Handle the selected option
-            //     if (value == 'settings') {
-            //       // Navigate to account settings
-            //     } else if (value == 'sign_out') {
-            //       // Sign out logic
-            //     }
-            //   },
-            //   itemBuilder: (BuildContext context) {
-            //     return [
-            //       PopupMenuItem<String>(
-            //         value: 'settings',
-            //         child: Text('Account Settings'),
-            //       ),
-            //       PopupMenuItem<String>(
-            //         value: 'sign_out',
-            //         child: Text('Sign Out'),
-            //       ),
-            //     ];
-            //   },
-            //   child: CircleAvatar(
-            //     backgroundImage: NetworkImage(userAvatarUrl),
-            //     radius: 16, // Adjust size as needed
-            //   ),
-            // ),
           ],
         ),
       ),

@@ -2,19 +2,19 @@ class User {
   final int id;
   final bool active;
   final String name;
-  final int color;
-  final bool seesPatients;
+  final String? color;
+  final bool isProvider;
   final DateTime dateCreated;
   final DateTime dateUpdated;
-  final String createdBy;
-  final String updatedBy;
+  final String? createdBy;
+  final String? updatedBy;
 
   User({
     required this.id,
     required this.active,
     required this.name,
     required this.color,
-    required this.seesPatients,
+    required this.isProvider,
     required this.dateCreated,
     required this.dateUpdated,
     required this.createdBy,
@@ -27,7 +27,7 @@ class User {
       active: json['active'],
       name: json['name'],
       color: json['color'],
-      seesPatients: json['sees_patients'],
+      isProvider: json['is_provider'],
       dateCreated: DateTime.parse(json['date_created']),
       dateUpdated: DateTime.parse(json['date_updated']),
       createdBy: json['created_by'],
@@ -41,7 +41,7 @@ class User {
       'active': active,
       'name': name,
       'color': color,
-      'sees_patients': seesPatients,
+      'is_provider': isProvider,
       'date_created': dateCreated.toIso8601String(),
       'date_updated': dateUpdated.toIso8601String(),
       'created_by': createdBy,

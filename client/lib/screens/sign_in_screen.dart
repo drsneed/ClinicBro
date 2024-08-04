@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import '../services/auth_service.dart';
 import '../widgets/custom_title_bar.dart';
 import '../widgets/themed_icon.dart';
-import '../services/data_service.dart';
 import 'dart:io' show Platform;
 
 class SignInScreen extends StatefulWidget {
@@ -12,13 +12,12 @@ class SignInScreen extends StatefulWidget {
 class _SignInScreenState extends State<SignInScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final DataService _dataService = DataService('http://192.168.1.34:33420');
 
   Future<void> _signIn() async {
     final username = _usernameController.text;
     final password = _passwordController.text;
-    final token = await _dataService.authenticateUser(username, password);
-    if (token != null && token.isNotEmpty) {
+    final authService = AuthService();
+    if (await authService.signIn(username, password)) {
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
       showDialog(
@@ -46,8 +45,14 @@ class _SignInScreenState extends State<SignInScreen> {
           : NavigationAppBar(
               title: CustomTitleBar(
                 showBackButton: false,
+                showAvatarButton: false,
                 title: Text('Sign In'),
-                userAvatarUrl: '',
+                onAccountSettings: () {
+                  // Navigate to account settings page
+                },
+                onSignOut: () {
+                  // Handle sign out logic
+                },
               ),
               automaticallyImplyLeading: false,
             ),
@@ -84,6 +89,9 @@ class _SignInScreenState extends State<SignInScreen> {
                 PasswordBox(
                   controller: _passwordController,
                   placeholder: 'Password',
+                  onSubmitted: (value) {
+                    _signIn();
+                  },
                 ),
                 SizedBox(height: 20),
                 FilledButton(

@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package auth;
+
+// The authentication service definition.
+service AuthService {
+  rpc Authenticate (AuthRequest) returns (AuthResponse);
+}
+
+// The request message containing the user's credentials.
+message AuthRequest {
+  string name = 1;
+  string password = 2;
+}
+
+// The response message containing the authentication result.
+message AuthResponse {
+  string token = 1;
+}
