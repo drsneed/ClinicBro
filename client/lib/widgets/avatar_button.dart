@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'authenticated_image_provider.dart';
+import 'package:fluent_ui/fluent_ui.dart' show Button, ContentDialog;
 
 class AvatarButton extends StatelessWidget {
   final VoidCallback onAccountSettings;
@@ -37,22 +38,61 @@ class AvatarButton extends StatelessWidget {
             if (result == 'account_settings') {
               onAccountSettings();
             } else if (result == 'sign_out') {
-              onSignOut();
+              _confirmSignOut(context); // Show confirmation dialog
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            const PopupMenuItem<String>(
+            PopupMenuItem<String>(
               value: 'account_settings',
-              child: Text('Account Settings'),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.account_circle), // Icon for account settings
+                  SizedBox(width: 8), // Space between icon and text
+                  Text('Account Settings'),
+                ],
+              ),
             ),
-            const PopupMenuItem<String>(
+            PopupMenuItem<String>(
               value: 'sign_out',
-              child: Text('Sign Out'),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.exit_to_app), // Icon for sign out
+                  SizedBox(width: 8), // Space between icon and text
+                  Text('Sign Out'),
+                ],
+              ),
             ),
           ],
           offset: Offset(0, 50), // Adjust the vertical offset as needed
         ),
       ),
+    );
+  }
+
+  void _confirmSignOut(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ContentDialog(
+          title: Text('Confirm Sign Out'),
+          content: Text('Are you sure you want to sign out?'),
+          actions: <Widget>[
+            Button(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            ),
+            Button(
+              child: Text('Sign Out'),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+                onSignOut(); // Execute the sign-out process
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 }
