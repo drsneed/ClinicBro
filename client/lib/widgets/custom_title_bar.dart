@@ -1,7 +1,5 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/material.dart' show PopupMenuButton, PopupMenuItem;
 import 'package:window_manager/window_manager.dart';
-import '../repositories/user_repository.dart';
 import 'avatar_button.dart';
 import 'themed_icon.dart';
 import 'dart:io' show Platform;
@@ -13,16 +11,18 @@ class CustomTitleBar extends StatelessWidget {
   final List<Widget>? actions;
   final VoidCallback onAccountSettings;
   final VoidCallback onSignOut;
+  final VoidCallback? onBack;
 
   const CustomTitleBar({
-    Key? key,
+    super.key,
     this.showBackButton = false,
     this.showAvatarButton = false,
     this.title,
     this.actions,
     required this.onAccountSettings,
     required this.onSignOut,
-  }) : super(key: key);
+    this.onBack,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,18 +34,18 @@ class CustomTitleBar extends StatelessWidget {
       },
       child: Container(
         height: 32,
-        color: FluentTheme.of(context).micaBackgroundColor,
+        color: isMobile
+            ? Colors.transparent
+            : FluentTheme.of(context).micaBackgroundColor,
         child: Row(
           children: [
             SizedBox(width: isMobile ? 0 : 8),
-            ThemedIcon(svgPath: 'assets/icon/app_icon.svg'),
-            SizedBox(width: 8),
+            const ThemedIcon(svgPath: 'assets/icon/app_icon.svg'),
+            const SizedBox(width: 8),
             if (showBackButton)
               IconButton(
-                icon: Icon(FluentIcons.back, size: 12),
-                onPressed: () {
-                  // Handle back navigation
-                },
+                icon: const Icon(FluentIcons.back, size: 12),
+                onPressed: onBack,
               ),
             if (title != null)
               Expanded(
@@ -55,9 +55,13 @@ class CustomTitleBar extends StatelessWidget {
                 ),
               ),
             if (showAvatarButton)
-              AvatarButton(
-                onAccountSettings: onAccountSettings,
-                onSignOut: onSignOut,
+              Padding(
+                padding: const EdgeInsets.only(
+                    right: 5.0), // Move the avatar button 5 pixels to the left
+                child: AvatarButton(
+                  onAccountSettings: onAccountSettings,
+                  onSignOut: onSignOut,
+                ),
               ),
             if (actions != null) ...actions!,
             if (!isMobile) ...[
@@ -103,7 +107,7 @@ class CloseWindowButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(FluentIcons.chrome_close, size: 12),
+      icon: const Icon(FluentIcons.chrome_close, size: 12),
       onPressed: () async {
         await windowManager.close();
       },

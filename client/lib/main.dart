@@ -1,4 +1,6 @@
 import 'dart:io' show Platform;
+import 'package:clinicbro/screens/schedule_screen.dart';
+import 'package:clinicbro/screens/settings_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:window_manager/window_manager.dart';
@@ -47,6 +49,8 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (context) => SignInScreen(),
         '/home': (context) => HomeScreen(setThemeMode: setThemeMode),
+        // '/schedule': (context) => ScheduleScreen(),
+        // '/settings': (context) => SettingsScreen(setThemeMode: setThemeMode),
       },
     );
   }

@@ -17,6 +17,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  final List<int> _history = [];
 
   @override
   Widget build(BuildContext context) {
@@ -25,11 +26,20 @@ class _HomeScreenState extends State<HomeScreen> {
     return NavigationView(
       appBar: NavigationAppBar(
         title: CustomTitleBar(
-          showBackButton: true,
+          showBackButton: _history.isNotEmpty,
           showAvatarButton: true,
           title: const Text('ClinicBro'),
+          onBack: () {
+            if (_history.isNotEmpty) {
+              setState(() {
+                _currentIndex = _history.removeLast();
+              });
+            }
+          },
           onAccountSettings: () {
-            // Navigate to account settings page
+            setState(() {
+              _currentIndex = 2;
+            });
           },
           onSignOut: () {
             AuthService().signOut();
@@ -40,7 +50,14 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       pane: NavigationPane(
         selected: _currentIndex,
-        onChanged: (index) => setState(() => _currentIndex = index),
+        onChanged: (index) {
+          setState(() {
+            if (_currentIndex != index) {
+              _history.add(_currentIndex);
+              _currentIndex = index;
+            }
+          });
+        },
         displayMode: isMobile ? PaneDisplayMode.auto : PaneDisplayMode.compact,
         items: [
           PaneItem(
