@@ -41,6 +41,12 @@ type AuthRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// PasswordChangeRequest model
+type PasswordChangeRequest struct {
+	CurrentPassword string `json:"current_password" binding:"required"`
+	NewPassword     string `json:"new_password" binding:"required"`
+}
+
 // UserCreate model
 type UserCreate struct {
 	Name       string `json:"name" binding:"required"`
@@ -94,6 +100,7 @@ func main() {
 		authorized.GET("/avatar/:id", getAvatar)
 		authorized.PUT("/avatar/:id", updateAvatar)
 		authorized.DELETE("/avatar/:id", deleteAvatar)
+		authorized.POST("/change-password", changePassword)
 	}
 
 	// Start server
@@ -182,6 +189,53 @@ func authenticate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": tokenString, "user_id": user.ID})
+}
+
+func changePassword(c *gin.Context) {
+	// Extract user ID from the JWT claims
+	claims, exists := c.Get("claims")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	userID, ok := claims.(jwt.MapClaims)["user_id"].(float64)
+	if !ok {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		return
+	}
+
+	var req PasswordChangeRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var user User
+	result := db.Raw(`
+		SELECT * FROM users
+		WHERE id = ? AND active = true
+		  AND (password = crypt(?, password))
+	`, uint(userID), req.CurrentPassword).Scan(&user)
+
+	if result.Error != nil || result.RowsAffected == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Current password is incorrect"})
+		return
+	}
+
+	// Update the password
+	result = db.Exec(`
+		UPDATE users
+		SET password = crypt(?, gen_salt('bf')), date_updated = NOW(), updated_user_id = ?
+		WHERE id = ?
+	`, req.NewPassword, uint(userID), uint(userID))
+
+	if result.Error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update password"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
 }
 
 func createUser(c *gin.Context) {
@@ -273,7 +327,8 @@ func getAvatar(c *gin.Context) {
 	var avatar Avatar
 	result := db.Where("user_id = ?", userID).First(&avatar)
 	if result.Error != nil {
-		c.File("img/avatar.png") // Default avatar
+		//c.File("img/avatar.png") // Default avatar
+		c.Data(http.StatusNotFound, "image/png", nil)
 		return
 	}
 

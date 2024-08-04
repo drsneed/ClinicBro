@@ -62,7 +62,7 @@ class UserRepository {
     }
   }
 
-// Create or update avatar
+  // Create or update avatar
   Future<bool> createOrUpdateAvatar(int userId, Uint8List imageData) async {
     final response = await DataService().postFile(
       '/avatar',
@@ -79,6 +79,7 @@ class UserRepository {
 
   // Get user avatar
   Future<Uint8List?> getAvatar(int userId) async {
+    print('Issuing get request for avatar!');
     final response = await DataService().get('/avatar/$userId');
     if (response.statusCode == 200) {
       return response.bodyBytes;
@@ -101,6 +102,20 @@ class UserRepository {
   // Delete avatar
   Future<bool> deleteAvatar(int userId) async {
     final response = await DataService().delete('/avatar/$userId');
+    return response.statusCode == 200;
+  }
+
+  // Change user password
+  Future<bool> changePassword(
+      String currentPassword, String newPassword) async {
+    final response = await DataService().post(
+      '/change-password',
+      body: jsonEncode({
+        'current_password': currentPassword,
+        'new_password': newPassword,
+      }),
+    );
+
     return response.statusCode == 200;
   }
 

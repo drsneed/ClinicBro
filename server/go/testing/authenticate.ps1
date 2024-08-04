@@ -18,5 +18,15 @@ $body = @{
     password = $password
 } | ConvertTo-Json
 
-# Make the POST request
-Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
+# Make the POST request and capture the response
+$response = Invoke-RestMethod -Uri $uri -Method Post -Headers $headers -Body $body
+
+# Convert the response to JSON string to see the full content
+$responseJson = $response | ConvertTo-Json -Depth 5
+
+# Output the full JSON response to the console
+Write-Host "Response:"
+Write-Host $responseJson
+
+# Optionally, you can output the response to a file for easier inspection
+$responseJson | Out-File -FilePath "response.json"

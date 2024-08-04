@@ -12,6 +12,7 @@ class CustomTitleBar extends StatelessWidget {
   final VoidCallback onAccountSettings;
   final VoidCallback onSignOut;
   final VoidCallback? onBack;
+  final GlobalKey<AvatarButtonState>? avatarButtonKey;
 
   const CustomTitleBar({
     super.key,
@@ -22,6 +23,7 @@ class CustomTitleBar extends StatelessWidget {
     required this.onAccountSettings,
     required this.onSignOut,
     this.onBack,
+    this.avatarButtonKey,
   });
 
   @override
@@ -59,6 +61,7 @@ class CustomTitleBar extends StatelessWidget {
                 padding: const EdgeInsets.only(
                     right: 5.0), // Move the avatar button 5 pixels to the left
                 child: AvatarButton(
+                  key: avatarButtonKey, // Pass the GlobalKey here
                   onAccountSettings: onAccountSettings,
                   onSignOut: onSignOut,
                 ),

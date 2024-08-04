@@ -3,8 +3,10 @@ import '../managers/user_manager.dart';
 import '../services/auth_service.dart';
 import 'schedule_screen.dart';
 import 'settings_screen.dart';
+import 'account_settings_dialog.dart';
 import '../widgets/custom_title_bar.dart';
 import 'dart:io' show Platform;
+import '../widgets/avatar_button.dart'; // Import AvatarButton
 
 class HomeScreen extends StatefulWidget {
   final Function(ThemeMode) setThemeMode;
@@ -18,6 +20,8 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
   final List<int> _history = [];
+  final GlobalKey<AvatarButtonState> _avatarButtonKey =
+      GlobalKey<AvatarButtonState>();
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
             AuthService().signOut();
             Navigator.of(context).pushReplacementNamed('/');
           },
+          avatarButtonKey: _avatarButtonKey, // Pass the key
         ),
         automaticallyImplyLeading: false,
       ),
@@ -81,60 +86,16 @@ class _HomeScreenState extends State<HomeScreen> {
   void _showAccountSettingsDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return ContentDialog(
-          title: Text('Account Settings'),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              // Icon and text for each setting option
-              _buildSettingsOption(
-                icon: FluentIcons.diamond_user,
-                label: 'Profile',
-                onTap: () {
-                  Navigator.pop(context);
-                  // Handle Profile settings navigation
-                },
-              ),
-              _buildSettingsOption(
-                icon: FluentIcons.lock,
-                label: 'Change Password',
-                onTap: () {
-                  Navigator.pop(context);
-                  // Handle Change Password navigation
-                },
-              ),
-              SizedBox(
-                  height: 20), // Add space between options and close button
-            ],
-          ),
-          actions: <Widget>[
-            Button(
-              child: Text('Close'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ],
+      builder: (context) {
+        return AccountSettingsDialog(
+          onAvatarChanged: () {
+            // Call refreshAvatar on the AvatarButton
+            if (_avatarButtonKey.currentState != null) {
+              _avatarButtonKey.currentState!.refreshAvatar();
+            }
+          },
         );
       },
-    );
-  }
-
-  Widget _buildSettingsOption({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Row(
-        children: <Widget>[
-          Icon(icon),
-          const SizedBox(width: 10),
-          Text(label),
-        ],
-      ),
     );
   }
 

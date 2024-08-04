@@ -12,9 +12,8 @@ create table Users (
     updated_user_id int
 );
 
-CREATE TABLE Avatar (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER REFERENCES Users(id),
+CREATE TABLE Avatars (
+    user_id INTEGER PRIMARY KEY REFERENCES Users(id) UNIQUE,
     image BYTEA
 );
 

@@ -31,4 +31,28 @@ class AuthService {
     }
     return true;
   }
+
+  Future<void> resetToken(String password) async {
+    final userManager = UserManager();
+    final currentUser = userManager.currentUser;
+    if (currentUser == null) {
+      throw Exception("No current user found. Cannot reset token.");
+    }
+
+    final dataService = DataService();
+    final response = await dataService.post(
+      '/authenticate',
+      body: jsonEncode({
+        'name': currentUser.name,
+        'password': password,
+      }),
+    );
+    if (response.statusCode != 200) {
+      throw Exception("Failed to reset token.");
+    }
+
+    final responseData = jsonDecode(response.body);
+    final token = responseData['token'];
+    dataService.setToken(token);
+  }
 }
