@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"ClinicBro-Server/models"
-	"ClinicBro-Server/utils"
+	"ClinicBro-Server/storage"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +20,12 @@ func CreateLocation(c *gin.Context) {
 	location.DateCreated = time.Now()
 	location.DateUpdated = time.Now()
 
-	if err := utils.DB.Create(&location).Error; err != nil {
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+
+	if err := db.Create(&location).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create location"})
 		return
 	}
@@ -30,8 +35,12 @@ func CreateLocation(c *gin.Context) {
 
 func GetLocation(c *gin.Context) {
 	id := c.Param("id")
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
 	var location models.Location
-	if err := utils.DB.First(&location, id).Error; err != nil {
+	if err := db.First(&location, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Location not found"})
 		return
 	}
@@ -39,8 +48,12 @@ func GetLocation(c *gin.Context) {
 }
 
 func GetAllLocations(c *gin.Context) {
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
 	var locations []models.Location
-	if err := utils.DB.Find(&locations).Error; err != nil {
+	if err := db.Find(&locations).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch locations"})
 		return
 	}
@@ -49,8 +62,12 @@ func GetAllLocations(c *gin.Context) {
 
 func UpdateLocation(c *gin.Context) {
 	id := c.Param("id")
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
 	var location models.Location
-	if err := utils.DB.First(&location, id).Error; err != nil {
+	if err := db.First(&location, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Location not found"})
 		return
 	}
@@ -62,7 +79,7 @@ func UpdateLocation(c *gin.Context) {
 
 	location.DateUpdated = time.Now()
 
-	if err := utils.DB.Save(&location).Error; err != nil {
+	if err := db.Save(&location).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update location"})
 		return
 	}
@@ -72,7 +89,11 @@ func UpdateLocation(c *gin.Context) {
 
 func DeleteLocation(c *gin.Context) {
 	id := c.Param("id")
-	if err := utils.DB.Delete(&models.Location{}, id).Error; err != nil {
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+	if err := db.Delete(&models.Location{}, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete location"})
 		return
 	}

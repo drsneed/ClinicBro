@@ -94,3 +94,13 @@ INSERT INTO Patients (
 (TRUE, 'Zoe', 'C.', 'Jenkins', '1991-05-18', NULL, 'zoe.jenkins@example.com', '555-8901-234', NULL, '456 Cedar St', 'Suite 5', 'Philadelphia', 'PA', '19101', 'Diabetic', TRUE, TRUE, TRUE, 1, 13, now(), now(), 13, 13),
 (TRUE, 'Michael', 'D.', 'Long', '1986-08-22', NULL, 'michael.long@example.com', '555-9012-345', NULL, '789 Fir St', 'Apt 2C', 'San Jose', 'CA', '95101', 'Pregnant', TRUE, TRUE, TRUE, 1, 14, now(), now(), 14, 14),
 (TRUE, 'Mia', 'E.', 'Bryant', '1983-01-15', NULL, 'mia.bryant@example.com', '555-0123-456', NULL, '123 Oak St', 'Unit 9A', 'Minneapolis', 'MN', '55401', 'Hearing impairment', TRUE, TRUE, FALSE, 1, 15, now(), now(), 15, 15);
+
+
+INSERT INTO locations (
+    active, name, phone, address_1, address_2, city, state, zip_code, date_created, date_updated, created_user_id, updated_user_id
+) VALUES 
+(true, 'Headquarters', '555-000-1111', '123 Corporate Plaza', 'Floor 10', 'Metropolis', 'NY', '10001', NOW(), NOW(), 10, 10),
+(true, 'Tech Hub', '555-222-3333', '456 Innovation Dr', NULL, 'Techville', 'CA', '94105', NOW(), NOW(), 10, 10),
+(true, 'Customer Service Center', '555-444-5555', '789 Service Ln', 'Suite A', 'Servicetown', 'TX', '75201', NOW(), NOW(), 10, 10),
+(false, 'Closed Branch', '555-666-7777', '321 Pastel Ave', NULL, 'Old City', 'FL', '33130', NOW(), NOW(), 10, 10),
+(true, 'Logistics Center', '555-888-9999', '654 Logistics Blvd', 'Warehouse 5', 'Transport Town', 'IL', '60616', NOW(), NOW(), 10, 10);

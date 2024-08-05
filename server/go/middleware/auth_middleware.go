@@ -1,16 +1,24 @@
 package middleware
 
 import (
+	"ClinicBro-Server/storage"
+	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var jwtSecret string
+
+func SetJWTSecret(secret string) {
+	jwtSecret = secret
+}
+
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fmt.Print("jwtSecret: ", jwtSecret)
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})
@@ -29,7 +37,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		claims := jwt.MapClaims{}
 
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
-			return []byte(os.Getenv("JWT_SECRET_KEY")), nil
+			return []byte(jwtSecret), nil
 		})
 
 		if err != nil {
@@ -44,8 +52,24 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// Add claims to the context
+		orgID, ok := claims["org_id"].(string)
+		if !ok {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "org_id not found in token"})
+			c.Abort()
+			return
+		}
+
+		db, err := storage.ConnectToTenantDB(orgID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to tenant database"})
+			c.Abort()
+			return
+		}
+
+		// Add claims and db to the context
 		c.Set("claims", claims)
+		c.Set("db", db)
+		c.Set("org_id", orgID)
 		c.Next()
 	}
 }

@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"ClinicBro-Server/models"
-	"ClinicBro-Server/utils"
+	"ClinicBro-Server/storage"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -23,8 +23,13 @@ func GetRecentPatients(c *gin.Context) {
 		return
 	}
 
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+
 	var recentPatients []models.RecentPatient
-	if err := utils.DB.Where("user_id = ?", uint(userID)).Order("date_created DESC").Limit(10).Find(&recentPatients).Error; err != nil {
+	if err := db.Where("user_id = ?", uint(userID)).Order("date_created DESC").Limit(10).Find(&recentPatients).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch recent patients"})
 		return
 	}
@@ -35,7 +40,7 @@ func GetRecentPatients(c *gin.Context) {
 	}
 
 	var patients []models.Patient
-	if err := utils.DB.Where("id IN ?", patientIDs).Find(&patients).Error; err != nil {
+	if err := db.Where("id IN ?", patientIDs).Find(&patients).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch patient details"})
 		return
 	}

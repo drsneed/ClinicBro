@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"ClinicBro-Server/models"
-	"ClinicBro-Server/utils"
+	"ClinicBro-Server/storage"
 
 	"github.com/gin-gonic/gin"
 )
@@ -20,7 +20,12 @@ func CreatePatient(c *gin.Context) {
 	patient.DateCreated = time.Now()
 	patient.DateUpdated = time.Now()
 
-	if err := utils.DB.Create(&patient).Error; err != nil {
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+
+	if err := db.Create(&patient).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create patient"})
 		return
 	}
@@ -30,8 +35,12 @@ func CreatePatient(c *gin.Context) {
 
 func GetPatient(c *gin.Context) {
 	id := c.Param("id")
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
 	var patient models.Patient
-	if err := utils.DB.First(&patient, id).Error; err != nil {
+	if err := db.First(&patient, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Patient not found"})
 		return
 	}
@@ -39,8 +48,12 @@ func GetPatient(c *gin.Context) {
 }
 
 func GetAllPatients(c *gin.Context) {
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
 	var patients []models.Patient
-	if err := utils.DB.Find(&patients).Error; err != nil {
+	if err := db.Find(&patients).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch patients"})
 		return
 	}
@@ -49,8 +62,12 @@ func GetAllPatients(c *gin.Context) {
 
 func UpdatePatient(c *gin.Context) {
 	id := c.Param("id")
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
 	var patient models.Patient
-	if err := utils.DB.First(&patient, id).Error; err != nil {
+	if err := db.First(&patient, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Patient not found"})
 		return
 	}
@@ -62,7 +79,7 @@ func UpdatePatient(c *gin.Context) {
 
 	patient.DateUpdated = time.Now()
 
-	if err := utils.DB.Save(&patient).Error; err != nil {
+	if err := db.Save(&patient).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update patient"})
 		return
 	}
@@ -72,7 +89,11 @@ func UpdatePatient(c *gin.Context) {
 
 func DeletePatient(c *gin.Context) {
 	id := c.Param("id")
-	if err := utils.DB.Delete(&models.Patient{}, id).Error; err != nil {
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+	if err := db.Delete(&models.Patient{}, id).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete patient"})
 		return
 	}

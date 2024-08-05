@@ -1,26 +1,27 @@
 package main
 
 import (
-	"log"
-	"os"
-
 	"ClinicBro-Server/handlers"
 	"ClinicBro-Server/middleware"
-	"ClinicBro-Server/utils"
+	"ClinicBro-Server/storage"
+	"log"
+	"os"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
-func init() {
+func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
-	utils.InitDB()
-}
+	storage.InitAll()
 
-func main() {
+	jwtSecret := os.Getenv("JWT_SECRET_KEY")
+	middleware.SetJWTSecret(jwtSecret)
+	handlers.SetJWTSecret(jwtSecret)
+
 	r := gin.Default()
 
 	// Public routes

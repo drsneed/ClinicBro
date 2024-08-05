@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"ClinicBro-Server/models"
-	"ClinicBro-Server/utils"
+	"ClinicBro-Server/storage"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,9 +14,12 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
 	var user models.User
-	result := utils.DB.Raw(`
+	result := db.Raw(`
 		INSERT INTO users (name, password, color, is_provider, active, date_created, date_updated)
 		VALUES (?, crypt(?, gen_salt('bf')), ?, ?, ?, NOW(), NOW())
 		RETURNING id, name, color, is_provider, active, date_created, date_updated
@@ -32,8 +35,12 @@ func CreateUser(c *gin.Context) {
 
 func GetUser(c *gin.Context) {
 	id := c.Param("id")
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
 	var user models.User
-	result := utils.DB.First(&user, id)
+	result := db.First(&user, id)
 	if result.Error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
@@ -42,8 +49,12 @@ func GetUser(c *gin.Context) {
 }
 
 func GetAllUsers(c *gin.Context) {
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
 	var users []models.User
-	result := utils.DB.Find(&users)
+	result := db.Find(&users)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch users"})
 		return

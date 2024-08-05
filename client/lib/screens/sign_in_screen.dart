@@ -10,21 +10,23 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  final _orgIdController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
 
   Future<void> _signIn() async {
+    final orgId = _orgIdController.text;
     final username = _usernameController.text;
     final password = _passwordController.text;
     final authService = AuthService();
-    if (await authService.signIn(username, password)) {
+    if (await authService.signIn(orgId, username, password)) {
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
       showDialog(
         context: context,
         builder: (context) => ContentDialog(
           title: Text('Authentication Error'),
-          content: Text('Invalid username or password'),
+          content: Text('Invalid organization ID, username, or password'),
           actions: [
             Button(
               child: Text('OK'),
@@ -81,6 +83,11 @@ class _SignInScreenState extends State<SignInScreen> {
                   ],
                 ),
                 SizedBox(height: 20),
+                TextBox(
+                  controller: _orgIdController,
+                  placeholder: 'Organization ID',
+                ),
+                SizedBox(height: 10),
                 TextBox(
                   controller: _usernameController,
                   placeholder: 'User Name',

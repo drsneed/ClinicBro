@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"ClinicBro-Server/models"
-	"ClinicBro-Server/utils"
+	"ClinicBro-Server/storage"
 	"io"
 	"net/http"
 	"strconv"
@@ -45,7 +45,12 @@ func CreateOrUpdateAvatar(c *gin.Context) {
 		Image:    buffer,
 	}
 
-	result := utils.DB.Save(&avatar)
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+
+	result := db.Save(&avatar)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not save avatar"})
 		return
@@ -64,8 +69,13 @@ func GetAvatar(c *gin.Context) {
 		return
 	}
 
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+
 	var avatar models.Avatar
-	result := utils.DB.Where("type = ? AND entity_id = ?", avatarType, entityID).First(&avatar)
+	result := db.Where("type = ? AND entity_id = ?", avatarType, entityID).First(&avatar)
 	if result.Error != nil {
 		c.Data(http.StatusNotFound, "image/png", nil) // Optionally serve a default avatar here
 		return
@@ -103,7 +113,12 @@ func UpdateAvatar(c *gin.Context) {
 		return
 	}
 
-	result := utils.DB.Model(&models.Avatar{}).Where("type = ? AND entity_id = ?", avatarType, entityID).Update("image", buffer)
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+
+	result := db.Model(&models.Avatar{}).Where("type = ? AND entity_id = ?", avatarType, entityID).Update("image", buffer)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update avatar"})
 		return
@@ -127,7 +142,12 @@ func DeleteAvatar(c *gin.Context) {
 		return
 	}
 
-	result := utils.DB.Where("type = ? AND entity_id = ?", avatarType, entityID).Delete(&models.Avatar{})
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+
+	result := db.Where("type = ? AND entity_id = ?", avatarType, entityID).Delete(&models.Avatar{})
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete avatar"})
 		return

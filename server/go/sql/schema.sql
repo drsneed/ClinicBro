@@ -15,7 +15,7 @@ create table users (
 create table locations (
     id serial primary key,
     active boolean,
-    name varchar(50) not null unique,
+    name varchar(50) not null,
     phone varchar(15),
     address_1 varchar(128),
     address_2 varchar(32),
