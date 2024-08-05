@@ -156,21 +156,40 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   Widget _buildAvatarDisplay() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
 
+    // Define fallback colors
+    final placeholderColor = isDarkMode
+        ? Color(0xFF424242)
+        : Color(0xFFF0F0F0); // Non-null fallback colors
+
     return FutureBuilder<Uint8List?>(
       future: _loadAvatarImage(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasData && snapshot.data != null) {
-          return CircleAvatar(
-            backgroundImage: MemoryImage(snapshot.data!),
-            radius: 50,
-          );
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final avatarData = snapshot.data;
+          if (avatarData != null) {
+            return CircleAvatar(
+              backgroundImage: MemoryImage(avatarData),
+              radius: 50,
+            );
+          } else {
+            // Data is null, show placeholder
+            return Container(
+              width: 100,
+              height: 100,
+              color: placeholderColor, // Use fallback color
+              child: const Icon(FluentIcons.contact, size: 50),
+            );
+          }
         } else {
+          // Handle unexpected case where neither hasData nor hasError
           return Container(
             width: 100,
             height: 100,
-            color: isDarkMode ? Colors.grey[850] : Colors.white,
+            color: placeholderColor,
             child: const Icon(FluentIcons.contact, size: 50),
           );
         }

@@ -1,44 +1,50 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart'
     show
-        State,
-        StatefulWidget,
-        VoidCallback,
-        Key,
-        Widget,
-        BuildContext,
-        Theme,
+        BorderRadius,
+        BoxDecoration,
+        BoxShape,
         Brightness,
+        BuildContext,
+        CircleAvatar,
         Color,
         Colors,
-        Material,
-        PopupMenuButton,
-        PopupMenuTheme,
-        PopupMenuThemeData,
-        Padding,
-        EdgeInsets,
-        MemoryImage,
-        CircleAvatar,
-        Icon,
-        FutureBuilder,
         ConnectionState,
-        PopupMenuItem,
-        PopupMenuEntry,
-        Row,
-        Icons,
-        SizedBox,
-        Text,
-        Offset,
-        showDialog,
-        Navigator,
-        BoxDecoration,
         Container,
-        BoxShape,
-        BorderRadius;
+        EdgeInsets,
+        FutureBuilder,
+        GestureDetector,
+        Icon,
+        Icons,
+        Key,
+        Material,
+        MemoryImage,
+        MouseRegion,
+        Navigator,
+        Offset,
+        Overlay,
+        Padding,
+        PopupMenuButton,
+        PopupMenuEntry,
+        PopupMenuItem,
+        Rect,
+        RelativeRect,
+        RenderBox,
+        Row,
+        SizedBox,
+        State,
+        StatefulWidget,
+        SystemMouseCursors,
+        Text,
+        Theme,
+        Tooltip,
+        VoidCallback,
+        Widget,
+        showDialog,
+        showMenu;
 
 import 'package:fluent_ui/fluent_ui.dart'
     show Button, FilledButton, ContentDialog, FluentIcons;
-import 'dart:ui' as ui;
 import '../repositories/user_repository.dart';
 import '../managers/user_manager.dart';
 
@@ -99,77 +105,102 @@ class AvatarButtonState extends State<AvatarButton> {
 
     return Material(
       color: Colors.transparent,
-      child: PopupMenuTheme(
-        data: PopupMenuThemeData(
-          color: menuBackgroundColor,
-        ),
-        child: PopupMenuButton<String>(
-          onSelected: (String result) {
-            if (result == 'account_settings') {
-              widget.onAccountSettings();
-            } else if (result == 'sign_out') {
-              _confirmSignOut(context);
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            PopupMenuItem<String>(
-              value: 'account_settings',
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.account_circle),
-                  SizedBox(width: 8),
-                  Text('Account Settings'),
-                ],
-              ),
-            ),
-            PopupMenuItem<String>(
-              value: 'sign_out',
-              child: Row(
-                children: <Widget>[
-                  Icon(Icons.exit_to_app),
-                  SizedBox(width: 8),
-                  Text('Sign Out'),
-                ],
-              ),
-            ),
-          ],
-          offset: Offset(0, 50),
-          child: FutureBuilder<Uint8List?>(
-            future: _avatarFuture,
-            builder: (context, snapshot) {
-              Widget avatarWidget;
-              if (snapshot.connectionState == ConnectionState.done) {
-                if (snapshot.hasData && snapshot.data != null) {
-                  avatarWidget = CircleAvatar(
-                    backgroundImage: MemoryImage(snapshot.data!),
-                    radius: 12,
-                  );
-                } else {
-                  avatarWidget = const CircleAvatar(
-                    radius: 12,
-                    child: Icon(FluentIcons.contact, size: 14),
-                  );
-                }
-              } else {
-                avatarWidget = const CircleAvatar(
-                  radius: 12,
-                  child: Icon(FluentIcons.contact, size: 14),
-                );
-              }
+      child: Tooltip(
+          message: UserManager().currentUser?.name,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () {
+                _showPopupMenu(context);
+              },
+              child: FutureBuilder<Uint8List?>(
+                future: _avatarFuture,
+                builder: (context, snapshot) {
+                  Widget avatarWidget;
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    if (snapshot.hasData && snapshot.data != null) {
+                      avatarWidget = CircleAvatar(
+                        backgroundImage: MemoryImage(snapshot.data!),
+                        radius: 12,
+                      );
+                    } else {
+                      avatarWidget = const CircleAvatar(
+                        radius: 12,
+                        child: Icon(FluentIcons.contact, size: 14),
+                      );
+                    }
+                  } else {
+                    avatarWidget = const CircleAvatar(
+                      radius: 12,
+                      child: Icon(FluentIcons.contact, size: 14),
+                    );
+                  }
 
-              return Container(
-                decoration: BoxDecoration(
-                  color: borderColor,
-                  shape: BoxShape.circle,
-                ),
-                padding: EdgeInsets.all(0.5), // Border width
-                child: avatarWidget,
-              );
-            },
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: borderColor,
+                      shape: BoxShape.circle,
+                    ),
+                    padding: EdgeInsets.all(0.5), // Border width
+                    child: avatarWidget,
+                  );
+                },
+              ),
+            ),
+          )),
+    );
+  }
+
+  void _showPopupMenu(BuildContext context) async {
+    final RenderBox overlay =
+        Overlay.of(context)!.context.findRenderObject() as RenderBox;
+    final RenderBox button = context.findRenderObject() as RenderBox;
+
+    final result = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromRect(
+        Rect.fromLTWH(
+          button.localToGlobal(Offset.zero).dx,
+          button.localToGlobal(Offset.zero).dy +
+              button.size.height +
+              16, // Added 16 pixels of extra space
+          button.size.width,
+          0,
+        ),
+        Offset.zero & overlay.size,
+      ),
+      items: <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'account_settings',
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.account_circle),
+              SizedBox(width: 8),
+              Text('Account Settings'),
+            ],
           ),
         ),
-      ),
+        PopupMenuItem<String>(
+          value: 'sign_out',
+          child: Row(
+            children: <Widget>[
+              Icon(Icons.exit_to_app),
+              SizedBox(width: 8),
+              Text('Sign Out'),
+            ],
+          ),
+        ),
+      ],
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.grey[850]
+          : Colors.white,
     );
+
+    if (result == 'account_settings') {
+      widget.onAccountSettings();
+    } else if (result == 'sign_out') {
+      _confirmSignOut(context);
+    }
   }
 
   // Confirm sign-out action

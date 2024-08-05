@@ -10,7 +10,7 @@ class UserRepository {
 
   Future<User?> createUser(User user) async {
     final response = await DataService().post(
-      '/user',
+      '/users',
       body: jsonEncode(user.toJson()),
     );
 
@@ -46,7 +46,7 @@ class UserRepository {
     }
   }
 
-  Future<bool> delete(int id) async {
+  Future<bool> deleteUser(int id) async {
     final response = await DataService().delete('/users/$id');
     return response.statusCode == 204;
   }
@@ -62,25 +62,19 @@ class UserRepository {
     }
   }
 
-  // Create or update avatar
+  // Create or update avatar for a user
   Future<bool> createOrUpdateAvatar(int userId, Uint8List imageData) async {
     final response = await DataService().postFile(
-      '/avatar',
+      '/avatars/user/$userId',
       file: imageData,
       filename: 'avatar.png',
-      fields: {'user_id': userId.toString()},
     );
     return response.statusCode == 200;
   }
 
-  String getAvatarUrl(int userId) {
-    return 'avatar://$userId';
-  }
-
   // Get user avatar
   Future<Uint8List?> getAvatar(int userId) async {
-    print('Issuing get request for avatar!');
-    final response = await DataService().get('/avatar/$userId');
+    final response = await DataService().get('/avatars/user/$userId');
     if (response.statusCode == 200) {
       return response.bodyBytes;
     } else {
@@ -89,19 +83,19 @@ class UserRepository {
     }
   }
 
-  // Update avatar
+  // Update avatar for a user
   Future<bool> updateAvatar(int userId, Uint8List imageData) async {
     final response = await DataService().putFile(
-      '/avatar/$userId',
+      '/avatars/user/$userId',
       file: imageData,
       filename: 'avatar.png',
     );
     return response.statusCode == 200;
   }
 
-  // Delete avatar
+  // Delete avatar for a user
   Future<bool> deleteAvatar(int userId) async {
-    final response = await DataService().delete('/avatar/$userId');
+    final response = await DataService().delete('/avatars/user/$userId');
     return response.statusCode == 200;
   }
 
