@@ -1,11 +1,9 @@
 import 'dart:io' show Platform;
-import 'package:clinicbro/screens/schedule_screen.dart';
-import 'package:clinicbro/screens/settings_screen.dart';
-import 'package:flutter/material.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:window_manager/window_manager.dart';
 import 'screens/sign_in_screen.dart';
 import 'screens/home_screen.dart';
+import 'widgets/custom_typography.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,12 +37,18 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    const fontFamily = 'Inter Thin';
     return FluentApp(
       debugShowCheckedModeBanner: false,
       title: 'ClinicBro',
       themeMode: _themeMode,
-      theme: FluentThemeData(brightness: Brightness.light),
-      darkTheme: FluentThemeData(brightness: Brightness.dark),
+      theme: FluentThemeData(
+        brightness: Brightness.light,
+        typography:
+            CustomTypography.getTypography(brightness: Brightness.light),
+      ),
+      darkTheme:
+          FluentThemeData(brightness: Brightness.dark, fontFamily: fontFamily),
       initialRoute: '/',
       routes: {
         '/': (context) => SignInScreen(),

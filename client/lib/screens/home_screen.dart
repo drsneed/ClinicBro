@@ -22,6 +22,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<int> _history = [];
   final GlobalKey<AvatarButtonState> _avatarButtonKey =
       GlobalKey<AvatarButtonState>();
+  String _currentPaneTitle = 'Home'; // Default title
 
   @override
   Widget build(BuildContext context) {
@@ -32,11 +33,12 @@ class _HomeScreenState extends State<HomeScreen> {
         title: CustomTitleBar(
           showBackButton: _history.isNotEmpty,
           showAvatarButton: true,
-          title: const Text('ClinicBro'),
+          title: Text(_currentPaneTitle), // Display the current pane item title
           onBack: () {
             if (_history.isNotEmpty) {
               setState(() {
                 _currentIndex = _history.removeLast();
+                _updatePaneTitle();
               });
             }
           },
@@ -58,6 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
             if (_currentIndex != index) {
               _history.add(_currentIndex);
               _currentIndex = index;
+              _updatePaneTitle(); // Update the title when pane changes
             }
           });
         },
@@ -81,6 +84,17 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
+  }
+
+  void _updatePaneTitle() {
+    // Update the current pane title based on the selected index
+    setState(() {
+      _currentPaneTitle = [
+        'Home',
+        'Schedule',
+        'Settings',
+      ][_currentIndex];
+    });
   }
 
   void _showAccountSettingsDialog(BuildContext context) {

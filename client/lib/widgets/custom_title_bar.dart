@@ -29,6 +29,8 @@ class CustomTitleBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
+    final textColor =
+        FluentTheme.of(context).typography.body?.color ?? Colors.black;
 
     return GestureDetector(
       onPanStart: (details) {
@@ -53,7 +55,14 @@ class CustomTitleBar extends StatelessWidget {
               Expanded(
                 child: Align(
                   alignment: Alignment.centerLeft,
-                  child: title!,
+                  child: DefaultTextStyle(
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500, // Make text bold
+                      fontSize: 16, // Optional: Adjust font size if needed
+                      color: textColor, // Apply theme's text color
+                    ),
+                    child: title!,
+                  ),
                 ),
               ),
             if (showAvatarButton)
