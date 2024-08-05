@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as mat
     show Colors, FloatingActionButton, CircleBorder;
 import '../widgets/scheduler.dart';
+import '../widgets/patient_finder.dart'; // Import the PatientFinder widget
 
 class ScheduleScreen extends StatefulWidget {
   @override
@@ -10,7 +11,6 @@ class ScheduleScreen extends StatefulWidget {
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
   bool _isFlyoutVisible = false;
-  final List<String> items = ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5'];
 
   void _toggleFlyout() {
     setState(() {
@@ -28,7 +28,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
           header: PageHeader(
             title: Text('Schedule'),
           ),
-          content: SchedulingControl(isFlyoutVisible: _isFlyoutVisible),
+          content: Scheduler(),
         ),
         if (isDesktop) _buildDesktopFlyout(),
         if (!isDesktop) _buildMobileFlyout(),
@@ -43,18 +43,13 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       right: 0,
       bottom: 0,
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 300),
-        width: _isFlyoutVisible ? 200 : 0,
+        duration: Duration(milliseconds: 150),
+        width: _isFlyoutVisible ? 400 : 0,
         child: Container(
           color: FluentTheme.of(context).micaBackgroundColor,
           child: _isFlyoutVisible
-              ? ListView.builder(
-                  itemCount: items.length,
-                  itemBuilder: (context, index) {
-                    return _buildDraggableItem(items[index]);
-                  },
-                )
-              : null,
+              ? PatientFinder()
+              : null, // Use PatientFinder here
         ),
       ),
     );
@@ -79,52 +74,20 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
             ),
           ],
         ),
-        child: ListView.builder(
-          itemCount: items.length,
-          itemBuilder: (context, index) {
-            return _buildDraggableItem(items[index]);
-          },
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDraggableItem(String itemName) {
-    return Draggable<String>(
-      data: itemName,
-      child: Container(
-        margin: EdgeInsets.all(8),
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(itemName),
-      ),
-      feedback: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).cardColor.withOpacity(0.8),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(itemName),
-      ),
-      childWhenDragging: Container(
-        margin: EdgeInsets.all(8),
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).inactiveBackgroundColor,
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(itemName),
+        child: PatientFinder(), // Use PatientFinder here
       ),
     );
   }
 
   Widget _buildFloatingActionButton(bool isDesktop) {
-    return Positioned(
-      right: 16,
-      bottom: 16,
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: 300),
+      right: isDesktop
+          ? (_isFlyoutVisible ? 416 : 16) // Move right if flyout visible
+          : 16, // Keep fixed right for mobile
+      bottom: !isDesktop
+          ? (_isFlyoutVisible ? 216 : 16) // Move up if flyout visible
+          : 16, // Keep fixed bottom for desktop
       child: SizedBox(
         width: isDesktop ? 40 : 64,
         height: isDesktop ? 40 : 64,

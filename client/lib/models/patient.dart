@@ -27,6 +27,16 @@ class Patient {
   final int? createdUserId;
   final int? updatedUserId;
 
+  // Getter for fullName
+  String get fullName {
+    // Check if middleName is null or empty, then format accordingly
+    if (middleName == null || middleName!.isEmpty) {
+      return '$lastName, $firstName';
+    } else {
+      return '$lastName, $firstName $middleName';
+    }
+  }
+
   Patient({
     required this.id,
     required this.active,

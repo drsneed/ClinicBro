@@ -1,4 +1,4 @@
-create table Users (
+create table users (
     id serial primary key,
     active boolean not null,
     name varchar(16) not null,
@@ -12,7 +12,7 @@ create table Users (
     updated_user_id int
 );
 
-create table Locations (
+create table locations (
     id serial primary key,
     active boolean,
     name varchar(50) not null unique,
@@ -29,7 +29,7 @@ create table Locations (
     updated_user_id int
 );
 
-create table Patients (
+create table patients (
     id serial primary key,
     active boolean,
     first_name varchar(50),
@@ -58,14 +58,14 @@ create table Patients (
     updated_user_id int
 );
 
-create table RecentPatients (
+create table recent_patients (
     user_id int not null references Users(id),
     patient_id int not null references Patients(id),
     date_created timestamp not null,
     unique(user_id, patient_id)
 );
 
-create table Avatars (
+create table avatars (
     type VARCHAR(20) NOT NULL,
     entity_id INTEGER NOT NULL,
     image BYTEA,

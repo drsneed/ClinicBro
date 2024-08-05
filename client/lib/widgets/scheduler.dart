@@ -1,15 +1,13 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
-class SchedulingControl extends StatefulWidget {
-  final bool isFlyoutVisible;
-  const SchedulingControl({Key? key, required this.isFlyoutVisible})
-      : super(key: key);
+class Scheduler extends StatefulWidget {
+  const Scheduler({Key? key}) : super(key: key);
 
   @override
-  _SchedulingControlState createState() => _SchedulingControlState();
+  _SchedulerState createState() => _SchedulerState();
 }
 
-class _SchedulingControlState extends State<SchedulingControl> {
+class _SchedulerState extends State<Scheduler> {
   late PageController _pageController;
   late DateTime _centerDate;
 
