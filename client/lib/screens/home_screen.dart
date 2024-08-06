@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import '../managers/user_manager.dart';
 import '../services/auth_service.dart';
-import 'schedule_screen.dart';
+import 'scheduler_screen.dart';
 import 'settings_screen.dart';
 import 'account_settings_dialog.dart';
 import '../widgets/custom_title_bar.dart';
@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
           PaneItem(
             icon: Icon(FluentIcons.calendar),
             title: Text('Schedule'),
-            body: ScheduleScreen(),
+            body: SchedulerScreen(),
           ),
           PaneItem(
             icon: Icon(FluentIcons.settings),

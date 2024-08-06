@@ -141,7 +141,7 @@ class AvatarButtonState extends State<AvatarButton> {
                       color: borderColor,
                       shape: BoxShape.circle,
                     ),
-                    padding: EdgeInsets.all(0.5), // Border width
+                    padding: EdgeInsets.all(1.0), // Border width
                     child: avatarWidget,
                   );
                 },

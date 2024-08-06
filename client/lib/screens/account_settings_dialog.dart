@@ -255,7 +255,7 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
         Align(
           alignment: Alignment.center,
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 60.0),
+            constraints: const BoxConstraints(maxWidth: 80.0),
             child: Button(
               child: const Text('Close'),
               onPressed: () {
