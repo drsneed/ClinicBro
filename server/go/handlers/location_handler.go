@@ -50,13 +50,27 @@ func GetLocation(c *gin.Context) {
 func GetAllLocations(c *gin.Context) {
 	var db = storage.GetTenantDB(c)
 	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection error"})
 		return
 	}
+
+	// Retrieve the optional include_inactive query parameter
+	includeInactive := c.DefaultQuery("include_inactive", "false")
+	includeInactiveBool := includeInactive == "true"
+
 	var locations []models.Location
-	if err := db.Find(&locations).Error; err != nil {
+
+	// Apply the condition based on the include_inactive parameter
+	query := db.Model(&models.Location{})
+	if !includeInactiveBool {
+		query = query.Where("active = ?", true)
+	}
+
+	if err := query.Find(&locations).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch locations"})
 		return
 	}
+
 	c.JSON(http.StatusOK, locations)
 }
 

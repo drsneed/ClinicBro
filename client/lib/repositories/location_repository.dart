@@ -48,8 +48,13 @@ class LocationRepository {
     return response.statusCode == 204;
   }
 
-  Future<List<Location>> getAllLocations() async {
-    final response = await DataService().get('/locations');
+  Future<List<Location>> getAllLocations({bool includeInactive = false}) async {
+    final queryParams = <String, String>{};
+    if (includeInactive) {
+      queryParams['include_inactive'] = 'true';
+    }
+    final response =
+        await DataService().get('/locations', queryParams: queryParams);
     if (response.statusCode == 200) {
       List<dynamic> locationsJson = jsonDecode(response.body);
       return locationsJson.map((json) => Location.fromJson(json)).toList();

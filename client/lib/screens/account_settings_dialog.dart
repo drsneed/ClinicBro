@@ -567,13 +567,30 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
     });
   }
 
+  Future<void> _loadOperatingScheduleForSelectedLocation() async {
+    if (selectedLocation != null) {
+      final selectedLocationId =
+          _locations.firstWhere((loc) => loc.name == selectedLocation).id;
+      final schedule =
+          await UserRepository().getOperatingSchedule(selectedLocationId);
+      if (schedule != null) {
+        setState(() {
+          _currentOperatingSchedule = schedule;
+          _updateWorkHoursFromSchedule(schedule);
+        });
+      }
+    }
+  }
+
   Future<void> _fetchLocations() async {
     final locationRepository = LocationRepository();
-    final locations = await locationRepository.getAllLocations();
+    final locations =
+        await locationRepository.getAllLocations(includeInactive: false);
     setState(() {
       _locations = locations;
       if (_locations.isNotEmpty) {
         selectedLocation = _locations.first.name;
+        _loadOperatingScheduleForSelectedLocation(); // Load schedule for the first location
       }
       _isLoading = false;
     });
@@ -607,10 +624,16 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
                     _locations.firstWhere((loc) => loc.name == newLocation).id;
                 final schedule = await UserRepository()
                     .getOperatingSchedule(selectedLocationId);
+
                 if (schedule != null) {
                   setState(() {
                     _currentOperatingSchedule = schedule;
                     _updateWorkHoursFromSchedule(schedule);
+                  });
+                } else {
+                  setState(() {
+                    _currentOperatingSchedule = null;
+                    _clearWorkHours();
                   });
                 }
               }
@@ -620,6 +643,20 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
         ),
       ],
     );
+  }
+
+  void _clearWorkHours() {
+    setState(() {
+      workHours = {
+        'Sunday': {'Start': null, 'End': null},
+        'Monday': {'Start': null, 'End': null},
+        'Tuesday': {'Start': null, 'End': null},
+        'Wednesday': {'Start': null, 'End': null},
+        'Thursday': {'Start': null, 'End': null},
+        'Friday': {'Start': null, 'End': null},
+        'Saturday': {'Start': null, 'End': null},
+      };
+    });
   }
 
   void _updateWorkHoursFromSchedule(OperatingSchedule schedule) {
