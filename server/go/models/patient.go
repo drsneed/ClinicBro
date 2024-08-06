@@ -23,7 +23,7 @@ type Patient struct {
 	CanText       bool       `json:"can_text"`
 	CanEmail      bool       `json:"can_email"`
 	LocationID    uint       `json:"location_id"`
-	UserID        uint       `json:"user_id"`
+	ProviderID    uint       `json:"provider_id"`
 	DateCreated   time.Time  `json:"date_created"`
 	DateUpdated   time.Time  `json:"date_updated"`
 	CreatedUserID uint       `json:"created_user_id"`

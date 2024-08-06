@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"ClinicBro-Server/storage"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -18,7 +17,6 @@ func SetJWTSecret(secret string) {
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Print("jwtSecret: ", jwtSecret)
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header is required"})

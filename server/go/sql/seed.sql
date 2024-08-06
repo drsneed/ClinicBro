@@ -104,3 +104,65 @@ INSERT INTO locations (
 (true, 'Customer Service Center', '555-444-5555', '789 Service Ln', 'Suite A', 'Servicetown', 'TX', '75201', NOW(), NOW(), 10, 10),
 (false, 'Closed Branch', '555-666-7777', '321 Pastel Ave', NULL, 'Old City', 'FL', '33130', NOW(), NOW(), 10, 10),
 (true, 'Logistics Center', '555-888-9999', '654 Logistics Blvd', 'Warehouse 5', 'Transport Town', 'IL', '60616', NOW(), NOW(), 10, 10);
+
+WITH random_appointments AS (
+    SELECT 
+        'Appointment ' || generate_series AS title,
+        (DATE '2024-08-01' + (random() * (DATE '2024-09-30' - DATE '2024-08-01'))::int) AS appt_date,
+        (TIME '08:00:00' + (random() * INTERVAL '9 hours'))::time AS appt_from,
+        floor(random() * 72 + 1)::int AS patient_id,
+        floor(random() * 10 + 6)::int AS provider_id,
+        floor(random() * 5 + 1)::int AS appointment_type_id,
+        floor(random() * 6 + 1)::int AS appointment_status_id,
+        floor(random() * 5 + 1)::int AS location_id,
+        floor(random() * 10 + 6)::int AS created_user_id
+    FROM generate_series(1, 50)
+)
+INSERT INTO appointments (
+    title, 
+    appt_date, 
+    appt_from, 
+    appt_to, 
+    notes, 
+    patient_id, 
+    provider_id, 
+    appointment_type_id, 
+    appointment_status_id, 
+    location_id, 
+    date_created, 
+    date_updated, 
+    created_user_id, 
+    updated_user_id
+)
+SELECT 
+    title,
+    appt_date,
+    appt_from,
+    (appt_from + INTERVAL '30 minutes')::time AS appt_to,
+    'Random appointment notes for ' || title,
+    patient_id,
+    provider_id,
+    appointment_type_id,
+    appointment_status_id,
+    location_id,
+    CURRENT_TIMESTAMP AS date_created,
+    CURRENT_TIMESTAMP AS date_updated,
+    created_user_id,
+    created_user_id AS updated_user_id
+FROM random_appointments;
+
+-- Seed script for operating_schedule
+INSERT INTO operating_schedule (
+    location_id, user_id, 
+    hours_sun_from, hours_sun_to, hours_mon_from, hours_mon_to,
+    hours_tue_from, hours_tue_to, hours_wed_from, hours_wed_to,
+    hours_thu_from, hours_thu_to, hours_fri_from, hours_fri_to,
+    hours_sat_from, hours_sat_to,
+    date_created, date_updated, created_user_id, updated_user_id
+) VALUES
+-- Location 1 hours (no user_id)
+(1, NULL, '09:00', '17:00', '08:00', '18:00', '08:00', '18:00', '08:00', '18:00', '08:00', '18:00', '08:00', '18:00', '09:00', '17:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1),
+-- User 1 schedule at Location 1
+(1, 1, '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1),
+-- User 2 schedule at Location 1
+(1, 2, '00:00', '00:00', '08:00', '16:00', '08:00', '16:00', '08:00', '16:00', '08:00', '16:00', '08:00', '16:00', '00:00', '00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1);

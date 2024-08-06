@@ -15,9 +15,7 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
-
 	storage.InitAll()
-
 	jwtSecret := os.Getenv("JWT_SECRET_KEY")
 	middleware.SetJWTSecret(jwtSecret)
 	handlers.SetJWTSecret(jwtSecret)
@@ -63,6 +61,36 @@ func main() {
 
 		// Password change route
 		authorized.POST("/change-password", handlers.ChangePassword)
+
+		// Appointment Types routes
+		authorized.POST("/appointment-types", handlers.CreateAppointmentType)
+		authorized.GET("/appointment-types/:id", handlers.GetAppointmentType)
+		authorized.GET("/appointment-types", handlers.GetAllAppointmentTypes)
+		authorized.PUT("/appointment-types/:id", handlers.UpdateAppointmentType)
+		authorized.DELETE("/appointment-types/:id", handlers.DeleteAppointmentType)
+
+		// Appointment Statuses routes
+		authorized.POST("/appointment-statuses", handlers.CreateAppointmentStatus)
+		authorized.GET("/appointment-statuses/:id", handlers.GetAppointmentStatus)
+		authorized.GET("/appointment-statuses", handlers.GetAllAppointmentStatuses)
+		authorized.PUT("/appointment-statuses/:id", handlers.UpdateAppointmentStatus)
+		authorized.DELETE("/appointment-statuses/:id", handlers.DeleteAppointmentStatus)
+
+		// Appointments routes
+		authorized.POST("/appointments", handlers.CreateAppointment)
+		authorized.GET("/appointments/:id", handlers.GetAppointment)
+		authorized.GET("/appointments", handlers.GetAllAppointments)
+		authorized.PUT("/appointments/:id", handlers.UpdateAppointment)
+		authorized.DELETE("/appointments/:id", handlers.DeleteAppointment)
+
+		// Appointment Items routes
+		authorized.GET("/appointment-items", handlers.GetAppointmentItems)
+
+		// Operating Schedule routes
+		authorized.POST("/operating-schedule", handlers.CreateOperatingSchedule)
+		authorized.GET("/operating-schedule", handlers.GetOperatingSchedule)
+		authorized.PUT("/operating-schedule", handlers.UpdateOperatingSchedule)
+		authorized.DELETE("/operating-schedule", handlers.DeleteOperatingSchedule)
 	}
 
 	// Start server
