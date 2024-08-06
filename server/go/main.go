@@ -23,7 +23,7 @@ func main() {
 	r := gin.Default()
 
 	// Apply the logging middleware globally
-	r.Use(middleware.LoggingMiddleware())
+	//r.Use(middleware.LoggingMiddleware())
 
 	// Public routes
 	r.POST("/authenticate", handlers.Authenticate)
@@ -95,6 +95,7 @@ func main() {
 		authorized.GET("/operating-schedule", handlers.GetOperatingSchedule)
 		authorized.PUT("/operating-schedule", handlers.UpdateOperatingSchedule)
 		authorized.DELETE("/operating-schedule", handlers.DeleteOperatingSchedule)
+		authorized.GET("/operating-schedule/current-user", handlers.GetOperatingScheduleForCurrentUser)
 	}
 
 	// Start server

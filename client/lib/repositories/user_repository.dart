@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import '../models/operating_schedule.dart';
 import '../models/patient_item.dart';
 import '../models/user.dart';
 import '../services/data_service.dart';
@@ -125,11 +126,11 @@ class UserRepository {
     return response.statusCode == 200;
   }
 
-  // Example of a protected endpoint call
-  Future<Map<String, dynamic>?> callProtectedEndpoint() async {
-    final response = await DataService().get('/protected-endpoint');
+  Future<OperatingSchedule?> getOperatingSchedule(int locationId) async {
+    final response = await DataService()
+        .get('/operating-schedule/current-user?location_id=$locationId');
     if (response.statusCode == 200) {
-      return jsonDecode(response.body);
+      return OperatingSchedule.fromJson(jsonDecode(response.body));
     } else {
       // Handle errors or throw exceptions
       return null;

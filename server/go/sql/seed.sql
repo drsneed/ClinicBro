@@ -152,7 +152,7 @@ SELECT
 FROM random_appointments;
 
 -- Seed script for operating_schedule
-INSERT INTO operating_schedule (
+INSERT INTO operating_schedules (
     location_id, user_id, 
     hours_sun_from, hours_sun_to, hours_mon_from, hours_mon_to,
     hours_tue_from, hours_tue_to, hours_wed_from, hours_wed_to,
@@ -163,6 +163,6 @@ INSERT INTO operating_schedule (
 -- Location 1 hours (no user_id)
 (1, NULL, '09:00', '17:00', '08:00', '18:00', '08:00', '18:00', '08:00', '18:00', '08:00', '18:00', '08:00', '18:00', '09:00', '17:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1),
 -- User 1 schedule at Location 1
-(1, 1, '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1),
+(1, 10, '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', '09:00', '17:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1),
 -- User 2 schedule at Location 1
-(1, 2, '00:00', '00:00', '08:00', '16:00', '08:00', '16:00', '08:00', '16:00', '08:00', '16:00', '08:00', '16:00', '00:00', '00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1);
+(1, 6, '00:00', '00:00', '08:00', '16:00', '08:00', '16:00', '08:00', '16:00', '08:00', '16:00', '08:00', '16:00', '00:00', '00:00', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 1, 1);

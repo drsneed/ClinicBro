@@ -30,23 +30,23 @@ create table locations (
 );
 
 
-create table operating_schedule (
+create table operating_schedules (
     location_id int not null,
     user_id int, -- if null, it's the location's hours of operation
-    hours_sun_from time not null,
-    hours_sun_to time not null,
-    hours_mon_from time not null,
-    hours_mon_to time not null,
-    hours_tue_from time not null,
-    hours_tue_to time not null,
-    hours_wed_from time not null,
-    hours_wed_to time not null,
-    hours_thu_from time not null,
-    hours_thu_to time not null,
-    hours_fri_from time not null,
-    hours_fri_to time not null,
-    hours_sat_from time not null,
-    hours_sat_to time not null,
+    hours_sun_from time,
+    hours_sun_to time,
+    hours_mon_from time,
+    hours_mon_to time,
+    hours_tue_from time,
+    hours_tue_to time,
+    hours_wed_from time,
+    hours_wed_to time,
+    hours_thu_from time,
+    hours_thu_to time,
+    hours_fri_from time,
+    hours_fri_to time,
+    hours_sat_from time,
+    hours_sat_to time,
     -- tracking columns
     date_created timestamp not null,
     date_updated timestamp not null,

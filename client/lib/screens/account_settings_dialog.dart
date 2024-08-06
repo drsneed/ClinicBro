@@ -2,18 +2,28 @@ import 'dart:typed_data';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:image_picker/image_picker.dart';
 import '../managers/user_manager.dart';
+import '../models/location.dart';
+import '../models/operating_schedule.dart';
+import '../repositories/location_repository.dart';
+import '../repositories/operating_schedule_repository.dart';
 import '../repositories/user_repository.dart';
 import '../services/auth_service.dart';
 import 'dart:io'; // For File
 import 'package:flutter/material.dart'
-    show CircularProgressIndicator, ScaffoldMessenger, SnackBar, Theme;
+    show
+        CircularProgressIndicator,
+        ScaffoldMessenger,
+        SnackBar,
+        Theme,
+        TimeOfDay;
 import 'package:image/image.dart' as img;
+
+import '../widgets/custom_time_picker.dart';
 
 class AccountSettingsDialog extends StatefulWidget {
   final VoidCallback onAvatarChanged; // Callback to refresh avatar
 
-  const AccountSettingsDialog({Key? key, required this.onAvatarChanged})
-      : super(key: key);
+  const AccountSettingsDialog({super.key, required this.onAvatarChanged});
 
   @override
   _AccountSettingsDialogState createState() => _AccountSettingsDialogState();
@@ -23,6 +33,92 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   final oldPasswordController = TextEditingController();
   final newPasswordController = TextEditingController();
   final reenterNewPasswordController = TextEditingController();
+  String? selectedLocation;
+  List<Location> _locations = [];
+  bool _isLoading = true;
+  Uint8List? _cachedAvatarData; // Cached avatar data
+  OperatingSchedule? _currentOperatingSchedule;
+  @override
+  void initState() {
+    super.initState();
+    _fetchLocations();
+  }
+
+  Map<String, Map<String, DateTime?>> workHours = {
+    'Monday': {'Start': null, 'End': null},
+    'Tuesday': {'Start': null, 'End': null},
+    'Wednesday': {'Start': null, 'End': null},
+    'Thursday': {'Start': null, 'End': null},
+    'Friday': {'Start': null, 'End': null},
+    'Saturday': {'Start': null, 'End': null},
+    'Sunday': {'Start': null, 'End': null},
+  };
+
+  Future<void> _handleSaveWorkHours() async {
+    final locationId =
+        _locations.firstWhere((loc) => loc.name == selectedLocation).id;
+    final userId = UserManager().currentUser?.id;
+
+    if (userId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('User ID is not available.')),
+      );
+      return;
+    }
+
+    // Create the new schedule
+    final updatedSchedule = OperatingSchedule(
+      locationId: locationId,
+      userId: userId,
+      hoursSunFrom: _dateTimeToTimeOfDay(workHours['Sunday']?['Start']),
+      hoursSunTo: _dateTimeToTimeOfDay(workHours['Sunday']?['End']),
+      hoursMonFrom: _dateTimeToTimeOfDay(workHours['Monday']?['Start']),
+      hoursMonTo: _dateTimeToTimeOfDay(workHours['Monday']?['End']),
+      hoursTueFrom: _dateTimeToTimeOfDay(workHours['Tuesday']?['Start']),
+      hoursTueTo: _dateTimeToTimeOfDay(workHours['Tuesday']?['End']),
+      hoursWedFrom: _dateTimeToTimeOfDay(workHours['Wednesday']?['Start']),
+      hoursWedTo: _dateTimeToTimeOfDay(workHours['Wednesday']?['End']),
+      hoursThuFrom: _dateTimeToTimeOfDay(workHours['Thursday']?['Start']),
+      hoursThuTo: _dateTimeToTimeOfDay(workHours['Thursday']?['End']),
+      hoursFriFrom: _dateTimeToTimeOfDay(workHours['Friday']?['Start']),
+      hoursFriTo: _dateTimeToTimeOfDay(workHours['Friday']?['End']),
+      hoursSatFrom: _dateTimeToTimeOfDay(workHours['Saturday']?['Start']),
+      hoursSatTo: _dateTimeToTimeOfDay(workHours['Saturday']?['End']),
+      dateCreated: DateTime.now(),
+      dateUpdated: DateTime.now(),
+    );
+    print(updatedSchedule.hoursMonFrom);
+
+    bool success;
+    if (_currentOperatingSchedule == null) {
+      updatedSchedule.printJson();
+      // Create a new schedule if current schedule is null
+      success = await OperatingScheduleRepository()
+          .createOperatingSchedule(updatedSchedule);
+    } else {
+      // Update existing schedule
+      final updatedScheduleWithId = updatedSchedule.copyWith(
+          locationId: _currentOperatingSchedule!.locationId,
+          userId: _currentOperatingSchedule!.userId);
+      success = await OperatingScheduleRepository()
+          .updateOperatingSchedule(updatedScheduleWithId);
+    }
+
+    if (success) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Work hours saved successfully.')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to save work hours.')),
+      );
+    }
+  }
+
+  TimeOfDay? _dateTimeToTimeOfDay(DateTime? dateTime) {
+    if (dateTime == null) return null;
+    return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+  }
 
   Future<void> _handleChangePassword() async {
     final oldPassword = oldPasswordController.text;
@@ -105,6 +201,12 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
     }
   }
 
+  String _formatTime(DateTime dateTime) {
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
   Future<void> _handleEditAvatar() async {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -127,7 +229,9 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
 
           if (success) {
             widget.onAvatarChanged(); // Refresh the avatar in the parent
-            setState(() {}); // Refresh the dialog state
+            setState(() {
+              _cachedAvatarData = null; // Invalidate cache to reload the avatar
+            });
           } else {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Failed to update profile picture')),
@@ -143,9 +247,16 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   }
 
   Future<Uint8List?> _loadAvatarImage() async {
+    if (_cachedAvatarData != null) {
+      return _cachedAvatarData; // Return cached data if available
+    }
+
     try {
       final userId = UserManager().currentUser?.id;
       final bytes = await UserRepository().getAvatar(userId ?? 0);
+      setState(() {
+        _cachedAvatarData = bytes; // Cache the data
+      });
       return bytes;
     } catch (e) {
       print('Error loading avatar: $e');
@@ -220,6 +331,13 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
                   label: 'User Profile',
                 ),
                 content: _buildUserProfileSection(context, _handleEditAvatar),
+              ),
+              Expander(
+                header: _buildSettingsOption(
+                  icon: FluentIcons.calendar,
+                  label: 'Work Hours',
+                ),
+                content: _buildWorkHoursSection(),
               ),
               Expander(
                 header: _buildSettingsOption(
@@ -386,6 +504,273 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildWorkHoursSection() {
+    if (_isLoading) {
+      return Center(child: ProgressRing()); // Show a loading indicator
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            // Location ComboBox
+            Expanded(
+              child: _buildLocationComboBox(),
+            ),
+
+            // Spacer between ComboBox and Button
+            SizedBox(width: 24), // Adjust this width as needed for spacing
+
+            // Fill Defaults Button
+            Button(
+              onPressed: _fillDefaultWorkHours,
+              child: Text('Fill Defaults'),
+            ),
+          ],
+        ),
+        SizedBox(height: 16),
+        _buildWeeklySchedule(),
+        Align(
+          alignment: Alignment.bottomRight,
+          child: Button(
+            onPressed: _handleSaveWorkHours,
+            child: const Text('Save'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _fillDefaultWorkHours() {
+    setState(() {
+      // Set work hours for Monday to Friday
+      final startOfDay = DateTime(2024, 1, 1, 9, 0);
+      final endOfDay = DateTime(2024, 1, 1, 17, 0);
+      final daysOfWeek = [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday'
+      ];
+
+      for (final day in daysOfWeek) {
+        workHours[day] = {'Start': startOfDay, 'End': endOfDay};
+      }
+
+      // Set work hours for Saturday and Sunday to null
+      workHours['Saturday'] = {'Start': null, 'End': null};
+      workHours['Sunday'] = {'Start': null, 'End': null};
+    });
+  }
+
+  Future<void> _fetchLocations() async {
+    final locationRepository = LocationRepository();
+    final locations = await locationRepository.getAllLocations();
+    setState(() {
+      _locations = locations;
+      if (_locations.isNotEmpty) {
+        selectedLocation = _locations.first.name;
+      }
+      _isLoading = false;
+    });
+  }
+
+  Widget _buildLocationComboBox() {
+    if (_locations.isEmpty) {
+      return Center(child: Text('No locations found.'));
+    }
+    return Row(
+      children: [
+        SizedBox(width: 80, child: Text('Location:')),
+        SizedBox(width: 8),
+        Expanded(
+          child: ComboBox<String>(
+            placeholder: Text('Select a location'),
+            isExpanded: true,
+            items: _locations
+                .map((Location location) => ComboBoxItem<String>(
+                      value: location.name,
+                      child: Text(location.name),
+                    ))
+                .toList(),
+            onChanged: (String? newLocation) async {
+              setState(() {
+                selectedLocation = newLocation;
+              });
+
+              if (newLocation != null) {
+                final selectedLocationId =
+                    _locations.firstWhere((loc) => loc.name == newLocation).id;
+                final schedule = await UserRepository()
+                    .getOperatingSchedule(selectedLocationId);
+                if (schedule != null) {
+                  setState(() {
+                    _currentOperatingSchedule = schedule;
+                    _updateWorkHoursFromSchedule(schedule);
+                  });
+                }
+              }
+            },
+            value: selectedLocation,
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _updateWorkHoursFromSchedule(OperatingSchedule schedule) {
+    setState(() {
+      // Sunday
+      if (schedule.hoursSunFrom != null && schedule.hoursSunTo != null) {
+        workHours['Sunday'] = {
+          'Start': DateTime(2024, 1, 1, schedule.hoursSunFrom!.hour,
+              schedule.hoursSunFrom!.minute),
+          'End': DateTime(2024, 1, 1, schedule.hoursSunTo!.hour,
+              schedule.hoursSunTo!.minute),
+        };
+      } else {
+        workHours['Sunday'] = {'Start': null, 'End': null};
+      }
+
+      // Monday
+      if (schedule.hoursMonFrom != null && schedule.hoursMonTo != null) {
+        workHours['Monday'] = {
+          'Start': DateTime(2024, 1, 1, schedule.hoursMonFrom!.hour,
+              schedule.hoursMonFrom!.minute),
+          'End': DateTime(2024, 1, 1, schedule.hoursMonTo!.hour,
+              schedule.hoursMonTo!.minute),
+        };
+      } else {
+        workHours['Monday'] = {'Start': null, 'End': null};
+      }
+
+      // Tuesday
+      if (schedule.hoursTueFrom != null && schedule.hoursTueTo != null) {
+        workHours['Tuesday'] = {
+          'Start': DateTime(2024, 1, 1, schedule.hoursTueFrom!.hour,
+              schedule.hoursTueFrom!.minute),
+          'End': DateTime(2024, 1, 1, schedule.hoursTueTo!.hour,
+              schedule.hoursTueTo!.minute),
+        };
+      } else {
+        workHours['Tuesday'] = {'Start': null, 'End': null};
+      }
+
+      // Wednesday
+      if (schedule.hoursWedFrom != null && schedule.hoursWedTo != null) {
+        workHours['Wednesday'] = {
+          'Start': DateTime(2024, 1, 1, schedule.hoursWedFrom!.hour,
+              schedule.hoursWedFrom!.minute),
+          'End': DateTime(2024, 1, 1, schedule.hoursWedTo!.hour,
+              schedule.hoursWedTo!.minute),
+        };
+      } else {
+        workHours['Wednesday'] = {'Start': null, 'End': null};
+      }
+
+      // Thursday
+      if (schedule.hoursThuFrom != null && schedule.hoursThuTo != null) {
+        workHours['Thursday'] = {
+          'Start': DateTime(2024, 1, 1, schedule.hoursThuFrom!.hour,
+              schedule.hoursThuFrom!.minute),
+          'End': DateTime(2024, 1, 1, schedule.hoursThuTo!.hour,
+              schedule.hoursThuTo!.minute),
+        };
+      } else {
+        workHours['Thursday'] = {'Start': null, 'End': null};
+      }
+
+      // Friday
+      if (schedule.hoursFriFrom != null && schedule.hoursFriTo != null) {
+        workHours['Friday'] = {
+          'Start': DateTime(2024, 1, 1, schedule.hoursFriFrom!.hour,
+              schedule.hoursFriFrom!.minute),
+          'End': DateTime(2024, 1, 1, schedule.hoursFriTo!.hour,
+              schedule.hoursFriTo!.minute),
+        };
+      } else {
+        workHours['Friday'] = {'Start': null, 'End': null};
+      }
+
+      // Saturday
+      if (schedule.hoursSatFrom != null && schedule.hoursSatTo != null) {
+        workHours['Saturday'] = {
+          'Start': DateTime(2024, 1, 1, schedule.hoursSatFrom!.hour,
+              schedule.hoursSatFrom!.minute),
+          'End': DateTime(2024, 1, 1, schedule.hoursSatTo!.hour,
+              schedule.hoursSatTo!.minute),
+        };
+      } else {
+        workHours['Saturday'] = {'Start': null, 'End': null};
+      }
+    });
+  }
+
+  Widget _buildWeeklySchedule() {
+    // Rearrange the days to start with Sunday
+    final daysOfWeek = [
+      'Sunday',
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday'
+    ];
+
+    return Column(
+      children: daysOfWeek.map((day) => _buildDaySchedule(day)).toList(),
+    );
+  }
+
+  Widget _buildDaySchedule(String day) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        children: [
+          SizedBox(width: 100, child: Text(day)),
+          SizedBox(width: 16),
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(child: _buildTimePicker(day, 'Start')),
+                SizedBox(width: 16),
+                Expanded(child: _buildTimePicker(day, 'End')),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimePicker(String day, String label) {
+    final time = workHours[day]![label];
+
+    return CustomTimePicker(
+      header: label,
+      selected: time,
+      onChanged: (newTime) {
+        if (newTime != null) {
+          // Round minutes to nearest 15
+          //int roundedMinute = (newTime.minute / 15).round() * 15;
+          setState(() {
+            workHours[day]![label] = DateTime(
+              2024,
+              1,
+              1,
+              newTime.hour,
+              newTime.minute,
+            );
+          });
+        }
+      },
+      minuteIncrement: 15,
+      hourFormat: HourFormat.h,
     );
   }
 }

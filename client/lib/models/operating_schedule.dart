@@ -3,44 +3,44 @@ import 'package:flutter/material.dart' show TimeOfDay;
 class OperatingSchedule {
   final int locationId;
   final int? userId;
-  final TimeOfDay hoursSunFrom;
-  final TimeOfDay hoursSunTo;
-  final TimeOfDay hoursMonFrom;
-  final TimeOfDay hoursMonTo;
-  final TimeOfDay hoursTueFrom;
-  final TimeOfDay hoursTueTo;
-  final TimeOfDay hoursWedFrom;
-  final TimeOfDay hoursWedTo;
-  final TimeOfDay hoursThuFrom;
-  final TimeOfDay hoursThuTo;
-  final TimeOfDay hoursFriFrom;
-  final TimeOfDay hoursFriTo;
-  final TimeOfDay hoursSatFrom;
-  final TimeOfDay hoursSatTo;
-  final DateTime dateCreated;
-  final DateTime dateUpdated;
+  final TimeOfDay? hoursSunFrom;
+  final TimeOfDay? hoursSunTo;
+  final TimeOfDay? hoursMonFrom;
+  final TimeOfDay? hoursMonTo;
+  final TimeOfDay? hoursTueFrom;
+  final TimeOfDay? hoursTueTo;
+  final TimeOfDay? hoursWedFrom;
+  final TimeOfDay? hoursWedTo;
+  final TimeOfDay? hoursThuFrom;
+  final TimeOfDay? hoursThuTo;
+  final TimeOfDay? hoursFriFrom;
+  final TimeOfDay? hoursFriTo;
+  final TimeOfDay? hoursSatFrom;
+  final TimeOfDay? hoursSatTo;
+  final DateTime? dateCreated;
+  final DateTime? dateUpdated;
   final int? createdUserId;
   final int? updatedUserId;
 
   OperatingSchedule({
     required this.locationId,
     this.userId,
-    required this.hoursSunFrom,
-    required this.hoursSunTo,
-    required this.hoursMonFrom,
-    required this.hoursMonTo,
-    required this.hoursTueFrom,
-    required this.hoursTueTo,
-    required this.hoursWedFrom,
-    required this.hoursWedTo,
-    required this.hoursThuFrom,
-    required this.hoursThuTo,
-    required this.hoursFriFrom,
-    required this.hoursFriTo,
-    required this.hoursSatFrom,
-    required this.hoursSatTo,
-    required this.dateCreated,
-    required this.dateUpdated,
+    this.hoursSunFrom,
+    this.hoursSunTo,
+    this.hoursMonFrom,
+    this.hoursMonTo,
+    this.hoursTueFrom,
+    this.hoursTueTo,
+    this.hoursWedFrom,
+    this.hoursWedTo,
+    this.hoursThuFrom,
+    this.hoursThuTo,
+    this.hoursFriFrom,
+    this.hoursFriTo,
+    this.hoursSatFrom,
+    this.hoursSatTo,
+    this.dateCreated,
+    this.dateUpdated,
     this.createdUserId,
     this.updatedUserId,
   });
@@ -63,11 +63,21 @@ class OperatingSchedule {
       hoursFriTo: _parseTime(json['hours_fri_to']),
       hoursSatFrom: _parseTime(json['hours_sat_from']),
       hoursSatTo: _parseTime(json['hours_sat_to']),
-      dateCreated: DateTime.parse(json['date_created']),
-      dateUpdated: DateTime.parse(json['date_updated']),
+      dateCreated: json['date_created'] != null
+          ? DateTime.parse(json['date_created'])
+          : null,
+      dateUpdated: json['date_updated'] != null
+          ? DateTime.parse(json['date_updated'])
+          : null,
       createdUserId: json['created_user_id'],
       updatedUserId: json['updated_user_id'],
     );
+  }
+
+  // Method to print the JSON output
+  void printJson() {
+    final json = toJson();
+    print(json);
   }
 
   Map<String, dynamic> toJson() {
@@ -88,25 +98,72 @@ class OperatingSchedule {
       'hours_fri_to': _formatTime(hoursFriTo),
       'hours_sat_from': _formatTime(hoursSatFrom),
       'hours_sat_to': _formatTime(hoursSatTo),
-      'date_created': dateCreated.toIso8601String(),
-      'date_updated': dateUpdated.toIso8601String(),
       'created_user_id': createdUserId,
       'updated_user_id': updatedUserId,
     };
   }
 
   // Helper function to parse time from string
-  static TimeOfDay _parseTime(String timeString) {
+  static TimeOfDay? _parseTime(String? timeString) {
+    if (timeString == null || timeString.isEmpty) return null;
     final time =
-        TimeOfDay.fromDateTime(DateTime.parse('1970-01-01 $timeString'));
+        TimeOfDay.fromDateTime(DateTime.parse('1970-01-01T$timeString'));
     return time;
   }
 
   // Helper function to format time to string
-  static String _formatTime(TimeOfDay time) {
+  static String? _formatTime(TimeOfDay? time) {
+    if (time == null) return null;
     final now = DateTime.now();
     final dateTime =
         DateTime(now.year, now.month, now.day, time.hour, time.minute);
     return dateTime.toIso8601String().split('T')[1].split('.')[0];
+  }
+
+  // Add copyWith method
+  OperatingSchedule copyWith({
+    int? locationId,
+    int? userId,
+    TimeOfDay? hoursSunFrom,
+    TimeOfDay? hoursSunTo,
+    TimeOfDay? hoursMonFrom,
+    TimeOfDay? hoursMonTo,
+    TimeOfDay? hoursTueFrom,
+    TimeOfDay? hoursTueTo,
+    TimeOfDay? hoursWedFrom,
+    TimeOfDay? hoursWedTo,
+    TimeOfDay? hoursThuFrom,
+    TimeOfDay? hoursThuTo,
+    TimeOfDay? hoursFriFrom,
+    TimeOfDay? hoursFriTo,
+    TimeOfDay? hoursSatFrom,
+    TimeOfDay? hoursSatTo,
+    DateTime? dateCreated,
+    DateTime? dateUpdated,
+    int? createdUserId,
+    int? updatedUserId,
+  }) {
+    return OperatingSchedule(
+      locationId: locationId ?? this.locationId,
+      userId: userId ?? this.userId,
+      hoursSunFrom: hoursSunFrom ?? this.hoursSunFrom,
+      hoursSunTo: hoursSunTo ?? this.hoursSunTo,
+      hoursMonFrom: hoursMonFrom ?? this.hoursMonFrom,
+      hoursMonTo: hoursMonTo ?? this.hoursMonTo,
+      hoursTueFrom: hoursTueFrom ?? this.hoursTueFrom,
+      hoursTueTo: hoursTueTo ?? this.hoursTueTo,
+      hoursWedFrom: hoursWedFrom ?? this.hoursWedFrom,
+      hoursWedTo: hoursWedTo ?? this.hoursWedTo,
+      hoursThuFrom: hoursThuFrom ?? this.hoursThuFrom,
+      hoursThuTo: hoursThuTo ?? this.hoursThuTo,
+      hoursFriFrom: hoursFriFrom ?? this.hoursFriFrom,
+      hoursFriTo: hoursFriTo ?? this.hoursFriTo,
+      hoursSatFrom: hoursSatFrom ?? this.hoursSatFrom,
+      hoursSatTo: hoursSatTo ?? this.hoursSatTo,
+      dateCreated: dateCreated ?? this.dateCreated,
+      dateUpdated: dateUpdated ?? this.dateUpdated,
+      createdUserId: createdUserId ?? this.createdUserId,
+      updatedUserId: updatedUserId ?? this.updatedUserId,
+    );
   }
 }

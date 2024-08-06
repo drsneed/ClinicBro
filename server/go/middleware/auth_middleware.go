@@ -57,6 +57,13 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		// userID, ok := claims["user_id"].(string)
+		// if !ok {
+		// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "user_id not found in token"})
+		// 	c.Abort()
+		// 	return
+		// }
+
 		db, err := storage.ConnectToTenantDB(orgID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to tenant database"})
@@ -68,6 +75,7 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Set("claims", claims)
 		c.Set("db", db)
 		c.Set("org_id", orgID)
+		//c.Set("user_id", userID)
 		c.Next()
 	}
 }
