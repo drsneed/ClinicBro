@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 class Patient {
   final int id;
   final bool active;

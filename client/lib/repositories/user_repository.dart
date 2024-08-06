@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import '../models/patient_item.dart';
 import '../models/user.dart';
 import '../services/data_service.dart';
 
@@ -56,6 +57,17 @@ class UserRepository {
     if (response.statusCode == 200) {
       List<dynamic> usersJson = jsonDecode(response.body);
       return usersJson.map((json) => User.fromJson(json)).toList();
+    } else {
+      // Handle errors or throw exceptions
+      return [];
+    }
+  }
+
+  Future<List<PatientItem>> getRecentPatients() async {
+    final response = await DataService().get('/recent-patients');
+    if (response.statusCode == 200) {
+      List<dynamic> patientsJson = jsonDecode(response.body);
+      return patientsJson.map((json) => PatientItem.fromJson(json)).toList();
     } else {
       // Handle errors or throw exceptions
       return [];

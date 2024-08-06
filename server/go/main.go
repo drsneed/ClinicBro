@@ -59,8 +59,9 @@ func main() {
 		authorized.PUT("/patients/:id", handlers.UpdatePatient)
 		authorized.DELETE("/patients/:id", handlers.DeletePatient)
 
-		// Recent patients route
+		// Recent patients routes
 		authorized.GET("/recent-patients", handlers.GetRecentPatients)
+		authorized.POST("/recent-patients/:patient_id", handlers.AddRecentPatient)
 
 		// Password change route
 		authorized.POST("/change-password", handlers.ChangePassword)

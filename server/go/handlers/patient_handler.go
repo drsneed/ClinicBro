@@ -72,7 +72,6 @@ func GetPatient(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Patient not found"})
 		return
 	}
-	// fmt.Printf("Patient Data: %+v", patient)
 	c.JSON(http.StatusOK, patient)
 }
 

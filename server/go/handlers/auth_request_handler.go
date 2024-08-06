@@ -3,6 +3,7 @@ package handlers
 import (
 	"ClinicBro-Server/models"
 	"ClinicBro-Server/storage"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -24,16 +25,16 @@ func Authenticate(c *gin.Context) {
 		return
 	}
 
-	// Connect to the tenant database
 	db, err := storage.ConnectToTenantDB(authRequest.OrgID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to tenant database"})
 		return
 	}
 
-	// Find the user and verify the password using PostgreSQL's crypt function
+	fmt.Printf("Executing query with name=%s and password=%s\n", authRequest.Name, authRequest.Password)
+
 	var user models.User
-	if err := db.Raw("SELECT * FROM users WHERE name = ? AND password = crypt(?, password)",
+	if err := db.Raw("SELECT * FROM users WHERE active=true AND name = ? AND password = crypt(?, password)",
 		authRequest.Name, authRequest.Password).Scan(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
@@ -43,8 +44,11 @@ func Authenticate(c *gin.Context) {
 		return
 	}
 
-	// If we got here, the user is authenticated
-	// Create JWT token
+	if user.ID == 0 {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
+	}
+
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": user.ID,
 		"org_id":  authRequest.OrgID,
