@@ -4,7 +4,7 @@ create table users (
     name varchar(16) not null,
     password varchar(60) not null,
     color varchar(9) not null,
-    sees_patients boolean not null,
+    is_provider boolean not null,
     -- tracking columns
     date_created timestamp not null,
     date_updated timestamp not null,

@@ -22,6 +22,9 @@ func main() {
 
 	r := gin.Default()
 
+	// Apply the logging middleware globally
+	r.Use(middleware.LoggingMiddleware())
+
 	// Public routes
 	r.POST("/authenticate", handlers.Authenticate)
 

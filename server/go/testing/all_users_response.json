@@ -1,0 +1,92 @@
+[
+  {
+    "id": 7,
+    "name": "Benjamin",
+    "color": "#4B0082",
+    "is_provider": false,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T21:07:09.621983Z"
+  },
+  {
+    "id": 8,
+    "name": "Catherine",
+    "color": "#008080",
+    "is_provider": true,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T21:07:09.621983Z"
+  },
+  {
+    "id": 9,
+    "name": "Dorothy",
+    "color": "#800080",
+    "is_provider": true,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T21:07:09.621983Z"
+  },
+  {
+    "id": 10,
+    "name": "Edward",
+    "color": "#4682B4",
+    "is_provider": false,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T21:07:09.621983Z"
+  },
+  {
+    "id": 11,
+    "name": "Fiona",
+    "color": "#008000",
+    "is_provider": true,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T21:07:09.621983Z"
+  },
+  {
+    "id": 12,
+    "name": "George",
+    "color": "#A52A2A",
+    "is_provider": true,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T21:07:09.621983Z"
+  },
+  {
+    "id": 13,
+    "name": "Helen",
+    "color": "#D2B48C",
+    "is_provider": false,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T21:07:09.621983Z"
+  },
+  {
+    "id": 14,
+    "name": "Isaac",
+    "color": "#DC143C",
+    "is_provider": true,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T21:07:09.621983Z"
+  },
+  {
+    "id": 15,
+    "name": "Julian",
+    "color": "#20B2AA",
+    "is_provider": false,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T21:07:09.621983Z"
+  },
+  {
+    "id": 6,
+    "name": "Alexander",
+    "color": "#003366",
+    "is_provider": true,
+    "active": true,
+    "date_created": "2024-08-04T21:07:09.621983Z",
+    "date_updated": "2024-08-04T23:34:18.841809Z"
+  }
+]

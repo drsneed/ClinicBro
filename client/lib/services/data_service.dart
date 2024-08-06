@@ -1,7 +1,5 @@
 import 'dart:typed_data';
-
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class DataService {
   static final DataService _instance = DataService._internal();
@@ -19,32 +17,36 @@ class DataService {
     String path, {
     Map<String, String>? headers,
     Object? body,
+    Map<String, String>? queryParams,
   }) async {
-    return request('post', path, body: body);
+    return request('POST', path,
+        body: body, headers: headers, queryParams: queryParams);
   }
 
   Future<http.Response> get(
     String path, {
     Map<String, String>? headers,
-    Object? body,
+    Map<String, String>? queryParams,
   }) async {
-    return request('get', path, body: body);
+    return request('GET', path, headers: headers, queryParams: queryParams);
   }
 
   Future<http.Response> put(
     String path, {
     Map<String, String>? headers,
     Object? body,
+    Map<String, String>? queryParams,
   }) async {
-    return request('put', path, body: body);
+    return request('PUT', path,
+        body: body, headers: headers, queryParams: queryParams);
   }
 
   Future<http.Response> delete(
     String path, {
     Map<String, String>? headers,
-    Object? body,
+    Map<String, String>? queryParams,
   }) async {
-    return request('delete', path, body: body);
+    return request('DELETE', path, headers: headers, queryParams: queryParams);
   }
 
   Future<http.Response> request(
@@ -52,8 +54,9 @@ class DataService {
     String path, {
     Map<String, String>? headers,
     Object? body,
+    Map<String, String>? queryParams,
   }) async {
-    final url = Uri.parse('$baseUrl$path');
+    final uri = _buildUri(path, queryParams);
     final requestHeaders = {
       'Content-Type': 'application/json',
       if (_jwtToken != null) 'Authorization': 'Bearer $_jwtToken',
@@ -62,16 +65,24 @@ class DataService {
 
     switch (method.toUpperCase()) {
       case 'GET':
-        return await http.get(url, headers: requestHeaders);
+        return await http.get(uri, headers: requestHeaders);
       case 'POST':
-        return await http.post(url, headers: requestHeaders, body: body);
+        return await http.post(uri, headers: requestHeaders, body: body);
       case 'PUT':
-        return await http.put(url, headers: requestHeaders, body: body);
+        return await http.put(uri, headers: requestHeaders, body: body);
       case 'DELETE':
-        return await http.delete(url, headers: requestHeaders);
+        return await http.delete(uri, headers: requestHeaders);
       default:
         throw Exception('Unsupported HTTP method');
     }
+  }
+
+  Uri _buildUri(String path, Map<String, String>? queryParams) {
+    final uri = Uri.parse('$baseUrl$path');
+    if (queryParams != null && queryParams.isNotEmpty) {
+      return uri.replace(queryParameters: queryParams);
+    }
+    return uri;
   }
 
   Future<http.Response> postFile(

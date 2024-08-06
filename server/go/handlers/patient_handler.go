@@ -1,14 +1,36 @@
 package handlers
 
 import (
+	"ClinicBro-Server/models"
+	"ClinicBro-Server/storage"
+	"encoding/json"
+	"log"
 	"net/http"
 	"time"
 
-	"ClinicBro-Server/models"
-	"ClinicBro-Server/storage"
-
 	"github.com/gin-gonic/gin"
 )
+
+// Example function that logs JSON deserialization
+func unmarshalPatient(jsonData []byte) {
+	var patient models.Patient
+	err := json.Unmarshal(jsonData, &patient)
+	if err != nil {
+		log.Printf("Error unmarshaling patient: %v", err)
+		return
+	}
+	log.Printf("Deserialized Patient: %+v", patient)
+}
+
+// Example function that logs JSON serialization
+func logPatient(patient models.Patient) {
+	jsonData, err := json.Marshal(patient)
+	if err != nil {
+		log.Printf("Error marshaling patient: %v", err)
+		return
+	}
+	log.Printf("Serialized Patient JSON: %s", jsonData)
+}
 
 func CreatePatient(c *gin.Context) {
 	var patient models.Patient
@@ -39,11 +61,18 @@ func GetPatient(c *gin.Context) {
 	if db == nil {
 		return
 	}
+	// var patient models.Patient
+	// result := db.Raw("SELECT address_1, address_2 FROM patients WHERE id = ?", id).Scan(&patient)
+	// if result.Error != nil {
+	// 	log.Fatalf("Query error: %v", result.Error)
+	// }
+
 	var patient models.Patient
 	if err := db.First(&patient, id).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Patient not found"})
 		return
 	}
+	// fmt.Printf("Patient Data: %+v", patient)
 	c.JSON(http.StatusOK, patient)
 }
 

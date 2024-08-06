@@ -109,8 +109,10 @@ func ConnectToTenantDB(orgID string) (*gorm.DB, error) {
 		return nil, err
 	}
 
-	// Create new database connection
-	db, err := gorm.Open(postgres.Open(tenantInfo.GetDSN()), &gorm.Config{})
+	// Create new database connection with logging
+	db, err := gorm.Open(postgres.Open(tenantInfo.GetDSN()), &gorm.Config{
+		Logger: CustomLogger{}, // Use the custom logger for SQL logging
+	})
 	if err != nil {
 		return nil, err
 	}
