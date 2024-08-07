@@ -3,16 +3,21 @@ import 'package:http/http.dart' as http;
 
 class DataService {
   static final DataService _instance = DataService._internal();
-  static const String baseUrl = 'http://192.168.1.34:33420';
   factory DataService() => _instance;
   DataService._internal();
 
+  String? _baseUrl;
   String? _jwtToken;
   bool _loggingEnabled = false; // Flag to enable/disable logging
 
   String? get jwtToken => _jwtToken;
   void setToken(String? token) {
     _jwtToken = token;
+  }
+
+  String? get baseUrl => _baseUrl;
+  void setBaseUrl(String baseUrl) {
+    _baseUrl = baseUrl;
   }
 
   void enableLogging(bool enable) {
