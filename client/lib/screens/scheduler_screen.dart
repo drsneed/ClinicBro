@@ -2,7 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as mat
     show Colors, FloatingActionButton, CircleBorder;
 import '../widgets/scheduler/scheduler.dart';
-import '../widgets/scheduler/scheduler_controls.dart'; // Import the SchedulerControls widget
+import '../widgets/scheduler/scheduler_carousel.dart';
 import '../widgets/patient_finder.dart'; // Import the PatientFinder widget
 
 class SchedulerScreen extends StatefulWidget {
@@ -41,7 +41,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
       children: [
         ScaffoldPage(
           header: PageHeader(
-            title: SchedulerControls(
+            title: SchedulerCarousel(
               onViewModeChange: _handleViewModeChange,
               selectedViewMode: _viewMode,
               onViewTypeChange: _handleViewTypeChange,

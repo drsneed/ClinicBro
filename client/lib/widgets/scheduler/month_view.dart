@@ -94,18 +94,17 @@ class _MonthViewState extends State<MonthView> {
     final currentMonthColor = theme.inactiveColor.withOpacity(0.7);
 
     return Padding(
-      padding: const EdgeInsets.all(16.0), // Add padding around the MonthView
+      padding: const EdgeInsets.all(16.0),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          final cellWidth = constraints.maxWidth / 7;
-          final cellHeight =
-              (constraints.maxHeight - 20) / 6; // Adjust height to fit grid
+          final cellSize = constraints.maxWidth / 7;
+          final gridHeight = cellSize * 6; // Height to fit all rows
 
           return Column(
             children: [
-              _buildWeekdayHeader(cellWidth, textColor),
+              _buildWeekdayHeader(cellSize, textColor),
               Container(
-                height: cellHeight * 6, // Ensure container height fits the grid
+                height: gridHeight + 40, // Add some extra padding for safety
                 child: PageView.builder(
                   controller: _pageController,
                   onPageChanged: _onPageChanged,
@@ -117,8 +116,7 @@ class _MonthViewState extends State<MonthView> {
                     final daysToShow = _getDaysInMonth(monthToShow);
                     return _buildCalendarGrid(
                         daysToShow,
-                        cellWidth,
-                        cellHeight,
+                        cellSize,
                         cellColor,
                         todayBackgroundColor,
                         todayColor,
@@ -135,14 +133,14 @@ class _MonthViewState extends State<MonthView> {
     );
   }
 
-  Widget _buildWeekdayHeader(double cellWidth, Color textColor) {
+  Widget _buildWeekdayHeader(double cellSize, Color textColor) {
     return Container(
-      height: 20,
+      height: cellSize,
       child: Row(
         children: List.generate(7, (index) {
           final weekday = ['S', 'M', 'T', 'W', 'T', 'F', 'S'][index];
           return Container(
-            width: cellWidth,
+            width: cellSize,
             child: Center(
               child: Text(
                 weekday,
@@ -161,8 +159,7 @@ class _MonthViewState extends State<MonthView> {
 
   Widget _buildCalendarGrid(
       List<DateTime> days,
-      double cellWidth,
-      double cellHeight,
+      double cellSize,
       Color cellColor,
       Color todayBackgroundColor,
       Color todayColor,
@@ -174,7 +171,7 @@ class _MonthViewState extends State<MonthView> {
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 7,
-        childAspectRatio: cellWidth / cellHeight,
+        childAspectRatio: 1.0, // Ensures square cells
       ),
       itemCount: days.length,
       itemBuilder: (context, index) {
@@ -191,6 +188,8 @@ class _MonthViewState extends State<MonthView> {
             }
           },
           child: Container(
+            width: cellSize, // Explicitly set width
+            height: cellSize, // Explicitly set height to ensure square
             decoration: BoxDecoration(
               border: Border.all(color: borderColor),
               color: isToday ? todayBackgroundColor : cellColor,
@@ -203,7 +202,7 @@ class _MonthViewState extends State<MonthView> {
                       ? todayColor
                       : (isCurrentMonth ? currentMonthColor : textColor),
                   fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                  fontSize: cellWidth * 0.25,
+                  fontSize: cellSize * 0.25,
                 ),
               ),
             ),

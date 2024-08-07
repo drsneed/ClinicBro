@@ -20,60 +20,63 @@ class SchedulerControls extends StatelessWidget {
   Widget build(BuildContext context) {
     final bodyTextStyle = FluentTheme.of(context).typography.body;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        // View Mode Buttons
-        ViewModeButton(
-          viewMode: 'Day',
-          icon: FluentIcons.calendar_day,
-          text: 'Day View',
-          isSelected: selectedViewMode == 'Day',
-          onTap: () => onViewModeChange('Day'),
-        ),
-        SizedBox(width: 8),
-        ViewModeButton(
-          viewMode: '5-Day',
-          icon: FluentIcons.calendar_work_week,
-          text: '5-Day View',
-          isSelected: selectedViewMode == '5-Day',
-          onTap: () => onViewModeChange('5-Day'),
-        ),
-        SizedBox(width: 8),
-        ViewModeButton(
-          viewMode: 'Week',
-          icon: FluentIcons.calendar_week,
-          text: 'Week View',
-          isSelected: selectedViewMode == 'Week',
-          onTap: () => onViewModeChange('Week'),
-        ),
-        SizedBox(width: 8),
-        ViewModeButton(
-          viewMode: 'Month',
-          icon: FluentIcons.calendar,
-          text: 'Month View',
-          isSelected: selectedViewMode == 'Month',
-          onTap: () => onViewModeChange('Month'),
-        ),
-        SizedBox(width: 16),
-        // View Type Toggle with adjusted size
-        SizedBox(
-          height: 24, // Adjusted height to make it smaller
-          child: ToggleSwitch(
-            onChanged: onViewTypeChange,
-            checked: isMultiple,
-            content: Text(
-              isMultiple ? 'Multiple' : 'Single',
-              style: FluentTheme.of(context)
-                  .typography
-                  .body
-                  ?.copyWith(fontSize: 12), // Adjust font size
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          // View Mode Buttons
+          ViewModeButton(
+            viewMode: 'Day',
+            icon: FluentIcons.calendar_day,
+            text: 'Day View',
+            isSelected: selectedViewMode == 'Day',
+            onTap: () => onViewModeChange('Day'),
+          ),
+          SizedBox(width: 8),
+          ViewModeButton(
+            viewMode: '5-Day',
+            icon: FluentIcons.calendar_work_week,
+            text: '5-Day View',
+            isSelected: selectedViewMode == '5-Day',
+            onTap: () => onViewModeChange('5-Day'),
+          ),
+          SizedBox(width: 8),
+          ViewModeButton(
+            viewMode: 'Week',
+            icon: FluentIcons.calendar_week,
+            text: 'Week View',
+            isSelected: selectedViewMode == 'Week',
+            onTap: () => onViewModeChange('Week'),
+          ),
+          SizedBox(width: 8),
+          ViewModeButton(
+            viewMode: 'Month',
+            icon: FluentIcons.calendar,
+            text: 'Month View',
+            isSelected: selectedViewMode == 'Month',
+            onTap: () => onViewModeChange('Month'),
+          ),
+          SizedBox(width: 16),
+          // View Type Toggle with adjusted size
+          SizedBox(
+            height: 24, // Adjusted height to make it smaller
+            child: ToggleSwitch(
+              onChanged: onViewTypeChange,
+              checked: isMultiple,
+              content: Text(
+                isMultiple ? 'Multiple' : 'Single',
+                style: FluentTheme.of(context)
+                    .typography
+                    .body
+                    ?.copyWith(fontSize: 12), // Adjust font size
+              ),
             ),
           ),
-        ),
-        SizedBox(width: 16),
-        _buildFilterButton(context),
-      ],
+          SizedBox(width: 16),
+          _buildFilterButton(context),
+        ],
+      ),
     );
   }
 
