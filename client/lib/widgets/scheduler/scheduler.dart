@@ -42,6 +42,16 @@ class _SchedulerState extends State<Scheduler> {
     setState(() {
       _centerDate = newDate;
     });
+    if (widget.viewMode == 'Month') {
+      _updateMonthView(newDate);
+    }
+  }
+
+  void _updateMonthView(DateTime newDate) {
+    final monthDiff = (newDate.year - DateTime.now().year) * 12 +
+        newDate.month -
+        DateTime.now().month;
+    //_pageController.jumpToPage(1000 + monthDiff);
   }
 
   void _onPageChanged(int page) {

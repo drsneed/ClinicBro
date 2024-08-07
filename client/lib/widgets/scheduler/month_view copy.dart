@@ -93,45 +93,41 @@ class _MonthViewState extends State<MonthView> {
     final textColor = theme.inactiveColor.withOpacity(0.3);
     final currentMonthColor = theme.inactiveColor.withOpacity(0.7);
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0), // Add padding around the MonthView
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final cellWidth = constraints.maxWidth / 7;
-          final cellHeight =
-              (constraints.maxHeight - 20) / 6; // Adjust height to fit grid
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final availableHeight = constraints.maxHeight;
+        final cellWidth = constraints.maxWidth / 7;
+        final cellHeight = availableHeight / 6;
 
-          return Column(
-            children: [
-              _buildWeekdayHeader(cellWidth, textColor),
-              Container(
-                height: cellHeight * 6, // Ensure container height fits the grid
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: _onPageChanged,
-                  itemBuilder: (context, page) {
-                    final monthToShow = DateTime(
-                      DateTime.now().year,
-                      DateTime.now().month + (page - 1000),
-                    );
-                    final daysToShow = _getDaysInMonth(monthToShow);
-                    return _buildCalendarGrid(
-                        daysToShow,
-                        cellWidth,
-                        cellHeight,
-                        cellColor,
-                        todayBackgroundColor,
-                        todayColor,
-                        borderColor,
-                        textColor,
-                        currentMonthColor);
-                  },
-                ),
+        return Column(
+          children: [
+            _buildWeekdayHeader(cellWidth, textColor),
+            Expanded(
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: _onPageChanged,
+                itemBuilder: (context, page) {
+                  final monthToShow = DateTime(
+                    DateTime.now().year,
+                    DateTime.now().month + (page - 1000),
+                  );
+                  final daysToShow = _getDaysInMonth(monthToShow);
+                  return _buildCalendarGrid(
+                      daysToShow,
+                      cellWidth,
+                      cellHeight,
+                      cellColor,
+                      todayBackgroundColor,
+                      todayColor,
+                      borderColor,
+                      textColor,
+                      currentMonthColor);
+                },
               ),
-            ],
-          );
-        },
-      ),
+            ),
+          ],
+        );
+      },
     );
   }
 

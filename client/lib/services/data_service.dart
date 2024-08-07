@@ -8,7 +8,7 @@ class DataService {
   DataService._internal();
 
   String? _jwtToken;
-  bool _loggingEnabled = true; // Flag to enable/disable logging
+  bool _loggingEnabled = false; // Flag to enable/disable logging
 
   String? get jwtToken => _jwtToken;
   void setToken(String? token) {
