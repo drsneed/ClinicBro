@@ -38,6 +38,7 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   List<Location> _locations = [];
   bool _isLoading = true;
   Uint8List? _cachedAvatarData; // Cached avatar data
+  bool _loadedAvatar = false;
   OperatingSchedule? _currentOperatingSchedule;
   @override
   void initState() {
@@ -307,6 +308,7 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
             widget.onAvatarChanged(); // Refresh the avatar in the parent
             setState(() {
               _cachedAvatarData = null; // Invalidate cache to reload the avatar
+              _loadedAvatar = false; // Allow new GET request to server
             });
           } else {
             _showInfoBar('Failed to update profile picture',
@@ -321,11 +323,12 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   }
 
   Future<Uint8List?> _loadAvatarImage() async {
-    if (_cachedAvatarData != null) {
+    if (_cachedAvatarData != null || _loadedAvatar) {
       return _cachedAvatarData; // Return cached data if available
     }
 
     try {
+      _loadedAvatar = true;
       final userId = UserManager().currentUser?.id;
       final bytes = await UserRepository().getAvatar(userId ?? 0);
       setState(() {

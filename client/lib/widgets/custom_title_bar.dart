@@ -77,9 +77,9 @@ class CustomTitleBar extends StatelessWidget {
               ),
             if (actions != null) ...actions!,
             if (!isMobile) ...[
-              MinimizeWindowButton(),
-              MaximizeWindowButton(),
-              CloseWindowButton(),
+              const MinimizeWindowButton(),
+              const MaximizeWindowButton(),
+              const CloseWindowButton(),
             ],
           ],
         ),
@@ -89,10 +89,12 @@ class CustomTitleBar extends StatelessWidget {
 }
 
 class MinimizeWindowButton extends StatelessWidget {
+  const MinimizeWindowButton({super.key});
+
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(FluentIcons.chrome_minimize, size: 12),
+      icon: const Icon(FluentIcons.chrome_minimize, size: 12),
       onPressed: () async {
         await windowManager.minimize();
       },
@@ -101,21 +103,26 @@ class MinimizeWindowButton extends StatelessWidget {
 }
 
 class MaximizeWindowButton extends StatelessWidget {
+  const MaximizeWindowButton({super.key});
+
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(FluentIcons.chrome_full_screen, size: 12),
+      icon: const Icon(FluentIcons.chrome_restore, size: 12),
       onPressed: () async {
-        if (await windowManager.isMaximized())
+        if (await windowManager.isMaximized()) {
           await windowManager.restore();
-        else
+        } else {
           await windowManager.maximize();
+        }
       },
     );
   }
 }
 
 class CloseWindowButton extends StatelessWidget {
+  const CloseWindowButton({super.key});
+
   @override
   Widget build(BuildContext context) {
     return IconButton(
