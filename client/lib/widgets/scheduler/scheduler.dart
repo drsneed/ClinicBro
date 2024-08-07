@@ -1,13 +1,14 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'day_view.dart'; // Existing day view
-import 'five_day_view.dart'; // Import FiveDayView
-import 'week_view.dart'; // Import WeekView
-import 'month_view.dart'; // Import MonthView
+import 'package:intl/intl.dart';
+import 'day_view.dart';
+import 'five_day_view.dart';
+import 'week_view.dart';
+import 'month_view.dart';
 
 class Scheduler extends StatefulWidget {
   final String viewMode;
   final bool isMultiple;
-  final List<String>? providers; // Added providers for multiple schedules
+  final List<String>? providers;
 
   const Scheduler({
     Key? key,
@@ -21,17 +22,14 @@ class Scheduler extends StatefulWidget {
 }
 
 class _SchedulerState extends State<Scheduler> {
-  late PageController _pageController;
   late DateTime _centerDate;
+  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
     _centerDate = DateTime.now();
-    _pageController = PageController(
-      initialPage: 1000,
-      viewportFraction: 1.0,
-    );
+    _pageController = PageController(initialPage: 1000);
   }
 
   @override
@@ -40,16 +38,15 @@ class _SchedulerState extends State<Scheduler> {
     super.dispose();
   }
 
-  @override
-  void didUpdateWidget(Scheduler oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    // Handle view mode change if necessary
+  void _onDateChanged(DateTime newDate) {
+    setState(() {
+      _centerDate = newDate;
+    });
   }
 
   void _onPageChanged(int page) {
-    setState(() {
-      _centerDate = DateTime.now().add(Duration(days: page - 1000));
-    });
+    final newDate = DateTime.now().add(Duration(days: page - 1000));
+    _onDateChanged(newDate);
   }
 
   @override
@@ -76,13 +73,23 @@ class _SchedulerState extends State<Scheduler> {
           onPageChanged: _onPageChanged,
         );
       case '5-Day':
-        return FiveDayView();
+        return FiveDayView(
+          pageController: _pageController,
+          onPageChanged: _onPageChanged,
+        );
       case 'Week':
-        return WeekView();
+        return WeekView(
+          pageController: _pageController,
+          onPageChanged: _onPageChanged,
+        );
       case 'Month':
-        return MonthView();
+        return MonthView(
+          initialDate: _centerDate,
+          onDateSelected: _onDateChanged,
+          onMonthChanged: _onDateChanged,
+        );
       default:
-        return Container(); // Default empty container or handle unsupported views
+        return Container();
     }
   }
 
@@ -96,10 +103,10 @@ class _SchedulerState extends State<Scheduler> {
       child: Row(
         children: widget.providers!.map((provider) {
           return Container(
-            width: 300, // Adjust width as needed
+            width: 300,
             margin: EdgeInsets.only(right: 8),
             child: DayView(
-              pageController: _pageController,
+              pageController: PageController(initialPage: 1000),
               onPageChanged: _onPageChanged,
             ),
           );
@@ -109,6 +116,31 @@ class _SchedulerState extends State<Scheduler> {
   }
 
   Widget _buildDateHeader() {
+    String headerText;
+
+    switch (widget.viewMode) {
+      case 'Day':
+        headerText = DateFormat('EEEE, MMMM d, y').format(_centerDate);
+        break;
+      case '5-Day':
+        final endDate = _centerDate.add(Duration(days: 4));
+        headerText =
+            '${DateFormat('MMM d').format(_centerDate)} - ${DateFormat('MMM d, y').format(endDate)}';
+        break;
+      case 'Week':
+        final startOfWeek =
+            _centerDate.subtract(Duration(days: _centerDate.weekday - 1));
+        final endOfWeek = startOfWeek.add(Duration(days: 6));
+        headerText =
+            '${DateFormat('MMM d').format(startOfWeek)} - ${DateFormat('MMM d, y').format(endOfWeek)}';
+        break;
+      case 'Month':
+        headerText = DateFormat('MMMM yyyy').format(_centerDate);
+        break;
+      default:
+        headerText = '';
+    }
+
     return Container(
       padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
       child: Row(
@@ -116,24 +148,50 @@ class _SchedulerState extends State<Scheduler> {
         children: [
           IconButton(
             icon: Icon(FluentIcons.chevron_left),
-            onPressed: () => _pageController.previousPage(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            ),
+            onPressed: () => _navigateToPrevious(),
           ),
           Text(
-            '${_centerDate.year}-${_centerDate.month.toString().padLeft(2, '0')}-${_centerDate.day.toString().padLeft(2, '0')}',
+            headerText,
             style: FluentTheme.of(context).typography.subtitle,
           ),
           IconButton(
             icon: Icon(FluentIcons.chevron_right),
-            onPressed: () => _pageController.nextPage(
-              duration: Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            ),
+            onPressed: () => _navigateToNext(),
           ),
         ],
       ),
     );
+  }
+
+  void _navigateToPrevious() {
+    switch (widget.viewMode) {
+      case 'Day':
+      case '5-Day':
+      case 'Week':
+        _pageController.previousPage(
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        break;
+      case 'Month':
+        _onDateChanged(DateTime(_centerDate.year, _centerDate.month - 1, 1));
+        break;
+    }
+  }
+
+  void _navigateToNext() {
+    switch (widget.viewMode) {
+      case 'Day':
+      case '5-Day':
+      case 'Week':
+        _pageController.nextPage(
+          duration: Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        break;
+      case 'Month':
+        _onDateChanged(DateTime(_centerDate.year, _centerDate.month + 1, 1));
+        break;
+    }
   }
 }
