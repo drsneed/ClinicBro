@@ -42,6 +42,7 @@ class CustomTimePicker extends StatefulWidget {
     required this.selected,
     this.onChanged,
     this.onCancel,
+    this.onClear,
     this.hourFormat = HourFormat.h,
     this.header,
     this.headerStyle,
@@ -51,6 +52,7 @@ class CustomTimePicker extends StatefulWidget {
     this.autofocus = false,
     this.minuteIncrement = 1,
     this.locale,
+    this.showClearButton = false,
   });
 
   /// The current date selected date.
@@ -65,6 +67,9 @@ class CustomTimePicker extends StatefulWidget {
 
   /// Whenever the user cancels the date change.
   final VoidCallback? onCancel;
+
+  /// Whenever the user clicks the clear button
+  final VoidCallback? onClear;
 
   /// The clock system to use
   final HourFormat hourFormat;
@@ -103,6 +108,8 @@ class CustomTimePicker extends StatefulWidget {
   /// If null, the system locale will be used.
   final Locale? locale;
 
+  final bool showClearButton;
+
   bool get use24Format => [HourFormat.HH, HourFormat.H].contains(hourFormat);
 
   @override
@@ -132,7 +139,8 @@ class CustomTimePicker extends StatefulWidget {
       ))
       ..add(DoubleProperty('popupHeight', popupHeight,
           defaultValue: kPickerPopupHeight))
-      ..add(IntProperty('minuteIncrement', minuteIncrement, defaultValue: 1));
+      ..add(IntProperty('minuteIncrement', minuteIncrement, defaultValue: 1))
+      ..add(FlagProperty('showClearButton', value: showClearButton));
   }
 }
 
@@ -166,28 +174,63 @@ class _CustomTimePickerState extends State<CustomTimePicker>
   @override
   void didUpdateWidget(CustomTimePicker oldWidget) {
     super.didUpdateWidget(oldWidget);
+    reinitializeControllers();
     if (widget.selected != time) {
       time = widget.selected ?? DateTime.now();
-      _hourController.jumpToItem(() {
-        var hour = time.hour - 1;
-        if (!widget.use24Format) {
-          hour -= 12;
-        }
-        return hour;
-      }());
-      _minuteController.jumpToItem(time.minute ~/ widget.minuteIncrement);
-      _amPmController.jumpToItem(_isPm ? 1 : 0);
+      if (_hourController != null) {
+        _hourController!.jumpToItem(() {
+          var hour = time.hour - 1;
+          if (!widget.use24Format) {
+            hour -= 12;
+          }
+          return hour;
+        }());
+      }
+      if (_minuteController != null) {
+        _minuteController!.jumpToItem(time.minute ~/ widget.minuteIncrement);
+      }
+      if (_amPmController != null) {
+        _amPmController!.jumpToItem(_isPm ? 1 : 0);
+      }
     }
+  }
+
+  bool isMobile(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return size.width < 600; // You can adjust this threshold as needed
   }
 
   void handleDateChanged(DateTime date) {
     setState(() => time = date);
   }
 
-  void initControllers() {
-    if (widget.selected == null && mounted) {
-      setState(() => time = DateTime.now());
+  void reinitializeControllers() {
+    if (_hourController == null ||
+        _minuteController == null ||
+        _amPmController == null) {
+      initControllers();
     }
+  }
+  // void initControllers() {
+  //   if (widget.selected == null && mounted) {
+  //     setState(() => time = DateTime.now());
+  //   }
+  //   _hourController = FixedExtentScrollController(
+  //     initialItem: () {
+  //       var hour = time.hour - 1;
+  //       if (!widget.use24Format) {
+  //         hour -= 12;
+  //       }
+  //       return hour;
+  //     }(),
+  //   );
+  //   _minuteController = FixedExtentScrollController(
+  //     initialItem: time.minute ~/ widget.minuteIncrement,
+  //   );
+
+  //   _amPmController = FixedExtentScrollController(initialItem: _isPm ? 1 : 0);
+  // }
+  void initControllers() {
     _hourController = FixedExtentScrollController(
       initialItem: () {
         var hour = time.hour - 1;
@@ -200,7 +243,6 @@ class _CustomTimePickerState extends State<CustomTimePicker>
     _minuteController = FixedExtentScrollController(
       initialItem: time.minute ~/ widget.minuteIncrement,
     );
-
     _amPmController = FixedExtentScrollController(initialItem: _isPm ? 1 : 0);
   }
 
@@ -214,7 +256,7 @@ class _CustomTimePickerState extends State<CustomTimePicker>
     final theme = FluentTheme.of(context);
     final localizations = FluentLocalizations.of(context);
     final locale = widget.locale ?? Localizations.maybeLocaleOf(context);
-
+    final bool isOnMobile = isMobile(context);
     Widget picker = Picker(
       pickerHeight: widget.popupHeight,
       pickerContent: (context) {
@@ -268,7 +310,7 @@ class _CustomTimePickerState extends State<CustomTimePicker>
                       child: Text(
                         () {
                           if (widget.selected == null) {
-                            return localizations.hour;
+                            return isOnMobile ? 'hr' : localizations.hour;
                           }
                           late int finalHour;
                           var hour = time.hour;
@@ -290,7 +332,7 @@ class _CustomTimePickerState extends State<CustomTimePicker>
                       padding: widget.contentPadding,
                       child: Text(
                         widget.selected == null
-                            ? localizations.minute
+                            ? (isOnMobile ? 'min' : localizations.minute)
                             : _formatMinute(time.minute, '$locale'),
                         textAlign: TextAlign.center,
                       ),
@@ -303,13 +345,22 @@ class _CustomTimePickerState extends State<CustomTimePicker>
                         padding: widget.contentPadding,
                         child: Text(
                           () {
-                            if (_isPm) return localizations.pm;
-                            return localizations.am;
+                            if (_isPm) return localizations.pm.toLowerCase();
+                            return localizations.am.toLowerCase();
                           }(),
                           textAlign: TextAlign.center,
                         ),
                       ),
                     ),
+                  if (widget.showClearButton) ...[
+                    Padding(
+                      padding: widget.contentPadding,
+                      child: IconButton(
+                        icon: Icon(FluentIcons.cancel, size: 14),
+                        onPressed: widget.onClear ?? () {},
+                      ),
+                    ),
+                  ],
                 ]),
               ),
             ),

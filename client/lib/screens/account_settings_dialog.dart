@@ -19,6 +19,7 @@ import 'package:flutter/material.dart'
 import 'package:image/image.dart' as img;
 
 import '../widgets/custom_time_picker.dart';
+import 'quick_fill_dialog.dart';
 
 class AccountSettingsDialog extends StatefulWidget {
   final VoidCallback onAvatarChanged; // Callback to refresh avatar
@@ -113,6 +114,72 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   TimeOfDay? _dateTimeToTimeOfDay(DateTime? dateTime) {
     if (dateTime == null) return null;
     return TimeOfDay(hour: dateTime.hour, minute: dateTime.minute);
+  }
+
+  void _showQuickFillDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) => QuickFillDialog(
+        onFill:
+            (List<bool> selectedDays, TimeOfDay startTime, TimeOfDay endTime) {
+          setState(() {
+            final daysOfWeek = [
+              'Sunday',
+              'Monday',
+              'Tuesday',
+              'Wednesday',
+              'Thursday',
+              'Friday',
+              'Saturday'
+            ];
+
+            for (int i = 0; i < daysOfWeek.length; i++) {
+              if (selectedDays[i]) {
+                workHours[daysOfWeek[i]] = {
+                  'Start':
+                      DateTime(2024, 1, 1, startTime.hour, startTime.minute),
+                  'End': DateTime(2024, 1, 1, endTime.hour, endTime.minute),
+                };
+              } else {
+                // Clear the hours for unchecked days
+                workHours[daysOfWeek[i]] = {'Start': null, 'End': null};
+              }
+            }
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildLocationAndButtons() {
+    const double buttonHeight = 34.0;
+
+    return Wrap(
+      alignment: WrapAlignment.start,
+      spacing: 8,
+      runSpacing: 8,
+      children: [
+        SizedBox(
+          width: 300,
+          height: buttonHeight,
+          child: _buildLocationComboBox(),
+        ),
+        SizedBox(
+          height: buttonHeight,
+          child: Button(
+            onPressed: _showQuickFillDialog,
+            child: const Text('Quick Fill'),
+          ),
+        ),
+        SizedBox(
+          height: buttonHeight,
+          child: Button(
+            onPressed: _clearAllWorkHours,
+            child: const Text('Clear All'),
+          ),
+        ),
+      ],
+    );
   }
 
   Future<void> _handleChangePassword() async {
@@ -532,34 +599,12 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
 // Update to _buildWorkHoursSection method
   Widget _buildWorkHoursSection() {
     if (_isLoading) {
-      return Center(child: ProgressRing()); // Show a loading indicator
+      return Center(child: ProgressRing());
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: [
-            // Location ComboBox
-            Expanded(
-              child: _buildLocationComboBox(),
-            ),
-
-            // Spacer between ComboBox and Buttons
-            const SizedBox(
-                width: 24), // Adjust this width as needed for spacing
-
-            // Fill Defaults Button
-            Button(
-              onPressed: _fillDefaultWorkHours,
-              child: const Text('Auto-Fill'),
-            ),
-            const SizedBox(width: 8),
-            Button(
-              onPressed: _clearAllWorkHours,
-              child: const Text('Clear All'),
-            )
-          ],
-        ),
+        _buildLocationAndButtons(),
         const SizedBox(height: 16),
         _buildWeeklySchedule(),
         const SizedBox(height: 16),
@@ -632,7 +677,7 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
     }
     return Row(
       children: [
-        SizedBox(width: 80, child: Text('Location:')),
+        Text('Location:'),
         SizedBox(width: 8),
         Expanded(
           child: ComboBox<String>(
@@ -641,7 +686,10 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
             items: _locations
                 .map((Location location) => ComboBoxItem<String>(
                       value: location.name,
-                      child: Text(location.name),
+                      child: Text(
+                        location.name,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ))
                 .toList(),
             onChanged: (String? newLocation) async {
@@ -797,18 +845,38 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   Widget _buildDaySchedule(String day) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 100, child: Text(day)),
-          SizedBox(width: 16),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(child: _buildTimePicker(day, 'Start')),
-                SizedBox(width: 16),
-                Expanded(child: _buildTimePicker(day, 'End')),
-              ],
+          Container(
+            padding: EdgeInsets.only(bottom: 4),
+            decoration: BoxDecoration(
+              border: Border(
+                bottom: BorderSide(
+                  color: Colors.grey[130]!,
+                  width: 1,
+                ),
+              ),
             ),
+            child: Text(
+              day,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Expanded(
+                child: _buildTimePicker(day, 'Start'),
+              ),
+              SizedBox(width: 16),
+              Expanded(
+                child: _buildTimePicker(day, 'End'),
+              ),
+            ],
           ),
         ],
       ),
@@ -816,13 +884,13 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   }
 
   Widget _buildTimePicker(String day, String label) {
-    final time = workHours[day]![label];
+    final time = workHours[day]?[label];
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: CustomTimePicker(
+            contentPadding: EdgeInsets.all(4.0),
             header: label,
             selected: time,
             onChanged: (newTime) {
@@ -838,32 +906,14 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
                 });
               }
             },
+            onClear: () {
+              setState(() {
+                workHours[day]![label] = null;
+              });
+            },
+            showClearButton: true,
             minuteIncrement: 15,
             hourFormat: HourFormat.h,
-          ),
-        ),
-        SizedBox(
-          width: 30, // Adjust this width as needed
-          height: 40, // Adjust this height as needed
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Positioned(
-                right: 0,
-                top: 17, // Adjust this value to move the button up or down
-                child: IconButton(
-                  icon: Icon(FluentIcons.cancel, size: 14),
-                  style: ButtonStyle(
-                    iconSize: ButtonState.all(14.0),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      workHours[day]![label] = null;
-                    });
-                  },
-                ),
-              ),
-            ],
           ),
         ),
       ],
