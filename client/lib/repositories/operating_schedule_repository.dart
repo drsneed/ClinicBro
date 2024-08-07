@@ -8,12 +8,17 @@ class OperatingScheduleRepository {
   factory OperatingScheduleRepository() => _instance;
   OperatingScheduleRepository._internal();
 
-  Future<bool> createOperatingSchedule(OperatingSchedule schedule) async {
+  Future<OperatingSchedule?> createOperatingSchedule(
+      OperatingSchedule schedule) async {
     final response = await DataService().post(
       '/operating-schedule',
       body: jsonEncode(schedule.toJson()),
     );
-    return response.statusCode == 200;
+    if (response.statusCode == 201) {
+      return OperatingSchedule.fromJson(jsonDecode(response.body));
+    } else {
+      return null;
+    }
   }
 
   Future<OperatingSchedule?> getOperatingSchedule({
@@ -35,13 +40,18 @@ class OperatingScheduleRepository {
     }
   }
 
-  Future<bool> updateOperatingSchedule(OperatingSchedule schedule) async {
+  Future<OperatingSchedule?> updateOperatingSchedule(
+      OperatingSchedule schedule) async {
     final response = await DataService().put(
       '/operating-schedule',
       body: jsonEncode(schedule.toJson()),
     );
 
-    return response.statusCode == 200;
+    if (response.statusCode == 200) {
+      return OperatingSchedule.fromJson(jsonDecode(response.body));
+    } else {
+      return null;
+    }
   }
 
   Future<bool> deleteOperatingSchedule({

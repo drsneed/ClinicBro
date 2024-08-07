@@ -8,9 +8,15 @@ class DataService {
   DataService._internal();
 
   String? _jwtToken;
+  bool _loggingEnabled = true; // Flag to enable/disable logging
+
   String? get jwtToken => _jwtToken;
   void setToken(String? token) {
     _jwtToken = token;
+  }
+
+  void enableLogging(bool enable) {
+    _loggingEnabled = enable;
   }
 
   Future<http.Response> post(
@@ -63,18 +69,37 @@ class DataService {
       ...?headers,
     };
 
+    if (_loggingEnabled) {
+      _log('Request Method: $method');
+      _log('Request URL: $uri');
+      _log('Request Headers: $requestHeaders');
+      if (body != null) _log('Request Body: $body');
+    }
+
+    http.Response response;
     switch (method.toUpperCase()) {
       case 'GET':
-        return await http.get(uri, headers: requestHeaders);
+        response = await http.get(uri, headers: requestHeaders);
+        break;
       case 'POST':
-        return await http.post(uri, headers: requestHeaders, body: body);
+        response = await http.post(uri, headers: requestHeaders, body: body);
+        break;
       case 'PUT':
-        return await http.put(uri, headers: requestHeaders, body: body);
+        response = await http.put(uri, headers: requestHeaders, body: body);
+        break;
       case 'DELETE':
-        return await http.delete(uri, headers: requestHeaders);
+        response = await http.delete(uri, headers: requestHeaders);
+        break;
       default:
         throw Exception('Unsupported HTTP method');
     }
+
+    if (_loggingEnabled) {
+      _log('Response Status Code: ${response.statusCode}');
+      _log('Response Body: ${response.body}');
+    }
+
+    return response;
   }
 
   Uri _buildUri(String path, Map<String, String>? queryParams) {
@@ -108,8 +133,22 @@ class DataService {
       'Authorization': 'Bearer $_jwtToken',
     });
 
+    if (_loggingEnabled) {
+      _log('File Upload URL: $url');
+      _log('File Name: $filename');
+      _log('Request Headers: ${request.headers}');
+      if (fields != null) _log('Fields: $fields');
+    }
+
     final streamedResponse = await request.send();
-    return await http.Response.fromStream(streamedResponse);
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (_loggingEnabled) {
+      _log('Response Status Code: ${response.statusCode}');
+      _log('Response Body: ${response.body}');
+    }
+
+    return response;
   }
 
   Future<http.Response> putFile(
@@ -130,7 +169,25 @@ class DataService {
       'Authorization': 'Bearer $_jwtToken',
     });
 
+    if (_loggingEnabled) {
+      _log('File Upload URL: $url');
+      _log('File Name: $filename');
+      _log('Request Headers: ${request.headers}');
+    }
+
     final streamedResponse = await request.send();
-    return await http.Response.fromStream(streamedResponse);
+    final response = await http.Response.fromStream(streamedResponse);
+
+    if (_loggingEnabled) {
+      _log('Response Status Code: ${response.statusCode}');
+      _log('Response Body: ${response.body}');
+    }
+
+    return response;
+  }
+
+  void _log(String message) {
+    // Replace with your preferred logging mechanism
+    print(message);
   }
 }

@@ -60,9 +60,8 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
     final userId = UserManager().currentUser?.id;
 
     if (userId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('User ID is not available.')),
-      );
+      _showInfoBar('User ID is not available.',
+          severity: InfoBarSeverity.error);
       return;
     }
 
@@ -87,31 +86,27 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
       dateCreated: DateTime.now(),
       dateUpdated: DateTime.now(),
     );
-    print(updatedSchedule.hoursMonFrom);
-
     bool success;
     if (_currentOperatingSchedule == null) {
-      updatedSchedule.printJson();
       // Create a new schedule if current schedule is null
-      success = await OperatingScheduleRepository()
+      _currentOperatingSchedule = await OperatingScheduleRepository()
           .createOperatingSchedule(updatedSchedule);
+      success = _currentOperatingSchedule != null;
     } else {
       // Update existing schedule
-      final updatedScheduleWithId = updatedSchedule.copyWith(
+      OperatingSchedule? updatedScheduleWithId = updatedSchedule.copyWith(
           locationId: _currentOperatingSchedule!.locationId,
           userId: _currentOperatingSchedule!.userId);
-      success = await OperatingScheduleRepository()
+      updatedScheduleWithId = await OperatingScheduleRepository()
           .updateOperatingSchedule(updatedScheduleWithId);
+      success = updatedScheduleWithId != null;
     }
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Work hours saved successfully.')),
-      );
+      _showInfoBar('Work hours saved successfully.');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to save work hours.')),
-      );
+      _showInfoBar('Failed to save work hours.',
+          severity: InfoBarSeverity.error);
     }
   }
 
@@ -201,6 +196,20 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
     }
   }
 
+  void _showInfoBar(String message,
+      {InfoBarSeverity severity = InfoBarSeverity.info}) {
+    displayInfoBar(
+      context,
+      builder: (context, close) {
+        return InfoBar(
+          title: Text(message),
+          severity: severity,
+          onClose: close,
+        );
+      },
+    );
+  }
+
   String _formatTime(DateTime dateTime) {
     final hour = dateTime.hour.toString().padLeft(2, '0');
     final minute = dateTime.minute.toString().padLeft(2, '0');
@@ -233,14 +242,12 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
               _cachedAvatarData = null; // Invalidate cache to reload the avatar
             });
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Failed to update profile picture')),
-            );
+            _showInfoBar('Failed to update profile picture',
+                severity: InfoBarSeverity.error);
           }
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to decode image')),
-          );
+          _showInfoBar('Failed to decode image',
+              severity: InfoBarSeverity.error);
         }
       }
     }
@@ -507,6 +514,22 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
     );
   }
 
+  // Method to clear all work hours
+  void _clearAllWorkHours() {
+    setState(() {
+      workHours = {
+        'Sunday': {'Start': null, 'End': null},
+        'Monday': {'Start': null, 'End': null},
+        'Tuesday': {'Start': null, 'End': null},
+        'Wednesday': {'Start': null, 'End': null},
+        'Thursday': {'Start': null, 'End': null},
+        'Friday': {'Start': null, 'End': null},
+        'Saturday': {'Start': null, 'End': null},
+      };
+    });
+  }
+
+// Update to _buildWorkHoursSection method
   Widget _buildWorkHoursSection() {
     if (_isLoading) {
       return Center(child: ProgressRing()); // Show a loading indicator
@@ -521,18 +544,25 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
               child: _buildLocationComboBox(),
             ),
 
-            // Spacer between ComboBox and Button
-            SizedBox(width: 24), // Adjust this width as needed for spacing
+            // Spacer between ComboBox and Buttons
+            const SizedBox(
+                width: 24), // Adjust this width as needed for spacing
 
             // Fill Defaults Button
             Button(
               onPressed: _fillDefaultWorkHours,
-              child: Text('Fill Defaults'),
+              child: const Text('Auto-Fill'),
             ),
+            const SizedBox(width: 8),
+            Button(
+              onPressed: _clearAllWorkHours,
+              child: const Text('Clear All'),
+            )
           ],
         ),
-        SizedBox(height: 16),
+        const SizedBox(height: 16),
         _buildWeeklySchedule(),
+        const SizedBox(height: 16),
         Align(
           alignment: Alignment.bottomRight,
           child: Button(
@@ -788,26 +818,55 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   Widget _buildTimePicker(String day, String label) {
     final time = workHours[day]![label];
 
-    return CustomTimePicker(
-      header: label,
-      selected: time,
-      onChanged: (newTime) {
-        if (newTime != null) {
-          // Round minutes to nearest 15
-          //int roundedMinute = (newTime.minute / 15).round() * 15;
-          setState(() {
-            workHours[day]![label] = DateTime(
-              2024,
-              1,
-              1,
-              newTime.hour,
-              newTime.minute,
-            );
-          });
-        }
-      },
-      minuteIncrement: 15,
-      hourFormat: HourFormat.h,
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: CustomTimePicker(
+            header: label,
+            selected: time,
+            onChanged: (newTime) {
+              if (newTime != null) {
+                setState(() {
+                  workHours[day]![label] = DateTime(
+                    2024,
+                    1,
+                    1,
+                    newTime.hour,
+                    newTime.minute,
+                  );
+                });
+              }
+            },
+            minuteIncrement: 15,
+            hourFormat: HourFormat.h,
+          ),
+        ),
+        SizedBox(
+          width: 30, // Adjust this width as needed
+          height: 40, // Adjust this height as needed
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                right: 0,
+                top: 17, // Adjust this value to move the button up or down
+                child: IconButton(
+                  icon: Icon(FluentIcons.cancel, size: 14),
+                  style: ButtonStyle(
+                    iconSize: ButtonState.all(14.0),
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      workHours[day]![label] = null;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
