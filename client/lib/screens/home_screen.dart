@@ -74,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
           PaneItem(
             icon: Icon(FluentIcons.calendar),
             title: Text('Schedule'),
-            body: SchedulerScreen(),
+            body: SchedulerScreen(isMobile: isMobile),
           ),
           PaneItem(
             icon: Icon(FluentIcons.settings),

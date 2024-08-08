@@ -7,6 +7,11 @@ import '../widgets/scheduler/scheduler_carousel.dart';
 import '../widgets/patient_finder.dart'; // Import the PatientFinder widget
 
 class SchedulerScreen extends StatefulWidget {
+  final bool isMobile;
+  const SchedulerScreen({
+    Key? key,
+    required this.isMobile,
+  }) : super(key: key);
   @override
   _SchedulerScreenState createState() => _SchedulerScreenState();
 }
@@ -42,7 +47,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width > 600;
+    final isDesktop = !widget.isMobile;
 
     return Row(
       children: [
