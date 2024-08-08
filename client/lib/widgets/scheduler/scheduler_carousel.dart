@@ -7,13 +7,16 @@ class SchedulerCarousel extends StatelessWidget {
   final String selectedViewMode;
   final void Function(bool isMultiple) onViewTypeChange;
   final bool isMultiple;
-
+  final void Function(bool showNavigation) onShowNavigationChange;
+  final bool showNavigation;
   const SchedulerCarousel({
     Key? key,
     required this.onViewModeChange,
     required this.selectedViewMode,
     required this.onViewTypeChange,
     required this.isMultiple,
+    required this.onShowNavigationChange,
+    required this.showNavigation,
   }) : super(key: key);
 
   @override
@@ -34,6 +37,8 @@ class SchedulerCarousel extends StatelessWidget {
           selectedViewMode: selectedViewMode,
           onViewTypeChange: onViewTypeChange,
           isMultiple: isMultiple,
+          onShowNavigationChange: onShowNavigationChange,
+          showNavigation: showNavigation,
         ),
         // Add more items here if needed
       ],

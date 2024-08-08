@@ -1,12 +1,12 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 
-class MonthView extends StatefulWidget {
+class NavigationMonthView extends StatefulWidget {
   final DateTime initialDate;
   final Function(DateTime)? onDateSelected;
   final Function(DateTime) onMonthChanged;
 
-  const MonthView({
+  const NavigationMonthView({
     Key? key,
     required this.initialDate,
     required this.onMonthChanged,
@@ -14,10 +14,10 @@ class MonthView extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _MonthViewState createState() => _MonthViewState();
+  _NavigationMonthViewState createState() => _NavigationMonthViewState();
 }
 
-class _MonthViewState extends State<MonthView> {
+class _NavigationMonthViewState extends State<NavigationMonthView> {
   late PageController _pageController;
   late DateTime _currentMonth;
 
@@ -32,7 +32,7 @@ class _MonthViewState extends State<MonthView> {
   }
 
   @override
-  void didUpdateWidget(MonthView oldWidget) {
+  void didUpdateWidget(NavigationMonthView oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.initialDate.year != _currentMonth.year ||
         widget.initialDate.month != _currentMonth.month) {
@@ -89,23 +89,36 @@ class _MonthViewState extends State<MonthView> {
     final cellColor = theme.cardColor;
     final todayBackgroundColor = theme.accentColor;
     const todayColor = Colors.white;
-    final borderColor = theme.inactiveColor;
+    final borderColor = Colors.transparent;
     final textColor = theme.inactiveColor.withOpacity(0.3);
     final currentMonthColor = theme.inactiveColor.withOpacity(0.7);
 
+    final headerText = DateFormat('MMMM yyyy').format(_currentMonth);
+
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(4.0),
       child: LayoutBuilder(
         builder: (context, constraints) {
           final cellWidth = constraints.maxWidth / 7;
           final availableHeight = constraints.maxHeight -
-              50.0; // 50.0 is estimation of scheduler controls height
-          final cellHeight = (availableHeight / 6).clamp(0.0,
-              cellWidth); // Ensure the height does not exceed the cell width
+              70.0; // Estimation of scheduler controls height
+          final cellHeight = (availableHeight / 6).clamp(
+              0.0, cellWidth); // Ensure height does not exceed cell width
           final gridHeight = cellHeight * 6; // Height to fit all rows
 
           return Column(
             children: [
+              // Display month and year above the calendar
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: Text(
+                  headerText,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
               _buildWeekdayHeader(cellWidth, textColor),
               Container(
                 height: gridHeight + 10, // Add some extra padding for safety
@@ -174,8 +187,17 @@ class _MonthViewState extends State<MonthView> {
             width: cellWidth,
             height: cellHeight,
             decoration: BoxDecoration(
-              border: Border.all(color: borderColor),
               color: isToday ? todayBackgroundColor : cellColor,
+              border: Border(
+                right: BorderSide(
+                  color: borderColor,
+                  width: 0.5, // Ensure border width is consistent
+                ),
+                bottom: BorderSide(
+                  color: borderColor,
+                  width: 0.5, // Ensure border width is consistent
+                ),
+              ),
             ),
             child: Center(
               child: Text(
@@ -194,56 +216,6 @@ class _MonthViewState extends State<MonthView> {
       },
     );
   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   final theme = FluentTheme.of(context);
-  //   final cellColor = theme.cardColor;
-  //   final todayBackgroundColor = theme.accentColor;
-  //   const todayColor = Colors.white;
-  //   final borderColor = theme.inactiveColor;
-  //   final textColor = theme.inactiveColor.withOpacity(0.3);
-  //   final currentMonthColor = theme.inactiveColor.withOpacity(0.7);
-
-  //   return Padding(
-  //     padding: const EdgeInsets.all(16.0),
-  //     child: LayoutBuilder(
-  //       builder: (context, constraints) {
-  //         final cellSize = constraints.maxWidth / 7;
-  //         final gridHeight = cellSize * 6; // Height to fit all rows
-
-  //         return Column(
-  //           children: [
-  //             _buildWeekdayHeader(cellSize, textColor),
-  //             Container(
-  //               height: gridHeight + 40, // Add some extra padding for safety
-  //               child: PageView.builder(
-  //                 controller: _pageController,
-  //                 onPageChanged: _onPageChanged,
-  //                 itemBuilder: (context, page) {
-  //                   final monthToShow = DateTime(
-  //                     DateTime.now().year,
-  //                     DateTime.now().month + (page - 1000),
-  //                   );
-  //                   final daysToShow = _getDaysInMonth(monthToShow);
-  //                   return _buildCalendarGrid(
-  //                       daysToShow,
-  //                       cellSize,
-  //                       cellColor,
-  //                       todayBackgroundColor,
-  //                       todayColor,
-  //                       borderColor,
-  //                       textColor,
-  //                       currentMonthColor);
-  //                 },
-  //               ),
-  //             ),
-  //           ],
-  //         );
-  //       },
-  //     ),
-  //   );
-  // }
 
   Widget _buildWeekdayHeader(double cellSize, Color textColor) {
     return Container(
@@ -268,59 +240,4 @@ class _MonthViewState extends State<MonthView> {
       ),
     );
   }
-
-  // Widget _buildCalendarGrid(
-  //     List<DateTime> days,
-  //     double cellSize,
-  //     Color cellColor,
-  //     Color todayBackgroundColor,
-  //     Color todayColor,
-  //     Color borderColor,
-  //     Color textColor,
-  //     Color currentMonthColor) {
-  //   return GridView.builder(
-  //     shrinkWrap: true,
-  //     physics: ScrollPhysics(),
-  //     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-  //       crossAxisCount: 7,
-  //       childAspectRatio: 1.0, // Ensures square cells
-  //     ),
-  //     itemCount: days.length,
-  //     itemBuilder: (context, index) {
-  //       final date = days[index];
-  //       final isCurrentMonth = date.month == _currentMonth.month;
-  //       final isToday = date.year == DateTime.now().year &&
-  //           date.month == DateTime.now().month &&
-  //           date.day == DateTime.now().day;
-
-  //       return GestureDetector(
-  //         onTap: () {
-  //           if (widget.onDateSelected != null) {
-  //             widget.onDateSelected!(date);
-  //           }
-  //         },
-  //         child: Container(
-  //           width: cellSize, // Explicitly set width
-  //           height: cellSize, // Explicitly set height to ensure square
-  //           decoration: BoxDecoration(
-  //             border: Border.all(color: borderColor),
-  //             color: isToday ? todayBackgroundColor : cellColor,
-  //           ),
-  //           child: Center(
-  //             child: Text(
-  //               '${date.day}',
-  //               style: TextStyle(
-  //                 color: isToday
-  //                     ? todayColor
-  //                     : (isCurrentMonth ? currentMonthColor : textColor),
-  //                 fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-  //                 fontSize: cellSize * 0.25,
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 }

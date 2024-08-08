@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as mat
     show Colors, FloatingActionButton, CircleBorder;
+import '../widgets/scheduler/navigation_panel.dart';
 import '../widgets/scheduler/scheduler.dart';
 import '../widgets/scheduler/scheduler_carousel.dart';
 import '../widgets/patient_finder.dart'; // Import the PatientFinder widget
@@ -14,7 +15,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   bool _isFlyoutVisible = false;
   String _viewMode = 'Day'; // Default view mode
   bool _isMultiple = false; // Default view type
-
+  bool _showNavigation = false; // Default months navigation visibility
   void _toggleFlyout() {
     setState(() {
       _isFlyoutVisible = !_isFlyoutVisible;
@@ -33,30 +34,48 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
     });
   }
 
+  void _handleShowNavigationChange(bool showNavigation) {
+    setState(() {
+      _showNavigation = showNavigation;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = MediaQuery.of(context).size.width > 600;
 
-    return Stack(
+    return Row(
       children: [
-        ScaffoldPage(
-          header: PageHeader(
-            title: SchedulerCarousel(
-              onViewModeChange: _handleViewModeChange,
-              selectedViewMode: _viewMode,
-              onViewTypeChange: _handleViewTypeChange,
-              isMultiple: _isMultiple,
-            ),
-          ),
-          content: Scheduler(
-            viewMode: _viewMode,
-            isMultiple: _isMultiple,
-            // You can pass additional parameters here if needed
+        // Vertical panel on the left
+        if (_showNavigation)
+          SchedulerNavigationPanel(isVisible: _showNavigation),
+
+        Expanded(
+          child: Stack(
+            children: [
+              ScaffoldPage(
+                header: PageHeader(
+                  title: SchedulerCarousel(
+                    onViewModeChange: _handleViewModeChange,
+                    selectedViewMode: _viewMode,
+                    onViewTypeChange: _handleViewTypeChange,
+                    isMultiple: _isMultiple,
+                    onShowNavigationChange: _handleShowNavigationChange,
+                    showNavigation: _showNavigation,
+                  ),
+                ),
+                content: Scheduler(
+                  viewMode: _viewMode,
+                  isMultiple: _isMultiple,
+                  // Additional parameters
+                ),
+              ),
+              if (isDesktop) _buildDesktopFlyout(),
+              if (!isDesktop) _buildMobileFlyout(),
+              _buildFloatingActionButton(isDesktop),
+            ],
           ),
         ),
-        if (isDesktop) _buildDesktopFlyout(),
-        if (!isDesktop) _buildMobileFlyout(),
-        _buildFloatingActionButton(isDesktop),
       ],
     );
   }

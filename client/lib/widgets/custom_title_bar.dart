@@ -102,19 +102,35 @@ class MinimizeWindowButton extends StatelessWidget {
   }
 }
 
-class MaximizeWindowButton extends StatelessWidget {
+class MaximizeWindowButton extends StatefulWidget {
   const MaximizeWindowButton({super.key});
+
+  @override
+  _MaximizeWindowButtonState createState() => _MaximizeWindowButtonState();
+}
+
+class _MaximizeWindowButtonState extends State<MaximizeWindowButton> {
+  bool _isMaximized = false;
 
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: const Icon(FluentIcons.chrome_restore, size: 12),
+      icon: Icon(
+        _isMaximized ? FluentIcons.chrome_restore : FluentIcons.square_shape,
+        size: 12,
+      ),
       onPressed: () async {
-        if (await windowManager.isMaximized()) {
+        if (_isMaximized) {
           await windowManager.restore();
         } else {
           await windowManager.maximize();
         }
+
+        // Update the icon state after the action
+        final isMaximized = await windowManager.isMaximized();
+        setState(() {
+          _isMaximized = isMaximized;
+        });
       },
     );
   }

@@ -36,6 +36,13 @@ class _SignInScreenState extends State<SignInScreen> {
         _rememberMe = true;
       }
     });
+
+    // Validate and set server URL if it's not empty
+    final serverUrl = _serverUrlController.text;
+    if (serverUrl.isNotEmpty) {
+      DataService().setBaseUrl(serverUrl);
+      // You might want to add additional logic here to verify if the server URL is valid
+    }
   }
 
   Future<void> _saveData() async {

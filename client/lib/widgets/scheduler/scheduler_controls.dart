@@ -2,80 +2,122 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'filter_dialog.dart';
 import 'view_mode_button.dart'; // Import the new file
 
-class SchedulerControls extends StatelessWidget {
+class SchedulerControls extends StatefulWidget {
   final void Function(String viewMode) onViewModeChange;
   final String selectedViewMode;
   final void Function(bool isMultiple) onViewTypeChange;
   final bool isMultiple;
-
+  final void Function(bool showNavigation) onShowNavigationChange;
+  final bool showNavigation;
   const SchedulerControls({
     Key? key,
     required this.onViewModeChange,
     required this.selectedViewMode,
     required this.onViewTypeChange,
     required this.isMultiple,
+    required this.onShowNavigationChange,
+    required this.showNavigation,
   }) : super(key: key);
+
+  @override
+  _SchedulerControlsState createState() => _SchedulerControlsState();
+}
+
+class _SchedulerControlsState extends State<SchedulerControls> {
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final bodyTextStyle = FluentTheme.of(context).typography.body;
 
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          // View Mode Buttons
-          ViewModeButton(
-            viewMode: 'Day',
-            icon: FluentIcons.calendar_day,
-            text: 'Day View',
-            isSelected: selectedViewMode == 'Day',
-            onTap: () => onViewModeChange('Day'),
-          ),
-          SizedBox(width: 8),
-          ViewModeButton(
-            viewMode: '5-Day',
-            icon: FluentIcons.calendar_work_week,
-            text: '5-Day View',
-            isSelected: selectedViewMode == '5-Day',
-            onTap: () => onViewModeChange('5-Day'),
-          ),
-          SizedBox(width: 8),
-          ViewModeButton(
-            viewMode: 'Week',
-            icon: FluentIcons.calendar_week,
-            text: 'Week View',
-            isSelected: selectedViewMode == 'Week',
-            onTap: () => onViewModeChange('Week'),
-          ),
-          SizedBox(width: 8),
-          ViewModeButton(
-            viewMode: 'Month',
-            icon: FluentIcons.calendar,
-            text: 'Month View',
-            isSelected: selectedViewMode == 'Month',
-            onTap: () => onViewModeChange('Month'),
-          ),
-          SizedBox(width: 16),
-          // View Type Toggle with adjusted size
-          SizedBox(
-            height: 24, // Adjusted height to make it smaller
-            child: ToggleSwitch(
-              onChanged: onViewTypeChange,
-              checked: isMultiple,
-              content: Text(
-                isMultiple ? 'Multiple' : 'Single',
-                style: FluentTheme.of(context)
-                    .typography
-                    .body
-                    ?.copyWith(fontSize: 12), // Adjust font size
+    return Scrollbar(
+      controller: _scrollController,
+      thumbVisibility: true, // Show scrollbar when needed
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        controller: _scrollController,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            // View Mode Buttons
+            ViewModeButton(
+              viewMode: 'Day',
+              icon: FluentIcons.calendar_day,
+              text: 'Day View',
+              isSelected: widget.selectedViewMode == 'Day',
+              onTap: () => widget.onViewModeChange('Day'),
+            ),
+            SizedBox(width: 8),
+            ViewModeButton(
+              viewMode: '5-Day',
+              icon: FluentIcons.calendar_work_week,
+              text: '5-Day View',
+              isSelected: widget.selectedViewMode == '5-Day',
+              onTap: () => widget.onViewModeChange('5-Day'),
+            ),
+            SizedBox(width: 8),
+            ViewModeButton(
+              viewMode: 'Week',
+              icon: FluentIcons.calendar_week,
+              text: 'Week View',
+              isSelected: widget.selectedViewMode == 'Week',
+              onTap: () => widget.onViewModeChange('Week'),
+            ),
+            SizedBox(width: 8),
+            ViewModeButton(
+              viewMode: 'Month',
+              icon: FluentIcons.calendar,
+              text: 'Month View',
+              isSelected: widget.selectedViewMode == 'Month',
+              onTap: () => widget.onViewModeChange('Month'),
+            ),
+            SizedBox(width: 16),
+            // View Type Toggle with adjusted size
+            SizedBox(
+              height: 24, // Adjusted height to make it smaller
+              child: ToggleSwitch(
+                onChanged: widget.onViewTypeChange,
+                checked: widget.isMultiple,
+                content: Text(
+                  widget.isMultiple ? 'Multiple' : 'Single',
+                  style: FluentTheme.of(context)
+                      .typography
+                      .body
+                      ?.copyWith(fontSize: 12), // Adjust font size
+                ),
               ),
             ),
-          ),
-          SizedBox(width: 16),
-          _buildFilterButton(context),
-        ],
+            SizedBox(width: 16),
+            SizedBox(
+              height: 24, // Adjusted height to make it smaller
+              child: ToggleSwitch(
+                onChanged: widget.onShowNavigationChange,
+                checked: widget.showNavigation,
+                content: Text(
+                  'Show Navigator',
+                  style: FluentTheme.of(context)
+                      .typography
+                      .body
+                      ?.copyWith(fontSize: 12), // Adjust font size
+                ),
+              ),
+            ),
+            SizedBox(width: 16),
+            _buildFilterButton(context),
+          ],
+        ),
       ),
     );
   }
