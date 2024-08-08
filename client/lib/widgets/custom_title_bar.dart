@@ -9,8 +9,8 @@ class CustomTitleBar extends StatelessWidget {
   final bool showAvatarButton;
   final Widget? title;
   final List<Widget>? actions;
-  final VoidCallback onAccountSettings;
-  final VoidCallback onSignOut;
+  final VoidCallback? onAccountSettings;
+  final VoidCallback? onSignOut;
   final VoidCallback? onBack;
   final GlobalKey<AvatarButtonState>? avatarButtonKey;
 
@@ -20,8 +20,8 @@ class CustomTitleBar extends StatelessWidget {
     this.showAvatarButton = false,
     this.title,
     this.actions,
-    required this.onAccountSettings,
-    required this.onSignOut,
+    this.onAccountSettings,
+    this.onSignOut,
     this.onBack,
     this.avatarButtonKey,
   });
@@ -71,8 +71,8 @@ class CustomTitleBar extends StatelessWidget {
                     right: 5.0), // Move the avatar button 5 pixels to the left
                 child: AvatarButton(
                   key: avatarButtonKey, // Pass the GlobalKey here
-                  onAccountSettings: onAccountSettings,
-                  onSignOut: onSignOut,
+                  onAccountSettings: onAccountSettings ?? () => {},
+                  onSignOut: onSignOut ?? () => {},
                 ),
               ),
             if (actions != null) ...actions!,

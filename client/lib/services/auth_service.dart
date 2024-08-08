@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 import '../repositories/user_repository.dart';
 import 'data_service.dart';
 import '../managers/user_manager.dart';
+import 'package:dotenv/dotenv.dart';
 
 class AuthService {
   static final AuthService _instance = AuthService._internal();
@@ -63,5 +65,26 @@ class AuthService {
     final responseData = jsonDecode(response.body);
     final token = responseData['token'];
     dataService.setToken(token);
+  }
+
+  Future<bool> validateOrganization(String orgId) async {
+    var env = DotEnv()..load();
+    assert(env.isDefined('ORG_VALIDATION_KEY'),
+        'Missing ORG_VALIDATION_KEY env var');
+    final String apiKey = env['ORG_VALIDATION_KEY'] ?? '';
+    print('apiKey = $apiKey');
+    final dataService = DataService();
+    final response = await dataService.post(
+      '/validate-org',
+      headers: {'X-CLIENT-API-KEY': apiKey},
+      body: jsonEncode({'org_id': orgId}),
+    );
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(response.body);
+      return responseData['valid'] ==
+          true; // Adjust based on your server response
+    } else {
+      return false;
+    }
   }
 }

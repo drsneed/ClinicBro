@@ -89,7 +89,7 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
     final cellColor = theme.cardColor;
     final todayBackgroundColor = theme.accentColor;
     const todayColor = Colors.white;
-    final borderColor = Colors.transparent;
+    final borderColor = theme.cardColor;
     final textColor = theme.inactiveColor.withOpacity(0.3);
     final currentMonthColor = theme.inactiveColor.withOpacity(0.7);
 
@@ -191,11 +191,11 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
               border: Border(
                 right: BorderSide(
                   color: borderColor,
-                  width: 0.5, // Ensure border width is consistent
+                  width: 1.0, // Ensure border width is consistent
                 ),
                 bottom: BorderSide(
                   color: borderColor,
-                  width: 0.5, // Ensure border width is consistent
+                  width: 1.0, // Ensure border width is consistent
                 ),
               ),
             ),

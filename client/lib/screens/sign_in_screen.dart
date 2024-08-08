@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:dotenv/dotenv.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
@@ -7,6 +10,8 @@ import '../widgets/themed_icon.dart';
 import 'dart:io' show Platform;
 
 class SignInScreen extends StatefulWidget {
+  const SignInScreen({super.key});
+
   @override
   _SignInScreenState createState() => _SignInScreenState();
 }
@@ -18,6 +23,7 @@ class _SignInScreenState extends State<SignInScreen> {
   final _passwordController = TextEditingController();
   bool _rememberMe = false;
   bool _showCredentials = false;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -57,40 +63,76 @@ class _SignInScreenState extends State<SignInScreen> {
     }
   }
 
+  void _showInfoBar(String message,
+      {InfoBarSeverity severity = InfoBarSeverity.info,
+      int durationSeconds = 3}) {
+    displayInfoBar(
+      context,
+      duration: Duration(seconds: durationSeconds),
+      builder: (context, close) {
+        return InfoBar(
+          title: Text(message),
+          severity: severity,
+          onClose: close,
+        );
+      },
+    );
+  }
+
   Future<void> _validateOrgIdAndServerUrl() async {
-    final serverUrl = _serverUrlController.text;
-    DataService().setBaseUrl(serverUrl);
-    // TODO: Implement validation logic
-    // For now, we'll just assume it's valid
     setState(() {
-      _showCredentials = true;
+      _isLoading = true;
     });
-    await _saveData();
+
+    final serverUrl = _serverUrlController.text;
+    final orgId = _orgIdController.text;
+    final dataService = DataService();
+    dataService.setBaseUrl(serverUrl);
+
+    // validate server url
+    if (!await dataService.validateServer()) {
+      _showInfoBar(
+          "Server is not available. Please check the URL or your network connection",
+          severity: InfoBarSeverity.error,
+          durationSeconds: 5);
+    } else {
+      // validate org id
+      if (await AuthService().validateOrganization(orgId)) {
+        setState(() {
+          _showCredentials = true;
+        });
+        await _saveData();
+      } else {
+        _showInfoBar("Invalid Organization ID",
+            severity: InfoBarSeverity.error);
+      }
+    }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _signIn() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     final orgId = _orgIdController.text;
     final username = _usernameController.text;
     final password = _passwordController.text;
     final authService = AuthService();
+
     if (await authService.signIn(orgId, username, password)) {
       await _saveData();
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
-      showDialog(
-        context: context,
-        builder: (context) => ContentDialog(
-          title: Text('Authentication Error'),
-          content: Text('Invalid credentials or server information'),
-          actions: [
-            Button(
-              child: Text('OK'),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ],
-        ),
-      );
+      _showInfoBar("Invalid name or password", severity: InfoBarSeverity.error);
     }
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _goBack() {
@@ -105,93 +147,112 @@ class _SignInScreenState extends State<SignInScreen> {
     return NavigationView(
       appBar: isMobile
           ? null
-          : NavigationAppBar(
+          : const NavigationAppBar(
               title: CustomTitleBar(
                 showBackButton: false,
                 showAvatarButton: false,
                 title: Text('Sign In'),
-                onAccountSettings: () {
-                  // Navigate to account settings page
-                },
-                onSignOut: () {
-                  // Handle sign out logic
-                },
               ),
               automaticallyImplyLeading: false,
             ),
       content: ScaffoldPage(
-        content: Center(
-          child: Container(
-            constraints: BoxConstraints(maxWidth: 300),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ThemedIcon(svgPath: 'assets/icon/app_icon.svg', size: 48),
-                    SizedBox(width: 8),
-                    Text(
-                      'ClinicBro',
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
+        content: Stack(
+          children: [
+            // Main content
+            if (!_isLoading)
+              Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 300),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ThemedIcon(
+                            svgPath: 'assets/icon/app_icon.svg',
+                            size: 48,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'ClinicBro',
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
+                      const SizedBox(height: 20),
+                      if (!_showCredentials) ...[
+                        TextBox(
+                          controller: _serverUrlController,
+                          placeholder: 'Server URL',
+                        ),
+                        const SizedBox(height: 10),
+                        TextBox(
+                          controller: _orgIdController,
+                          placeholder: 'Organization ID',
+                        ),
+                      ] else ...[
+                        TextBox(
+                          controller: _usernameController,
+                          placeholder: 'User Name',
+                        ),
+                        const SizedBox(height: 10),
+                        PasswordBox(
+                          controller: _passwordController,
+                          placeholder: 'Password',
+                          onSubmitted: (value) {
+                            _signIn();
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        Checkbox(
+                          checked: _rememberMe,
+                          onChanged: (value) {
+                            setState(() {
+                              _rememberMe = value!;
+                            });
+                          },
+                          content: const Text('Remember Me'),
+                        ),
+                      ],
+                      const SizedBox(height: 20),
+                      FilledButton(
+                        onPressed: _showCredentials
+                            ? _signIn
+                            : _validateOrgIdAndServerUrl,
+                        child: Text(_showCredentials ? 'Sign In' : 'Continue'),
+                      ),
+                      if (_showCredentials) ...[
+                        const SizedBox(height: 10),
+                        Button(
+                          onPressed: _goBack,
+                          child: const Text('Back'),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            // Loading indicator
+            if (_isLoading)
+              Positioned.fill(
+                child: Container(
+                  color: Colors
+                      .transparent, // Optional: Adds a semi-transparent background
+                  child: const Center(
+                    child: ProgressRing(
+                      strokeWidth: 4,
+                      semanticLabel: "Attempting to Connect...",
+                      value: null, // null makes it indeterminate
                     ),
-                  ],
+                  ),
                 ),
-                SizedBox(height: 20),
-                if (!_showCredentials) ...[
-                  TextBox(
-                    controller: _serverUrlController,
-                    placeholder: 'Server URL',
-                  ),
-                  SizedBox(height: 10),
-                  TextBox(
-                    controller: _orgIdController,
-                    placeholder: 'Organization ID',
-                  ),
-                ] else ...[
-                  TextBox(
-                    controller: _usernameController,
-                    placeholder: 'User Name',
-                  ),
-                  SizedBox(height: 10),
-                  PasswordBox(
-                    controller: _passwordController,
-                    placeholder: 'Password',
-                    onSubmitted: (value) {
-                      _signIn();
-                    },
-                  ),
-                  SizedBox(height: 10),
-                  Checkbox(
-                    checked: _rememberMe,
-                    onChanged: (value) {
-                      setState(() {
-                        _rememberMe = value!;
-                      });
-                    },
-                    content: Text('Remember Me'),
-                  ),
-                ],
-                SizedBox(height: 20),
-                FilledButton(
-                  onPressed:
-                      _showCredentials ? _signIn : _validateOrgIdAndServerUrl,
-                  child: Text(_showCredentials ? 'Sign In' : 'Continue'),
-                ),
-                if (_showCredentials) ...[
-                  SizedBox(height: 10),
-                  Button(
-                    onPressed: _goBack,
-                    child: Text('Back'),
-                  ),
-                ],
-              ],
-            ),
-          ),
+              ),
+          ],
         ),
       ),
     );

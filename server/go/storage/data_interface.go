@@ -1,6 +1,8 @@
 package storage
 
 import (
+	"ClinicBro-Server/models"
+	"ClinicBro-Server/utils"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -15,19 +17,6 @@ import (
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-type Tenant struct {
-	OrgID      string
-	DBName     string
-	DBHost     string
-	DBUser     string
-	DBPassword string
-}
-
-func (t *Tenant) GetDSN() string {
-	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s sslmode=disable",
-		t.DBHost, t.DBUser, t.DBPassword, t.DBName)
-}
 
 var (
 	masterDB      *gorm.DB
@@ -66,14 +55,14 @@ func InitAll() {
 	InitRedis()
 }
 
-func getTenantInfo(orgID string) (*Tenant, error) {
+func GetTenantInfo(orgID string) (*models.Tenant, error) {
 	ctx := context.Background()
 
 	// Check Redis cache first
 	cacheKey := fmt.Sprintf("tenant:%s", orgID)
 	cachedInfo, err := redisClient.Get(ctx, cacheKey).Result()
 	if err == nil {
-		var tenantInfo Tenant
+		var tenantInfo models.Tenant
 		err = json.Unmarshal([]byte(cachedInfo), &tenantInfo)
 		if err == nil {
 			return &tenantInfo, nil
@@ -81,7 +70,7 @@ func getTenantInfo(orgID string) (*Tenant, error) {
 	}
 
 	// If not in cache, query master database
-	var tenantInfo Tenant
+	var tenantInfo models.Tenant
 	result := masterDB.Where("org_id = ?", orgID).First(&tenantInfo)
 	if result.Error != nil {
 		return nil, result.Error
@@ -104,14 +93,14 @@ func ConnectToTenantDB(orgID string) (*gorm.DB, error) {
 	}
 	tenantDBMutex.RUnlock()
 
-	tenantInfo, err := getTenantInfo(orgID)
+	tenantInfo, err := GetTenantInfo(orgID)
 	if err != nil {
 		return nil, err
 	}
 
 	// Create new database connection with logging
 	db, err := gorm.Open(postgres.Open(tenantInfo.GetDSN()), &gorm.Config{
-		Logger: CustomLogger{}, // Use the custom logger for SQL logging
+		Logger: utils.CustomLogger{}, // Use the custom logger for SQL logging
 	})
 	if err != nil {
 		return nil, err

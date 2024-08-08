@@ -4,6 +4,7 @@ import (
 	"ClinicBro-Server/handlers"
 	"ClinicBro-Server/middleware"
 	"ClinicBro-Server/storage"
+	"ClinicBro-Server/utils"
 	"log"
 	"os"
 
@@ -17,16 +18,26 @@ func main() {
 	}
 	storage.InitAll()
 	jwtSecret := os.Getenv("JWT_SECRET_KEY")
+	utils.Assert(len(jwtSecret) > 0, "Missing JWT_SECRET_KEY")
 	middleware.SetJWTSecret(jwtSecret)
 	handlers.SetJWTSecret(jwtSecret)
+	orgValidationKey := os.Getenv("ORG_VALIDATION_KEY")
+	utils.Assert(len(orgValidationKey) > 0, "Missing ORG_VALIDATION_KEY")
+	middleware.SetOrgValidationKey(orgValidationKey)
 
 	r := gin.Default()
 
 	// Apply the logging middleware globally
 	//r.Use(middleware.LoggingMiddleware())
 
+	// Enforces client api key presense for /validate-org and /server-version
+	r.Use(middleware.ClientApiKeyMiddleware())
+
 	// Public routes
+	r.GET("/whoareyou", handlers.WhoAreYou)
 	r.POST("/authenticate", handlers.Authenticate)
+	r.POST("/validate-org", handlers.ValidateOrganization)
+	r.GET("/server-version", handlers.GetServerVersion)
 
 	// Protected routes
 	authorized := r.Group("/")

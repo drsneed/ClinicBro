@@ -3,7 +3,6 @@ package handlers
 import (
 	"ClinicBro-Server/models"
 	"ClinicBro-Server/storage"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -30,8 +29,6 @@ func Authenticate(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to connect to tenant database"})
 		return
 	}
-
-	fmt.Printf("Executing query with name=%s and password=%s\n", authRequest.Name, authRequest.Password)
 
 	var user models.User
 	if err := db.Raw("SELECT * FROM users WHERE active=true AND name = ? AND password = crypt(?, password)",

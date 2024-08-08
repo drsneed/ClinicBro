@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:io' show SocketException;
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
+import '../utils/logger.dart';
 
 class DataService {
   static final DataService _instance = DataService._internal();
@@ -8,7 +11,8 @@ class DataService {
 
   String? _baseUrl;
   String? _jwtToken;
-  bool _loggingEnabled = false; // Flag to enable/disable logging
+  bool _loggingEnabled = false;
+  final _logger = Logger();
 
   String? get jwtToken => _jwtToken;
   void setToken(String? token) {
@@ -22,6 +26,27 @@ class DataService {
 
   void enableLogging(bool enable) {
     _loggingEnabled = enable;
+  }
+
+  Future<bool> validateServer() async {
+    try {
+      final response = await get('/whoareyou');
+      if (response.statusCode == 200) {
+        final responseString = jsonDecode(response.body);
+        return responseString == "ClinicBro-Server";
+      } else {
+        return false;
+      }
+    } on http.ClientException catch (e) {
+      _logger.log(Level.SEVERE, 'ClientException: $e');
+      return false;
+    } on SocketException catch (e) {
+      _logger.log(Level.SEVERE, 'SocketException: $e');
+      return false;
+    } catch (e) {
+      _logger.log(Level.SEVERE, 'Unexpected error: $e');
+      return false;
+    }
   }
 
   Future<http.Response> post(
@@ -75,10 +100,10 @@ class DataService {
     };
 
     if (_loggingEnabled) {
-      _log('Request Method: $method');
-      _log('Request URL: $uri');
-      _log('Request Headers: $requestHeaders');
-      if (body != null) _log('Request Body: $body');
+      _logger.log(Level.INFO, 'Request Method: $method');
+      _logger.log(Level.INFO, 'Request URL: $uri');
+      _logger.log(Level.INFO, 'Request Headers: $requestHeaders');
+      if (body != null) _logger.log(Level.INFO, 'Request Body: $body');
     }
 
     http.Response response;
@@ -100,8 +125,8 @@ class DataService {
     }
 
     if (_loggingEnabled) {
-      _log('Response Status Code: ${response.statusCode}');
-      _log('Response Body: ${response.body}');
+      _logger.log(Level.INFO, 'Response Status Code: ${response.statusCode}');
+      _logger.log(Level.INFO, 'Response Body: ${response.body}');
     }
 
     return response;
@@ -139,18 +164,18 @@ class DataService {
     });
 
     if (_loggingEnabled) {
-      _log('File Upload URL: $url');
-      _log('File Name: $filename');
-      _log('Request Headers: ${request.headers}');
-      if (fields != null) _log('Fields: $fields');
+      _logger.log(Level.INFO, 'File Upload URL: $url');
+      _logger.log(Level.INFO, 'File Name: $filename');
+      _logger.log(Level.INFO, 'Request Headers: ${request.headers}');
+      if (fields != null) _logger.log(Level.INFO, 'Fields: $fields');
     }
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
 
     if (_loggingEnabled) {
-      _log('Response Status Code: ${response.statusCode}');
-      _log('Response Body: ${response.body}');
+      _logger.log(Level.INFO, 'Response Status Code: ${response.statusCode}');
+      _logger.log(Level.INFO, 'Response Body: ${response.body}');
     }
 
     return response;
@@ -175,24 +200,19 @@ class DataService {
     });
 
     if (_loggingEnabled) {
-      _log('File Upload URL: $url');
-      _log('File Name: $filename');
-      _log('Request Headers: ${request.headers}');
+      _logger.log(Level.INFO, 'File Upload URL: $url');
+      _logger.log(Level.INFO, 'File Name: $filename');
+      _logger.log(Level.INFO, 'Request Headers: ${request.headers}');
     }
 
     final streamedResponse = await request.send();
     final response = await http.Response.fromStream(streamedResponse);
 
     if (_loggingEnabled) {
-      _log('Response Status Code: ${response.statusCode}');
-      _log('Response Body: ${response.body}');
+      _logger.log(Level.INFO, 'Response Status Code: ${response.statusCode}');
+      _logger.log(Level.INFO, 'Response Body: ${response.body}');
     }
 
     return response;
-  }
-
-  void _log(String message) {
-    // Replace with your preferred logging mechanism
-    print(message);
   }
 }
