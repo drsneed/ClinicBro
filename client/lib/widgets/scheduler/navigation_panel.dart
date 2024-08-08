@@ -83,24 +83,22 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
 
   Widget _buildViewContent() {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: NavigationMonthView(
-            initialDate: DateTime(_centerDate.year, _centerDate.month - 1, 1),
-            onMonthChanged: _onDateChanged,
-          ),
+        NavigationMonthView(
+          initialDate: DateTime(_centerDate.year, _centerDate.month - 1, 1),
+          onMonthChanged: _onDateChanged,
+        ),
+        NavigationMonthView(
+          initialDate: _centerDate,
+          onMonthChanged: _onDateChanged,
+        ),
+        NavigationMonthView(
+          initialDate: DateTime(_centerDate.year, _centerDate.month + 1, 1),
+          onMonthChanged: _onDateChanged,
         ),
         Expanded(
-          child: NavigationMonthView(
-            initialDate: _centerDate,
-            onMonthChanged: _onDateChanged,
-          ),
-        ),
-        Expanded(
-          child: NavigationMonthView(
-            initialDate: DateTime(_centerDate.year, _centerDate.month + 1, 1),
-            onMonthChanged: _onDateChanged,
-          ),
+          child: SizedBox.expand(),
         ),
       ],
     );

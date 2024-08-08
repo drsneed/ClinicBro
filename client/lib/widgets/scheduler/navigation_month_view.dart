@@ -1,6 +1,8 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 
+import '../../utils/calendar_grid.dart';
+
 class NavigationMonthView extends StatefulWidget {
   final DateTime initialDate;
   final Function(DateTime)? onDateSelected;
@@ -20,11 +22,12 @@ class NavigationMonthView extends StatefulWidget {
 class _NavigationMonthViewState extends State<NavigationMonthView> {
   late PageController _pageController;
   late DateTime _currentMonth;
-
+  late CalendarGrid _calendarGrid;
   @override
   void initState() {
     super.initState();
     _currentMonth = DateTime(widget.initialDate.year, widget.initialDate.month);
+    _calendarGrid = CalendarGrid(_currentMonth);
     _pageController = PageController(initialPage: 1000);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       widget.onMonthChanged(_currentMonth);
@@ -43,6 +46,7 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
   void _updateToMonth(DateTime newMonth) {
     setState(() {
       _currentMonth = DateTime(newMonth.year, newMonth.month);
+      _calendarGrid = CalendarGrid(_currentMonth);
     });
     final newPage = 1000 +
         (newMonth.year - DateTime.now().year) * 12 +
@@ -54,21 +58,6 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
   void dispose() {
     _pageController.dispose();
     super.dispose();
-  }
-
-  List<DateTime> _getDaysInMonth(DateTime month) {
-    final firstDayOfMonth = DateTime(month.year, month.month, 1);
-    final daysInMonth = <DateTime>[];
-
-    final firstDayOfGrid =
-        firstDayOfMonth.subtract(Duration(days: firstDayOfMonth.weekday - 1));
-
-    for (var i = 0; i < 42; i++) {
-      final date = firstDayOfGrid.add(Duration(days: i));
-      daysInMonth.add(date);
-    }
-
-    return daysInMonth;
   }
 
   void _onPageChanged(int page) {
@@ -95,65 +84,62 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
 
     final headerText = DateFormat('MMMM yyyy').format(_currentMonth);
 
-    return Padding(
-      padding: const EdgeInsets.all(4.0),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final cellWidth = constraints.maxWidth / 7;
-          final availableHeight = constraints.maxHeight -
-              70.0; // Estimation of scheduler controls height
-          final cellHeight = (availableHeight / 6).clamp(
-              0.0, cellWidth); // Ensure height does not exceed cell width
-          final gridHeight = cellHeight * 6; // Height to fit all rows
+    return Container(
+      // color: Colors.blue
+      //     .withOpacity(0.2), // Temporarily change the background color
+      child: Padding(
+        padding: const EdgeInsets.all(4.0),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final cellWidth = constraints.maxWidth / 7;
+            final availableHeight = constraints.maxHeight -
+                70.0; // Estimation of scheduler controls height
+            final cellHeight = (availableHeight / _calendarGrid.numberOfRows)
+                .clamp(0.0, cellWidth); // height can't exceed cell width
+            final gridHeight = cellHeight * _calendarGrid.numberOfRows;
 
-          return Column(
-            children: [
-              // Display month and year above the calendar
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: Text(
-                  headerText,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+            return Column(
+              children: [
+                // Display month and year above the calendar
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10.0),
+                  child: Text(
+                    headerText,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              _buildWeekdayHeader(cellWidth, textColor),
-              Container(
-                height: gridHeight + 10, // Add some extra padding for safety
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: _onPageChanged,
-                  itemBuilder: (context, page) {
-                    final monthToShow = DateTime(
-                      DateTime.now().year,
-                      DateTime.now().month + (page - 1000),
-                    );
-                    final daysToShow = _getDaysInMonth(monthToShow);
-                    return _buildCalendarGrid(
-                      daysToShow,
-                      cellWidth,
-                      cellHeight,
-                      cellColor,
-                      todayBackgroundColor,
-                      todayColor,
-                      borderColor,
-                      textColor,
-                      currentMonthColor,
-                    );
-                  },
+                _buildWeekdayHeader(cellWidth, textColor),
+                Container(
+                  height: gridHeight, // Add some extra padding for safety
+                  child: PageView.builder(
+                    controller: _pageController,
+                    onPageChanged: _onPageChanged,
+                    itemBuilder: (context, page) {
+                      return _buildCalendarGrid(
+                        cellWidth,
+                        cellHeight,
+                        cellColor,
+                        todayBackgroundColor,
+                        todayColor,
+                        borderColor,
+                        textColor,
+                        currentMonthColor,
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildCalendarGrid(
-      List<DateTime> days,
       double cellWidth,
       double cellHeight,
       Color cellColor,
@@ -167,11 +153,11 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
       physics: NeverScrollableScrollPhysics(),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 7,
-        childAspectRatio: cellWidth / cellHeight, // Use the cell aspect ratio
+        childAspectRatio: cellWidth / cellHeight,
       ),
-      itemCount: days.length,
+      itemCount: _calendarGrid.days.length,
       itemBuilder: (context, index) {
-        final date = days[index];
+        final date = _calendarGrid.days[index];
         final isCurrentMonth = date.month == _currentMonth.month;
         final isToday = date.year == DateTime.now().year &&
             date.month == DateTime.now().month &&
@@ -191,11 +177,11 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
               border: Border(
                 right: BorderSide(
                   color: borderColor,
-                  width: 1.0, // Ensure border width is consistent
+                  width: 1.0,
                 ),
                 bottom: BorderSide(
                   color: borderColor,
-                  width: 1.0, // Ensure border width is consistent
+                  width: 1.0,
                 ),
               ),
             ),

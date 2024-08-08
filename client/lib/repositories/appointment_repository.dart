@@ -1,5 +1,6 @@
 import 'dart:convert';
 import '../models/appointment.dart'; // Import your Appointment model
+import '../models/appointment_item.dart';
 import '../services/data_service.dart';
 
 class AppointmentRepository {
@@ -64,7 +65,7 @@ class AppointmentRepository {
     }
   }
 
-  Future<List<Appointment>> getAppointmentsInRange(
+  Future<List<AppointmentItem>> getAppointmentsInRange(
       DateTime startDate, DateTime endDate) async {
     final response = await DataService().get(
       '/appointment-items',
@@ -75,13 +76,38 @@ class AppointmentRepository {
     );
 
     if (response.statusCode == 200) {
-      List<dynamic> appointmentsJson = jsonDecode(response.body);
-      return appointmentsJson
-          .map((json) => Appointment.fromJson(json))
-          .toList();
-    } else {
-      // Handle errors or throw exceptions
-      return [];
+      var appointmentsJson = jsonDecode(response.body);
+
+      // Ensure appointmentDatesJson is not null and is a list before processing it.
+      if (appointmentsJson != null && appointmentsJson is List) {
+        return appointmentsJson
+            .map((json) => AppointmentItem.fromJson(json))
+            .toList();
+      }
     }
+    return [];
+  }
+
+  Future<List<DateTime>> getAppointmentDatesInRange(
+      DateTime startDate, DateTime endDate) async {
+    final response = await DataService().get(
+      '/appointment-dates',
+      queryParams: {
+        'start_date': startDate.toIso8601String(),
+        'end_date': endDate.toIso8601String(),
+      },
+    );
+    if (response.statusCode == 200) {
+      var appointmentDatesJson = jsonDecode(response.body);
+
+      // Ensure appointmentDatesJson is not null and is a list before processing it.
+      if (appointmentDatesJson != null && appointmentDatesJson is List) {
+        return appointmentDatesJson
+            .map((json) => DateTime.parse(json))
+            .toList();
+      }
+    }
+
+    return [];
   }
 }

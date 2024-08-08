@@ -123,16 +123,18 @@ class _SignInScreenState extends State<SignInScreen> {
     final password = _passwordController.text;
     final authService = AuthService();
 
+    // Only exit loading state in the event of a sign in failure.
+    // This prevents what looks like a flicker of the screen as the user
+    // is signing in.
     if (await authService.signIn(orgId, username, password)) {
       await _saveData();
       Navigator.of(context).pushReplacementNamed('/home');
     } else {
+      setState(() {
+        _isLoading = false;
+      });
       _showInfoBar("Invalid name or password", severity: InfoBarSeverity.error);
     }
-
-    setState(() {
-      _isLoading = false;
-    });
   }
 
   void _goBack() {

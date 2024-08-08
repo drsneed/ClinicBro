@@ -1,5 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
+import '../../models/appointment_item.dart';
+import '../../repositories/appointment_repository.dart';
+import '../../services/data_service.dart';
+import '../../utils/logger.dart';
 import 'day_view.dart';
 import 'five_day_view.dart';
 import 'week_view.dart';
@@ -9,7 +13,6 @@ class Scheduler extends StatefulWidget {
   final String viewMode;
   final bool isMultiple;
   final List<String>? providers;
-
   const Scheduler({
     Key? key,
     required this.viewMode,
@@ -24,18 +27,48 @@ class Scheduler extends StatefulWidget {
 class _SchedulerState extends State<Scheduler> {
   late DateTime _centerDate;
   late PageController _pageController;
-
+  List<AppointmentItem> _appointments = [];
   @override
   void initState() {
     super.initState();
     _centerDate = DateTime.now();
     _pageController = PageController(initialPage: 1000);
+    _loadAppointments();
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _loadAppointments() async {
+    final logger = Logger();
+    int startYear = _centerDate.year;
+    int startMonth = _centerDate.month - 1;
+    if (startMonth == 0) {
+      startYear -= 1;
+      startMonth = 12;
+    }
+    final startDate = DateTime(startYear, startMonth, 1);
+
+    int endYear = _centerDate.year;
+    int endMonth = _centerDate.month + 2;
+    if (endMonth > 12) {
+      endYear += 1;
+      endMonth -= 12;
+    }
+    final endDate = DateTime(endYear, endMonth, 0);
+
+    final apptRepository = AppointmentRepository();
+    logger.log(Level.INFO,
+        "attempting to fetch appointments from $startDate to $endDate");
+    final appointments =
+        await apptRepository.getAppointmentsInRange(startDate, endDate);
+    setState(() {
+      _appointments = appointments;
+      logger.log(Level.INFO, "loaded ${_appointments.length} appointments");
+    });
   }
 
   void _onDateChanged(DateTime newDate) {
@@ -45,6 +78,7 @@ class _SchedulerState extends State<Scheduler> {
     if (widget.viewMode == 'Month') {
       _updateMonthView(newDate);
     }
+    _loadAppointments();
   }
 
   void _updateMonthView(DateTime newDate) {

@@ -98,8 +98,11 @@ func main() {
 		authorized.PUT("/appointments/:id", handlers.UpdateAppointment)
 		authorized.DELETE("/appointments/:id", handlers.DeleteAppointment)
 
-		// Appointment Items routes
+		// Appointment Items route
 		authorized.GET("/appointment-items", handlers.GetAppointmentItems)
+
+		// Appointment Dates route
+		authorized.GET("/appointment-dates", handlers.GetAppointmentDates)
 
 		// Operating Schedule routes
 		authorized.POST("/operating-schedule", handlers.CreateOperatingSchedule)
