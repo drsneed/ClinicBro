@@ -92,6 +92,7 @@ class _SchedulerState extends State<Scheduler> {
           initialDate: widget.centerDate,
           onDateSelected: widget.onDateChanged,
           onMonthChanged: widget.onDateChanged,
+          appointments: widget.appointments,
         );
       default:
         return Container();

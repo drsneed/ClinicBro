@@ -50,15 +50,10 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
     });
   }
 
-  void onNavigationDateChanged(DateTime newDate) {
+  void onDateChanged(DateTime newDate) {
     setState(() {
       _centerDate = newDate;
-    });
-  }
-
-  void onSchedulerDateChanged(DateTime newDate) {
-    setState(() {
-      _centerDate = newDate;
+      _loadAppointments();
     });
   }
 
@@ -126,7 +121,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
           SchedulerNavigationPanel(
             isVisible: _showNavigation,
             centerDate: _centerDate,
-            onDateChanged: onNavigationDateChanged,
+            onDateChanged: onDateChanged,
             selectedDates: _getSelectedDates(),
           ),
 
@@ -148,7 +143,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
                   viewMode: _viewMode,
                   isMultiple: _isMultiple,
                   centerDate: _centerDate,
-                  onDateChanged: onSchedulerDateChanged,
+                  onDateChanged: onDateChanged,
                   appointments: _appointments,
                   // Additional parameters
                 ),

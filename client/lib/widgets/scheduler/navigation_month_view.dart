@@ -180,9 +180,8 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
                               : (isCurrentMonth
                                   ? currentMonthColor
                                   : textColor)),
-                      fontWeight: hasAppointment || isToday
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      fontWeight:
+                          hasAppointment ? FontWeight.bold : FontWeight.normal,
                       fontSize: cellWidth * 0.4,
                     ),
                   ),
