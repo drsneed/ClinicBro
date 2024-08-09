@@ -12,73 +12,34 @@ import 'month_view.dart';
 class Scheduler extends StatefulWidget {
   final String viewMode;
   final bool isMultiple;
-  final List<String>? providers;
+  final DateTime centerDate;
+  final void Function(DateTime) onDateChanged;
+  final List<AppointmentItem> appointments;
   const Scheduler({
-    Key? key,
+    super.key,
     required this.viewMode,
     required this.isMultiple,
-    this.providers,
-  }) : super(key: key);
+    required this.centerDate,
+    required this.onDateChanged,
+    required this.appointments,
+  });
 
   @override
   _SchedulerState createState() => _SchedulerState();
 }
 
 class _SchedulerState extends State<Scheduler> {
-  late DateTime _centerDate;
   late PageController _pageController;
-  List<AppointmentItem> _appointments = [];
   @override
   void initState() {
     super.initState();
-    _centerDate = DateTime.now();
     _pageController = PageController(initialPage: 1000);
-    _loadAppointments();
   }
 
   @override
   void dispose() {
     _pageController.dispose();
     super.dispose();
-  }
-
-  void _loadAppointments() async {
-    final logger = Logger();
-    int startYear = _centerDate.year;
-    int startMonth = _centerDate.month - 1;
-    if (startMonth == 0) {
-      startYear -= 1;
-      startMonth = 12;
-    }
-    final startDate = DateTime(startYear, startMonth, 1);
-
-    int endYear = _centerDate.year;
-    int endMonth = _centerDate.month + 2;
-    if (endMonth > 12) {
-      endYear += 1;
-      endMonth -= 12;
-    }
-    final endDate = DateTime(endYear, endMonth, 0);
-
-    final apptRepository = AppointmentRepository();
-    logger.log(Level.INFO,
-        "attempting to fetch appointments from $startDate to $endDate");
-    final appointments =
-        await apptRepository.getAppointmentsInRange(startDate, endDate);
-    setState(() {
-      _appointments = appointments;
-      logger.log(Level.INFO, "loaded ${_appointments.length} appointments");
-    });
-  }
-
-  void _onDateChanged(DateTime newDate) {
-    setState(() {
-      _centerDate = newDate;
-    });
-    if (widget.viewMode == 'Month') {
-      _updateMonthView(newDate);
-    }
-    _loadAppointments();
   }
 
   void _updateMonthView(DateTime newDate) {
@@ -90,7 +51,7 @@ class _SchedulerState extends State<Scheduler> {
 
   void _onPageChanged(int page) {
     final newDate = DateTime.now().add(Duration(days: page - 1000));
-    _onDateChanged(newDate);
+    widget.onDateChanged(newDate);
   }
 
   @override
@@ -128,9 +89,9 @@ class _SchedulerState extends State<Scheduler> {
         );
       case 'Month':
         return MonthView(
-          initialDate: _centerDate,
-          onDateSelected: _onDateChanged,
-          onMonthChanged: _onDateChanged,
+          initialDate: widget.centerDate,
+          onDateSelected: widget.onDateChanged,
+          onMonthChanged: widget.onDateChanged,
         );
       default:
         return Container();
@@ -138,25 +99,8 @@ class _SchedulerState extends State<Scheduler> {
   }
 
   Widget _buildMultipleSchedules() {
-    if (widget.providers == null || widget.providers!.isEmpty) {
-      return Center(child: Text('No providers selected.'));
-    }
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: widget.providers!.map((provider) {
-          return Container(
-            width: 300,
-            margin: EdgeInsets.only(right: 8),
-            child: DayView(
-              pageController: PageController(initialPage: 1000),
-              onPageChanged: _onPageChanged,
-            ),
-          );
-        }).toList(),
-      ),
-    );
+    return const Center(
+        child: Text('Multiple Schedule mode not implemented yet'));
   }
 
   Widget _buildDateHeader() {
@@ -164,22 +108,22 @@ class _SchedulerState extends State<Scheduler> {
 
     switch (widget.viewMode) {
       case 'Day':
-        headerText = DateFormat('EEEE, MMMM d, y').format(_centerDate);
+        headerText = DateFormat('EEEE, MMMM d, y').format(widget.centerDate);
         break;
       case '5-Day':
-        final endDate = _centerDate.add(Duration(days: 4));
+        final endDate = widget.centerDate.add(Duration(days: 4));
         headerText =
-            '${DateFormat('MMM d').format(_centerDate)} - ${DateFormat('MMM d, y').format(endDate)}';
+            '${DateFormat('MMM d').format(widget.centerDate)} - ${DateFormat('MMM d, y').format(endDate)}';
         break;
       case 'Week':
-        final startOfWeek =
-            _centerDate.subtract(Duration(days: _centerDate.weekday - 1));
+        final startOfWeek = widget.centerDate
+            .subtract(Duration(days: widget.centerDate.weekday - 1));
         final endOfWeek = startOfWeek.add(Duration(days: 6));
         headerText =
             '${DateFormat('MMM d').format(startOfWeek)} - ${DateFormat('MMM d, y').format(endOfWeek)}';
         break;
       case 'Month':
-        headerText = DateFormat('MMMM yyyy').format(_centerDate);
+        headerText = DateFormat('MMMM yyyy').format(widget.centerDate);
         break;
       default:
         headerText = '';
@@ -218,7 +162,8 @@ class _SchedulerState extends State<Scheduler> {
         );
         break;
       case 'Month':
-        _onDateChanged(DateTime(_centerDate.year, _centerDate.month - 1, 1));
+        widget.onDateChanged(
+            DateTime(widget.centerDate.year, widget.centerDate.month - 1, 1));
         break;
     }
   }
@@ -234,7 +179,8 @@ class _SchedulerState extends State<Scheduler> {
         );
         break;
       case 'Month':
-        _onDateChanged(DateTime(_centerDate.year, _centerDate.month + 1, 1));
+        widget.onDateChanged(
+            DateTime(widget.centerDate.year, widget.centerDate.month + 1, 1));
         break;
     }
   }

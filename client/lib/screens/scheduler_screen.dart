@@ -1,6 +1,9 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as mat
     show Colors, FloatingActionButton, CircleBorder;
+import '../models/appointment_item.dart';
+import '../repositories/appointment_repository.dart';
+import '../utils/logger.dart';
 import '../widgets/scheduler/navigation_panel.dart';
 import '../widgets/scheduler/scheduler.dart';
 import '../widgets/scheduler/scheduler_carousel.dart';
@@ -21,6 +24,9 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   String _viewMode = 'Day'; // Default view mode
   bool _isMultiple = false; // Default view type
   bool _showNavigation = false; // Default months navigation visibility
+  DateTime _centerDate = DateTime.now(); // Add this line
+  List<AppointmentItem> _appointments = [];
+
   void _toggleFlyout() {
     setState(() {
       _isFlyoutVisible = !_isFlyoutVisible;
@@ -45,15 +51,60 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
     });
   }
 
+  void onNavigationDateChanged(DateTime newDate) {
+    setState(() {
+      _centerDate = newDate;
+    });
+  }
+
+  void onSchedulerDateChanged(DateTime newDate) {
+    setState(() {
+      _centerDate = newDate;
+    });
+  }
+
+  void _loadAppointments() async {
+    final logger = Logger();
+    int startYear = _centerDate.year;
+    int startMonth = _centerDate.month - 1;
+    if (startMonth == 0) {
+      startYear -= 1;
+      startMonth = 12;
+    }
+    final startDate = DateTime(startYear, startMonth, 1);
+
+    int endYear = _centerDate.year;
+    int endMonth = _centerDate.month + 2;
+    if (endMonth > 12) {
+      endYear += 1;
+      endMonth -= 12;
+    }
+    final endDate = DateTime(endYear, endMonth, 0);
+
+    final apptRepository = AppointmentRepository();
+    logger.log(Level.INFO,
+        "attempting to fetch appointments from $startDate to $endDate");
+    final appointments =
+        await apptRepository.getAppointmentsInRange(startDate, endDate);
+    setState(() {
+      _appointments = appointments;
+      logger.log(Level.INFO, "loaded ${_appointments.length} appointments");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = !widget.isMobile;
-
+    print('building scheduler screen for date $_centerDate');
     return Row(
       children: [
         // Vertical panel on the left
         if (_showNavigation)
-          SchedulerNavigationPanel(isVisible: _showNavigation),
+          SchedulerNavigationPanel(
+            isVisible: _showNavigation,
+            centerDate: _centerDate,
+            onDateChanged: onNavigationDateChanged,
+          ),
 
         Expanded(
           child: Stack(
@@ -72,6 +123,9 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
                 content: Scheduler(
                   viewMode: _viewMode,
                   isMultiple: _isMultiple,
+                  centerDate: _centerDate,
+                  onDateChanged: onSchedulerDateChanged,
+                  appointments: _appointments,
                   // Additional parameters
                 ),
               ),

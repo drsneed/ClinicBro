@@ -1,12 +1,17 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
-
 import 'navigation_month_view.dart';
 
 class SchedulerNavigationPanel extends StatefulWidget {
   final bool isVisible;
+  final DateTime centerDate;
+  final void Function(DateTime) onDateChanged;
 
-  SchedulerNavigationPanel({required this.isVisible});
+  SchedulerNavigationPanel({
+    required this.isVisible,
+    required this.centerDate,
+    required this.onDateChanged,
+  });
 
   @override
   _SchedulerNavigationPanelState createState() =>
@@ -14,26 +19,18 @@ class SchedulerNavigationPanel extends StatefulWidget {
 }
 
 class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
-  late DateTime _centerDate;
-  late PageController _pageController;
+  late ScrollController _scrollController;
 
   @override
   void initState() {
     super.initState();
-    _centerDate = DateTime.now();
-    _pageController = PageController(initialPage: 1000);
+    _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onDateChanged(DateTime newDate) {
-    setState(() {
-      _centerDate = newDate;
-    });
   }
 
   @override
@@ -43,64 +40,67 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
       width: widget.isVisible ? 250 : 0,
       color: FluentTheme.of(context).micaBackgroundColor,
       child: widget.isVisible
-          ? Column(
+          ? Stack(
               children: [
-                _buildHeader(),
-                Expanded(
-                  child: _buildViewContent(),
-                ),
+                _buildScrollableContent(),
+                _buildFloatingButtons(),
               ],
             )
           : null,
     );
   }
 
-  Widget _buildHeader() {
-    final headerText = 'Navigator';
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: const Icon(FluentIcons.chevron_left),
-            onPressed: () => _onDateChanged(
-                DateTime(_centerDate.year, _centerDate.month - 1, 1)),
-          ),
-          Text(
-            headerText,
-            style: FluentTheme.of(context).typography.bodyLarge,
-          ),
-          IconButton(
-            icon: const Icon(FluentIcons.chevron_right),
-            onPressed: () => _onDateChanged(
-                DateTime(_centerDate.year, _centerDate.month + 1, 1)),
-          ),
-        ],
-      ),
+  Widget _buildScrollableContent() {
+    return ListView(
+      controller: _scrollController,
+      children: [
+        NavigationMonthView(
+          key: ValueKey('previous-month'),
+          initialDate:
+              DateTime(widget.centerDate.year, widget.centerDate.month - 1, 1),
+          onMonthChanged: widget.onDateChanged,
+        ),
+        NavigationMonthView(
+          key: ValueKey('current-month'),
+          initialDate: widget.centerDate,
+          onMonthChanged: widget.onDateChanged,
+        ),
+        NavigationMonthView(
+          key: ValueKey('next-month'),
+          initialDate:
+              DateTime(widget.centerDate.year, widget.centerDate.month + 1, 1),
+          onMonthChanged: widget.onDateChanged,
+        ),
+        SizedBox(height: 1000), // Add extra space to allow scrolling
+      ],
     );
   }
 
-  Widget _buildViewContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        NavigationMonthView(
-          initialDate: DateTime(_centerDate.year, _centerDate.month - 1, 1),
-          onMonthChanged: _onDateChanged,
+  Widget _buildFloatingButtons() {
+    return Positioned(
+      top: 0,
+      left: 0,
+      right: 0,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        color: Colors
+            .transparent, //FluentTheme.of(context).micaBackgroundColor.withOpacity(0.8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(FluentIcons.chevron_left),
+              onPressed: () => widget.onDateChanged(DateTime(
+                  widget.centerDate.year, widget.centerDate.month - 1, 1)),
+            ),
+            IconButton(
+              icon: const Icon(FluentIcons.chevron_right),
+              onPressed: () => widget.onDateChanged(DateTime(
+                  widget.centerDate.year, widget.centerDate.month + 1, 1)),
+            ),
+          ],
         ),
-        NavigationMonthView(
-          initialDate: _centerDate,
-          onMonthChanged: _onDateChanged,
-        ),
-        NavigationMonthView(
-          initialDate: DateTime(_centerDate.year, _centerDate.month + 1, 1),
-          onMonthChanged: _onDateChanged,
-        ),
-        Expanded(
-          child: SizedBox.expand(),
-        ),
-      ],
+      ),
     );
   }
 }
