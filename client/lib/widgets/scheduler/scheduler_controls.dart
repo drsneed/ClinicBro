@@ -106,7 +106,7 @@ class _SchedulerControlsState extends State<SchedulerControls> {
                 onChanged: widget.onShowNavigationChange,
                 checked: widget.showNavigation,
                 content: Text(
-                  'Show Navigator',
+                  'Navigation',
                   style: FluentTheme.of(context)
                       .typography
                       .body

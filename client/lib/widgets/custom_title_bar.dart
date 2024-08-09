@@ -117,7 +117,7 @@ class _MaximizeWindowButtonState extends State<MaximizeWindowButton> {
     return IconButton(
       icon: Icon(
         _isMaximized ? FluentIcons.chrome_restore : FluentIcons.square_shape,
-        size: 12,
+        size: 13,
       ),
       onPressed: () async {
         if (_isMaximized) {
@@ -125,7 +125,6 @@ class _MaximizeWindowButtonState extends State<MaximizeWindowButton> {
         } else {
           await windowManager.maximize();
         }
-
         // Update the icon state after the action
         final isMaximized = await windowManager.isMaximized();
         setState(() {

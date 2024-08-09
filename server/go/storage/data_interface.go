@@ -71,7 +71,7 @@ func GetTenantInfo(orgID string) (*models.Tenant, error) {
 
 	// If not in cache, query master database
 	var tenantInfo models.Tenant
-	result := masterDB.Where("org_id = ?", orgID).First(&tenantInfo)
+	result := masterDB.Where("active = true and org_id = ?", orgID).First(&tenantInfo)
 	if result.Error != nil {
 		return nil, result.Error
 	}

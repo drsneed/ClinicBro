@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' show TimeOfDay;
 class Appointment {
   final int id;
   final String title;
+  final bool isEvent;
   final DateTime apptDate;
   final TimeOfDay apptFrom;
   final TimeOfDay apptTo;
@@ -20,6 +21,7 @@ class Appointment {
   Appointment({
     required this.id,
     required this.title,
+    required this.isEvent,
     required this.apptDate,
     required this.apptFrom,
     required this.apptTo,
@@ -39,6 +41,7 @@ class Appointment {
     return Appointment(
       id: json['id'],
       title: json['title'],
+      isEvent: json['is_event'],
       apptDate: DateTime.parse(json['appt_date']),
       apptFrom: _parseTime(json['appt_from']),
       apptTo: _parseTime(json['appt_to']),
@@ -59,6 +62,7 @@ class Appointment {
     return {
       'id': id,
       'title': title,
+      'is_event': isEvent,
       'appt_date': apptDate.toIso8601String().split('T')[0], // Only date part
       'appt_from': _formatTime(apptFrom),
       'appt_to': _formatTime(apptTo),

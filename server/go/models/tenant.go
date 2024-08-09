@@ -3,11 +3,13 @@ package models
 import "fmt"
 
 type Tenant struct {
-	OrgID      string
-	DBName     string
-	DBHost     string
-	DBUser     string
-	DBPassword string
+	OrgID        string
+	Active       bool
+	DBName       string
+	DBHost       string
+	DBUser       string
+	DBPassword   string
+	LicenseCount int
 }
 
 func (t *Tenant) GetDSN() string {

@@ -105,51 +105,6 @@ INSERT INTO locations (
 (false, 'Closed Branch', '555-666-7777', '321 Pastel Ave', NULL, 'Old City', 'FL', '33130', NOW(), NOW(), 10, 10),
 (true, 'Logistics Center', '555-888-9999', '654 Logistics Blvd', 'Warehouse 5', 'Transport Town', 'IL', '60616', NOW(), NOW(), 10, 10);
 
-WITH random_appointments AS (
-    SELECT 
-        'Appointment ' || generate_series AS title,
-        (DATE '2024-08-01' + (random() * (DATE '2024-09-30' - DATE '2024-08-01'))::int) AS appt_date,
-        (TIME '08:00:00' + (random() * INTERVAL '9 hours'))::time AS appt_from,
-        floor(random() * 72 + 1)::int AS patient_id,
-        floor(random() * 10 + 6)::int AS provider_id,
-        floor(random() * 5 + 1)::int AS appointment_type_id,
-        floor(random() * 6 + 1)::int AS appointment_status_id,
-        floor(random() * 5 + 1)::int AS location_id,
-        floor(random() * 10 + 6)::int AS created_user_id
-    FROM generate_series(1, 50)
-)
-INSERT INTO appointments (
-    title, 
-    appt_date, 
-    appt_from, 
-    appt_to, 
-    notes, 
-    patient_id, 
-    provider_id, 
-    appointment_type_id, 
-    appointment_status_id, 
-    location_id, 
-    date_created, 
-    date_updated, 
-    created_user_id, 
-    updated_user_id
-)
-SELECT 
-    title,
-    appt_date,
-    appt_from,
-    (appt_from + INTERVAL '30 minutes')::time AS appt_to,
-    'Random appointment notes for ' || title,
-    patient_id,
-    provider_id,
-    appointment_type_id,
-    appointment_status_id,
-    location_id,
-    CURRENT_TIMESTAMP AS date_created,
-    CURRENT_TIMESTAMP AS date_updated,
-    created_user_id,
-    created_user_id AS updated_user_id
-FROM random_appointments;
 
 -- Seed script for operating_schedule
 INSERT INTO operating_schedules (

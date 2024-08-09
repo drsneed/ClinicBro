@@ -104,6 +104,9 @@ func main() {
 		// Appointment Dates route
 		authorized.GET("/appointment-dates", handlers.GetAppointmentDates)
 
+		// Event Participants route
+		authorized.GET("/event-participants", handlers.GetEventParticipants)
+
 		// Operating Schedule routes
 		authorized.POST("/operating-schedule", handlers.CreateOperatingSchedule)
 		authorized.GET("/operating-schedule", handlers.GetOperatingSchedule)

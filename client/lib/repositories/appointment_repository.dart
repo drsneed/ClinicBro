@@ -1,6 +1,7 @@
 import 'dart:convert';
-import '../models/appointment.dart'; // Import your Appointment model
+import '../models/appointment.dart';
 import '../models/appointment_item.dart';
+import '../models/event_participant.dart';
 import '../services/data_service.dart';
 
 class AppointmentRepository {
@@ -104,6 +105,28 @@ class AppointmentRepository {
       if (appointmentDatesJson != null && appointmentDatesJson is List) {
         return appointmentDatesJson
             .map((json) => DateTime.parse(json))
+            .toList();
+      }
+    }
+
+    return [];
+  }
+
+  Future<List<EventParticipant>> getEventParticipants(int appointmentId) async {
+    final response = await DataService().get(
+      '/event-participants',
+      queryParams: {
+        'appointment_id': appointmentId.toString(),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      var participantsJson = jsonDecode(response.body);
+
+      // Ensure participantsJson is not null and is a list before processing it.
+      if (participantsJson != null && participantsJson is List) {
+        return participantsJson
+            .map((json) => EventParticipant.fromJson(json))
             .toList();
       }
     }

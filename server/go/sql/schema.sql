@@ -126,17 +126,41 @@ create table appointment_statuses (
     updated_user_id int
 );
 
+-- Drop indexes for appointments table
+DROP INDEX IF EXISTS idx_appointments_is_event;
+DROP INDEX IF EXISTS idx_appointments_appt_date;
+DROP INDEX IF EXISTS idx_appointments_patient_id;
+DROP INDEX IF EXISTS idx_appointments_provider_id;
+DROP INDEX IF EXISTS idx_appointments_location_id;
+DROP INDEX IF EXISTS idx_appointments_appointment_type_id;
+DROP INDEX IF EXISTS idx_appointments_appointment_status_id;
+DROP INDEX IF EXISTS idx_appointments_date_created;
+DROP INDEX IF EXISTS idx_appointments_date_provider;
+DROP INDEX IF EXISTS idx_appointments_date_patient;
+DROP INDEX IF EXISTS idx_appointments_date_location;
+DROP INDEX IF EXISTS idx_appointments_date_status;
+
+-- Drop indexes for event_user_links table
+DROP INDEX IF EXISTS idx_event_user_links_appointment_id;
+DROP INDEX IF EXISTS idx_event_user_links_user_id;
+DROP INDEX IF EXISTS idx_event_user_links_appointment_user;
+
+-- Drop tables
+DROP TABLE IF EXISTS event_user_links;
+DROP TABLE IF EXISTS appointments;
+
 create table appointments (
     id serial primary key,
-    title varchar(16) not null,
+    title varchar(16),
+    is_event boolean default false,
     appt_date date not null,
     appt_from time not null,
     appt_to time not null,
     notes varchar(2500) not null,
-    patient_id int not null,
-    provider_id int not null,
-    appointment_type_id int not null,
-    appointment_status_id int not null,
+    patient_id int,
+    provider_id int,
+    appointment_type_id int,
+    appointment_status_id int,
     location_id int not null,
     -- tracking columns
     date_created timestamp not null,
@@ -145,21 +169,82 @@ create table appointments (
     updated_user_id int not null
 );
 
-create view appointment_items as 
-  select a.id as appt_id,
-  case when appt_type is not null then appt_type.name else a.title end as title,
-  case when appt_status is null then 'New' else appt_status.name end as status,
-  case when pat is null then '' else concat(pat.last_name, ', ', pat.first_name) end as patient,
-  case when prov is null then '' else prov.name end as provider,
-  case when loc is null then '' else loc.name end as location,
-  case when appt_type is null then '' else appt_type.color end as color,
-  to_char(a.appt_date, 'YYYY-MM-DD') as appt_date, 
-  to_char(a.appt_from, 'HH24:MI') as appt_from, 
-  to_char(a.appt_to, 'HH24:MI') as appt_to
-  from appointments a 
-  left join patients pat on pat.id=a.patient_id
-  left join users prov on prov.id=a.provider_id
-  left join locations loc on loc.id=a.location_id
-  left join appointment_types appt_type on appt_type.id=a.appointment_type_id
-  left join appointment_statuses appt_status on appt_status.id=a.appointment_status_id
-  order by a.appt_date, a.appt_from;
+CREATE INDEX idx_appointments_is_event ON appointments(is_event);
+
+CREATE INDEX idx_appointments_appt_date ON appointments(appt_date);
+CREATE INDEX idx_appointments_patient_id ON appointments(patient_id);
+CREATE INDEX idx_appointments_provider_id ON appointments(provider_id);
+CREATE INDEX idx_appointments_location_id ON appointments(location_id);
+CREATE INDEX idx_appointments_appointment_type_id ON appointments(appointment_type_id);
+CREATE INDEX idx_appointments_appointment_status_id ON appointments(appointment_status_id);
+CREATE INDEX idx_appointments_date_created ON appointments(date_created);
+
+-- Composite indexes for common query patterns
+CREATE INDEX idx_appointments_date_provider ON appointments(appt_date, provider_id);
+CREATE INDEX idx_appointments_date_patient ON appointments(appt_date, patient_id);
+CREATE INDEX idx_appointments_date_location ON appointments(appt_date, location_id);
+CREATE INDEX idx_appointments_date_status ON appointments(appt_date, appointment_status_id);
+
+CREATE TABLE event_user_links (
+    id SERIAL PRIMARY KEY,
+    appointment_id INT NOT NULL REFERENCES appointments(id),
+    user_id INT NOT NULL REFERENCES users(id),
+    UNIQUE (appointment_id, user_id)
+);
+CREATE INDEX idx_event_user_links_appointment_id ON event_user_links(appointment_id);
+CREATE INDEX idx_event_user_links_user_id ON event_user_links(user_id);
+CREATE INDEX idx_event_user_links_appointment_user ON event_user_links(appointment_id, user_id);
+
+CREATE VIEW appointment_items AS 
+SELECT 
+    a.id AS appt_id,
+    CASE 
+        WHEN a.is_event THEN a.title 
+        ELSE appt_type.name 
+    END AS title,
+    CASE 
+        WHEN appt_status.name IS NULL THEN '' 
+        ELSE appt_status.name 
+    END AS status,
+    CASE 
+        WHEN a.is_event THEN 
+            string_agg(u.name, ', ') 
+        ELSE 
+            '' 
+    END AS participants, -- For events
+    CASE 
+        WHEN a.is_event THEN 
+            '' 
+        ELSE 
+            COALESCE(concat(pat.last_name, ', ', pat.first_name), '') 
+    END AS patient, -- For appointments
+    CASE 
+        WHEN a.is_event THEN '' 
+        ELSE COALESCE(prov.name, '') 
+    END AS provider,
+    CASE 
+        WHEN a.is_event THEN '' 
+        ELSE COALESCE(loc.name, '') 
+    END AS location,
+    CASE 
+        WHEN appt_type.color IS NULL THEN '' 
+        ELSE appt_type.color 
+    END AS color,
+    TO_CHAR(a.appt_date, 'YYYY-MM-DD') AS appt_date, 
+    TO_CHAR(a.appt_from, 'HH24:MI') AS appt_from, 
+    TO_CHAR(a.appt_to, 'HH24:MI') AS appt_to,
+    a.notes
+FROM appointments a
+LEFT JOIN patients pat ON pat.id = a.patient_id
+LEFT JOIN users prov ON prov.id = a.provider_id
+LEFT JOIN locations loc ON loc.id = a.location_id
+LEFT JOIN appointment_types appt_type ON appt_type.id = a.appointment_type_id
+LEFT JOIN appointment_statuses appt_status ON appt_status.id = a.appointment_status_id
+LEFT JOIN event_user_links eul ON eul.appointment_id = a.id
+LEFT JOIN users u ON u.id = eul.user_id
+GROUP BY 
+    a.id, a.title, a.is_event, appt_type.name, appt_status.name, pat.last_name, pat.first_name, 
+    prov.name, loc.name, appt_type.color, a.appt_date, a.appt_from, a.appt_to, a.notes
+ORDER BY 
+    a.appt_date, a.appt_from;
+
