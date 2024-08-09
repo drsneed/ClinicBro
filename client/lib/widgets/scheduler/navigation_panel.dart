@@ -20,15 +20,77 @@ class SchedulerNavigationPanel extends StatefulWidget {
 
 class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
   late ScrollController _scrollController;
+  late List<DateTime> _monthList;
+  final int _initialMonthCount = 36; // Start with 3 years worth of months
+  final double _estimatedMonthViewHeight =
+      240.0; // Estimate of NavigationMonthView height
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
+    _scrollController =
+        ScrollController(initialScrollOffset: _estimatedMonthViewHeight * 12);
+    _initializeMonthList();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _initializeMonthList() {
+    DateTime startDate =
+        DateTime(widget.centerDate.year - 1, widget.centerDate.month, 1);
+    _monthList = List.generate(_initialMonthCount, (index) {
+      return DateTime(startDate.year, startDate.month + index, 1);
+    });
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      _addMonthsToEnd();
+    } else if (_scrollController.position.pixels ==
+        _scrollController.position.minScrollExtent) {
+      _addMonthsToStart();
+    }
+  }
+
+  void _updateCenterDate() {
+    if (!_scrollController.position.isScrollingNotifier.value) {
+      _monthList.forEach(print);
+      //widget.onDateChanged(_monthList[_monthList.length - 2]);
+      double viewportHeight = _scrollController.position.viewportDimension;
+      double scrollOffset = _scrollController.offset;
+      int centralIndex =
+          ((scrollOffset + (viewportHeight / 2)) / _estimatedMonthViewHeight)
+              .floor();
+
+      if (centralIndex >= 0 && centralIndex < _monthList.length) {
+        // _monthList.forEach(print);
+        // print('centralIndex = $centralIndex');
+        // print('updating center date with ${_monthList[centralIndex]}');
+        widget.onDateChanged(_monthList[centralIndex]);
+      }
+    }
+  }
+
+  void _addMonthsToEnd() {
+    setState(() {
+      DateTime lastDate = _monthList.last;
+      _monthList.add(DateTime(lastDate.year, lastDate.month + 1, 1));
+    });
+  }
+
+  void _addMonthsToStart() {
+    setState(() {
+      DateTime firstDate = _monthList.first;
+      _monthList.insert(0, DateTime(firstDate.year, firstDate.month - 1, 1));
+      // Adjust scroll position to keep the view stable
+      _scrollController
+          .jumpTo(_scrollController.offset + (1 * _estimatedMonthViewHeight));
+    });
   }
 
   @override
   void dispose() {
+    _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
     super.dispose();
   }
@@ -51,28 +113,17 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
   }
 
   Widget _buildScrollableContent() {
-    return ListView(
+    //_initializeMonthList();
+    return ListView.builder(
       controller: _scrollController,
-      children: [
-        NavigationMonthView(
-          key: ValueKey('previous-month'),
-          initialDate:
-              DateTime(widget.centerDate.year, widget.centerDate.month - 1, 1),
-          onMonthChanged: widget.onDateChanged,
-        ),
-        NavigationMonthView(
-          key: ValueKey('current-month'),
-          initialDate: widget.centerDate,
-          onMonthChanged: widget.onDateChanged,
-        ),
-        NavigationMonthView(
-          key: ValueKey('next-month'),
-          initialDate:
-              DateTime(widget.centerDate.year, widget.centerDate.month + 1, 1),
-          onMonthChanged: widget.onDateChanged,
-        ),
-        SizedBox(height: 1000), // Add extra space to allow scrolling
-      ],
+      itemCount: _monthList.length,
+      itemBuilder: (context, index) {
+        return NavigationMonthView(
+          key: ValueKey('month-$index'),
+          initialDate: _monthList[index],
+          onMonthChanged: (_) {}, // We're not using this anymore
+        );
+      },
     );
   }
 
@@ -83,20 +134,29 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
       right: 0,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        color: Colors
-            .transparent, //FluentTheme.of(context).micaBackgroundColor.withOpacity(0.8),
+        color: Colors.transparent,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
               icon: const Icon(FluentIcons.chevron_left),
-              onPressed: () => widget.onDateChanged(DateTime(
-                  widget.centerDate.year, widget.centerDate.month - 1, 1)),
+              onPressed: () {
+                double newOffset =
+                    _scrollController.offset - _estimatedMonthViewHeight;
+                _scrollController.animateTo(newOffset,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut);
+              },
             ),
             IconButton(
               icon: const Icon(FluentIcons.chevron_right),
-              onPressed: () => widget.onDateChanged(DateTime(
-                  widget.centerDate.year, widget.centerDate.month + 1, 1)),
+              onPressed: () {
+                double newOffset =
+                    _scrollController.offset + _estimatedMonthViewHeight;
+                _scrollController.animateTo(newOffset,
+                    duration: Duration(milliseconds: 300),
+                    curve: Curves.easeInOut);
+              },
             ),
           ],
         ),
