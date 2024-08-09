@@ -2,17 +2,20 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 
 import '../../utils/calendar_grid.dart';
+import '../../utils/logger.dart';
 
 class NavigationMonthView extends StatefulWidget {
   final DateTime initialDate;
-  final Function(DateTime)? onDateSelected;
-  final Function(DateTime) onMonthChanged;
+  final List<DateTime> appointmentDates;
+  final List<DateTime> selectedDates;
+  final Function(DateTime) onDaySelected;
 
   const NavigationMonthView({
     Key? key,
     required this.initialDate,
-    required this.onMonthChanged,
-    this.onDateSelected,
+    required this.appointmentDates,
+    required this.selectedDates,
+    required this.onDaySelected,
   }) : super(key: key);
 
   @override
@@ -20,18 +23,14 @@ class NavigationMonthView extends StatefulWidget {
 }
 
 class _NavigationMonthViewState extends State<NavigationMonthView> {
-  late PageController _pageController;
   late DateTime _currentMonth;
   late CalendarGrid _calendarGrid;
+
   @override
   void initState() {
     super.initState();
     _currentMonth = DateTime(widget.initialDate.year, widget.initialDate.month);
     _calendarGrid = CalendarGrid(_currentMonth);
-    _pageController = PageController(initialPage: 1000);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      widget.onMonthChanged(_currentMonth);
-    });
   }
 
   @override
@@ -48,45 +47,21 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
       _currentMonth = DateTime(newMonth.year, newMonth.month);
       _calendarGrid = CalendarGrid(_currentMonth);
     });
-    final newPage = 1000 +
-        (newMonth.year - DateTime.now().year) * 12 +
-        (newMonth.month - DateTime.now().month);
-    _pageController.jumpToPage(newPage);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  void _onPageChanged(int page) {
-    final newMonth =
-        DateTime(DateTime.now().year, DateTime.now().month + (page - 1000));
-    if (newMonth.year != _currentMonth.year ||
-        newMonth.month != _currentMonth.month) {
-      setState(() {
-        _currentMonth = newMonth;
-      });
-      widget.onMonthChanged(newMonth);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = FluentTheme.of(context);
     final cellColor = theme.cardColor;
-    final todayBackgroundColor = theme.accentColor;
-    const todayColor = Colors.white;
+    final todayColor = Colors.white;
     final borderColor = theme.cardColor;
-    final textColor = theme.inactiveColor.withOpacity(0.3);
-    final currentMonthColor = theme.inactiveColor.withOpacity(0.7);
-
+    final textColor = theme.inactiveColor.withOpacity(0.1);
+    final todayBackgroundColor = theme.accentColor;
+    final currentMonthColor = theme.inactiveColor.withOpacity(0.5);
+    final appointmentColor = theme.inactiveColor.withOpacity(0.8);
     final headerText = DateFormat('MMMM yyyy').format(_currentMonth);
 
     return Container(
-      // color: Colors.blue
-      //     .withOpacity(0.2), // Temporarily change the background color
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: LayoutBuilder(
@@ -106,30 +81,26 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
                   child: Text(
                     headerText,
                     style: TextStyle(
+                      color: theme.inactiveColor.withOpacity(0.7),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                 ),
-                _buildWeekdayHeader(cellWidth, textColor),
+                _buildWeekdayHeader(
+                    cellWidth, theme.inactiveColor.withOpacity(0.7)),
                 Container(
                   height: gridHeight, // Add some extra padding for safety
-                  child: PageView.builder(
-                    controller: _pageController,
-                    onPageChanged: _onPageChanged,
-                    itemBuilder: (context, page) {
-                      return _buildCalendarGrid(
-                        cellWidth,
-                        cellHeight,
-                        cellColor,
-                        todayBackgroundColor,
-                        todayColor,
-                        borderColor,
-                        textColor,
-                        currentMonthColor,
-                      );
-                    },
-                  ),
+                  child: _buildCalendarGrid(
+                      cellWidth,
+                      cellHeight,
+                      cellColor,
+                      todayBackgroundColor,
+                      todayColor,
+                      borderColor,
+                      textColor,
+                      currentMonthColor,
+                      appointmentColor),
                 ),
               ],
             );
@@ -140,14 +111,16 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
   }
 
   Widget _buildCalendarGrid(
-      double cellWidth,
-      double cellHeight,
-      Color cellColor,
-      Color todayBackgroundColor,
-      Color todayColor,
-      Color borderColor,
-      Color textColor,
-      Color currentMonthColor) {
+    double cellWidth,
+    double cellHeight,
+    Color cellColor,
+    Color todayBackgroundColor,
+    Color todayColor,
+    Color borderColor,
+    Color textColor,
+    Color currentMonthColor,
+    Color appointmentColor,
+  ) {
     return GridView.builder(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
@@ -162,12 +135,21 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
         final isToday = date.year == DateTime.now().year &&
             date.month == DateTime.now().month &&
             date.day == DateTime.now().day;
+        final hasAppointment = isCurrentMonth &&
+            widget.appointmentDates.any((appointmentDate) =>
+                appointmentDate.year == date.year &&
+                appointmentDate.month == date.month &&
+                appointmentDate.day == date.day);
+
+        final isSelected = isCurrentMonth &&
+            widget.selectedDates.any((selectedDate) =>
+                selectedDate.year == date.year &&
+                selectedDate.month == date.month &&
+                selectedDate.day == date.day);
 
         return GestureDetector(
           onTap: () {
-            if (widget.onDateSelected != null) {
-              widget.onDateSelected!(date);
-            }
+            widget.onDaySelected(date);
           },
           child: Container(
             width: cellWidth,
@@ -185,17 +167,35 @@ class _NavigationMonthViewState extends State<NavigationMonthView> {
                 ),
               ),
             ),
-            child: Center(
-              child: Text(
-                '${date.day}',
-                style: TextStyle(
-                  color: isToday
-                      ? todayColor
-                      : (isCurrentMonth ? currentMonthColor : textColor),
-                  fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                  fontSize: cellWidth * 0.25,
+            child: Stack(
+              children: [
+                Center(
+                  child: Text(
+                    '${date.day}',
+                    style: TextStyle(
+                      color: isToday
+                          ? todayColor
+                          : (hasAppointment
+                              ? appointmentColor
+                              : (isCurrentMonth
+                                  ? currentMonthColor
+                                  : textColor)),
+                      fontWeight: hasAppointment || isToday
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      fontSize: cellWidth * 0.4,
+                    ),
+                  ),
                 ),
-              ),
+                if (isSelected) // Apply overlay if selected
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.green.withOpacity(0.2), // Tinted overlay
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ),
         );

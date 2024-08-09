@@ -26,7 +26,6 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   bool _showNavigation = false; // Default months navigation visibility
   DateTime _centerDate = DateTime.now(); // Add this line
   List<AppointmentItem> _appointments = [];
-
   void _toggleFlyout() {
     setState(() {
       _isFlyoutVisible = !_isFlyoutVisible;
@@ -92,6 +91,30 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
     });
   }
 
+  List<DateTime> _getSelectedDates() {
+    switch (_viewMode) {
+      case 'Day':
+        return [_centerDate];
+      case 'Week':
+        final startDate = DateTime(_centerDate.year, _centerDate.month,
+            _centerDate.day - _centerDate.weekday);
+        return List.generate(7, (index) {
+          return DateTime(
+              startDate.year, startDate.month, startDate.day + index);
+        });
+      case 'Month':
+        List<DateTime> result = [];
+        var date = DateTime(_centerDate.year, _centerDate.month, 1);
+        while (date.month == _centerDate.month) {
+          result.add(date);
+          date = DateTime(date.year, date.month, date.day + 1);
+        }
+        return result;
+      default:
+        return [];
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDesktop = !widget.isMobile;
@@ -104,6 +127,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
             isVisible: _showNavigation,
             centerDate: _centerDate,
             onDateChanged: onNavigationDateChanged,
+            selectedDates: _getSelectedDates(),
           ),
 
         Expanded(

@@ -1,16 +1,20 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
+import '../../repositories/appointment_repository.dart';
+import '../../utils/logger.dart';
 import 'navigation_month_view.dart';
 
 class SchedulerNavigationPanel extends StatefulWidget {
   final bool isVisible;
   final DateTime centerDate;
   final void Function(DateTime) onDateChanged;
+  final List<DateTime> selectedDates;
 
   SchedulerNavigationPanel({
     required this.isVisible,
     required this.centerDate,
     required this.onDateChanged,
+    required this.selectedDates,
   });
 
   @override
@@ -24,14 +28,16 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
   final int _initialMonthCount = 36; // Start with 3 years worth of months
   final double _estimatedMonthViewHeight =
       240.0; // Estimate of NavigationMonthView height
+  Map<DateTime, List<DateTime>> _appointmentDatesMap =
+      {}; // Map to cache appointment dates
 
   @override
   void initState() {
     super.initState();
-    _scrollController =
-        ScrollController(initialScrollOffset: _estimatedMonthViewHeight * 12);
+    _scrollController = ScrollController();
     _initializeMonthList();
     _scrollController.addListener(_onScroll);
+    _fetchAndCacheAppointmentDates(); // Fetch initial appointment dates
   }
 
   void _initializeMonthList() {
@@ -52,30 +58,12 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
     }
   }
 
-  void _updateCenterDate() {
-    if (!_scrollController.position.isScrollingNotifier.value) {
-      _monthList.forEach(print);
-      //widget.onDateChanged(_monthList[_monthList.length - 2]);
-      double viewportHeight = _scrollController.position.viewportDimension;
-      double scrollOffset = _scrollController.offset;
-      int centralIndex =
-          ((scrollOffset + (viewportHeight / 2)) / _estimatedMonthViewHeight)
-              .floor();
-
-      if (centralIndex >= 0 && centralIndex < _monthList.length) {
-        // _monthList.forEach(print);
-        // print('centralIndex = $centralIndex');
-        // print('updating center date with ${_monthList[centralIndex]}');
-        widget.onDateChanged(_monthList[centralIndex]);
-      }
-    }
-  }
-
   void _addMonthsToEnd() {
     setState(() {
       DateTime lastDate = _monthList.last;
       _monthList.add(DateTime(lastDate.year, lastDate.month + 1, 1));
     });
+    _fetchAndCacheAppointmentDates(); // Fetch new appointment dates if needed
   }
 
   void _addMonthsToStart() {
@@ -84,8 +72,38 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
       _monthList.insert(0, DateTime(firstDate.year, firstDate.month - 1, 1));
       // Adjust scroll position to keep the view stable
       _scrollController
-          .jumpTo(_scrollController.offset + (1 * _estimatedMonthViewHeight));
+          .jumpTo(_scrollController.offset + (_estimatedMonthViewHeight));
     });
+    _fetchAndCacheAppointmentDates(); // Fetch new appointment dates if needed
+  }
+
+  Future<void> _fetchAndCacheAppointmentDates() async {
+    DateTime firstDate = _monthList.first;
+    DateTime lastDate = _monthList.last;
+
+    final appointmentDates = await fetchAppointmentDates(firstDate, lastDate);
+    final Map<DateTime, List<DateTime>> newAppointmentDatesMap = {};
+
+    for (var date in _monthList) {
+      newAppointmentDatesMap[date] = appointmentDates.where((appointmentDate) {
+        return appointmentDate.year == date.year &&
+            appointmentDate.month == date.month;
+      }).toList();
+    }
+
+    setState(() {
+      _appointmentDatesMap = newAppointmentDatesMap;
+    });
+    Logger().log(Level.INFO,
+        "Fetched and cached ${appointmentDates.length} appointment dates");
+  }
+
+  Future<List<DateTime>> fetchAppointmentDates(
+      DateTime from, DateTime to) async {
+    final appointmentRepository = AppointmentRepository();
+    final appointmentDates =
+        await appointmentRepository.getAppointmentDatesInRange(from, to);
+    return appointmentDates;
   }
 
   @override
@@ -97,6 +115,11 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
 
   @override
   Widget build(BuildContext context) {
+    // Ensure the correct month is visible
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToMonthContainingDate(widget.centerDate);
+    });
+
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),
       width: widget.isVisible ? 250 : 0,
@@ -112,16 +135,35 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
     );
   }
 
+  void _scrollToMonthContainingDate(DateTime date) {
+    final index = _monthList
+        .indexWhere((d) => d.year == date.year && d.month == date.month);
+
+    if (index == -1) return; // Date not found
+
+    final targetOffset = index * _estimatedMonthViewHeight;
+
+    _scrollController.animateTo(
+      targetOffset,
+      duration: Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
+
   Widget _buildScrollableContent() {
-    //_initializeMonthList();
     return ListView.builder(
       controller: _scrollController,
       itemCount: _monthList.length,
       itemBuilder: (context, index) {
+        final month = _monthList[index];
+        final appointmentDates = _appointmentDatesMap[month] ?? [];
+
         return NavigationMonthView(
           key: ValueKey('month-$index'),
-          initialDate: _monthList[index],
-          onMonthChanged: (_) {}, // We're not using this anymore
+          initialDate: month,
+          onDaySelected: widget.onDateChanged,
+          appointmentDates: appointmentDates,
+          selectedDates: widget.selectedDates,
         );
       },
     );
@@ -134,7 +176,7 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
       right: 0,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-        color: Colors.transparent,
+        color: FluentTheme.of(context).micaBackgroundColor.withOpacity(0.8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
