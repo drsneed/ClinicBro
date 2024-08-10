@@ -9,6 +9,7 @@ class SchedulerControls extends StatefulWidget {
   final bool isMultiple;
   final void Function(bool showNavigation) onShowNavigationChange;
   final bool showNavigation;
+
   const SchedulerControls({
     Key? key,
     required this.onViewModeChange,
@@ -51,21 +52,13 @@ class _SchedulerControlsState extends State<SchedulerControls> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            // View Mode Buttons
+            // View Mode Buttons (reversed order)
             ViewModeButton(
-              viewMode: 'Day',
-              icon: FluentIcons.calendar_day,
-              text: 'Day View',
-              isSelected: widget.selectedViewMode == 'Day',
-              onTap: () => widget.onViewModeChange('Day'),
-            ),
-            SizedBox(width: 8),
-            ViewModeButton(
-              viewMode: '5-Day',
-              icon: FluentIcons.calendar_work_week,
-              text: '5-Day View',
-              isSelected: widget.selectedViewMode == '5-Day',
-              onTap: () => widget.onViewModeChange('5-Day'),
+              viewMode: 'Month',
+              icon: FluentIcons.calendar,
+              text: 'Month View',
+              isSelected: widget.selectedViewMode == 'Month',
+              onTap: () => widget.onViewModeChange('Month'),
             ),
             SizedBox(width: 8),
             ViewModeButton(
@@ -77,11 +70,19 @@ class _SchedulerControlsState extends State<SchedulerControls> {
             ),
             SizedBox(width: 8),
             ViewModeButton(
-              viewMode: 'Month',
-              icon: FluentIcons.calendar,
-              text: 'Month View',
-              isSelected: widget.selectedViewMode == 'Month',
-              onTap: () => widget.onViewModeChange('Month'),
+              viewMode: '5-Day',
+              icon: FluentIcons.calendar_work_week,
+              text: '5-Day View',
+              isSelected: widget.selectedViewMode == '5-Day',
+              onTap: () => widget.onViewModeChange('5-Day'),
+            ),
+            SizedBox(width: 8),
+            ViewModeButton(
+              viewMode: 'Day',
+              icon: FluentIcons.calendar_day,
+              text: 'Day View',
+              isSelected: widget.selectedViewMode == 'Day',
+              onTap: () => widget.onViewModeChange('Day'),
             ),
             SizedBox(width: 16),
             // View Type Toggle with adjusted size

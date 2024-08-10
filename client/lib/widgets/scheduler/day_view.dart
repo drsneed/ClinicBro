@@ -1,13 +1,20 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import '../../models/appointment_item.dart';
+import '../../managers/overlay_manager.dart';
+import 'appointment_day_view.dart';
 
 class DayView extends StatelessWidget {
   final PageController pageController;
   final Function(int) onPageChanged;
+  final List<AppointmentItem> appointments;
+  final OverlayManager overlayManager;
 
   const DayView({
     Key? key,
     required this.pageController,
     required this.onPageChanged,
+    required this.appointments,
+    required this.overlayManager,
   }) : super(key: key);
 
   @override
@@ -23,15 +30,18 @@ class DayView extends StatelessWidget {
   }
 
   Widget _buildDaySchedule(BuildContext context, DateTime date) {
+    final dateAppointments = appointments
+        .where((appt) => appt.apptDate == date.toString().split(' ')[0])
+        .toList();
+
     return Container(
       color: FluentTheme.of(context).cardColor,
       child: ListView.builder(
         itemCount: 24,
         itemBuilder: (context, index) {
           String timeString = _formatTime(index);
-
           return Container(
-            height: 120,
+            height: 60,
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -45,7 +55,7 @@ class DayView extends StatelessWidget {
                   left: 0,
                   top: 8,
                   child: SizedBox(
-                    width: 60, // Adjusted width to fit longer time strings
+                    width: 60,
                     height: 20,
                     child: Text(
                       timeString,
@@ -70,17 +80,7 @@ class DayView extends StatelessWidget {
                     ),
                   ),
                 ),
-                Positioned(
-                  left: 60,
-                  right: 0,
-                  top: 60,
-                  child: CustomPaint(
-                    size: Size(double.infinity, 1),
-                    painter: DashedLinePainter(
-                      color: FluentTheme.of(context).inactiveBackgroundColor,
-                    ),
-                  ),
-                ),
+                ..._buildAppointmentsForHour(context, dateAppointments, index),
               ],
             ),
           );
@@ -89,31 +89,32 @@ class DayView extends StatelessWidget {
     );
   }
 
+  List<Widget> _buildAppointmentsForHour(
+      BuildContext context, List<AppointmentItem> dateAppointments, int hour) {
+    return dateAppointments.where((appt) {
+      final apptHour = int.parse(appt.apptFrom.split(':')[0]);
+      return apptHour == hour;
+    }).map((appt) {
+      final apptMinute = int.parse(appt.apptFrom.split(':')[1]);
+      final topPosition =
+          (apptMinute / 60) * 60; // Scale minutes to the 60px height
+
+      return Positioned(
+        left: 65,
+        right: 5,
+        top: topPosition,
+        child: AppointmentDayView(
+          appointment: appt,
+          overlayManager: overlayManager,
+        ),
+      );
+    }).toList();
+  }
+
   String _formatTime(int index) {
     final hour = index % 24;
     final ampm = hour >= 12 ? 'PM' : 'AM';
     final hour12 = hour % 12 == 0 ? 12 : hour % 12;
     return '$hour12:00 $ampm';
   }
-}
-
-class DashedLinePainter extends CustomPainter {
-  final Color color;
-
-  DashedLinePainter({required this.color});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    double dashWidth = 5, dashSpace = 3, startX = 0;
-    final paint = Paint()
-      ..color = color
-      ..strokeWidth = 1;
-    while (startX < size.width) {
-      canvas.drawLine(Offset(startX, 0), Offset(startX + dashWidth, 0), paint);
-      startX += dashWidth + dashSpace;
-    }
-  }
-
-  @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
 }

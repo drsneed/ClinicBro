@@ -22,7 +22,7 @@ class SchedulerScreen extends StatefulWidget {
 
 class _SchedulerScreenState extends State<SchedulerScreen> {
   bool _isFlyoutVisible = false;
-  String _viewMode = 'Day'; // Default view mode
+  String _viewMode = 'Month'; // Default view mode
   bool _isMultiple = false; // Default view type
   bool _showNavigation = false; // Default months navigation visibility
   DateTime _centerDate = DateTime.now(); // Add this line

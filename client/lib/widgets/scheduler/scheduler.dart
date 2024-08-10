@@ -31,6 +31,7 @@ class Scheduler extends StatefulWidget {
 
 class _SchedulerState extends State<Scheduler> {
   late PageController _pageController;
+
   @override
   void initState() {
     super.initState();
@@ -77,6 +78,8 @@ class _SchedulerState extends State<Scheduler> {
         return DayView(
           pageController: _pageController,
           onPageChanged: _onPageChanged,
+          appointments: widget.appointments,
+          overlayManager: widget.overlayManager,
         );
       case '5-Day':
         return FiveDayView(
