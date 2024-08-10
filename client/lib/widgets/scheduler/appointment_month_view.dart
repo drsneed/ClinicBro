@@ -1,11 +1,17 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import '../../managers/overlay_manager.dart';
 import '../../models/appointment_item.dart';
-import 'appointment_details_dialog.dart';
+//import 'appointment_details_dialog.dart';
+import 'appointment_details_popup.dart';
 
 class AppointmentMonthView extends StatelessWidget {
   final AppointmentItem appointment;
-  const AppointmentMonthView({Key? key, required this.appointment})
-      : super(key: key);
+  final OverlayManager overlayManager;
+  const AppointmentMonthView({
+    Key? key,
+    required this.appointment,
+    required this.overlayManager,
+  }) : super(key: key);
 
   Color _getBackgroundColor(String colorString) {
     try {
@@ -28,14 +34,13 @@ class AppointmentMonthView extends StatelessWidget {
   Widget build(BuildContext context) {
     Color backgroundColor = _getBackgroundColor(appointment.color);
     Color textColor = _getTextColor(backgroundColor);
-
     return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (context) =>
-              AppointmentDetailsDialog(appointment: appointment),
-        );
+      onTapUp: (details) {
+        final RenderBox renderBox = context.findRenderObject() as RenderBox;
+        final Offset globalPosition =
+            renderBox.localToGlobal(details.localPosition);
+        overlayManager.showAppointmentDetailsPopup(
+            context, appointment, globalPosition);
       },
       child: Container(
         padding: EdgeInsets.all(2),

@@ -222,10 +222,7 @@ SELECT
         WHEN a.is_event THEN '' 
         ELSE COALESCE(prov.name, '') 
     END AS provider,
-    CASE 
-        WHEN a.is_event THEN '' 
-        ELSE COALESCE(loc.name, '') 
-    END AS location,
+    COALESCE(loc.name, '') AS location,
     CASE 
         WHEN appt_type.color IS NULL THEN '' 
         ELSE appt_type.color 

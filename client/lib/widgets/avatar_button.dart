@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart'
     show
-        BorderRadius,
         BoxDecoration,
         BoxShape,
         Brightness,
@@ -23,8 +22,6 @@ import 'package:flutter/material.dart'
         Navigator,
         Offset,
         Overlay,
-        Padding,
-        PopupMenuButton,
         PopupMenuEntry,
         PopupMenuItem,
         Rect,
@@ -53,10 +50,10 @@ class AvatarButton extends StatefulWidget {
   final VoidCallback onSignOut;
 
   const AvatarButton({
-    Key? key,
+    super.key,
     required this.onAccountSettings,
     required this.onSignOut,
-  }) : super(key: key);
+  });
 
   @override
   AvatarButtonState createState() => AvatarButtonState();
@@ -98,7 +95,6 @@ class AvatarButtonState extends State<AvatarButton> {
   @override
   Widget build(BuildContext context) {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
-    final menuBackgroundColor = isDarkMode ? Colors.grey[850] : Colors.white;
     final borderColor = isDarkMode
         ? const Color.fromARGB(255, 185, 184, 184)
         : const Color.fromARGB(255, 2, 91, 164);
@@ -121,17 +117,17 @@ class AvatarButtonState extends State<AvatarButton> {
                     if (snapshot.hasData && snapshot.data != null) {
                       avatarWidget = CircleAvatar(
                         backgroundImage: MemoryImage(snapshot.data!),
-                        radius: 12,
+                        radius: 14,
                       );
                     } else {
                       avatarWidget = const CircleAvatar(
-                        radius: 12,
+                        radius: 14,
                         child: Icon(FluentIcons.contact, size: 14),
                       );
                     }
                   } else {
                     avatarWidget = const CircleAvatar(
-                      radius: 12,
+                      radius: 14,
                       child: Icon(FluentIcons.contact, size: 14),
                     );
                   }
@@ -141,7 +137,7 @@ class AvatarButtonState extends State<AvatarButton> {
                       color: borderColor,
                       shape: BoxShape.circle,
                     ),
-                    padding: EdgeInsets.all(1.0), // Border width
+                    padding: const EdgeInsets.all(1.0), // Border width
                     child: avatarWidget,
                   );
                 },
@@ -153,7 +149,7 @@ class AvatarButtonState extends State<AvatarButton> {
 
   void _showPopupMenu(BuildContext context) async {
     final RenderBox overlay =
-        Overlay.of(context)!.context.findRenderObject() as RenderBox;
+        Overlay.of(context).context.findRenderObject() as RenderBox;
     final RenderBox button = context.findRenderObject() as RenderBox;
 
     final result = await showMenu<String>(
@@ -170,7 +166,7 @@ class AvatarButtonState extends State<AvatarButton> {
         Offset.zero & overlay.size,
       ),
       items: <PopupMenuEntry<String>>[
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'account_settings',
           child: Row(
             children: <Widget>[
@@ -180,7 +176,7 @@ class AvatarButtonState extends State<AvatarButton> {
             ],
           ),
         ),
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'sign_out',
           child: Row(
             children: <Widget>[
@@ -209,17 +205,17 @@ class AvatarButtonState extends State<AvatarButton> {
       context: context,
       builder: (BuildContext context) {
         return ContentDialog(
-          title: Text('Confirm Sign Out'),
-          content: Text('Are you sure you want to sign out?'),
+          title: const Text('Confirm Sign Out'),
+          content: const Text('Are you sure you want to sign out?'),
           actions: <Widget>[
             Button(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             FilledButton(
-              child: Text('Sign Out'),
+              child: const Text('Sign Out'),
               onPressed: () {
                 Navigator.of(context).pop();
                 widget.onSignOut();

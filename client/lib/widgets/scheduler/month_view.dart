@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 
+import '../../managers/overlay_manager.dart';
 import '../../models/appointment_item.dart';
 import '../../utils/calendar_grid.dart';
 import 'appointment_month_view.dart';
@@ -10,12 +11,13 @@ class MonthView extends StatefulWidget {
   final Function(DateTime)? onDateSelected;
   final Function(DateTime) onMonthChanged;
   final List<AppointmentItem> appointments;
-
+  final OverlayManager overlayManager;
   const MonthView({
     Key? key,
     required this.initialDate,
     required this.onMonthChanged,
     required this.appointments,
+    required this.overlayManager,
     this.onDateSelected,
   }) : super(key: key);
 
@@ -193,7 +195,9 @@ class _MonthViewState extends State<MonthView> {
                     itemCount: dateAppointments.length,
                     itemBuilder: (context, index) {
                       return AppointmentMonthView(
-                          appointment: dateAppointments[index]);
+                        appointment: dateAppointments[index],
+                        overlayManager: widget.overlayManager,
+                      );
                     },
                   ),
                 ),

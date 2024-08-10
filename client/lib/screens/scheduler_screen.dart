@@ -4,6 +4,7 @@ import 'package:flutter/material.dart' as mat
 import '../models/appointment_item.dart';
 import '../repositories/appointment_repository.dart';
 import '../utils/logger.dart';
+import '../managers/overlay_manager.dart';
 import '../widgets/scheduler/navigation_panel.dart';
 import '../widgets/scheduler/scheduler.dart';
 import '../widgets/scheduler/scheduler_carousel.dart';
@@ -26,6 +27,11 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   bool _showNavigation = false; // Default months navigation visibility
   DateTime _centerDate = DateTime.now(); // Add this line
   List<AppointmentItem> _appointments = [];
+  DateTime? _cachedStartDate;
+  DateTime? _cachedEndDate;
+  List<AppointmentItem> _cachedAppointments = [];
+
+  final _overlayManager = OverlayManager();
   void _toggleFlyout() {
     setState(() {
       _isFlyoutVisible = !_isFlyoutVisible;
@@ -51,14 +57,18 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   }
 
   void onDateChanged(DateTime newDate) {
-    setState(() {
-      _centerDate = newDate;
-      _loadAppointments();
-    });
+    if (newDate.year != _centerDate.year ||
+        newDate.month != _centerDate.month ||
+        newDate.day != _centerDate.day) {
+      setState(() {
+        _centerDate = newDate;
+        _loadAppointments();
+      });
+    }
   }
 
   void _loadAppointments() async {
-    final logger = Logger();
+    // Determine the new date range
     int startYear = _centerDate.year;
     int startMonth = _centerDate.month - 1;
     if (startMonth == 0) {
@@ -75,15 +85,32 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
     }
     final endDate = DateTime(endYear, endMonth, 0);
 
-    final apptRepository = AppointmentRepository();
-    logger.log(Level.INFO,
-        "attempting to fetch appointments from $startDate to $endDate");
-    final appointments =
-        await apptRepository.getAppointmentsInRange(startDate, endDate);
-    setState(() {
-      _appointments = appointments;
-      logger.log(Level.INFO, "loaded ${_appointments.length} appointments");
-    });
+    // Check if the new date range overlaps with the cached range
+    if (_cachedStartDate != null &&
+        _cachedEndDate != null &&
+        startDate.isBefore(_cachedEndDate!) &&
+        endDate.isAfter(_cachedStartDate!)) {
+      // Use cached data if overlapping
+      setState(() {
+        _appointments = _cachedAppointments;
+      });
+    } else {
+      // Fetch from the server
+      final logger = Logger();
+      final apptRepository = AppointmentRepository();
+      logger.log(Level.INFO,
+          "attempting to fetch appointments from $startDate to $endDate");
+      final appointments =
+          await apptRepository.getAppointmentsInRange(startDate, endDate);
+
+      setState(() {
+        _appointments = appointments;
+        _cachedStartDate = startDate;
+        _cachedEndDate = endDate;
+        _cachedAppointments = appointments;
+        logger.log(Level.INFO, "loaded ${_appointments.length} appointments");
+      });
+    }
   }
 
   List<DateTime> _getSelectedDates() {
@@ -114,6 +141,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   Widget build(BuildContext context) {
     final isDesktop = !widget.isMobile;
     print('building scheduler screen for date $_centerDate');
+    _overlayManager.clearCurrentOverlay();
     return Row(
       children: [
         // Vertical panel on the left
@@ -145,6 +173,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
                   centerDate: _centerDate,
                   onDateChanged: onDateChanged,
                   appointments: _appointments,
+                  overlayManager: _overlayManager,
                   // Additional parameters
                 ),
               ),

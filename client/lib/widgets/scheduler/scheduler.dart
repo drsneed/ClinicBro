@@ -1,9 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
+import '../../managers/overlay_manager.dart';
 import '../../models/appointment_item.dart';
-import '../../repositories/appointment_repository.dart';
-import '../../services/data_service.dart';
-import '../../utils/logger.dart';
 import 'day_view.dart';
 import 'five_day_view.dart';
 import 'week_view.dart';
@@ -15,6 +13,8 @@ class Scheduler extends StatefulWidget {
   final DateTime centerDate;
   final void Function(DateTime) onDateChanged;
   final List<AppointmentItem> appointments;
+  final OverlayManager overlayManager;
+
   const Scheduler({
     super.key,
     required this.viewMode,
@@ -22,6 +22,7 @@ class Scheduler extends StatefulWidget {
     required this.centerDate,
     required this.onDateChanged,
     required this.appointments,
+    required this.overlayManager,
   });
 
   @override
@@ -93,6 +94,7 @@ class _SchedulerState extends State<Scheduler> {
           onDateSelected: widget.onDateChanged,
           onMonthChanged: widget.onDateChanged,
           appointments: widget.appointments,
+          overlayManager: widget.overlayManager,
         );
       default:
         return Container();
