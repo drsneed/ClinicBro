@@ -60,4 +60,8 @@ class AppointmentItem {
       'notes': notes,
     };
   }
+
+  bool isEvent() {
+    return patient.isEmpty;
+  }
 }

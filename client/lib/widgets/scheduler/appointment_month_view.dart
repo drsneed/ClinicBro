@@ -1,24 +1,26 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import '../../managers/overlay_manager.dart';
 import '../../models/appointment_item.dart';
-//import 'appointment_details_dialog.dart';
-import 'appointment_details_popup.dart';
 
 class AppointmentMonthView extends StatelessWidget {
   final AppointmentItem appointment;
   final OverlayManager overlayManager;
+
   const AppointmentMonthView({
-    Key? key,
+    super.key,
     required this.appointment,
     required this.overlayManager,
-  }) : super(key: key);
+  });
 
-  Color _getBackgroundColor(String colorString) {
+  Color _getBackgroundColor(String colorString, BuildContext context) {
     try {
       return Color(int.parse(colorString.replaceAll('#', '0xFF')));
     } catch (e) {
-      // Return a default color if parsing fails
-      return Colors.grey;
+      final isDarkTheme = FluentTheme.of(context).brightness == Brightness.dark;
+      // Use the theme's background color if parsing fails
+      return isDarkTheme
+          ? Color.fromARGB(255, 41, 40, 40)
+          : Color.fromARGB(255, 225, 223, 221);
     }
   }
 
@@ -32,8 +34,10 @@ class AppointmentMonthView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color backgroundColor = _getBackgroundColor(appointment.color);
+    Color backgroundColor = _getBackgroundColor(appointment.color, context);
     Color textColor = _getTextColor(backgroundColor);
+    final isEvent = appointment.isEvent();
+
     return GestureDetector(
       onTapUp: (details) {
         final RenderBox renderBox = context.findRenderObject() as RenderBox;
@@ -43,7 +47,10 @@ class AppointmentMonthView extends StatelessWidget {
             context, appointment, globalPosition);
       },
       child: Container(
-        padding: EdgeInsets.all(2),
+        constraints: BoxConstraints(
+          maxWidth: double.infinity, // Ensure the container takes full width
+        ),
+        padding: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(4),

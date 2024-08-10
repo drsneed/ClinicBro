@@ -24,7 +24,7 @@ class AppointmentDetailsPopup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isEvent = appointment.patient.isEmpty;
+    final isEvent = appointment.isEvent();
     final titleText = appointment.title;
     final backgroundColor = _getBackgroundColor(appointment.color);
     final screenSize = MediaQuery.of(context).size;
