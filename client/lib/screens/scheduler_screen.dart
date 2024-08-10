@@ -1,6 +1,6 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as mat
-    show Colors, FloatingActionButton, CircleBorder;
+    show Colors, FloatingActionButton, CircleBorder, CircularProgressIndicator;
 import '../models/appointment_item.dart';
 import '../repositories/appointment_repository.dart';
 import '../utils/logger.dart';
@@ -16,6 +16,7 @@ class SchedulerScreen extends StatefulWidget {
     Key? key,
     required this.isMobile,
   }) : super(key: key);
+
   @override
   _SchedulerScreenState createState() => _SchedulerScreenState();
 }
@@ -30,8 +31,10 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   DateTime? _cachedStartDate;
   DateTime? _cachedEndDate;
   List<AppointmentItem> _cachedAppointments = [];
+  bool _isLoading = false; // Add this line
 
   final _overlayManager = OverlayManager();
+
   void _toggleFlyout() {
     setState(() {
       _isFlyoutVisible = !_isFlyoutVisible;
@@ -93,9 +96,14 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
       // Use cached data if overlapping
       setState(() {
         _appointments = _cachedAppointments;
+        _isLoading = false; // Set loading to false when using cached data
       });
     } else {
       // Fetch from the server
+      setState(() {
+        _isLoading = true; // Start loading
+      });
+
       final logger = Logger();
       final apptRepository = AppointmentRepository();
       logger.log(Level.INFO,
@@ -108,9 +116,23 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
         _cachedStartDate = startDate;
         _cachedEndDate = endDate;
         _cachedAppointments = appointments;
+        _isLoading = false; // Stop loading
         logger.log(Level.INFO, "loaded ${_appointments.length} appointments");
       });
     }
+  }
+
+  // Method to handle refresh
+  void _refreshAppointments() {
+    setState(() {
+      // Clear cached data
+      _cachedStartDate = null;
+      _cachedEndDate = null;
+      _cachedAppointments = [];
+      _appointments = []; // Clear current appointments
+      _isLoading = true; // Start loading indicator
+    });
+    _loadAppointments();
   }
 
   List<DateTime> _getSelectedDates() {
@@ -152,30 +174,38 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
             onDateChanged: onDateChanged,
             selectedDates: _getSelectedDates(),
           ),
-
         Expanded(
           child: Stack(
             children: [
               ScaffoldPage(
-                header: PageHeader(
-                  title: SchedulerCarousel(
-                    onViewModeChange: _handleViewModeChange,
-                    selectedViewMode: _viewMode,
-                    onViewTypeChange: _handleViewTypeChange,
-                    isMultiple: _isMultiple,
-                    onShowNavigationChange: _handleShowNavigationChange,
-                    showNavigation: _showNavigation,
-                  ),
-                ),
-                content: Scheduler(
-                  viewMode: _viewMode,
+                header: SchedulerCarousel(
+                  onViewModeChange: _handleViewModeChange,
+                  selectedViewMode: _viewMode,
+                  onViewTypeChange: _handleViewTypeChange,
                   isMultiple: _isMultiple,
-                  centerDate: _centerDate,
-                  onDateChanged: onDateChanged,
-                  appointments: _appointments,
-                  overlayManager: _overlayManager,
-                  // Additional parameters
+                  onShowNavigationChange: _handleShowNavigationChange,
+                  showNavigation: _showNavigation,
+                  onRefresh: _refreshAppointments, // Pass refresh callback here
                 ),
+                content: _isLoading
+                    ? Center(
+                        child: SizedBox(
+                          width: 100, // Set the width as per your requirement
+                          height: 100, // Set the height as per your requirement
+                          child: mat.CircularProgressIndicator(
+                            strokeWidth: 8,
+                          ),
+                        ),
+                      )
+                    : Scheduler(
+                        viewMode: _viewMode,
+                        isMultiple: _isMultiple,
+                        centerDate: _centerDate,
+                        onDateChanged: onDateChanged,
+                        appointments: _appointments,
+                        overlayManager: _overlayManager,
+                        // Additional parameters
+                      ),
               ),
               if (isDesktop) _buildDesktopFlyout(),
               if (!isDesktop) _buildMobileFlyout(),

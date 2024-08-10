@@ -7,11 +7,12 @@ import '../../models/appointment_item.dart';
 class AppointmentDetailsPopup extends StatelessWidget {
   final AppointmentItem appointment;
   final Offset position;
-
+  final void Function() onEdit;
   const AppointmentDetailsPopup({
     Key? key,
     required this.appointment,
     required this.position,
+    required this.onEdit,
   }) : super(key: key);
 
   Color _getBackgroundColor(String colorString) {
@@ -85,6 +86,13 @@ class AppointmentDetailsPopup extends StatelessWidget {
                                 style: FluentTheme.of(context)
                                     .typography
                                     .subtitle)),
+                        Tooltip(
+                          message: isEvent ? "Edit Event" : "Edit Appointment",
+                          child: IconButton(
+                            icon: const Icon(FluentIcons.edit, size: 18),
+                            onPressed: onEdit,
+                          ),
+                        ),
                       ],
                     ),
                     SizedBox(height: 8),

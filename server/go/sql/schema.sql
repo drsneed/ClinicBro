@@ -12,6 +12,96 @@ create table users (
     updated_user_id int
 );
 
+CREATE TABLE user_preferences (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users(id),
+    preference_key VARCHAR(50) NOT NULL,
+    preference_value TEXT,
+    -- tracking columns
+    date_created TIMESTAMP NOT NULL,
+    date_updated TIMESTAMP NOT NULL,
+    created_user_id INT,
+    updated_user_id INT,
+    UNIQUE (user_id, preference_key)
+);
+
+CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
+
+CREATE TABLE roles (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    -- tracking columns
+    date_created TIMESTAMP NOT NULL,
+    date_updated TIMESTAMP NOT NULL,
+    created_user_id INT,
+    updated_user_id INT
+);
+
+CREATE TABLE permissions (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    -- tracking columns
+    date_created TIMESTAMP NOT NULL,
+    date_updated TIMESTAMP NOT NULL,
+    created_user_id INT,
+    updated_user_id INT
+);
+
+CREATE TABLE role_permissions (
+    role_id INT NOT NULL REFERENCES roles(id),
+    permission_id INT NOT NULL REFERENCES permissions(id),
+    -- tracking columns
+    date_created TIMESTAMP NOT NULL,
+    date_updated TIMESTAMP NOT NULL,
+    created_user_id INT,
+    updated_user_id INT,
+    PRIMARY KEY (role_id, permission_id)
+);
+
+CREATE TABLE user_roles (
+    user_id INT NOT NULL REFERENCES users(id),
+    role_id INT NOT NULL REFERENCES roles(id),
+    -- tracking columns
+    date_created TIMESTAMP NOT NULL,
+    date_updated TIMESTAMP NOT NULL,
+    created_user_id INT,
+    updated_user_id INT,
+    PRIMARY KEY (user_id, role_id)
+);
+
+CREATE INDEX idx_role_permissions_role_id ON role_permissions(role_id);
+CREATE INDEX idx_role_permissions_permission_id ON role_permissions(permission_id);
+CREATE INDEX idx_user_roles_user_id ON user_roles(user_id);
+CREATE INDEX idx_user_roles_role_id ON user_roles(role_id);
+
+CREATE VIEW user_role_permissions AS
+SELECT 
+    u.id AS user_id,
+    u.name AS user_name,
+    r.id AS role_id,
+    r.name AS role_name,
+    p.id AS permission_id,
+    p.name AS permission_name
+FROM 
+    users u
+JOIN user_roles ur ON u.id = ur.user_id
+JOIN roles r ON ur.role_id = r.id
+JOIN role_permissions rp ON r.id = rp.role_id
+JOIN permissions p ON rp.permission_id = p.id;
+
+CREATE OR REPLACE FUNCTION user_has_permission(p_user_id INT, p_permission_name VARCHAR) 
+RETURNS BOOLEAN AS $$
+BEGIN
+    RETURN EXISTS (
+        SELECT 1
+        FROM user_role_permissions
+        WHERE user_id = p_user_id AND permission_name = p_permission_name
+    );
+END;
+$$ LANGUAGE plpgsql;
+
 create table locations (
     id serial primary key,
     active boolean,

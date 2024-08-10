@@ -2,10 +2,10 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 import '../../models/appointment_item.dart';
 
-class AppointmentDetailsDialog extends StatelessWidget {
+class AppointmentEditDialog extends StatelessWidget {
   final AppointmentItem appointment;
 
-  const AppointmentDetailsDialog({Key? key, required this.appointment})
+  const AppointmentEditDialog({Key? key, required this.appointment})
       : super(key: key);
 
   Color _getBackgroundColor(String colorString) {

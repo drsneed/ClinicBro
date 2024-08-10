@@ -88,16 +88,17 @@ class _SignInScreenState extends State<SignInScreen> {
     final orgId = _orgIdController.text;
     final dataService = DataService();
     dataService.setBaseUrl(serverUrl);
-
+    final authService = AuthService();
     // validate server url
-    if (!await dataService.validateServer()) {
+
+    if (!await authService.validateServer()) {
       _showInfoBar(
           "Server is not available. Please check the URL or your network connection",
           severity: InfoBarSeverity.error,
           durationSeconds: 5);
     } else {
       // validate org id
-      if (await AuthService().validateOrganization(orgId)) {
+      if (await authService.validateOrganization(orgId)) {
         setState(() {
           _showCredentials = true;
         });

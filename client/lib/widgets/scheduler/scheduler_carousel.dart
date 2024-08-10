@@ -9,6 +9,7 @@ class SchedulerCarousel extends StatelessWidget {
   final bool isMultiple;
   final void Function(bool showNavigation) onShowNavigationChange;
   final bool showNavigation;
+  final void Function() onRefresh;
   const SchedulerCarousel({
     Key? key,
     required this.onViewModeChange,
@@ -17,13 +18,14 @@ class SchedulerCarousel extends StatelessWidget {
     required this.isMultiple,
     required this.onShowNavigationChange,
     required this.showNavigation,
+    required this.onRefresh,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return CarouselSlider(
       options: CarouselOptions(
-        height: 60.0, // Adjust height if needed
+        height: 36.0, // Adjust height if needed
         viewportFraction: 1.0,
         enableInfiniteScroll: false,
         initialPage: 0,
@@ -39,6 +41,7 @@ class SchedulerCarousel extends StatelessWidget {
           isMultiple: isMultiple,
           onShowNavigationChange: onShowNavigationChange,
           showNavigation: showNavigation,
+          onRefresh: onRefresh,
         ),
         // Add more items here if needed
       ],

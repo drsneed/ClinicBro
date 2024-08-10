@@ -21,104 +21,131 @@ func main() {
 	utils.Assert(len(jwtSecret) > 0, "Missing JWT_SECRET_KEY")
 	middleware.SetJWTSecret(jwtSecret)
 	handlers.SetJWTSecret(jwtSecret)
-	orgValidationKey := os.Getenv("ORG_VALIDATION_KEY")
-	utils.Assert(len(orgValidationKey) > 0, "Missing ORG_VALIDATION_KEY")
-	middleware.SetOrgValidationKey(orgValidationKey)
+	clientApiKey := os.Getenv("CLIENT_API_KEY")
+	utils.Assert(len(clientApiKey) > 0, "Missing CLIENT_API_KEY")
 
-	r := gin.Default()
+	app := gin.Default()
 
-	// Apply the logging middleware globally
 	//r.Use(middleware.LoggingMiddleware())
 
-	// Enforces client api key presense for /validate-org and /server-version
-	r.Use(middleware.ClientApiKeyMiddleware())
+	// These routes require a valid client api key in the X-CLIENT-API-KEY header
+	apiKeyUser := app.Group("/")
+	apiKeyUser.Use(middleware.ClientApiKeyMiddleware(clientApiKey))
+	{
+		apiKeyUser.GET("/validate-server", handlers.ValidateServer)
+		apiKeyUser.POST("/validate-organization", handlers.ValidateOrganization)
+		apiKeyUser.POST("/authenticate-user", handlers.AuthenticateUser)
+	}
 
-	// Public routes
-	r.GET("/whoareyou", handlers.WhoAreYou)
-	r.POST("/authenticate", handlers.Authenticate)
-	r.POST("/validate-org", handlers.ValidateOrganization)
-	r.GET("/server-version", handlers.GetServerVersion)
-
-	// Protected routes
-	authorized := r.Group("/")
-	authorized.Use(middleware.AuthMiddleware())
+	// These routes require a bearer token (jwt format)
+	authenticatedUser := app.Group("/")
+	authenticatedUser.Use(middleware.AuthMiddleware())
 	{
 		// User routes
-		authorized.POST("/users", handlers.CreateUser)
-		authorized.GET("/users/:id", handlers.GetUser)
-		authorized.GET("/users", handlers.GetAllUsers)
-		//authorized.PUT("/users/:id", handlers.UpdateUser)
-		//authorized.DELETE("/users/:id", handlers.DeleteUser)
+		authenticatedUser.POST("/users", handlers.CreateUser)
+		authenticatedUser.GET("/users/:id", handlers.GetUser)
+		authenticatedUser.GET("/users", handlers.GetAllUsers)
+		//authenticatedUser.PUT("/users/:id", handlers.UpdateUser)
+		//authenticatedUser.DELETE("/users/:id", handlers.DeleteUser)
 
 		// Avatar routes
-		authorized.POST("/avatars/:type/:id", handlers.CreateOrUpdateAvatar)
-		authorized.GET("/avatars/:type/:id", handlers.GetAvatar)
-		authorized.PUT("/avatars/:type/:id", handlers.UpdateAvatar)
-		authorized.DELETE("/avatars/:type/:id", handlers.DeleteAvatar)
+		authenticatedUser.POST("/avatars/:type/:id", handlers.CreateOrUpdateAvatar)
+		authenticatedUser.GET("/avatars/:type/:id", handlers.GetAvatar)
+		authenticatedUser.PUT("/avatars/:type/:id", handlers.UpdateAvatar)
+		authenticatedUser.DELETE("/avatars/:type/:id", handlers.DeleteAvatar)
 
 		// Location routes
-		authorized.POST("/locations", handlers.CreateLocation)
-		authorized.GET("/locations/:id", handlers.GetLocation)
-		authorized.GET("/locations", handlers.GetAllLocations)
-		authorized.PUT("/locations/:id", handlers.UpdateLocation)
-		authorized.DELETE("/locations/:id", handlers.DeleteLocation)
+		authenticatedUser.POST("/locations", handlers.CreateLocation)
+		authenticatedUser.GET("/locations/:id", handlers.GetLocation)
+		authenticatedUser.GET("/locations", handlers.GetAllLocations)
+		authenticatedUser.PUT("/locations/:id", handlers.UpdateLocation)
+		authenticatedUser.DELETE("/locations/:id", handlers.DeleteLocation)
 
 		// Patient routes
-		authorized.POST("/patients", handlers.CreatePatient)
-		authorized.GET("/patients/:id", handlers.GetPatient)
-		authorized.GET("/patients", handlers.GetAllPatients)
-		authorized.PUT("/patients/:id", handlers.UpdatePatient)
-		authorized.DELETE("/patients/:id", handlers.DeletePatient)
+		authenticatedUser.POST("/patients", handlers.CreatePatient)
+		authenticatedUser.GET("/patients/:id", handlers.GetPatient)
+		authenticatedUser.GET("/patients", handlers.GetAllPatients)
+		authenticatedUser.PUT("/patients/:id", handlers.UpdatePatient)
+		authenticatedUser.DELETE("/patients/:id", handlers.DeletePatient)
 
 		// Recent patients routes
-		authorized.GET("/recent-patients", handlers.GetRecentPatients)
-		authorized.POST("/recent-patients/:patient_id", handlers.AddRecentPatient)
+		authenticatedUser.GET("/recent-patients", handlers.GetRecentPatients)
+		authenticatedUser.POST("/recent-patients/:patient_id", handlers.AddRecentPatient)
 
 		// Password change route
-		authorized.POST("/change-password", handlers.ChangePassword)
+		authenticatedUser.POST("/change-password", handlers.ChangePassword)
 
 		// Appointment Types routes
-		authorized.POST("/appointment-types", handlers.CreateAppointmentType)
-		authorized.GET("/appointment-types/:id", handlers.GetAppointmentType)
-		authorized.GET("/appointment-types", handlers.GetAllAppointmentTypes)
-		authorized.PUT("/appointment-types/:id", handlers.UpdateAppointmentType)
-		authorized.DELETE("/appointment-types/:id", handlers.DeleteAppointmentType)
+		authenticatedUser.POST("/appointment-types", handlers.CreateAppointmentType)
+		authenticatedUser.GET("/appointment-types/:id", handlers.GetAppointmentType)
+		authenticatedUser.GET("/appointment-types", handlers.GetAllAppointmentTypes)
+		authenticatedUser.PUT("/appointment-types/:id", handlers.UpdateAppointmentType)
+		authenticatedUser.DELETE("/appointment-types/:id", handlers.DeleteAppointmentType)
 
 		// Appointment Statuses routes
-		authorized.POST("/appointment-statuses", handlers.CreateAppointmentStatus)
-		authorized.GET("/appointment-statuses/:id", handlers.GetAppointmentStatus)
-		authorized.GET("/appointment-statuses", handlers.GetAllAppointmentStatuses)
-		authorized.PUT("/appointment-statuses/:id", handlers.UpdateAppointmentStatus)
-		authorized.DELETE("/appointment-statuses/:id", handlers.DeleteAppointmentStatus)
+		authenticatedUser.POST("/appointment-statuses", handlers.CreateAppointmentStatus)
+		authenticatedUser.GET("/appointment-statuses/:id", handlers.GetAppointmentStatus)
+		authenticatedUser.GET("/appointment-statuses", handlers.GetAllAppointmentStatuses)
+		authenticatedUser.PUT("/appointment-statuses/:id", handlers.UpdateAppointmentStatus)
+		authenticatedUser.DELETE("/appointment-statuses/:id", handlers.DeleteAppointmentStatus)
 
 		// Appointments routes
-		authorized.POST("/appointments", handlers.CreateAppointment)
-		authorized.GET("/appointments/:id", handlers.GetAppointment)
-		authorized.GET("/appointments", handlers.GetAllAppointments)
-		authorized.PUT("/appointments/:id", handlers.UpdateAppointment)
-		authorized.DELETE("/appointments/:id", handlers.DeleteAppointment)
+		authenticatedUser.POST("/appointments", handlers.CreateAppointment)
+		authenticatedUser.GET("/appointments/:id", handlers.GetAppointment)
+		authenticatedUser.GET("/appointments", handlers.GetAllAppointments)
+		authenticatedUser.PUT("/appointments/:id", handlers.UpdateAppointment)
+		authenticatedUser.DELETE("/appointments/:id", handlers.DeleteAppointment)
 
 		// Appointment Items route
-		authorized.GET("/appointment-items", handlers.GetAppointmentItems)
+		authenticatedUser.GET("/appointment-items", handlers.GetAppointmentItems)
 
 		// Appointment Dates route
-		authorized.GET("/appointment-dates", handlers.GetAppointmentDates)
+		authenticatedUser.GET("/appointment-dates", handlers.GetAppointmentDates)
 
 		// Event Participants route
-		authorized.GET("/event-participants", handlers.GetEventParticipants)
+		authenticatedUser.GET("/event-participants", handlers.GetEventParticipants)
 
 		// Operating Schedule routes
-		authorized.POST("/operating-schedule", handlers.CreateOperatingSchedule)
-		authorized.GET("/operating-schedule", handlers.GetOperatingSchedule)
-		authorized.PUT("/operating-schedule", handlers.UpdateOperatingSchedule)
-		authorized.DELETE("/operating-schedule", handlers.DeleteOperatingSchedule)
-		authorized.GET("/operating-schedule/current-user", handlers.GetOperatingScheduleForCurrentUser)
+		authenticatedUser.POST("/operating-schedule", handlers.CreateOperatingSchedule)
+		authenticatedUser.GET("/operating-schedule", handlers.GetOperatingSchedule)
+		authenticatedUser.PUT("/operating-schedule", handlers.UpdateOperatingSchedule)
+		authenticatedUser.DELETE("/operating-schedule", handlers.DeleteOperatingSchedule)
+		authenticatedUser.GET("/operating-schedule/current-user", handlers.GetOperatingScheduleForCurrentUser)
+
+		// RBAC routes
+		authenticatedUser.POST("/roles", handlers.CreateRole)
+		authenticatedUser.GET("/roles", handlers.GetAllRoles)
+		authenticatedUser.GET("/roles/:id", handlers.GetRole)
+		authenticatedUser.PUT("/roles/:id", handlers.UpdateRole)
+		authenticatedUser.DELETE("/roles/:id", handlers.DeleteRole)
+
+		authenticatedUser.POST("/permissions", handlers.CreatePermission)
+		authenticatedUser.GET("/permissions", handlers.GetAllPermissions)
+		authenticatedUser.GET("/permissions/:id", handlers.GetPermission)
+		authenticatedUser.PUT("/permissions/:id", handlers.UpdatePermission)
+		authenticatedUser.DELETE("/permissions/:id", handlers.DeletePermission)
+
+		authenticatedUser.POST("/user-roles", handlers.AssignRoleToUser)
+		authenticatedUser.GET("/user-roles/:user_id", handlers.GetUserRoles)
+		authenticatedUser.DELETE("/user-roles/:user_id/:role_id", handlers.RemoveRoleFromUser)
+
+		authenticatedUser.GET("/user-permissions/:user_id", handlers.GetUserPermissions)
+
+		// User Preferences routes
+		authenticatedUser.POST("/user-preferences", handlers.SetUserPreference)
+		authenticatedUser.GET("/user-preferences/:user_id", handlers.GetUserPreferences)
+		authenticatedUser.GET("/user-preferences/:user_id/:key", handlers.GetUserPreference)
+		authenticatedUser.PUT("/user-preferences/:user_id/:key", handlers.UpdateUserPreference)
+		authenticatedUser.DELETE("/user-preferences/:user_id/:key", handlers.DeleteUserPreference)
+
+		// User permission check route
+		authenticatedUser.GET("/check-permission", handlers.UserHasPermission)
+
+		// System Information
+		authenticatedUser.GET("/server-version", handlers.GetServerVersion)
 	}
 
-	// Start server
-	host := os.Getenv("ClinicBroHost")
-	if host == "" {
-		host = "[::]:8080"
-	}
-	r.Run(host)
+	host := os.Getenv("SERVER_HOST")
+	utils.Assert(len(host) > 0, "Missing SERVER_HOST")
+	app.Run(host)
 }

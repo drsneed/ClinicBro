@@ -6,23 +6,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var orgValidationApiKey string
+var actualClientApiKey string
 
-func SetOrgValidationKey(key string) {
-	orgValidationApiKey = key
-}
-
-func ClientApiKeyMiddleware() gin.HandlerFunc {
+func ClientApiKeyMiddleware(clientApiKey string) gin.HandlerFunc {
+	actualClientApiKey = clientApiKey
 	return func(c *gin.Context) {
-		path := c.Request.URL.Path
-		if path == "/validate-org" || path == "/server-version" {
-			apiKey := c.GetHeader("X-Client-Api-Key")
-			if apiKey != orgValidationApiKey {
-				c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
-				c.Abort() // Stop further processing
-				return
-			}
+		providedClientApiKey := c.GetHeader("X-Client-Api-Key")
+		if providedClientApiKey == actualClientApiKey {
+			c.Next()
+			return
 		}
-		c.Next() // Proceed to the next handler
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		c.Abort() // Prevent further processing
 	}
 }

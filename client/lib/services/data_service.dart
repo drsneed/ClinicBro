@@ -1,5 +1,3 @@
-import 'dart:convert';
-import 'dart:io' show SocketException;
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import '../utils/logger.dart';
@@ -26,27 +24,6 @@ class DataService {
 
   void enableLogging(bool enable) {
     _loggingEnabled = enable;
-  }
-
-  Future<bool> validateServer() async {
-    try {
-      final response = await get('/whoareyou');
-      if (response.statusCode == 200) {
-        final responseString = jsonDecode(response.body);
-        return responseString == "ClinicBro-Server";
-      } else {
-        return false;
-      }
-    } on http.ClientException catch (e) {
-      _logger.log(Level.SEVERE, 'ClientException: $e');
-      return false;
-    } on SocketException catch (e) {
-      _logger.log(Level.SEVERE, 'SocketException: $e');
-      return false;
-    } catch (e) {
-      _logger.log(Level.SEVERE, 'Unexpected error: $e');
-      return false;
-    }
   }
 
   Future<http.Response> post(

@@ -9,6 +9,7 @@ class SchedulerControls extends StatefulWidget {
   final bool isMultiple;
   final void Function(bool showNavigation) onShowNavigationChange;
   final bool showNavigation;
+  final void Function() onRefresh; // Add this line
 
   const SchedulerControls({
     Key? key,
@@ -18,6 +19,7 @@ class SchedulerControls extends StatefulWidget {
     required this.isMultiple,
     required this.onShowNavigationChange,
     required this.showNavigation,
+    required this.onRefresh, // Add this line
   }) : super(key: key);
 
   @override
@@ -115,8 +117,19 @@ class _SchedulerControlsState extends State<SchedulerControls> {
                 ),
               ),
             ),
-            SizedBox(width: 16),
-            _buildFilterButton(context),
+            const SizedBox(width: 16),
+            IconButton(
+              icon: const Icon(FluentIcons.filter, size: 14),
+              onPressed: () => showDialog(
+                context: context,
+                builder: (context) => FilterDialog(),
+              ), // Call the refresh callback
+            ), // Updated method
+            const SizedBox(width: 4),
+            IconButton(
+              icon: const Icon(FluentIcons.refresh, size: 14),
+              onPressed: widget.onRefresh, // Call the refresh callback
+            ) // Updated method
           ],
         ),
       ),
@@ -137,7 +150,7 @@ class _SchedulerControlsState extends State<SchedulerControls> {
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
           decoration: BoxDecoration(
-            color: FluentTheme.of(context).inactiveBackgroundColor,
+            color: Colors.transparent,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: FluentTheme.of(context).accentColor,
