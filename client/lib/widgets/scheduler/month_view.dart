@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../managers/overlay_manager.dart';
 import '../../models/appointment_item.dart';
+import '../../models/patient_item.dart';
 import '../../utils/calendar_grid.dart';
 import 'appointment_month_view.dart';
 
@@ -161,52 +162,108 @@ class _MonthViewState extends State<MonthView> {
                 (appt) => DateFormat('yyyy-MM-dd').parse(appt.apptDate) == date)
             .toList();
 
-        return GestureDetector(
-          onTap: () {
-            if (widget.onDateSelected != null) {
-              widget.onDateSelected!(date);
-            }
+        return DragTarget<PatientItem>(
+          onAccept: (PatientItem patient) {
+            _showAppointmentEditDialog(context, patient, date);
           },
-          child: Container(
-            width: cellWidth,
-            height: cellHeight,
-            decoration: BoxDecoration(
-              border: Border.all(color: borderColor),
-              color: isToday ? todayBackgroundColor : cellColor,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(2.0),
-                  child: Text(
-                    '${date.day}',
-                    style: TextStyle(
-                      color: isToday
-                          ? todayColor
-                          : (isCurrentMonth ? currentMonthColor : textColor),
-                      fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
-                      fontSize: cellWidth * 0.10,
+          builder: (context, candidateData, rejectedData) {
+            final isDraggingOver = candidateData.isNotEmpty;
+            return GestureDetector(
+              onTap: () {
+                if (widget.onDateSelected != null) {
+                  widget.onDateSelected!(date);
+                }
+              },
+              child: Container(
+                width: cellWidth,
+                height: cellHeight,
+                decoration: BoxDecoration(
+                  border: Border.all(color: borderColor),
+                  color: isToday ? todayBackgroundColor : cellColor,
+                ),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(2.0),
+                          child: Text(
+                            '${date.day}',
+                            style: TextStyle(
+                              color: isToday
+                                  ? todayColor
+                                  : (isCurrentMonth
+                                      ? currentMonthColor
+                                      : textColor),
+                              fontWeight:
+                                  isToday ? FontWeight.bold : FontWeight.normal,
+                              fontSize: cellWidth * 0.10,
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: dateAppointments.length,
+                            itemBuilder: (context, index) {
+                              return AppointmentMonthView(
+                                appointment: dateAppointments[index],
+                                overlayManager: widget.overlayManager,
+                              );
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
+                    if (isDraggingOver)
+                      Container(
+                        color: FluentTheme.of(context)
+                            .accentColor
+                            .withOpacity(0.3),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(FluentIcons.add, size: cellWidth * 0.2),
+                              SizedBox(height: 4),
+                              Text(
+                                'New Appointment',
+                                style: TextStyle(fontSize: cellWidth * 0.08),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: dateAppointments.length,
-                    itemBuilder: (context, index) {
-                      return AppointmentMonthView(
-                        appointment: dateAppointments[index],
-                        overlayManager: widget.overlayManager,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         );
       },
     );
+  }
+
+  void _showAppointmentEditDialog(
+      BuildContext context, PatientItem patient, DateTime date) {
+    print('scheduling patient ${patient.fullName} for $date');
+    // showDialog(
+    //   context: context,
+    //   builder: (BuildContext context) {
+    //     return AppointmentEditDialog(
+    //       patient: patient,
+    //       date: date,
+    //       onSave: (AppointmentItem newAppointment) {
+    //         // Handle saving the new appointment
+    //         // You might want to add it to your appointments list and refresh the view
+    //         setState(() {
+    //           widget.appointments.add(newAppointment);
+    //         });
+    //       },
+    //     );
+    //   },
+    // );
   }
 
   Widget _buildWeekdayHeader(double cellSize, Color textColor) {

@@ -11,11 +11,8 @@ import (
 
 var jwtSecret string
 
-func SetJWTSecret(secret string) {
+func AuthMiddleware(secret string) gin.HandlerFunc {
 	jwtSecret = secret
-}
-
-func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {

@@ -1,4 +1,3 @@
-// models/auth.go
 package models
 
 type AuthRequest struct {

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:image_picker/image_picker.dart';
+import '../managers/preferences_manager.dart';
 import '../managers/user_manager.dart';
 import '../models/location.dart';
 import '../models/operating_schedule.dart';
@@ -23,8 +24,10 @@ import 'quick_fill_dialog.dart';
 
 class AccountSettingsDialog extends StatefulWidget {
   final VoidCallback onAvatarChanged; // Callback to refresh avatar
-
-  const AccountSettingsDialog({super.key, required this.onAvatarChanged});
+  const AccountSettingsDialog({
+    super.key,
+    required this.onAvatarChanged,
+  });
 
   @override
   _AccountSettingsDialogState createState() => _AccountSettingsDialogState();
@@ -40,10 +43,14 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   Uint8List? _cachedAvatarData; // Cached avatar data
   bool _loadedAvatar = false;
   OperatingSchedule? _currentOperatingSchedule;
+  late ThemeMode _currentThemeMode;
+  final PreferencesManager _preferencesManager = PreferencesManager();
+
   @override
   void initState() {
     super.initState();
     _fetchLocations();
+    _currentThemeMode = _preferencesManager.themeMode;
   }
 
   Map<String, Map<String, DateTime?>> workHours = {
@@ -411,6 +418,20 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
               ),
               Expander(
                 header: _buildSettingsOption(
+                  icon: FluentIcons.settings,
+                  label: 'User Preferences',
+                ),
+                content: _buildUserPreferencesSection(),
+              ),
+              Expander(
+                header: _buildSettingsOption(
+                  icon: FluentIcons.contact_info,
+                  label: 'Personal Information',
+                ),
+                content: _buildPersonalInformationSection(),
+              ),
+              Expander(
+                header: _buildSettingsOption(
                   icon: FluentIcons.calendar,
                   label: 'Work Hours',
                 ),
@@ -672,6 +693,49 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
       }
       _isLoading = false;
     });
+  }
+
+  Widget _buildUserPreferencesSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Theme Mode', style: FluentTheme.of(context).typography.bodyLarge),
+        SizedBox(height: 8),
+        ComboBox<ThemeMode>(
+          items: [
+            ComboBoxItem(value: ThemeMode.system, child: Text('System')),
+            ComboBoxItem(value: ThemeMode.light, child: Text('Light')),
+            ComboBoxItem(value: ThemeMode.dark, child: Text('Dark')),
+          ],
+          value: _currentThemeMode,
+          onChanged: (ThemeMode? mode) {
+            if (mode != null) {
+              setThemeMode(mode);
+            }
+          },
+        ),
+        // Add more user preference options here
+      ],
+    );
+  }
+
+  void setThemeMode(ThemeMode mode) async {
+    await _preferencesManager.setThemeMode(mode);
+    setState(() {
+      _currentThemeMode = mode;
+    });
+  }
+
+  Widget _buildPersonalInformationSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildReadOnlyTextBox('Email', 'example@email.com'),
+        SizedBox(height: 16),
+        _buildReadOnlyTextBox('Phone', '1-800-JUST-CALL'),
+        // Add more personal information fields here
+      ],
+    );
   }
 
   Widget _buildLocationComboBox() {

@@ -3,7 +3,9 @@ import 'dart:typed_data';
 import '../models/operating_schedule.dart';
 import '../models/patient_item.dart';
 import '../models/user.dart';
+import '../models/user_preferences.dart';
 import '../services/data_service.dart';
+import '../utils/logger.dart';
 
 class UserRepository {
   static final UserRepository _instance = UserRepository._internal();
@@ -135,5 +137,29 @@ class UserRepository {
       // Handle errors or throw exceptions
       return null;
     }
+  }
+
+  Future<UserPreferences?> getUserPreferences(int userId) async {
+    final response = await DataService().get('/user-preferences/$userId');
+    if (response.statusCode == 200) {
+      try {
+        List<dynamic> jsonResponse = jsonDecode(response.body);
+        return UserPreferences.fromJson(jsonResponse);
+      } catch (e) {
+        Logger().log(Level.SEVERE, e.toString());
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  Future<bool> updateUserPreference(
+      int userId, String key, String value) async {
+    final response = await DataService().put(
+      '/user-preferences/$userId/$key',
+      body: jsonEncode({'preference_value': value}),
+    );
+    return response.statusCode == 200;
   }
 }

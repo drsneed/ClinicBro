@@ -2,6 +2,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart'; // Import the intl package
 import '../models/patient_item.dart';
 import '../repositories/user_repository.dart';
+import 'patient_display.dart';
 
 class PatientFinder extends StatefulWidget {
   @override
@@ -69,51 +70,19 @@ class _PatientFinderState extends State<PatientFinder> {
   // Method to build content for the "Recent" tab
   Widget _buildRecentContent() {
     if (_isLoading) {
-      return Center(child: ProgressRing()); // Show a loading indicator
+      return Center(child: ProgressRing());
     }
 
     if (_recentPatients.isEmpty) {
       return Center(child: Text('No recent patients found.'));
     }
 
-    // Create a date formatter to remove the time component
-    final dateFormatter = DateFormat('yyyy-MM-dd');
-
-    // Get the theme context
-    final theme = FluentTheme.of(context);
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListView.builder(
         itemCount: _recentPatients.length,
         itemBuilder: (context, index) {
-          final patient = _recentPatients[index];
-          final dob = patient.dateOfBirth != null
-              ? dateFormatter.format(patient.dateOfBirth!)
-              : 'N/A';
-
-          // Determine the background color based on the active status
-          final backgroundColor = patient.active
-              ? theme.accentColor
-              : theme.inactiveColor; // Use the theme's inactive color
-
-          return Container(
-            color: backgroundColor,
-            child: ListTile(
-              title: Text(
-                patient.fullName,
-                style: TextStyle(
-                  color: patient.active ? Colors.black : Colors.grey,
-                ),
-              ),
-              subtitle: Text(
-                'DOB: $dob',
-                style: TextStyle(
-                  color: patient.active ? Colors.black : Colors.grey,
-                ),
-              ),
-            ),
-          );
+          return PatientDisplay(patient: _recentPatients[index]);
         },
       ),
     );

@@ -17,11 +17,6 @@ CREATE TABLE user_preferences (
     user_id INT NOT NULL REFERENCES users(id),
     preference_key VARCHAR(50) NOT NULL,
     preference_value TEXT,
-    -- tracking columns
-    date_created TIMESTAMP NOT NULL,
-    date_updated TIMESTAMP NOT NULL,
-    created_user_id INT,
-    updated_user_id INT,
     UNIQUE (user_id, preference_key)
 );
 
@@ -41,12 +36,7 @@ CREATE TABLE roles (
 CREATE TABLE permissions (
     id SERIAL PRIMARY KEY,
     name VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT,
-    -- tracking columns
-    date_created TIMESTAMP NOT NULL,
-    date_updated TIMESTAMP NOT NULL,
-    created_user_id INT,
-    updated_user_id INT
+    description TEXT
 );
 
 CREATE TABLE role_permissions (

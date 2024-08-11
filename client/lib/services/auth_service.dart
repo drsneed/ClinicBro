@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 
+import '../managers/preferences_manager.dart';
 import '../repositories/user_repository.dart';
 import 'data_service.dart';
 import '../managers/user_manager.dart';
@@ -13,8 +14,10 @@ class AuthService {
   AuthService._internal();
 
   String? _currentOrgId;
-
   String? get currentOrgId => _currentOrgId;
+
+  final UserManager _userManager = UserManager();
+  final PreferencesManager _preferencesManager = PreferencesManager();
 
   String getClientApiKey() {
     var env = DotEnv()..load();
@@ -45,10 +48,13 @@ class AuthService {
     final userId = responseData['user_id'];
     dataService.setToken(token);
     _currentOrgId = orgId; // Store the org_id
+
     // Fetch user details and update UserManager
     final user = await UserRepository().getUser(userId);
     if (user != null) {
-      UserManager().setCurrentUser(user);
+      _userManager.setCurrentUser(user);
+      // Load user preferences
+      await _preferencesManager.loadPreferences(user.id);
     }
     return true;
   }
@@ -57,8 +63,7 @@ class AuthService {
     if (_currentOrgId == null) {
       throw Exception("No organization ID found. Please sign in again.");
     }
-    final userManager = UserManager();
-    final currentUser = userManager.currentUser;
+    final currentUser = _userManager.currentUser;
     if (currentUser == null) {
       throw Exception("No current user found. Cannot reset token.");
     }
