@@ -1,24 +1,33 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import '../models/patient_item.dart';
 import '../repositories/user_repository.dart';
+import '../repositories/patient_repository.dart';
+import '../services/data_service.dart';
 import 'patient_display.dart';
 
 class PatientFinder extends StatefulWidget {
-  final VoidCallback? onDragStart; // Add this line
+  final VoidCallback? onDragStart;
   const PatientFinder({Key? key, this.onDragStart}) : super(key: key);
+
   @override
   _PatientFinderState createState() => _PatientFinderState();
 }
 
 class _PatientFinderState extends State<PatientFinder> {
-  int _currentIndex = 0; // To track the currently selected tab
+  int _currentIndex = 0;
   List<PatientItem> _recentPatients = [];
+  List<PatientItem> _searchResults = [];
+  List<PatientItem> _apptTodayPatients = [];
   bool _isLoading = true;
+  bool _isSearching = false;
+  bool _isApptTodayLoading = false;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _fetchRecentPatients();
+    _fetchApptTodayPatients();
   }
 
   Future<void> _fetchRecentPatients() async {
@@ -30,12 +39,50 @@ class _PatientFinderState extends State<PatientFinder> {
     });
   }
 
+  Future<void> _fetchApptTodayPatients() async {
+    setState(() {
+      _isApptTodayLoading = true;
+    });
+
+    DataService().enableLogging(true);
+
+    final patientRepository = PatientRepository();
+    final apptTodayPatients =
+        await patientRepository.getPatientsWithAppointmentToday();
+
+    setState(() {
+      _apptTodayPatients = apptTodayPatients;
+      _isApptTodayLoading = false;
+    });
+  }
+
+  Future<void> _searchPatients(String query) async {
+    if (query.isEmpty) {
+      setState(() {
+        _searchResults = [];
+        _isSearching = false;
+      });
+      return;
+    }
+
+    setState(() {
+      _isSearching = true;
+    });
+
+    final patientRepository = PatientRepository();
+    final results = await patientRepository.searchPatients(searchTerm: query);
+
+    setState(() {
+      _searchResults = results;
+      _isSearching = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldPage(
       content: Column(
         children: [
-          // TabView
           Expanded(
             child: TabView(
               currentIndex: _currentIndex,
@@ -68,16 +115,13 @@ class _PatientFinderState extends State<PatientFinder> {
     );
   }
 
-  // Method to build content for the "Recent" tab
   Widget _buildRecentContent() {
     if (_isLoading) {
       return Center(child: ProgressRing());
     }
-
     if (_recentPatients.isEmpty) {
       return Center(child: Text('No recent patients found.'));
     }
-
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: ListView.builder(
@@ -92,27 +136,27 @@ class _PatientFinderState extends State<PatientFinder> {
     );
   }
 
-  // Method to build content for the "Appt Today" tab
   Widget _buildApptTodayContent() {
+    if (_isApptTodayLoading) {
+      return Center(child: ProgressRing());
+    }
+    if (_apptTodayPatients.isEmpty) {
+      return Center(child: Text('No patients with appointments today.'));
+    }
     return Padding(
       padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Appointments Today:',
-            style: FluentTheme.of(context).typography.bodyLarge,
-          ),
-          SizedBox(height: 10),
-          // Example content for "Appt Today"
-          Text('Patient X - 10:00 AM'),
-          Text('Patient Y - 11:30 AM'),
-        ],
+      child: ListView.builder(
+        itemCount: _apptTodayPatients.length,
+        itemBuilder: (context, index) {
+          return PatientDisplay(
+            patient: _apptTodayPatients[index],
+            onDragStart: widget.onDragStart,
+          );
+        },
       ),
     );
   }
 
-  // Method to build content for the "Search" tab
   Widget _buildSearchContent() {
     return Padding(
       padding: const EdgeInsets.all(16.0),
@@ -124,12 +168,37 @@ class _PatientFinderState extends State<PatientFinder> {
             style: FluentTheme.of(context).typography.bodyLarge,
           ),
           SizedBox(height: 10),
-          // Example content for "Search"
           TextBox(
+            controller: _searchController,
             placeholder: 'Enter patient name',
+            onChanged: (value) {
+              _searchPatients(value);
+            },
+          ),
+          SizedBox(height: 10),
+          Expanded(
+            child: _isSearching
+                ? Center(child: ProgressRing())
+                : _searchResults.isEmpty
+                    ? Center(child: Text('No results found'))
+                    : ListView.builder(
+                        itemCount: _searchResults.length,
+                        itemBuilder: (context, index) {
+                          return PatientDisplay(
+                            patient: _searchResults[index],
+                            onDragStart: widget.onDragStart,
+                          );
+                        },
+                      ),
           ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }

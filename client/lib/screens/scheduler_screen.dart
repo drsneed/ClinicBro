@@ -109,7 +109,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
       logger.log(Level.INFO,
           "attempting to fetch appointments from $startDate to $endDate");
       final appointments =
-          await apptRepository.getAppointmentsInRange(startDate, endDate);
+          await apptRepository.getAppointmentItemsInRange(startDate, endDate);
 
       setState(() {
         _appointments = appointments;

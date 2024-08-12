@@ -70,13 +70,93 @@ func GetAppointment(c *gin.Context) {
 func GetAllAppointments(c *gin.Context) {
 	var db = storage.GetTenantDB(c)
 	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection error"})
 		return
 	}
+
+	// Get optional query parameters
+	patientID := c.Query("patient_id")
+	providerID := c.Query("provider_id")
+	locationID := c.Query("location_id")
+	appointmentTypeID := c.Query("appointment_type_id")
+	appointmentStatusID := c.Query("appointment_status_id")
+	fromDate := c.Query("from_date")
+	toDate := c.Query("to_date")
+
+	// Create the base query
+	query := db.Model(&models.Appointment{}).Where("1 = 1")
+
+	// Add conditions based on query parameters
+	if patientID != "" {
+		pID, err := strconv.ParseUint(patientID, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Patient ID"})
+			return
+		}
+		query = query.Where("patient_id = ?", uint(pID))
+	}
+
+	if providerID != "" {
+		pID, err := strconv.ParseUint(providerID, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Provider ID"})
+			return
+		}
+		query = query.Where("provider_id = ?", uint(pID))
+	}
+
+	if locationID != "" {
+		lID, err := strconv.ParseUint(locationID, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Location ID"})
+			return
+		}
+		query = query.Where("location_id = ?", uint(lID))
+	}
+
+	if appointmentTypeID != "" {
+		atID, err := strconv.ParseUint(appointmentTypeID, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Appointment Type ID"})
+			return
+		}
+		query = query.Where("appointment_type_id = ?", uint(atID))
+	}
+
+	if appointmentStatusID != "" {
+		asID, err := strconv.ParseUint(appointmentStatusID, 10, 32)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Appointment Status ID"})
+			return
+		}
+		query = query.Where("appointment_status_id = ?", uint(asID))
+	}
+
+	if fromDate != "" {
+		_, err := time.Parse("2006-01-02", fromDate)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid From Date format"})
+			return
+		}
+		query = query.Where("appt_date >= ?", fromDate)
+	}
+
+	if toDate != "" {
+		_, err := time.Parse("2006-01-02", toDate)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid To Date format"})
+			return
+		}
+		query = query.Where("appt_date <= ?", toDate)
+	}
+
+	// Execute the query
 	var appointments []models.Appointment
-	if err := db.Find(&appointments).Error; err != nil {
+	if err := query.Find(&appointments).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch appointments"})
 		return
 	}
+
 	c.JSON(http.StatusOK, appointments)
 }
 

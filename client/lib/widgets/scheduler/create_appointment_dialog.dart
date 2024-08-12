@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import '../../models/create_appointment_data.dart';
 import '../../models/appointment.dart';
 import '../../models/location.dart';
+import '../../utils/popup_menu_utils.dart';
+import 'appointment_history_dialog.dart';
 
 class CreateAppointmentDialog extends StatefulWidget {
   final CreateAppointmentData? viewModel;
@@ -60,7 +62,58 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
     super.dispose();
   }
 
-  Widget _buildPatientLabel() {
+  void _showPatientMenu() async {
+    final RenderBox? button = context.findRenderObject() as RenderBox?;
+    final RenderBox? overlay =
+        Overlay.of(context)?.context.findRenderObject() as RenderBox?;
+
+    if (button == null || overlay == null) {
+      print('Button or Overlay RenderBox is null');
+      return;
+    }
+
+    final buttonPosition = button.localToGlobal(Offset.zero);
+
+    final result = await showPopupMenu<String>(
+      context: context,
+      buttonRect: Rect.fromLTWH(
+        buttonPosition.dx + 188,
+        buttonPosition.dy + 160,
+        388,
+        0,
+      ),
+      items: <mat.PopupMenuEntry<String>>[
+        const mat.PopupMenuItem<String>(
+          value: 'appointment_history',
+          child: Row(
+            children: <Widget>[
+              Icon(mat.Icons.history),
+              SizedBox(width: 8),
+              Text('Appointment History'),
+            ],
+          ),
+        ),
+      ],
+      color: const Color.fromARGB(255, 46, 45, 44),
+    );
+
+    if (result == 'appointment_history') {
+      _showAppointmentHistoryDialog();
+    }
+  }
+
+  void _showAppointmentHistoryDialog() {
+    final patientId = widget.viewModel?.patient.id ?? 0; // Get the patient ID
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AppointmentHistoryDialog(patientId: patientId);
+      },
+    );
+  }
+
+  Widget _buildPatientDropdown() {
     final patient = widget.viewModel?.patient;
     final theme = FluentTheme.of(context);
     final dateFormatter = DateFormat('yyyy-MM-dd');
@@ -104,6 +157,11 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
             ],
           ),
         ),
+        const SizedBox(width: 4),
+        IconButton(
+          icon: Icon(FluentIcons.chevron_down),
+          onPressed: _showPatientMenu,
+        ),
       ],
     );
   }
@@ -113,9 +171,9 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text('Create Appointment'),
-        const SizedBox(width: 80),
+        const SizedBox(width: 60),
         Expanded(
-          child: _buildPatientLabel(),
+          child: _buildPatientDropdown(), // Updated method
         ),
       ],
     );
@@ -429,7 +487,6 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              //_buildPatientLabel(), // Ensure this is properly implemented
               _buildDatePicker(),
               const SizedBox(height: 16),
               _buildTimePickers(),

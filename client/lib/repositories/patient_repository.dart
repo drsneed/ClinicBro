@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import '../models/patient.dart';
+import '../models/patient_item.dart';
 import '../services/data_service.dart';
 
 class PatientRepository {
@@ -62,6 +63,42 @@ class PatientRepository {
     }
   }
 
+  Future<List<PatientItem>> searchPatients({
+    String? searchTerm,
+    String? email,
+    String? phone,
+    String? dateOfBirth,
+  }) async {
+    // Build query parameters
+    final queryParams = <String, String>{};
+    if (searchTerm != null) queryParams['search'] = searchTerm;
+    if (email != null) queryParams['email'] = email;
+    if (phone != null) queryParams['phone'] = phone;
+    if (dateOfBirth != null) queryParams['date_of_birth'] = dateOfBirth;
+
+    // Construct the URL with query parameters
+    final uri = Uri(
+      path: '/patients/search',
+      queryParameters: queryParams,
+    );
+
+    final response = await DataService().get(uri.toString());
+
+    if (response.statusCode == 200) {
+      try {
+        List<dynamic> patientItemsJson = jsonDecode(response.body);
+        return patientItemsJson
+            .map((json) => PatientItem.fromJson(json))
+            .toList();
+      } catch (e) {
+        return [];
+      }
+    } else {
+      // Handle errors or throw exceptions
+      return [];
+    }
+  }
+
   // Create or update avatar for a patient
   Future<bool> createOrUpdateAvatar(int patientId, Uint8List imageData) async {
     final response = await DataService().postFile(
@@ -101,5 +138,24 @@ class PatientRepository {
   Future<bool> deleteAvatar(int patientId) async {
     final response = await DataService().delete('/avatars/patient/$patientId');
     return response.statusCode == 200;
+  }
+
+  // New method to fetch patients with appointments today
+  Future<List<PatientItem>> getPatientsWithAppointmentToday() async {
+    final response = await DataService().get('/patients/appt-today');
+    if (response.statusCode == 200) {
+      try {
+        List<dynamic> patientItemsJson = jsonDecode(response.body);
+        return patientItemsJson
+            .map((json) => PatientItem.fromJson(json))
+            .toList();
+      } catch (e) {
+        // Handle JSON parsing error
+        return [];
+      }
+    } else {
+      // Handle errors or throw exceptions
+      return [];
+    }
   }
 }

@@ -55,8 +55,44 @@ class AppointmentRepository {
     return response.statusCode == 204;
   }
 
-  Future<List<Appointment>> getAllAppointments() async {
-    final response = await DataService().get('/appointments');
+  Future<List<Appointment>> getAllAppointments({
+    int? patientId,
+    int? providerId,
+    int? locationId,
+    int? appointmentTypeId,
+    int? appointmentStatusId,
+    DateTime? fromDate,
+    DateTime? toDate,
+  }) async {
+    final queryParams = <String, String>{};
+
+    if (patientId != null) {
+      queryParams['patient_id'] = patientId.toString();
+    }
+    if (providerId != null) {
+      queryParams['provider_id'] = providerId.toString();
+    }
+    if (locationId != null) {
+      queryParams['location_id'] = locationId.toString();
+    }
+    if (appointmentTypeId != null) {
+      queryParams['appointment_type_id'] = appointmentTypeId.toString();
+    }
+    if (appointmentStatusId != null) {
+      queryParams['appointment_status_id'] = appointmentStatusId.toString();
+    }
+    if (fromDate != null) {
+      queryParams['from_date'] = fromDate.toIso8601String();
+    }
+    if (toDate != null) {
+      queryParams['to_date'] = toDate.toIso8601String();
+    }
+
+    final response = await DataService().get(
+      '/appointments',
+      queryParams: queryParams,
+    );
+
     if (response.statusCode == 200) {
       List<dynamic> appointmentsJson = jsonDecode(response.body);
       return appointmentsJson
@@ -68,7 +104,7 @@ class AppointmentRepository {
     }
   }
 
-  Future<List<AppointmentItem>> getAppointmentsInRange(
+  Future<List<AppointmentItem>> getAppointmentItemsInRange(
       DateTime startDate, DateTime endDate) async {
     final response = await DataService().get(
       '/appointment-items',

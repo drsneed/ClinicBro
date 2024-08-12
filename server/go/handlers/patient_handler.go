@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -126,4 +127,119 @@ func DeletePatient(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Patient deleted successfully"})
+}
+
+func SearchPatients(c *gin.Context) {
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+
+	// Get search parameters from query string
+	searchTerm := c.Query("search")
+	email := c.Query("email")
+	phone := c.Query("phone")
+	dateOfBirth := c.Query("date_of_birth")
+
+	// Start building the query
+	query := db.Model(&models.Patient{})
+
+	// Add conditions based on provided search parameters
+	if searchTerm != "" {
+		searchTerm = "%" + strings.ToLower(searchTerm) + "%"
+		query = query.Where("LOWER(first_name) LIKE ? OR LOWER(last_name) LIKE ? OR LOWER(CONCAT(first_name, ' ', last_name)) LIKE ?",
+			searchTerm, searchTerm, searchTerm)
+	}
+	if email != "" {
+		query = query.Where("LOWER(email) LIKE ?", "%"+strings.ToLower(email)+"%")
+	}
+	if phone != "" {
+		query = query.Where("phone LIKE ?", "%"+phone+"%")
+	}
+	if dateOfBirth != "" {
+		query = query.Where("date_of_birth = ?", dateOfBirth)
+	}
+
+	// Execute the query
+	var patients []models.Patient
+	if err := query.Find(&patients).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not search patients"})
+		return
+	}
+
+	// Convert Patient models to PatientItem models
+	var patientItems []models.PatientItem
+	for _, patient := range patients {
+		// Format the full name as "LastName, FirstName MiddleInitial"
+		var fullName string
+		if patient.MiddleName != "" {
+			fullName = patient.LastName + ", " + patient.FirstName + " " + string(patient.MiddleName[0]) + "."
+		} else {
+			fullName = patient.LastName + ", " + patient.FirstName
+		}
+		patientItem := models.PatientItem{
+			ID:          patient.ID,
+			Active:      patient.Active,
+			FullName:    fullName,
+			DateOfBirth: patient.DateOfBirth,
+		}
+		patientItems = append(patientItems, patientItem)
+	}
+
+	c.JSON(http.StatusOK, patientItems)
+}
+
+func GetPatientsWithAppointmentToday(c *gin.Context) {
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		return
+	}
+
+	// Get today's date
+	today := time.Now().Format("2006-01-02")
+
+	// Find appointments scheduled for today
+	var appointments []models.Appointment
+	if err := db.Where("appt_date = ?", today).Find(&appointments).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch appointments"})
+		return
+	}
+
+	// Extract patient IDs from the appointments
+	var patientIDs []uint
+	for _, appointment := range appointments {
+		if appointment.PatientID != nil {
+			patientIDs = append(patientIDs, *appointment.PatientID)
+		}
+	}
+
+	// Fetch patients with these IDs
+	var patients []models.Patient
+	if len(patientIDs) > 0 {
+		if err := db.Where("id IN ?", patientIDs).Find(&patients).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch patients"})
+			return
+		}
+	}
+
+	// Convert Patient models to PatientItem models
+	var patientItems []models.PatientItem
+	for _, patient := range patients {
+		// Format the full name as "LastName, FirstName MiddleInitial"
+		var fullName string
+		if patient.MiddleName != "" {
+			fullName = patient.LastName + ", " + patient.FirstName + " " + string(patient.MiddleName[0]) + "."
+		} else {
+			fullName = patient.LastName + ", " + patient.FirstName
+		}
+		patientItem := models.PatientItem{
+			ID:          patient.ID,
+			Active:      patient.Active,
+			FullName:    fullName,
+			DateOfBirth: patient.DateOfBirth,
+		}
+		patientItems = append(patientItems, patientItem)
+	}
+
+	c.JSON(http.StatusOK, patientItems)
 }

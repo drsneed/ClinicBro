@@ -90,6 +90,12 @@ func main() {
 		authTokenRouter.GET("/recent-patients", handlers.GetRecentPatients)
 		authTokenRouter.POST("/recent-patients/:patient_id", handlers.AddRecentPatient)
 
+		// Search patients route
+		authTokenRouter.GET("/patients/search", handlers.SearchPatients)
+
+		// Patients with appt today route
+		authTokenRouter.GET("/patients/appt-today", handlers.GetPatientsWithAppointmentToday)
+
 		// Password change route
 		authTokenRouter.POST("/change-password", handlers.ChangePassword)
 
