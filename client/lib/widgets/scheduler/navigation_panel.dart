@@ -9,8 +9,8 @@ class SchedulerNavigationPanel extends StatefulWidget {
   final DateTime centerDate;
   final void Function(DateTime) onDateChanged;
   final List<DateTime> selectedDates;
-
-  SchedulerNavigationPanel({
+  const SchedulerNavigationPanel({
+    super.key,
     required this.isVisible,
     required this.centerDate,
     required this.onDateChanged,
@@ -18,11 +18,11 @@ class SchedulerNavigationPanel extends StatefulWidget {
   });
 
   @override
-  _SchedulerNavigationPanelState createState() =>
-      _SchedulerNavigationPanelState();
+  SchedulerNavigationPanelState createState() =>
+      SchedulerNavigationPanelState();
 }
 
-class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
+class SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
   late ScrollController _scrollController;
   late List<DateTime> _monthList;
   final int _initialMonthCount = 36; // Start with 3 years worth of months
@@ -77,6 +77,11 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
     _fetchAndCacheAppointmentDates(); // Fetch new appointment dates if needed
   }
 
+  Future<void> refresh() async {
+    print('scheduler panel refresh called');
+    _fetchAndCacheAppointmentDates();
+  }
+
   Future<void> _fetchAndCacheAppointmentDates() async {
     DateTime firstDate = _monthList.first;
     DateTime lastDate = _monthList.last;
@@ -100,6 +105,7 @@ class _SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
 
   Future<List<DateTime>> fetchAppointmentDates(
       DateTime from, DateTime to) async {
+    print('navigation panel is fetching dates from server...');
     final appointmentRepository = AppointmentRepository();
     final appointmentDates =
         await appointmentRepository.getAppointmentDatesInRange(from, to);

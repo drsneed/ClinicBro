@@ -6,9 +6,9 @@ type Appointment struct {
 	ID                  uint      `gorm:"primaryKey" json:"id"`
 	Title               *string   `gorm:"size:16" json:"title"` // Made Title a pointer to handle NULL values
 	IsEvent             bool      `json:"is_event"`
-	ApptDate            time.Time `json:"appt_date"` // Use date type in Go for date columns
-	ApptFrom            string    `json:"appt_from"` // Use time.Time for time columns
-	ApptTo              string    `json:"appt_to"`   // Use time.Time for time columns
+	ApptDate            string    `json:"appt_date"`
+	ApptFrom            string    `json:"appt_from"`
+	ApptTo              string    `json:"appt_to"`
 	Notes               string    `gorm:"size:2500;not null" json:"notes"`
 	PatientID           *uint     `json:"patient_id"`            // Made PatientID a pointer to handle NULL values
 	ProviderID          *uint     `json:"provider_id"`           // Made ProviderID a pointer to handle NULL values

@@ -44,8 +44,6 @@ class _PatientFinderState extends State<PatientFinder> {
       _isApptTodayLoading = true;
     });
 
-    DataService().enableLogging(true);
-
     final patientRepository = PatientRepository();
     final apptTodayPatients =
         await patientRepository.getPatientsWithAppointmentToday();

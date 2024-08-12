@@ -22,6 +22,8 @@ class SchedulerScreen extends StatefulWidget {
 }
 
 class _SchedulerScreenState extends State<SchedulerScreen> {
+  final GlobalKey<SchedulerNavigationPanelState> _navigationPanelKey =
+      GlobalKey<SchedulerNavigationPanelState>();
   bool _isFlyoutVisible = false;
   String _viewMode = 'Month'; // Default view mode
   bool _isMultiple = false; // Default view type
@@ -133,6 +135,9 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
       _isLoading = true; // Start loading indicator
     });
     _loadAppointments();
+    // Force the SchedulerNavigationPanel to refresh
+    print('attempting to refresh navigation panel');
+    _navigationPanelKey.currentState?.refresh();
   }
 
   List<DateTime> _getSelectedDates() {
@@ -162,13 +167,13 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   @override
   Widget build(BuildContext context) {
     final isDesktop = !widget.isMobile;
-    print('building scheduler screen for date $_centerDate');
     _overlayManager.clearCurrentOverlay();
     return Row(
       children: [
         // Vertical panel on the left
         if (_showNavigation)
           SchedulerNavigationPanel(
+            key: _navigationPanelKey,
             isVisible: _showNavigation,
             centerDate: _centerDate,
             onDateChanged: _onDateChanged,

@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart' show TimeOfDay;
 
+import 'appointment_status.dart';
+import 'appointment_type.dart';
+import 'location.dart';
+import 'patient.dart';
+import 'user.dart';
+
 class Appointment {
   final int id;
   String title;
@@ -14,6 +20,12 @@ class Appointment {
   int appointmentStatusId;
   int locationId;
 
+  Patient? patient;
+  User? provider;
+  AppointmentType? appointmentType;
+  AppointmentStatus? appointmentStatus;
+  Location? location;
+
   Appointment({
     required this.id,
     required this.title,
@@ -27,6 +39,11 @@ class Appointment {
     required this.appointmentTypeId,
     required this.appointmentStatusId,
     required this.locationId,
+    this.patient,
+    this.provider,
+    this.appointmentType,
+    this.appointmentStatus,
+    this.location,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
@@ -43,6 +60,18 @@ class Appointment {
       appointmentTypeId: json['appointment_type_id'],
       appointmentStatusId: json['appointment_status_id'],
       locationId: json['location_id'],
+      patient:
+          json['patient'] != null ? Patient.fromJson(json['patient']) : null,
+      provider:
+          json['provider'] != null ? User.fromJson(json['provider']) : null,
+      appointmentType: json['appointment_type'] != null
+          ? AppointmentType.fromJson(json['appointment_type'])
+          : null,
+      appointmentStatus: json['appointment_status'] != null
+          ? AppointmentStatus.fromJson(json['appointment_status'])
+          : null,
+      location:
+          json['location'] != null ? Location.fromJson(json['location']) : null,
     );
   }
 

@@ -1,19 +1,18 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as mat;
 import 'package:intl/intl.dart';
-import '../../models/create_appointment_data.dart';
 import '../../models/appointment.dart';
+import '../../models/edit_appointment_data.dart';
 import '../../models/location.dart';
 import '../../utils/popup_menu_utils.dart';
-import '../custom_time_picker.dart';
 import 'appointment_history_dialog.dart';
 
-class CreateAppointmentDialog extends StatefulWidget {
-  final CreateAppointmentData? viewModel;
+class EditAppointmentDialog extends StatefulWidget {
+  final EditAppointmentData? viewModel;
   final DateTime date;
   final Function(Appointment) onSave;
 
-  const CreateAppointmentDialog({
+  const EditAppointmentDialog({
     super.key,
     required this.viewModel,
     required this.date,
@@ -21,11 +20,10 @@ class CreateAppointmentDialog extends StatefulWidget {
   });
 
   @override
-  _CreateAppointmentDialogState createState() =>
-      _CreateAppointmentDialogState();
+  _EditAppointmentDialogState createState() => _EditAppointmentDialogState();
 }
 
-class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
+class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
   late Appointment _appointment;
   final _formKey = GlobalKey<FormState>();
   DateTime? _selectedDate;
@@ -38,22 +36,7 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
   void initState() {
     super.initState();
 
-    // Calculate the next 30-minute interval
-    final now = DateTime.now();
-    final nextInterval = _getNextHalfHourInterval(now);
-
-    // Set the appointment times
-    final apptFrom = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      nextInterval.hour,
-      nextInterval.minute,
-    );
-
-    final apptTo = apptFrom.add(const Duration(minutes: 30));
-
-    _appointment = Appointment(
+    _appointment = widget.viewModel.app Appointment(
       id: 0,
       title: '',
       isEvent: false,
@@ -63,31 +46,13 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
       appointmentStatusId: widget.viewModel?.appointmentStatuses.first.id ?? 0,
       locationId: widget.viewModel?.locations.first.id ?? 0,
       apptDate: widget.date,
-      apptFrom: mat.TimeOfDay(hour: apptFrom.hour, minute: apptFrom.minute),
-      apptTo: mat.TimeOfDay(hour: apptTo.hour, minute: apptTo.minute),
+      apptFrom: mat.TimeOfDay.now(),
+      apptTo: mat.TimeOfDay.now(),
       notes: '',
     );
 
     _selectedDate = widget.date;
-    _selectedFrom = apptFrom;
-    _selectedTo = apptTo;
-
     _notesController = TextEditingController(text: _appointment.notes);
-  }
-
-  // Helper function to get the next 30-minute interval
-  DateTime _getNextHalfHourInterval(DateTime dateTime) {
-    final minutes = dateTime.minute;
-    final nextIntervalMinutes = (minutes ~/ 30 + 1) * 30;
-
-    // If the next interval is in the next hour
-    if (nextIntervalMinutes >= 60) {
-      return DateTime(
-          dateTime.year, dateTime.month, dateTime.day, dateTime.hour + 1, 0);
-    }
-
-    return DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour,
-        nextIntervalMinutes);
   }
 
   @override
@@ -441,8 +406,7 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: CustomTimePicker(
-            showClearButton: false,
+          child: TimePicker(
             selected: _selectedFrom,
             onChanged: (date) {
               setState(() {
@@ -468,9 +432,8 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: CustomTimePicker(
+          child: TimePicker(
             selected: _selectedTo,
-            showClearButton: false,
             onChanged: (date) {
               setState(() {
                 _selectedTo = date;
