@@ -10,7 +10,7 @@ $username = $args[1]
 $password = $args[2]
 
 # Define the URI and headers
-$uri = "http://192.168.1.34:33420/authenticate"
+$uri = "http://192.168.1.34:33420/authenticate-user"
 $headers = @{ "Content-Type" = "application/json" }
 
 # Create the body with the provided username and password

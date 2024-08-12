@@ -89,7 +89,7 @@ class Patient {
       canText: json['can_text'],
       canEmail: json['can_email'],
       locationId: json['location_id'],
-      userId: json['user_id'],
+      userId: json['provider_id'],
       dateCreated: DateTime.parse(json['date_created']),
       dateUpdated: DateTime.parse(json['date_updated']),
       createdUserId: json['created_user_id'],

@@ -4,6 +4,7 @@ import (
 	"ClinicBro-Server/models"
 	"ClinicBro-Server/storage"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -141,4 +142,128 @@ func GetEventParticipants(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, participants)
+}
+func GetEditAppointmentData(c *gin.Context) {
+	appointmentID := c.Query("appointment_id")
+
+	if appointmentID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Appointment ID is required"})
+		return
+	}
+
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection error"})
+		return
+	}
+
+	var response models.EditAppointmentResponse
+
+	// Fetch appointment details
+	if err := db.Preload("Patient").
+		Preload("Provider").
+		Preload("AppointmentType").
+		Preload("AppointmentStatus").
+		Preload("Location").
+		First(&response.Appointment, appointmentID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Appointment not found"})
+		return
+	}
+
+	// Collect IDs for filtering
+	var locationID uint
+	var appointmentTypeID uint
+	var appointmentStatusID uint
+	var providerID uint
+
+	if response.Appointment.LocationID != nil {
+		locationID = *response.Appointment.LocationID
+	}
+	if response.Appointment.AppointmentTypeID != nil {
+		appointmentTypeID = *response.Appointment.AppointmentTypeID
+	}
+	if response.Appointment.AppointmentStatusID != nil {
+		appointmentStatusID = *response.Appointment.AppointmentStatusID
+	}
+
+	if response.Appointment.ProviderID != nil {
+		providerID = *response.Appointment.ProviderID
+	}
+
+	// Fetch locations, providers, appointment statuses, and types
+	if err := db.Where("active = true OR id = ?", locationID).Find(&response.Locations).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch locations"})
+		return
+	}
+	if err := db.Where("active = true OR id = ?", appointmentStatusID).Find(&response.AppointmentStatuses).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch appointment statuses"})
+		return
+	}
+	if err := db.Where("active = true OR id = ?", appointmentTypeID).Find(&response.AppointmentTypes).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch appointment types"})
+		return
+	}
+	if err := db.Where("(is_provider = true and active = true) or id = ?", providerID).Find(&response.Providers).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch providers"})
+		return
+	}
+
+	c.JSON(http.StatusOK, response)
+}
+
+func GetCreateAppointmentData(c *gin.Context) {
+	patientIDParam := c.Query("patient_id") // Use query parameter for patient ID
+
+	if patientIDParam == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Patient ID is required"})
+		return
+	}
+
+	patientID, err := strconv.ParseUint(patientIDParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid Patient ID"})
+		return
+	}
+
+	var db = storage.GetTenantDB(c)
+	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection error"})
+		return
+	}
+
+	var response models.CreateAppointmentResponse
+
+	// Fetch all active locations
+	if err := db.Where("active = true").Find(&response.Locations).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch locations"})
+		return
+	}
+
+	// Fetch all active appointment types
+	if err := db.Where("active = true").Find(&response.AppointmentTypes).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch appointment types"})
+		return
+	}
+
+	// Fetch all active appointment statuses
+	if err := db.Where("active = true").Find(&response.AppointmentStatuses).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch appointment statuses"})
+		return
+	}
+
+	// Fetch all active providers
+	if err := db.Where("is_provider = true and active = true").Find(&response.Providers).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch providers"})
+		return
+	}
+
+	// Fetch patient details if patient ID is provided
+	var patient models.Patient
+	if err := db.First(&patient, patientID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Patient not found"})
+		return
+	}
+	response.Patient = &patient
+
+	c.JSON(http.StatusOK, response)
 }

@@ -12,6 +12,7 @@ class Scheduler extends StatefulWidget {
   final bool isMultiple;
   final DateTime centerDate;
   final void Function(DateTime) onDateChanged;
+  final void Function() onRefresh;
   final List<AppointmentItem> appointments;
   final OverlayManager overlayManager;
 
@@ -21,6 +22,7 @@ class Scheduler extends StatefulWidget {
     required this.isMultiple,
     required this.centerDate,
     required this.onDateChanged,
+    required this.onRefresh,
     required this.appointments,
     required this.overlayManager,
   });
@@ -96,6 +98,7 @@ class _SchedulerState extends State<Scheduler> {
           initialDate: widget.centerDate,
           onDateSelected: widget.onDateChanged,
           onMonthChanged: widget.onDateChanged,
+          onRefresh: widget.onRefresh,
           appointments: widget.appointments,
           overlayManager: widget.overlayManager,
         );

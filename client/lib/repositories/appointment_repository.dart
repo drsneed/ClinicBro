@@ -2,6 +2,8 @@ import 'dart:convert';
 import '../models/appointment.dart';
 import '../models/appointment_item.dart';
 import '../models/event_participant.dart';
+import '../models/create_appointment_data.dart';
+import '../models/edit_appointment_data.dart';
 import '../services/data_service.dart';
 
 class AppointmentRepository {
@@ -132,5 +134,37 @@ class AppointmentRepository {
     }
 
     return [];
+  }
+
+  Future<CreateAppointmentData?> getCreateAppointmentData(int patientId) async {
+    final response = await DataService().get(
+      '/create-appointment-data',
+      queryParams: {
+        'patient_id': patientId.toString(),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return CreateAppointmentData.fromJson(jsonDecode(response.body));
+    } else {
+      // Handle errors or throw exceptions
+      return null;
+    }
+  }
+
+  Future<EditAppointmentData?> getEditAppointmentData(int appointmentId) async {
+    final response = await DataService().get(
+      '/edit-appointment-data',
+      queryParams: {
+        'appointment_id': appointmentId.toString(),
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return EditAppointmentData.fromJson(jsonDecode(response.body));
+    } else {
+      // Handle errors or throw exceptions
+      return null;
+    }
   }
 }

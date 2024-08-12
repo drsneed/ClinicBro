@@ -2,21 +2,27 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:intl/intl.dart';
 
 import '../../managers/overlay_manager.dart';
+import '../../models/appointment.dart';
 import '../../models/appointment_item.dart';
 import '../../models/patient_item.dart';
+import '../../repositories/appointment_repository.dart';
 import '../../utils/calendar_grid.dart';
+import '../../utils/logger.dart';
 import 'appointment_month_view.dart';
+import 'create_appointment_dialog.dart';
 
 class MonthView extends StatefulWidget {
   final DateTime initialDate;
   final Function(DateTime)? onDateSelected;
   final Function(DateTime) onMonthChanged;
+  final Function() onRefresh;
   final List<AppointmentItem> appointments;
   final OverlayManager overlayManager;
   const MonthView({
     Key? key,
     required this.initialDate,
     required this.onMonthChanged,
+    required this.onRefresh,
     required this.appointments,
     required this.overlayManager,
     this.onDateSelected,
@@ -164,7 +170,7 @@ class _MonthViewState extends State<MonthView> {
 
         return DragTarget<PatientItem>(
           onAccept: (PatientItem patient) {
-            _showAppointmentEditDialog(context, patient, date);
+            _showCreateAppointmentDialog(context, patient, date);
           },
           builder: (context, candidateData, rejectedData) {
             final isDraggingOver = candidateData.isNotEmpty;
@@ -245,25 +251,48 @@ class _MonthViewState extends State<MonthView> {
     );
   }
 
-  void _showAppointmentEditDialog(
-      BuildContext context, PatientItem patient, DateTime date) {
-    print('scheduling patient ${patient.fullName} for $date');
-    // showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-    //     return AppointmentEditDialog(
-    //       patient: patient,
-    //       date: date,
-    //       onSave: (AppointmentItem newAppointment) {
-    //         // Handle saving the new appointment
-    //         // You might want to add it to your appointments list and refresh the view
-    //         setState(() {
-    //           widget.appointments.add(newAppointment);
-    //         });
-    //       },
-    //     );
-    //   },
-    // );
+  void _showCreateAppointmentDialog(
+    BuildContext context,
+    PatientItem patient,
+    DateTime date,
+  ) async {
+    final logger = Logger();
+    final repo = AppointmentRepository();
+
+    logger.log(Level.INFO, 'scheduling patient ${patient.fullName} on $date');
+
+    final viewModel = await repo.getCreateAppointmentData(patient.id);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 600), // Set max width
+            child: CreateAppointmentDialog(
+              viewModel: viewModel,
+              date: date,
+              onSave: (Appointment newAppointment) async {
+                // Validate and save Appointment model
+                try {
+                  final createdAppointment =
+                      await repo.createAppointment(newAppointment);
+                  if (createdAppointment != null) {
+                    widget.onRefresh();
+                  } else {
+                    // Handle the error
+                    // e.g., show a message to the user
+                  }
+                } catch (e) {
+                  // Handle any other exceptions
+                  // e.g., show a message to the user
+                }
+              },
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Widget _buildWeekdayHeader(double cellSize, Color textColor) {

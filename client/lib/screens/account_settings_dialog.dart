@@ -11,12 +11,7 @@ import '../repositories/user_repository.dart';
 import '../services/auth_service.dart';
 import 'dart:io'; // For File
 import 'package:flutter/material.dart'
-    show
-        CircularProgressIndicator,
-        ScaffoldMessenger,
-        SnackBar,
-        Theme,
-        TimeOfDay;
+    show CircularProgressIndicator, Theme, TimeOfDay;
 import 'package:image/image.dart' as img;
 
 import '../widgets/custom_time_picker.dart';

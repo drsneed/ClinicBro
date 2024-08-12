@@ -59,7 +59,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
     });
   }
 
-  void onDateChanged(DateTime newDate) {
+  void _onDateChanged(DateTime newDate) {
     if (newDate.year != _centerDate.year ||
         newDate.month != _centerDate.month ||
         newDate.day != _centerDate.day) {
@@ -171,7 +171,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
           SchedulerNavigationPanel(
             isVisible: _showNavigation,
             centerDate: _centerDate,
-            onDateChanged: onDateChanged,
+            onDateChanged: _onDateChanged,
             selectedDates: _getSelectedDates(),
           ),
         Expanded(
@@ -201,7 +201,8 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
                         viewMode: _viewMode,
                         isMultiple: _isMultiple,
                         centerDate: _centerDate,
-                        onDateChanged: onDateChanged,
+                        onDateChanged: _onDateChanged,
+                        onRefresh: _refreshAppointments,
                         appointments: _appointments,
                         overlayManager: _overlayManager,
                         // Additional parameters
@@ -217,6 +218,12 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
     );
   }
 
+  void _onPatientDragStart() {
+    setState(() {
+      _isFlyoutVisible = false; // Hide flyout when drag starts
+    });
+  }
+
   Widget _buildDesktopFlyout() {
     return Positioned(
       top: 0,
@@ -228,8 +235,8 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
         child: Container(
           color: FluentTheme.of(context).micaBackgroundColor,
           child: _isFlyoutVisible
-              ? PatientFinder()
-              : null, // Use PatientFinder here
+              ? PatientFinder(onDragStart: _onPatientDragStart)
+              : null,
         ),
       ),
     );
@@ -254,7 +261,7 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
             ),
           ],
         ),
-        child: PatientFinder(), // Use PatientFinder here
+        child: PatientFinder(onDragStart: _onPatientDragStart),
       ),
     );
   }

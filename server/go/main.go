@@ -5,6 +5,8 @@ import (
 	"ClinicBro-Server/middleware"
 	"ClinicBro-Server/storage"
 	"ClinicBro-Server/utils"
+	"flag"
+	"fmt"
 	"log"
 	"os"
 
@@ -13,10 +15,16 @@ import (
 )
 
 func main() {
+	// Load environment variables
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 	storage.InitAll()
+
+	// Parse command-line arguments
+	enableLogging := flag.Bool("enable-logging", false, "Enable logging middleware")
+	flag.Parse()
+
 	jwtSecret := os.Getenv("JWT_SECRET_KEY")
 	clientApiKey := os.Getenv("CLIENT_API_KEY")
 	host := os.Getenv("SERVER_HOST")
@@ -30,124 +38,135 @@ func main() {
 
 	app := gin.Default()
 
-	app.Use(middleware.LoggingMiddleware())
-
-	// These routes require a valid client api key in the X-CLIENT-API-KEY header
-	apiKeyEndpoints := app.Group("/")
-	apiKeyEndpoints.Use(middleware.ClientApiKeyMiddleware(clientApiKey))
-	{
-		apiKeyEndpoints.GET("/validate-server", handlers.ValidateServer)
-		apiKeyEndpoints.POST("/validate-organization", handlers.ValidateOrganization)
-		apiKeyEndpoints.POST("/authenticate-user", handlers.AuthenticateUser)
+	// Conditionally apply logging middleware based on the command-line argument
+	if *enableLogging {
+		app.Use(middleware.LoggingMiddleware())
+		fmt.Println("logging enabled")
+	} else {
+		fmt.Println("logging disabled")
 	}
 
-	// These routes require a bearer token (jwt format)
-	bearerTokenEndpoints := app.Group("/")
-	bearerTokenEndpoints.Use(middleware.AuthMiddleware(jwtSecret))
+	// Routes that require API Key Authentication
+	apiKeyRouter := app.Group("/")
+	apiKeyRouter.Use(middleware.ClientApiKeyMiddleware(clientApiKey))
+	{
+		apiKeyRouter.GET("/validate-server", handlers.ValidateServer)
+		apiKeyRouter.POST("/validate-organization", handlers.ValidateOrganization)
+		apiKeyRouter.POST("/authenticate-user", handlers.AuthenticateUser)
+	}
+
+	// Routes that require JWT Authentication
+	authTokenRouter := app.Group("/")
+	authTokenRouter.Use(middleware.AuthMiddleware(jwtSecret))
 	{
 		// User routes
-		bearerTokenEndpoints.POST("/users", handlers.CreateUser)
-		bearerTokenEndpoints.GET("/users/:id", handlers.GetUser)
-		bearerTokenEndpoints.GET("/users", handlers.GetAllUsers)
-		//bearerTokenEndpoints.PUT("/users/:id", handlers.UpdateUser)
-		//bearerTokenEndpoints.DELETE("/users/:id", handlers.DeleteUser)
+		authTokenRouter.POST("/users", handlers.CreateUser)
+		authTokenRouter.GET("/users/:id", handlers.GetUser)
+		authTokenRouter.GET("/users", handlers.GetAllUsers)
+		//authTokenRouter.PUT("/users/:id", handlers.UpdateUser)
+		//authTokenRouter.DELETE("/users/:id", handlers.DeleteUser)
 
 		// Avatar routes
-		bearerTokenEndpoints.POST("/avatars/:type/:id", handlers.CreateOrUpdateAvatar)
-		bearerTokenEndpoints.GET("/avatars/:type/:id", handlers.GetAvatar)
-		bearerTokenEndpoints.PUT("/avatars/:type/:id", handlers.UpdateAvatar)
-		bearerTokenEndpoints.DELETE("/avatars/:type/:id", handlers.DeleteAvatar)
+		authTokenRouter.POST("/avatars/:type/:id", handlers.CreateOrUpdateAvatar)
+		authTokenRouter.GET("/avatars/:type/:id", handlers.GetAvatar)
+		authTokenRouter.PUT("/avatars/:type/:id", handlers.UpdateAvatar)
+		authTokenRouter.DELETE("/avatars/:type/:id", handlers.DeleteAvatar)
 
 		// Location routes
-		bearerTokenEndpoints.POST("/locations", handlers.CreateLocation)
-		bearerTokenEndpoints.GET("/locations/:id", handlers.GetLocation)
-		bearerTokenEndpoints.GET("/locations", handlers.GetAllLocations)
-		bearerTokenEndpoints.PUT("/locations/:id", handlers.UpdateLocation)
-		bearerTokenEndpoints.DELETE("/locations/:id", handlers.DeleteLocation)
+		authTokenRouter.POST("/locations", handlers.CreateLocation)
+		authTokenRouter.GET("/locations/:id", handlers.GetLocation)
+		authTokenRouter.GET("/locations", handlers.GetAllLocations)
+		authTokenRouter.PUT("/locations/:id", handlers.UpdateLocation)
+		authTokenRouter.DELETE("/locations/:id", handlers.DeleteLocation)
 
 		// Patient routes
-		bearerTokenEndpoints.POST("/patients", handlers.CreatePatient)
-		bearerTokenEndpoints.GET("/patients/:id", handlers.GetPatient)
-		bearerTokenEndpoints.GET("/patients", handlers.GetAllPatients)
-		bearerTokenEndpoints.PUT("/patients/:id", handlers.UpdatePatient)
-		bearerTokenEndpoints.DELETE("/patients/:id", handlers.DeletePatient)
+		authTokenRouter.POST("/patients", handlers.CreatePatient)
+		authTokenRouter.GET("/patients/:id", handlers.GetPatient)
+		authTokenRouter.GET("/patients", handlers.GetAllPatients)
+		authTokenRouter.PUT("/patients/:id", handlers.UpdatePatient)
+		authTokenRouter.DELETE("/patients/:id", handlers.DeletePatient)
 
 		// Recent patients routes
-		bearerTokenEndpoints.GET("/recent-patients", handlers.GetRecentPatients)
-		bearerTokenEndpoints.POST("/recent-patients/:patient_id", handlers.AddRecentPatient)
+		authTokenRouter.GET("/recent-patients", handlers.GetRecentPatients)
+		authTokenRouter.POST("/recent-patients/:patient_id", handlers.AddRecentPatient)
 
 		// Password change route
-		bearerTokenEndpoints.POST("/change-password", handlers.ChangePassword)
+		authTokenRouter.POST("/change-password", handlers.ChangePassword)
 
 		// Appointment Types routes
-		bearerTokenEndpoints.POST("/appointment-types", handlers.CreateAppointmentType)
-		bearerTokenEndpoints.GET("/appointment-types/:id", handlers.GetAppointmentType)
-		bearerTokenEndpoints.GET("/appointment-types", handlers.GetAllAppointmentTypes)
-		bearerTokenEndpoints.PUT("/appointment-types/:id", handlers.UpdateAppointmentType)
-		bearerTokenEndpoints.DELETE("/appointment-types/:id", handlers.DeleteAppointmentType)
+		authTokenRouter.POST("/appointment-types", handlers.CreateAppointmentType)
+		authTokenRouter.GET("/appointment-types/:id", handlers.GetAppointmentType)
+		authTokenRouter.GET("/appointment-types", handlers.GetAllAppointmentTypes)
+		authTokenRouter.PUT("/appointment-types/:id", handlers.UpdateAppointmentType)
+		authTokenRouter.DELETE("/appointment-types/:id", handlers.DeleteAppointmentType)
 
 		// Appointment Statuses routes
-		bearerTokenEndpoints.POST("/appointment-statuses", handlers.CreateAppointmentStatus)
-		bearerTokenEndpoints.GET("/appointment-statuses/:id", handlers.GetAppointmentStatus)
-		bearerTokenEndpoints.GET("/appointment-statuses", handlers.GetAllAppointmentStatuses)
-		bearerTokenEndpoints.PUT("/appointment-statuses/:id", handlers.UpdateAppointmentStatus)
-		bearerTokenEndpoints.DELETE("/appointment-statuses/:id", handlers.DeleteAppointmentStatus)
+		authTokenRouter.POST("/appointment-statuses", handlers.CreateAppointmentStatus)
+		authTokenRouter.GET("/appointment-statuses/:id", handlers.GetAppointmentStatus)
+		authTokenRouter.GET("/appointment-statuses", handlers.GetAllAppointmentStatuses)
+		authTokenRouter.PUT("/appointment-statuses/:id", handlers.UpdateAppointmentStatus)
+		authTokenRouter.DELETE("/appointment-statuses/:id", handlers.DeleteAppointmentStatus)
 
 		// Appointments routes
-		bearerTokenEndpoints.POST("/appointments", handlers.CreateAppointment)
-		bearerTokenEndpoints.GET("/appointments/:id", handlers.GetAppointment)
-		bearerTokenEndpoints.GET("/appointments", handlers.GetAllAppointments)
-		bearerTokenEndpoints.PUT("/appointments/:id", handlers.UpdateAppointment)
-		bearerTokenEndpoints.DELETE("/appointments/:id", handlers.DeleteAppointment)
+		authTokenRouter.POST("/appointments", handlers.CreateAppointment)
+		authTokenRouter.GET("/appointments/:id", handlers.GetAppointment)
+		authTokenRouter.GET("/appointments", handlers.GetAllAppointments)
+		authTokenRouter.PUT("/appointments/:id", handlers.UpdateAppointment)
+		authTokenRouter.DELETE("/appointments/:id", handlers.DeleteAppointment)
+
+		// Routes for fetching create/edit appointment data
+		authTokenRouter.GET("/edit-appointment-data", handlers.GetEditAppointmentData)
+		authTokenRouter.GET("/create-appointment-data", handlers.GetCreateAppointmentData)
 
 		// Appointment Items route
-		bearerTokenEndpoints.GET("/appointment-items", handlers.GetAppointmentItems)
+		authTokenRouter.GET("/appointment-items", handlers.GetAppointmentItems)
 
 		// Appointment Dates route
-		bearerTokenEndpoints.GET("/appointment-dates", handlers.GetAppointmentDates)
+		authTokenRouter.GET("/appointment-dates", handlers.GetAppointmentDates)
 
 		// Event Participants route
-		bearerTokenEndpoints.GET("/event-participants", handlers.GetEventParticipants)
+		authTokenRouter.GET("/event-participants", handlers.GetEventParticipants)
 
 		// Operating Schedule routes
-		bearerTokenEndpoints.POST("/operating-schedule", handlers.CreateOperatingSchedule)
-		bearerTokenEndpoints.GET("/operating-schedule", handlers.GetOperatingSchedule)
-		bearerTokenEndpoints.PUT("/operating-schedule", handlers.UpdateOperatingSchedule)
-		bearerTokenEndpoints.DELETE("/operating-schedule", handlers.DeleteOperatingSchedule)
-		bearerTokenEndpoints.GET("/operating-schedule/current-user", handlers.GetOperatingScheduleForCurrentUser)
+		authTokenRouter.POST("/operating-schedule", handlers.CreateOperatingSchedule)
+		authTokenRouter.GET("/operating-schedule", handlers.GetOperatingSchedule)
+		authTokenRouter.PUT("/operating-schedule", handlers.UpdateOperatingSchedule)
+		authTokenRouter.DELETE("/operating-schedule", handlers.DeleteOperatingSchedule)
+		authTokenRouter.GET("/operating-schedule/current-user", handlers.GetOperatingScheduleForCurrentUser)
 
 		// RBAC routes
-		bearerTokenEndpoints.POST("/roles", handlers.CreateRole)
-		bearerTokenEndpoints.GET("/roles", handlers.GetAllRoles)
-		bearerTokenEndpoints.GET("/roles/:id", handlers.GetRole)
-		bearerTokenEndpoints.PUT("/roles/:id", handlers.UpdateRole)
-		bearerTokenEndpoints.DELETE("/roles/:id", handlers.DeleteRole)
+		authTokenRouter.POST("/roles", handlers.CreateRole)
+		authTokenRouter.GET("/roles", handlers.GetAllRoles)
+		authTokenRouter.GET("/roles/:id", handlers.GetRole)
+		authTokenRouter.PUT("/roles/:id", handlers.UpdateRole)
+		authTokenRouter.DELETE("/roles/:id", handlers.DeleteRole)
 
-		bearerTokenEndpoints.POST("/permissions", handlers.CreatePermission)
-		bearerTokenEndpoints.GET("/permissions", handlers.GetAllPermissions)
-		bearerTokenEndpoints.GET("/permissions/:id", handlers.GetPermission)
-		bearerTokenEndpoints.PUT("/permissions/:id", handlers.UpdatePermission)
-		bearerTokenEndpoints.DELETE("/permissions/:id", handlers.DeletePermission)
+		authTokenRouter.POST("/permissions", handlers.CreatePermission)
+		authTokenRouter.GET("/permissions", handlers.GetAllPermissions)
+		authTokenRouter.GET("/permissions/:id", handlers.GetPermission)
+		authTokenRouter.PUT("/permissions/:id", handlers.UpdatePermission)
+		authTokenRouter.DELETE("/permissions/:id", handlers.DeletePermission)
 
-		bearerTokenEndpoints.POST("/user-roles", handlers.AssignRoleToUser)
-		bearerTokenEndpoints.GET("/user-roles/:user_id", handlers.GetUserRoles)
-		bearerTokenEndpoints.DELETE("/user-roles/:user_id/:role_id", handlers.RemoveRoleFromUser)
+		authTokenRouter.POST("/user-roles", handlers.AssignRoleToUser)
+		authTokenRouter.GET("/user-roles/:user_id", handlers.GetUserRoles)
+		authTokenRouter.DELETE("/user-roles/:user_id/:role_id", handlers.RemoveRoleFromUser)
 
-		bearerTokenEndpoints.GET("/user-permissions/:user_id", handlers.GetUserPermissions)
+		authTokenRouter.GET("/user-permissions/:user_id", handlers.GetUserPermissions)
 
 		// User Preferences routes
-		bearerTokenEndpoints.POST("/user-preferences", handlers.SetUserPreference)
-		bearerTokenEndpoints.GET("/user-preferences/:user_id", handlers.GetUserPreferences)
-		bearerTokenEndpoints.GET("/user-preferences/:user_id/:key", handlers.GetUserPreference)
-		bearerTokenEndpoints.PUT("/user-preferences/:user_id/:key", handlers.UpdateUserPreference)
-		bearerTokenEndpoints.DELETE("/user-preferences/:user_id/:key", handlers.DeleteUserPreference)
+		authTokenRouter.POST("/user-preferences", handlers.SetUserPreference)
+		authTokenRouter.GET("/user-preferences/:user_id", handlers.GetUserPreferences)
+		authTokenRouter.GET("/user-preferences/:user_id/:key", handlers.GetUserPreference)
+		authTokenRouter.PUT("/user-preferences/:user_id/:key", handlers.UpdateUserPreference)
+		authTokenRouter.DELETE("/user-preferences/:user_id/:key", handlers.DeleteUserPreference)
 
 		// User permission check route
-		bearerTokenEndpoints.GET("/check-permission", handlers.UserHasPermission)
+		authTokenRouter.GET("/check-permission", handlers.UserHasPermission)
 
 		// System Information
-		bearerTokenEndpoints.GET("/server-version", handlers.GetServerVersion)
+		authTokenRouter.GET("/server-version", handlers.GetServerVersion)
 	}
 
+	// Start the server
 	app.Run(host)
 }

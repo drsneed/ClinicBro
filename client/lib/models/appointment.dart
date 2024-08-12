@@ -2,21 +2,17 @@ import 'package:flutter/material.dart' show TimeOfDay;
 
 class Appointment {
   final int id;
-  final String title;
-  final bool isEvent;
-  final DateTime apptDate;
-  final TimeOfDay apptFrom;
-  final TimeOfDay apptTo;
-  final String notes;
+  String title;
+  bool isEvent;
+  DateTime apptDate;
+  TimeOfDay apptFrom;
+  TimeOfDay apptTo;
+  String notes;
   final int patientId;
-  final int providerId;
-  final int appointmentTypeId;
-  final int appointmentStatusId;
-  final int locationId;
-  final DateTime dateCreated;
-  final DateTime dateUpdated;
-  final int createdUserId;
-  final int updatedUserId;
+  int providerId;
+  int appointmentTypeId;
+  int appointmentStatusId;
+  int locationId;
 
   Appointment({
     required this.id,
@@ -31,10 +27,6 @@ class Appointment {
     required this.appointmentTypeId,
     required this.appointmentStatusId,
     required this.locationId,
-    required this.dateCreated,
-    required this.dateUpdated,
-    required this.createdUserId,
-    required this.updatedUserId,
   });
 
   factory Appointment.fromJson(Map<String, dynamic> json) {
@@ -51,10 +43,6 @@ class Appointment {
       appointmentTypeId: json['appointment_type_id'],
       appointmentStatusId: json['appointment_status_id'],
       locationId: json['location_id'],
-      dateCreated: DateTime.parse(json['date_created']),
-      dateUpdated: DateTime.parse(json['date_updated']),
-      createdUserId: json['created_user_id'],
-      updatedUserId: json['updated_user_id'],
     );
   }
 
@@ -72,10 +60,6 @@ class Appointment {
       'appointment_type_id': appointmentTypeId,
       'appointment_status_id': appointmentStatusId,
       'location_id': locationId,
-      'date_created': dateCreated.toIso8601String(),
-      'date_updated': dateUpdated.toIso8601String(),
-      'created_user_id': createdUserId,
-      'updated_user_id': updatedUserId,
     };
   }
 

@@ -6,9 +6,9 @@ type Appointment struct {
 	ID                  uint      `gorm:"primaryKey" json:"id"`
 	Title               *string   `gorm:"size:16" json:"title"` // Made Title a pointer to handle NULL values
 	IsEvent             bool      `json:"is_event"`
-	ApptDate            time.Time `json:"appt_date"`
-	ApptFrom            time.Time `json:"appt_from"`
-	ApptTo              time.Time `json:"appt_to"`
+	ApptDate            time.Time `json:"appt_date"` // Use date type in Go for date columns
+	ApptFrom            string    `json:"appt_from"` // Use time.Time for time columns
+	ApptTo              string    `json:"appt_to"`   // Use time.Time for time columns
 	Notes               string    `gorm:"size:2500;not null" json:"notes"`
 	PatientID           *uint     `json:"patient_id"`            // Made PatientID a pointer to handle NULL values
 	ProviderID          *uint     `json:"provider_id"`           // Made ProviderID a pointer to handle NULL values
@@ -19,4 +19,11 @@ type Appointment struct {
 	DateUpdated         time.Time `json:"date_updated"`
 	CreatedUserID       uint      `json:"created_user_id"`
 	UpdatedUserID       uint      `json:"updated_user_id"`
+
+	// Define associations
+	Patient           *Patient           `gorm:"foreignKey:PatientID"`
+	Provider          *User              `gorm:"foreignKey:ProviderID"`
+	AppointmentType   *AppointmentType   `gorm:"foreignKey:AppointmentTypeID"`
+	AppointmentStatus *AppointmentStatus `gorm:"foreignKey:AppointmentStatusID"`
+	Location          *Location          `gorm:"foreignKey:LocationID"`
 }

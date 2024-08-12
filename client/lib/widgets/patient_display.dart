@@ -5,8 +5,9 @@ import '../models/patient_item.dart';
 
 class PatientDisplay extends StatelessWidget {
   final PatientItem patient;
-
-  PatientDisplay({required this.patient});
+  final VoidCallback? onDragStart; // Add this line
+  const PatientDisplay({Key? key, required this.patient, this.onDragStart})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +25,11 @@ class PatientDisplay extends StatelessWidget {
     if (patient.active) {
       return Draggable<PatientItem>(
         data: patient,
+        onDragStarted: () {
+          if (onDragStart != null) {
+            onDragStart!(); // Trigger the callback when drag starts
+          }
+        },
         feedback: mat.Material(
           elevation: 4.0,
           child: Container(
@@ -75,6 +81,6 @@ class PatientDisplay extends StatelessWidget {
     List<String> names = fullName.split(",");
     if (names.isEmpty) return "";
     if (names.length == 1) return names[0].trim()[0].toUpperCase();
-    return (names[1].trim()[0] + names.first.trim()[0]).toUpperCase();
+    return (names[1].trim()[0] + names.first[0]).toUpperCase();
   }
 }

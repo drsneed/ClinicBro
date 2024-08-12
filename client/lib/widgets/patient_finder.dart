@@ -1,10 +1,11 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:intl/intl.dart'; // Import the intl package
 import '../models/patient_item.dart';
 import '../repositories/user_repository.dart';
 import 'patient_display.dart';
 
 class PatientFinder extends StatefulWidget {
+  final VoidCallback? onDragStart; // Add this line
+  const PatientFinder({Key? key, this.onDragStart}) : super(key: key);
   @override
   _PatientFinderState createState() => _PatientFinderState();
 }
@@ -82,7 +83,10 @@ class _PatientFinderState extends State<PatientFinder> {
       child: ListView.builder(
         itemCount: _recentPatients.length,
         itemBuilder: (context, index) {
-          return PatientDisplay(patient: _recentPatients[index]);
+          return PatientDisplay(
+            patient: _recentPatients[index],
+            onDragStart: widget.onDragStart,
+          );
         },
       ),
     );
