@@ -85,6 +85,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           .map((tab) =>
                               TabButtonData(tabId: tab.id, label: tab.name))
                           .toList(),
+                      onTabsReordered: (reorderedTabs) {
+                        setState(() {
+                          _patientTabManager.reorderTabs(
+                              reorderedTabs.map((tab) => tab.tabId).toList());
+                        });
+                      },
                       selectedTabId: patientTabManager.selectedTabId,
                       onTabSelected: (tabId) {
                         patientTabManager.selectTab(tabId);

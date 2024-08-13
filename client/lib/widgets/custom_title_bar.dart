@@ -20,11 +20,13 @@ class CustomTitleBar extends StatelessWidget {
   final void Function(int)? onTabClosed;
   final void Function(PatientItem)? onPatientDropped;
   final List<TabButtonData>? tabButtonData;
+  final void Function(List<TabButtonData>)? onTabsReordered;
   const CustomTitleBar({
     super.key,
     this.onTabSelected,
     this.onTabClosed,
     this.onPatientDropped,
+    this.onTabsReordered,
     this.selectedTabId,
     this.showBackButton = false,
     this.showAvatarButton = false,
@@ -90,6 +92,7 @@ class CustomTitleBar extends StatelessWidget {
               selectedTabId: showSelectedPatientChart ? selectedTabId : null,
               onTabClosed: onTabClosed ?? (tabId) => {},
               tabButtons: tabButtonData ?? [],
+              onTabsReordered: onTabsReordered ?? (tabButtonData) => {},
             ),
             const Spacer(),
             if (showAvatarButton)

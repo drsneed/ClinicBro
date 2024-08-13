@@ -45,4 +45,12 @@ class PatientTabManager extends ChangeNotifier {
     }
     notifyListeners();
   }
+
+  void reorderTabs(List<int> newOrder) {
+    final newTabs = newOrder
+        .map((id) => _openTabs.firstWhere((tab) => tab.id == id))
+        .toList();
+    _openTabs = newTabs;
+    notifyListeners();
+  }
 }
