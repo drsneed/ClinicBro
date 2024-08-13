@@ -27,7 +27,7 @@ class TitleBarTabControl extends StatefulWidget {
 class _TitleBarTabControlState extends State<TitleBarTabControl> {
   late List<TabButtonData> _tabButtons;
   int? _draggedTabIndex;
-  int? _dropTargetIndex;
+  int? _dropIndicatorIndex;
 
   @override
   void initState() {
@@ -52,20 +52,39 @@ class _TitleBarTabControlState extends State<TitleBarTabControl> {
       builder: (context, candidateData, rejectedData) {
         return SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+          child: Stack(
             children: [
-              ..._tabButtons.asMap().entries.map((entry) {
-                final index = entry.key;
-                final tabButton = entry.value;
-                return _buildDraggableTabButton(context, tabButton, index);
-              }),
-              if (_dropTargetIndex == _tabButtons.length) _buildTabSkeleton(),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: _buildTabListWithIndicator(),
+              ),
+              if (_dropIndicatorIndex != null)
+                Positioned(
+                  left: _getDropIndicatorPosition(),
+                  top: 0,
+                  bottom: 0,
+                  child: _buildDropIndicator(),
+                ),
             ],
           ),
         );
       },
     );
+  }
+
+  List<Widget> _buildTabListWithIndicator() {
+    final tabWidgets = _tabButtons.asMap().entries.map((entry) {
+      final index = entry.key;
+      final tabButton = entry.value;
+      return _buildDraggableTabButton(context, tabButton, index);
+    }).toList();
+
+    if (_dropIndicatorIndex != null &&
+        _dropIndicatorIndex! <= tabWidgets.length) {
+      tabWidgets.insert(_dropIndicatorIndex!, _buildDropIndicator());
+    }
+
+    return tabWidgets;
   }
 
   Widget _buildDraggableTabButton(
@@ -77,33 +96,37 @@ class _TitleBarTabControlState extends State<TitleBarTabControl> {
           final draggedTab = _tabButtons.removeAt(draggedIndex);
           _tabButtons.insert(index, draggedTab);
           widget.onTabsReordered(_tabButtons);
+          _dropIndicatorIndex = null;
         });
       },
       builder: (context, candidateData, rejectedData) {
-        return Draggable<int>(
-          data: index,
-          child: _buildTabButton(context, tabData),
-          feedback: _buildTabButton(context, tabData, isDragging: true),
-          childWhenDragging: SizedBox(width: 0),
-          onDragStarted: () {
-            setState(() {
-              _draggedTabIndex = index;
-            });
-          },
-          onDragEnd: (details) {
-            setState(() {
-              _draggedTabIndex = null;
-              _dropTargetIndex = null;
-            });
-          },
-          onDragUpdate: (details) {
-            final RenderBox box = context.findRenderObject() as RenderBox;
-            final localPosition = box.globalToLocal(details.globalPosition);
-            setState(() {
-              _dropTargetIndex =
-                  (localPosition.dx ~/ 150).clamp(0, _tabButtons.length);
-            });
-          },
+        return Container(
+          key: tabData.tabKey, // Attach the key here
+          margin: EdgeInsets.symmetric(horizontal: 2.0),
+          child: Draggable<int>(
+            data: index,
+            child: _buildTabButton(context, tabData),
+            feedback: _buildTabButton(context, tabData, isDragging: true),
+            childWhenDragging: SizedBox(width: 0),
+            onDragStarted: () {
+              setState(() {
+                _draggedTabIndex = index;
+              });
+            },
+            onDragEnd: (details) {
+              setState(() {
+                _draggedTabIndex = null;
+                _dropIndicatorIndex = null;
+              });
+            },
+            onDragUpdate: (details) {
+              final RenderBox box = context.findRenderObject() as RenderBox;
+              final localPosition = box.globalToLocal(details.globalPosition);
+              setState(() {
+                _dropIndicatorIndex = _getDropIndicatorIndex(localPosition.dx);
+              });
+            },
+          ),
         );
       },
     );
@@ -117,54 +140,48 @@ class _TitleBarTabControlState extends State<TitleBarTabControl> {
     return Opacity(
       opacity: isDragging ? 0.7 : 1.0,
       child: Padding(
-        padding: const EdgeInsets.only(right: 4.0),
-        child: MouseRegion(
-          onEnter: (_) {},
-          onExit: (_) {},
-          child: GestureDetector(
-            onTap: () => widget.onTabSelected(tabData.tabId),
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              decoration: BoxDecoration(
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(
-                  color: isSelected
-                      ? FluentTheme.of(context).accentColor
-                      : primaryColor,
-                  width: 1.5,
-                ),
+        padding: const EdgeInsets.symmetric(horizontal: 2.0),
+        child: GestureDetector(
+          onTap: () => widget.onTabSelected(tabData.tabId),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: isSelected
+                    ? FluentTheme.of(context).accentColor
+                    : primaryColor,
+                width: 1.5,
               ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ThemedIcon(
-                    svgPath: 'assets/icon/clipboard.svg',
-                    size: 12.0,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ThemedIcon(
+                  svgPath: 'assets/icon/clipboard.svg',
+                  size: 12.0,
+                  color:
+                      isSelected ? FluentTheme.of(context).accentColor : null,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  tabData.label,
+                  style: TextStyle(
                     color:
                         isSelected ? FluentTheme.of(context).accentColor : null,
                   ),
-                  const SizedBox(width: 8),
-                  Text(
-                    tabData.label,
-                    style: TextStyle(
+                ),
+                const SizedBox(width: 4),
+                IconButton(
+                  icon: Icon(FluentIcons.chrome_close,
+                      size: 8,
                       color: isSelected
                           ? FluentTheme.of(context).accentColor
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  IconButton(
-                    icon: Icon(FluentIcons.chrome_close,
-                        size: 8,
-                        color: isSelected
-                            ? FluentTheme.of(context).accentColor
-                            : null),
-                    onPressed: () => widget.onTabClosed(tabData.tabId),
-                  ),
-                ],
-              ),
+                          : null),
+                  onPressed: () => widget.onTabClosed(tabData.tabId),
+                ),
+              ],
             ),
           ),
         ),
@@ -172,27 +189,57 @@ class _TitleBarTabControlState extends State<TitleBarTabControl> {
     );
   }
 
-  Widget _buildTabSkeleton() {
+  Widget _buildDropIndicator() {
     return Container(
-      width: 100,
-      height: 30,
-      margin: EdgeInsets.symmetric(horizontal: 4),
-      decoration: BoxDecoration(
-        color: FluentTheme.of(context).accentColor.withOpacity(0.3),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(
-          color: FluentTheme.of(context).accentColor,
-          width: 1.5,
-          style: BorderStyle.solid,
-        ),
-      ),
+      width: 2,
+      height: 30.0, // Set a fixed height for the indicator
+      color: FluentTheme.of(context).accentColor,
     );
+  }
+
+  int _getDropIndicatorIndex(double x) {
+    double accumulatedWidth = 0.0;
+
+    for (int i = 0; i < _tabButtons.length; i++) {
+      final tabWidth = _getTabWidth(_tabButtons[i].tabKey);
+      final tabEnd = accumulatedWidth + tabWidth;
+
+      if (x < tabEnd) {
+        return x < (accumulatedWidth + tabEnd) / 2 ? i : i + 1;
+      }
+
+      accumulatedWidth = tabEnd;
+    }
+
+    return _tabButtons.length; // Place at the end
+  }
+
+  double _getDropIndicatorPosition() {
+    double position = 0.0;
+
+    if (_dropIndicatorIndex != null) {
+      for (int i = 0; i < _dropIndicatorIndex!; i++) {
+        position += _getTabWidth(_tabButtons[i].tabKey);
+      }
+    }
+
+    return position;
+  }
+
+  double _getTabWidth(GlobalKey key) {
+    final RenderBox? renderBox =
+        key.currentContext?.findRenderObject() as RenderBox?;
+    return renderBox?.size.width ?? 150.0; // Default width if not available
   }
 }
 
 class TabButtonData {
   final int tabId;
   final String label;
+  final GlobalKey tabKey; // Add this key to measure width
 
-  TabButtonData({required this.tabId, required this.label});
+  TabButtonData({
+    required this.tabId,
+    required this.label,
+  }) : tabKey = GlobalKey();
 }
