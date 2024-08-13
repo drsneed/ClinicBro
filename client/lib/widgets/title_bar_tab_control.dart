@@ -160,7 +160,7 @@ class _TitleBarTabControlState extends State<TitleBarTabControl> {
               children: [
                 ThemedIcon(
                   svgPath: 'assets/icon/clipboard.svg',
-                  size: 12.0,
+                  size: 13.0,
                   color:
                       isSelected ? FluentTheme.of(context).accentColor : null,
                 ),

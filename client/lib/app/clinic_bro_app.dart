@@ -45,16 +45,18 @@ class ClinicBroAppState extends State<ClinicBroApp> {
 
   @override
   Widget build(BuildContext context) {
-    const fontFamily = 'Inter Thin';
+    const fontFamily = 'Fira Sans';
     return FluentApp(
       debugShowCheckedModeBanner: false,
       title: 'ClinicBro',
       themeMode: _preferencesManager.themeMode,
-      theme: FluentThemeData(
-        brightness: Brightness.light,
-        typography:
-            CustomTypography.getTypography(brightness: Brightness.light),
-      ),
+      // theme: FluentThemeData(
+      //   brightness: Brightness.light,
+      //   typography:
+      //       CustomTypography.getTypography(brightness: Brightness.light),
+      // ),
+      theme:
+          FluentThemeData(brightness: Brightness.light, fontFamily: fontFamily),
       darkTheme:
           FluentThemeData(brightness: Brightness.dark, fontFamily: fontFamily),
       initialRoute: '/',

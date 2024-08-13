@@ -97,6 +97,9 @@ flutter:
     - family: Aptos
       fonts:
         - asset: assets/fonts/Aptos.ttf
+    - family: Fira Sans
+      fonts:
+        - asset: assets/fonts/FiraSans.otf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
 
