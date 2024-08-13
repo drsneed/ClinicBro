@@ -18,10 +18,13 @@ class PatientTabManager extends ChangeNotifier {
   void openTab(int patientId, String patientName) {
     if (!_openTabs.any((tab) => tab.id == patientId)) {
       _openTabs.add(PatientTab(id: patientId, name: patientName));
-      _selectedTabId = patientId;
+      if (_openTabs.first.id == patientId) {
+        selectTab(patientId);
+      }
+      //_selectedTabId = patientId;
       notifyListeners();
     } else {
-      selectTab(patientId);
+      //selectTab(patientId);
     }
   }
 
@@ -35,8 +38,11 @@ class PatientTabManager extends ChangeNotifier {
 
   void selectTab(int patientId) {
     if (_openTabs.any((tab) => tab.id == patientId)) {
+      print('selecting tab for patient $patientId');
       _selectedTabId = patientId;
-      notifyListeners();
+    } else {
+      _selectedTabId = null;
     }
+    notifyListeners();
   }
 }

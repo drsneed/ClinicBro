@@ -121,10 +121,11 @@ class SchedulerNavigationPanelState extends State<SchedulerNavigationPanel> {
 
   @override
   Widget build(BuildContext context) {
-    // Ensure the correct month is visible
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _scrollToMonthContainingDate(widget.centerDate);
-    });
+    if (widget.isVisible) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToMonthContainingDate(widget.centerDate);
+      });
+    }
 
     return AnimatedContainer(
       duration: Duration(milliseconds: 300),

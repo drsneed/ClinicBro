@@ -1,6 +1,7 @@
 import 'package:clinicbro/widgets/title_bar_tab_control.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:window_manager/window_manager.dart';
+import '../models/patient_item.dart';
 import 'avatar_button.dart';
 import 'themed_icon.dart';
 import 'dart:io' show Platform;
@@ -17,11 +18,13 @@ class CustomTitleBar extends StatelessWidget {
   final int? selectedTabId;
   final void Function(int)? onTabSelected;
   final void Function(int)? onTabClosed;
+  final void Function(PatientItem)? onPatientDropped;
   final List<TabButtonData>? tabButtonData;
   const CustomTitleBar({
     super.key,
     this.onTabSelected,
     this.onTabClosed,
+    this.onPatientDropped,
     this.selectedTabId,
     this.showBackButton = false,
     this.showAvatarButton = false,
@@ -39,7 +42,13 @@ class CustomTitleBar extends StatelessWidget {
     final isMobile = Platform.isAndroid || Platform.isIOS;
     final textColor =
         FluentTheme.of(context).typography.body?.color ?? Colors.black;
-
+    bool showSelectedPatientChart = false;
+    if (title != null && title is Text) {
+      String titleText = (title as Text).data ?? '';
+      if (titleText == 'Patient Charts') {
+        showSelectedPatientChart = true;
+      }
+    }
     return GestureDetector(
       onPanStart: (details) {
         windowManager.startDragging();
@@ -76,12 +85,13 @@ class CustomTitleBar extends StatelessWidget {
               ),
             const SizedBox(width: 16),
             TitleBarTabControl(
+              onPatientDropped: onPatientDropped ?? (patient) => {},
               onTabSelected: onTabSelected ?? (tabId) => {},
-              selectedTabId: selectedTabId,
+              selectedTabId: showSelectedPatientChart ? selectedTabId : null,
               onTabClosed: onTabClosed ?? (tabId) => {},
               tabButtons: tabButtonData ?? [],
             ),
-            const Spacer(), // This will push the remaining items to the right
+            const Spacer(),
             if (showAvatarButton)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 5.0),

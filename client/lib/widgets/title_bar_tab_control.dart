@@ -1,11 +1,13 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'themed_icon.dart';
+import '../models/patient_item.dart';
 
 class TitleBarTabControl extends StatelessWidget {
   final void Function(int tabId) onTabSelected;
   final int? selectedTabId;
   final void Function(int tabId) onTabClosed;
   final List<TabButtonData> tabButtons;
+  final void Function(PatientItem) onPatientDropped; // New callback
 
   const TitleBarTabControl({
     super.key,
@@ -13,18 +15,26 @@ class TitleBarTabControl extends StatelessWidget {
     required this.selectedTabId,
     required this.onTabClosed,
     required this.tabButtons,
+    required this.onPatientDropped,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: tabButtons
-            .map((tabButton) => _buildTabButton(context, tabButton))
-            .toList(),
-      ),
+    return DragTarget<PatientItem>(
+      onAccept: (patient) {
+        onPatientDropped(patient);
+      },
+      builder: (context, candidateData, rejectedData) {
+        return SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: tabButtons
+                .map((tabButton) => _buildTabButton(context, tabButton))
+                .toList(),
+          ),
+        );
+      },
     );
   }
 

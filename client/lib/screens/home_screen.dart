@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../managers/user_manager.dart';
 import '../models/patient_item.dart';
 import '../services/auth_service.dart';
+import '../widgets/themed_icon.dart';
 import '../widgets/title_bar_tab_control.dart';
 import 'scheduler_screen.dart';
 import 'settings_screen.dart';
@@ -31,11 +32,13 @@ class _HomeScreenState extends State<HomeScreen> {
   String _currentPaneTitle = 'Home';
   late PatientTabManager _patientTabManager;
   bool _isFlyoutVisible = false;
-
+  static const String _patientChartsPaneTitle = 'Patient Charts';
   @override
   void initState() {
     super.initState();
     _patientTabManager = PatientTabManager();
+    _patientTabManager
+        .addListener(() => setState(() {})); // T tried this but it didn't help
   }
 
   void _toggleFlyout() {
@@ -51,50 +54,63 @@ class _HomeScreenState extends State<HomeScreen> {
     return ChangeNotifierProvider.value(
       value: _patientTabManager,
       child: ScaffoldPage(
+        padding: EdgeInsets.zero,
         content: Stack(
           children: [
             NavigationView(
               appBar: NavigationAppBar(
-                title: CustomTitleBar(
-                  showBackButton: _history.isNotEmpty,
-                  showAvatarButton: true,
-                  title: Text(_currentPaneTitle),
-                  onBack: () {
-                    if (_history.isNotEmpty) {
-                      setState(() {
-                        _currentIndex = _history.removeLast();
-                        _updatePaneTitle();
-                      });
-                    }
-                  },
-                  onAccountSettings: () {
-                    _showAccountSettingsDialog(context);
-                  },
-                  onSignOut: () {
-                    AuthService().signOut();
-                    Navigator.of(context).pushReplacementNamed('/');
-                  },
-                  avatarButtonKey: _avatarButtonKey,
-                  tabButtonData: _patientTabManager.openTabs
-                      .map((tab) =>
-                          TabButtonData(tabId: tab.id, label: tab.name))
-                      .toList(),
-                  selectedTabId: _patientTabManager.selectedTabId,
-                  onTabSelected: (tabId) {
-                    _patientTabManager.selectTab(tabId);
-                    setState(() {
-                      _currentIndex = 3; // Use index 3 for patient charts
-                      _currentPaneTitle = 'Patient Chart';
-                    });
-                  },
-                  onTabClosed: (tabId) {
-                    _patientTabManager.closeTab(tabId);
-                    if (_patientTabManager.openTabs.isEmpty) {
-                      setState(() {
-                        _currentIndex = 0;
-                        _updatePaneTitle();
-                      });
-                    }
+                title: Consumer<PatientTabManager>(
+                  builder: (context, patientTabManager, child) {
+                    return CustomTitleBar(
+                      showBackButton: _history.isNotEmpty,
+                      showAvatarButton: true,
+                      title: Text(_currentPaneTitle),
+                      onBack: () {
+                        if (_history.isNotEmpty) {
+                          setState(() {
+                            _currentIndex = _history.removeLast();
+                            _updatePaneTitle();
+                          });
+                        }
+                      },
+                      onAccountSettings: () {
+                        _showAccountSettingsDialog(context);
+                      },
+                      onSignOut: () {
+                        AuthService().signOut();
+                        Navigator.of(context).pushReplacementNamed('/');
+                      },
+                      avatarButtonKey: _avatarButtonKey,
+                      tabButtonData: patientTabManager.openTabs
+                          .map((tab) =>
+                              TabButtonData(tabId: tab.id, label: tab.name))
+                          .toList(),
+                      selectedTabId: patientTabManager.selectedTabId,
+                      onTabSelected: (tabId) {
+                        patientTabManager.selectTab(tabId);
+                        setState(() {
+                          _currentIndex = 2; // Use index 2 for patient charts
+                          _currentPaneTitle = _patientChartsPaneTitle;
+                        });
+                      },
+                      onTabClosed: (tabId) {
+                        patientTabManager.closeTab(tabId);
+                        if (patientTabManager.openTabs.isEmpty) {
+                          setState(() {
+                            _currentIndex = 0;
+                            _updatePaneTitle();
+                          });
+                        }
+                      },
+                      onPatientDropped: (patient) {
+                        setState(() {
+                          patientTabManager.openTab(
+                              patient.id, patient.fullName);
+                          _currentIndex = 2; // Switch to patient chart pane
+                          _currentPaneTitle = _patientChartsPaneTitle;
+                        });
+                      },
+                    );
                   },
                 ),
                 automaticallyImplyLeading: false,
@@ -124,13 +140,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     body: SchedulerScreen(isMobile: isMobile),
                   ),
                   PaneItem(
-                    icon: Icon(FluentIcons.settings),
-                    title: Text('Settings'),
-                    body: SettingsScreen(setThemeMode: widget.setThemeMode),
-                  ),
-                  PaneItem(
-                    icon: Icon(FluentIcons.health),
-                    title: Text('Patient Chart'),
+                    icon: ThemedIcon(
+                      svgPath: "assets/icon/clipboard.svg",
+                      size: 18.0,
+                    ),
+                    title: const Text(_patientChartsPaneTitle),
                     body: Consumer<PatientTabManager>(
                       builder: (context, patientTabManager, child) {
                         return patientTabManager.selectedTabId != null
@@ -140,15 +154,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   ),
+                  PaneItem(
+                    icon: Icon(FluentIcons.settings),
+                    title: Text('Settings'),
+                    body: SettingsScreen(setThemeMode: widget.setThemeMode),
+                  ),
                 ],
               ),
             ),
             if (_isFlyoutVisible) _buildFlyout(),
-            Positioned(
-              bottom: 16,
-              right: 16,
-              child: _buildFloatingActionButton(),
-            ),
+            _buildFloatingActionButton(),
           ],
         ),
       ),
@@ -168,6 +183,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildDesktopFlyout() {
     return Positioned(
+      key: const ValueKey('flyout'),
       top: 54,
       right: 0,
       bottom: 0,
@@ -189,6 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildMobileFlyout() {
     return AnimatedPositioned(
+      key: const ValueKey('flyout'),
       duration: Duration(milliseconds: 300),
       left: 0,
       right: 0,
@@ -217,6 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFloatingActionButton() {
     final isDesktop = !(Platform.isAndroid || Platform.isIOS);
     return AnimatedPositioned(
+      key: const ValueKey('fab'),
       duration: Duration(milliseconds: 300),
       right: isDesktop
           ? (_isFlyoutVisible ? 416 : 16)
@@ -251,8 +269,8 @@ class _HomeScreenState extends State<HomeScreen> {
       _currentPaneTitle = [
         'Home',
         'Schedule',
+        _patientChartsPaneTitle,
         'Settings',
-        'Patient Chart',
       ][_currentIndex];
     });
   }
