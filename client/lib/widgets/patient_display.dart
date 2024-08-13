@@ -2,11 +2,17 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as mat;
 import 'package:intl/intl.dart';
 import '../models/patient_item.dart';
+import 'themed_icon.dart';
 
 class PatientDisplay extends StatelessWidget {
   final PatientItem patient;
-  final VoidCallback? onDragStart; // Add this line
-  const PatientDisplay({Key? key, required this.patient, this.onDragStart})
+  final VoidCallback? onDragStart;
+  final void Function(PatientItem) onOpenChart;
+  const PatientDisplay(
+      {Key? key,
+      required this.patient,
+      this.onDragStart,
+      required this.onOpenChart})
       : super(key: key);
 
   @override
@@ -61,7 +67,7 @@ class PatientDisplay extends StatelessWidget {
               ? theme.accentColor.withOpacity(0.8)
               : theme.inactiveColor.withOpacity(0.5),
           child: Text(
-            _getInitials(patient.fullName),
+            patient.initials(),
             style: const TextStyle(color: Colors.white),
           ),
         ),
@@ -73,14 +79,17 @@ class PatientDisplay extends StatelessWidget {
           'DOB: $dob',
           style: TextStyle(color: textColor),
         ),
+        trailing: Tooltip(
+          message:
+              "Open ${patient.firstName}'${patient.firstName.endsWith('s') ? '' : 's'} chart",
+          child: IconButton(
+            icon: ThemedIcon(svgPath: 'assets/icon/clipboard.svg', size: 18.0),
+            onPressed: () {
+              onOpenChart(patient);
+            },
+          ),
+        ),
       ),
     );
-  }
-
-  String _getInitials(String fullName) {
-    List<String> names = fullName.split(",");
-    if (names.isEmpty) return "";
-    if (names.length == 1) return names[0].trim()[0].toUpperCase();
-    return (names[1].trim()[0] + names.first[0]).toUpperCase();
   }
 }

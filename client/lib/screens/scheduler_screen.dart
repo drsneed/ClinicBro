@@ -3,13 +3,11 @@ import 'package:flutter/material.dart' as mat
     show Colors, FloatingActionButton, CircleBorder, CircularProgressIndicator;
 import '../models/appointment_item.dart';
 import '../repositories/appointment_repository.dart';
-import '../services/data_service.dart';
 import '../utils/logger.dart';
 import '../managers/overlay_manager.dart';
 import '../widgets/scheduler/navigation_panel.dart';
 import '../widgets/scheduler/scheduler.dart';
 import '../widgets/scheduler/scheduler_carousel.dart';
-import '../widgets/patient_finder.dart'; // Import the PatientFinder widget
 
 class SchedulerScreen extends StatefulWidget {
   final bool isMobile;
@@ -25,7 +23,7 @@ class SchedulerScreen extends StatefulWidget {
 class _SchedulerScreenState extends State<SchedulerScreen> {
   final GlobalKey<SchedulerNavigationPanelState> _navigationPanelKey =
       GlobalKey<SchedulerNavigationPanelState>();
-  bool _isFlyoutVisible = false;
+
   String _viewMode = 'Month'; // Default view mode
   bool _isMultiple = false; // Default view type
   bool _showNavigation = false; // Default months navigation visibility
@@ -37,12 +35,6 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   bool _isLoading = false; // Add this line
 
   final _overlayManager = OverlayManager();
-
-  void _toggleFlyout() {
-    setState(() {
-      _isFlyoutVisible = !_isFlyoutVisible;
-    });
-  }
 
   void _handleViewModeChange(String viewMode) {
     setState(() {
@@ -216,9 +208,6 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
                         // Additional parameters
                       ),
               ),
-              if (isDesktop) _buildDesktopFlyout(),
-              if (!isDesktop) _buildMobileFlyout(),
-              _buildFloatingActionButton(isDesktop),
             ],
           ),
         ),
@@ -233,84 +222,5 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
             context, appointmentId, _refreshAppointments);
       }
     });
-  }
-
-  void _onPatientDragStart() {
-    setState(() {
-      _isFlyoutVisible = false; // Hide flyout when drag starts
-    });
-  }
-
-  Widget _buildDesktopFlyout() {
-    return Positioned(
-      top: 0,
-      right: 0,
-      bottom: 0,
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 150),
-        width: _isFlyoutVisible ? 400 : 0,
-        child: Container(
-          color: FluentTheme.of(context).micaBackgroundColor,
-          child: _isFlyoutVisible
-              ? PatientFinder(onDragStart: _onPatientDragStart)
-              : null,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMobileFlyout() {
-    return AnimatedPositioned(
-      duration: Duration(milliseconds: 300),
-      left: 0,
-      right: 0,
-      bottom: _isFlyoutVisible ? 0 : -200,
-      height: 200,
-      child: Container(
-        decoration: BoxDecoration(
-          color: FluentTheme.of(context).micaBackgroundColor,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          boxShadow: [
-            BoxShadow(
-              color: mat.Colors.black.withOpacity(0.1),
-              blurRadius: 8,
-              offset: Offset(0, -2),
-            ),
-          ],
-        ),
-        child: PatientFinder(onDragStart: _onPatientDragStart),
-      ),
-    );
-  }
-
-  Widget _buildFloatingActionButton(bool isDesktop) {
-    return AnimatedPositioned(
-      duration: Duration(milliseconds: 300),
-      right: isDesktop
-          ? (_isFlyoutVisible ? 416 : 16)
-          : 16, // Move right if flyout visible
-      bottom: !isDesktop
-          ? (_isFlyoutVisible ? 216 : 16)
-          : 16, // Move up if flyout visible
-      child: SizedBox(
-        width: isDesktop ? 40 : 64,
-        height: isDesktop ? 40 : 64,
-        child: mat.FloatingActionButton(
-          child: Icon(
-            _isFlyoutVisible
-                ? (isDesktop
-                    ? FluentIcons.chevron_right
-                    : FluentIcons.chevron_down)
-                : FluentIcons.people,
-            color: mat.Colors.white,
-            size: isDesktop ? 20 : 24,
-          ),
-          backgroundColor: mat.Colors.blue,
-          shape: mat.CircleBorder(),
-          onPressed: _toggleFlyout,
-          tooltip: _isFlyoutVisible ? 'Hide Patients' : 'Show Patients',
-        ),
-      ),
-    );
   }
 }

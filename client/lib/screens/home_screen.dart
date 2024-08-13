@@ -1,16 +1,22 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart' as mat;
+import 'package:provider/provider.dart';
 import '../managers/user_manager.dart';
+import '../models/patient_item.dart';
 import '../services/auth_service.dart';
+import '../widgets/title_bar_tab_control.dart';
 import 'scheduler_screen.dart';
 import 'settings_screen.dart';
 import 'account_settings_dialog.dart';
 import '../widgets/custom_title_bar.dart';
 import 'dart:io' show Platform;
-import '../widgets/avatar_button.dart'; // Import AvatarButton
+import '../widgets/avatar_button.dart';
+import 'patient_chart_screen.dart';
+import '../managers/patient_tab_manager.dart';
+import '../widgets/patient_finder.dart'; // Import the PatientFinder widget
 
 class HomeScreen extends StatefulWidget {
   final Function(ThemeMode) setThemeMode;
-
   const HomeScreen({Key? key, required this.setThemeMode}) : super(key: key);
 
   @override
@@ -22,77 +28,231 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<int> _history = [];
   final GlobalKey<AvatarButtonState> _avatarButtonKey =
       GlobalKey<AvatarButtonState>();
-  String _currentPaneTitle = 'Home'; // Default title
+  String _currentPaneTitle = 'Home';
+  late PatientTabManager _patientTabManager;
+  bool _isFlyoutVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _patientTabManager = PatientTabManager();
+  }
+
+  void _toggleFlyout() {
+    setState(() {
+      _isFlyoutVisible = !_isFlyoutVisible;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final isMobile = Platform.isAndroid || Platform.isIOS;
 
-    return NavigationView(
-      appBar: NavigationAppBar(
-        title: CustomTitleBar(
-          showBackButton: _history.isNotEmpty,
-          showAvatarButton: true,
-          title: Text(_currentPaneTitle), // Display the current pane item title
-          onBack: () {
-            if (_history.isNotEmpty) {
-              setState(() {
-                _currentIndex = _history.removeLast();
-                _updatePaneTitle();
-              });
-            }
-          },
-          onAccountSettings: () {
-            _showAccountSettingsDialog(context); // Show the dialog
-          },
-          onSignOut: () {
-            AuthService().signOut();
-            Navigator.of(context).pushReplacementNamed('/');
-          },
-          avatarButtonKey: _avatarButtonKey, // Pass the key
+    return ChangeNotifierProvider.value(
+      value: _patientTabManager,
+      child: ScaffoldPage(
+        content: Stack(
+          children: [
+            NavigationView(
+              appBar: NavigationAppBar(
+                title: CustomTitleBar(
+                  showBackButton: _history.isNotEmpty,
+                  showAvatarButton: true,
+                  title: Text(_currentPaneTitle),
+                  onBack: () {
+                    if (_history.isNotEmpty) {
+                      setState(() {
+                        _currentIndex = _history.removeLast();
+                        _updatePaneTitle();
+                      });
+                    }
+                  },
+                  onAccountSettings: () {
+                    _showAccountSettingsDialog(context);
+                  },
+                  onSignOut: () {
+                    AuthService().signOut();
+                    Navigator.of(context).pushReplacementNamed('/');
+                  },
+                  avatarButtonKey: _avatarButtonKey,
+                  tabButtonData: _patientTabManager.openTabs
+                      .map((tab) =>
+                          TabButtonData(tabId: tab.id, label: tab.name))
+                      .toList(),
+                  selectedTabId: _patientTabManager.selectedTabId,
+                  onTabSelected: (tabId) {
+                    _patientTabManager.selectTab(tabId);
+                    setState(() {
+                      _currentIndex = 3; // Use index 3 for patient charts
+                      _currentPaneTitle = 'Patient Chart';
+                    });
+                  },
+                  onTabClosed: (tabId) {
+                    _patientTabManager.closeTab(tabId);
+                    if (_patientTabManager.openTabs.isEmpty) {
+                      setState(() {
+                        _currentIndex = 0;
+                        _updatePaneTitle();
+                      });
+                    }
+                  },
+                ),
+                automaticallyImplyLeading: false,
+              ),
+              pane: NavigationPane(
+                selected: _currentIndex,
+                onChanged: (index) {
+                  setState(() {
+                    if (_currentIndex != index) {
+                      _history.add(_currentIndex);
+                      _currentIndex = index;
+                      _updatePaneTitle();
+                    }
+                  });
+                },
+                displayMode:
+                    isMobile ? PaneDisplayMode.auto : PaneDisplayMode.compact,
+                items: [
+                  PaneItem(
+                    icon: Icon(FluentIcons.home),
+                    title: Text('Home'),
+                    body: _buildHomeContent(),
+                  ),
+                  PaneItem(
+                    icon: Icon(FluentIcons.calendar),
+                    title: Text('Schedule'),
+                    body: SchedulerScreen(isMobile: isMobile),
+                  ),
+                  PaneItem(
+                    icon: Icon(FluentIcons.settings),
+                    title: Text('Settings'),
+                    body: SettingsScreen(setThemeMode: widget.setThemeMode),
+                  ),
+                  PaneItem(
+                    icon: Icon(FluentIcons.health),
+                    title: Text('Patient Chart'),
+                    body: Consumer<PatientTabManager>(
+                      builder: (context, patientTabManager, child) {
+                        return patientTabManager.selectedTabId != null
+                            ? PatientChartScreen(
+                                patientId: patientTabManager.selectedTabId!)
+                            : Center(child: Text('No patient selected'));
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (_isFlyoutVisible) _buildFlyout(),
+            Positioned(
+              bottom: 16,
+              right: 16,
+              child: _buildFloatingActionButton(),
+            ),
+          ],
         ),
-        automaticallyImplyLeading: false,
       ),
-      pane: NavigationPane(
-        selected: _currentIndex,
-        onChanged: (index) {
-          setState(() {
-            if (_currentIndex != index) {
-              _history.add(_currentIndex);
-              _currentIndex = index;
-              _updatePaneTitle(); // Update the title when pane changes
-            }
-          });
-        },
-        displayMode: isMobile ? PaneDisplayMode.auto : PaneDisplayMode.compact,
-        items: [
-          PaneItem(
-            icon: Icon(FluentIcons.home),
-            title: Text('Home'),
-            body: _buildHomeContent(),
+    );
+  }
+
+  Widget _buildFlyout() {
+    final isMobile = Platform.isAndroid || Platform.isIOS;
+    return isMobile ? _buildMobileFlyout() : _buildDesktopFlyout();
+  }
+
+  void _onOpenPatientChart(PatientItem patientItem) {
+    setState(() {
+      _patientTabManager.openTab(patientItem.id, patientItem.fullName);
+    });
+  }
+
+  Widget _buildDesktopFlyout() {
+    return Positioned(
+      top: 54,
+      right: 0,
+      bottom: 0,
+      child: AnimatedContainer(
+        duration: Duration(milliseconds: 150),
+        width: _isFlyoutVisible ? 400 : 0,
+        child: Container(
+          color: FluentTheme.of(context).micaBackgroundColor,
+          child: _isFlyoutVisible
+              ? PatientFinder(
+                  onDragStart: _onPatientDragStart,
+                  onOpenChart: _onOpenPatientChart,
+                )
+              : null,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMobileFlyout() {
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: 300),
+      left: 0,
+      right: 0,
+      bottom: _isFlyoutVisible ? 0 : -200,
+      height: 200,
+      child: Container(
+        decoration: BoxDecoration(
+          color: FluentTheme.of(context).micaBackgroundColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          boxShadow: [
+            BoxShadow(
+              color: mat.Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: Offset(0, -2),
+            ),
+          ],
+        ),
+        child: PatientFinder(
+          onDragStart: _onPatientDragStart,
+          onOpenChart: _onOpenPatientChart,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFloatingActionButton() {
+    final isDesktop = !(Platform.isAndroid || Platform.isIOS);
+    return AnimatedPositioned(
+      duration: Duration(milliseconds: 300),
+      right: isDesktop
+          ? (_isFlyoutVisible ? 416 : 16)
+          : 16, // Move right if flyout visible
+      bottom: !isDesktop
+          ? (_isFlyoutVisible ? 216 : 16)
+          : 16, // Move up if flyout visible
+      child: SizedBox(
+        width: isDesktop ? 40 : 64,
+        height: isDesktop ? 40 : 64,
+        child: mat.FloatingActionButton(
+          child: Icon(
+            _isFlyoutVisible
+                ? (isDesktop
+                    ? FluentIcons.chevron_right
+                    : FluentIcons.chevron_down)
+                : FluentIcons.people,
+            color: mat.Colors.white,
+            size: isDesktop ? 20 : 24,
           ),
-          PaneItem(
-            icon: Icon(FluentIcons.calendar),
-            title: Text('Schedule'),
-            body: SchedulerScreen(isMobile: isMobile),
-          ),
-          PaneItem(
-            icon: Icon(FluentIcons.settings),
-            title: Text('Settings'),
-            body: SettingsScreen(setThemeMode: widget.setThemeMode),
-          ),
-        ],
+          backgroundColor: mat.Colors.blue,
+          shape: mat.CircleBorder(),
+          onPressed: _toggleFlyout,
+          tooltip: _isFlyoutVisible ? 'Hide Patients' : 'Show Patients',
+        ),
       ),
     );
   }
 
   void _updatePaneTitle() {
-    // Update the current pane title based on the selected index
     setState(() {
       _currentPaneTitle = [
         'Home',
         'Schedule',
         'Settings',
+        'Patient Chart',
       ][_currentIndex];
     });
   }
@@ -103,7 +263,6 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context) {
         return AccountSettingsDialog(
           onAvatarChanged: () {
-            // Call refreshAvatar on the AvatarButton
             if (_avatarButtonKey.currentState != null) {
               _avatarButtonKey.currentState!.refreshAvatar();
             }
@@ -116,8 +275,19 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildHomeContent() {
     return ScaffoldPage(
       content: Center(
-        child: Text('Welcome ${UserManager().currentUser?.name ?? 'User'}!'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Welcome ${UserManager().currentUser?.name ?? 'User'}!'),
+          ],
+        ),
       ),
     );
+  }
+
+  void _onPatientDragStart() {
+    setState(() {
+      _isFlyoutVisible = false;
+    });
   }
 }

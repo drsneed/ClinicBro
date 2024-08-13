@@ -180,6 +180,7 @@ func SearchPatients(c *gin.Context) {
 		patientItem := models.PatientItem{
 			ID:          patient.ID,
 			Active:      patient.Active,
+			FirstName:   patient.FirstName,
 			FullName:    fullName,
 			DateOfBirth: patient.DateOfBirth,
 		}
@@ -235,6 +236,7 @@ func GetPatientsWithAppointmentToday(c *gin.Context) {
 		patientItem := models.PatientItem{
 			ID:          patient.ID,
 			Active:      patient.Active,
+			FirstName:   patient.FirstName,
 			FullName:    fullName,
 			DateOfBirth: patient.DateOfBirth,
 		}

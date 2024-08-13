@@ -126,4 +126,8 @@ class Patient {
       'updated_user_id': updatedUserId,
     };
   }
+
+  String initials() {
+    return firstName[0] + lastName[0];
+  }
 }

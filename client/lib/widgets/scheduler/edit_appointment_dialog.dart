@@ -174,7 +174,7 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
               ? theme.accentColor.withOpacity(0.8)
               : theme.inactiveColor.withOpacity(0.5),
           child: Text(
-            _getInitials(patient?.fullName ?? ''),
+            patient?.initials() ?? 'UNK',
             style: const TextStyle(
                 color: Colors.white, fontSize: 14), // Smaller size
           ),
@@ -567,16 +567,5 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
         ),
       ],
     );
-  }
-
-  String _getInitials(String fullName) {
-    try {
-      List<String> names = fullName.split(",");
-      if (names.isEmpty) return "";
-      if (names.length == 1) return names[0].trim()[0].toUpperCase();
-      return (names[1].trim()[0] + names.first[0]).toUpperCase();
-    } catch (e) {
-      return 'WTF';
-    }
   }
 }

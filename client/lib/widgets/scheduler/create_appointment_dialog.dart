@@ -164,7 +164,7 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
               ? theme.accentColor.withOpacity(0.8)
               : theme.inactiveColor.withOpacity(0.5),
           child: Text(
-            _getInitials(patient?.fullName ?? ''),
+            patient?.initials() ?? 'UNK',
             style: const TextStyle(
                 color: Colors.white, fontSize: 14), // Smaller size
           ),
@@ -193,7 +193,7 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
         ),
         const SizedBox(width: 12),
         IconButton(
-          icon: Icon(FluentIcons.chevron_down),
+          icon: const Icon(FluentIcons.chevron_down),
           onPressed: _showPatientMenu,
         ),
       ],
@@ -557,12 +557,5 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
         ),
       ],
     );
-  }
-
-  String _getInitials(String fullName) {
-    List<String> names = fullName.split(",");
-    if (names.isEmpty) return "";
-    if (names.length == 1) return names[0].trim()[0].toUpperCase();
-    return (names[1].trim()[0] + names.first[0]).toUpperCase();
   }
 }

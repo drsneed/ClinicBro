@@ -1,3 +1,4 @@
+import 'package:clinicbro/widgets/title_bar_tab_control.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:window_manager/window_manager.dart';
 import 'avatar_button.dart';
@@ -13,9 +14,15 @@ class CustomTitleBar extends StatelessWidget {
   final VoidCallback? onSignOut;
   final VoidCallback? onBack;
   final GlobalKey<AvatarButtonState>? avatarButtonKey;
-
+  final int? selectedTabId;
+  final void Function(int)? onTabSelected;
+  final void Function(int)? onTabClosed;
+  final List<TabButtonData>? tabButtonData;
   const CustomTitleBar({
     super.key,
+    this.onTabSelected,
+    this.onTabClosed,
+    this.selectedTabId,
     this.showBackButton = false,
     this.showAvatarButton = false,
     this.title,
@@ -24,6 +31,7 @@ class CustomTitleBar extends StatelessWidget {
     this.onSignOut,
     this.onBack,
     this.avatarButtonKey,
+    this.tabButtonData,
   });
 
   @override
@@ -44,7 +52,10 @@ class CustomTitleBar extends StatelessWidget {
         child: Row(
           children: [
             SizedBox(width: isMobile ? 0 : 8),
-            const ThemedIcon(svgPath: 'assets/icon/app_icon.svg'),
+            ThemedIcon(
+              svgPath: 'assets/icon/app_icon.svg',
+              color: textColor,
+            ),
             const SizedBox(width: 8),
             if (showBackButton)
               IconButton(
@@ -52,25 +63,30 @@ class CustomTitleBar extends StatelessWidget {
                 onPressed: onBack,
               ),
             if (title != null)
-              Expanded(
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: DefaultTextStyle(
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500, // Make text bold
-                      fontSize: 16, // Optional: Adjust font size if needed
-                      color: textColor, // Apply theme's text color
-                    ),
-                    child: title!,
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: DefaultTextStyle(
+                  style: TextStyle(
+                    fontWeight: FontWeight.w500,
+                    fontSize: 16,
+                    color: textColor,
                   ),
+                  child: title!,
                 ),
               ),
+            const SizedBox(width: 16),
+            TitleBarTabControl(
+              onTabSelected: onTabSelected ?? (tabId) => {},
+              selectedTabId: selectedTabId,
+              onTabClosed: onTabClosed ?? (tabId) => {},
+              tabButtons: tabButtonData ?? [],
+            ),
+            const Spacer(), // This will push the remaining items to the right
             if (showAvatarButton)
               Padding(
-                padding: const EdgeInsets.only(
-                    right: 5.0), // Move the avatar button 5 pixels to the left
+                padding: const EdgeInsets.symmetric(horizontal: 5.0),
                 child: AvatarButton(
-                  key: avatarButtonKey, // Pass the GlobalKey here
+                  key: avatarButtonKey,
                   onAccountSettings: onAccountSettings ?? () => {},
                   onSignOut: onSignOut ?? () => {},
                 ),
@@ -148,3 +164,12 @@ class CloseWindowButton extends StatelessWidget {
     );
   }
 }
+
+/*
+
+style: FluentTheme.of(context).typography.body?.copyWith(
+                          color: FluentTheme.of(context).accentColor,
+                        ) ??
+                    TextStyle(color: FluentTheme.of(context).accentColor),
+
+                    */

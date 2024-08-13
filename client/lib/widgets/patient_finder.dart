@@ -1,13 +1,15 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import '../managers/patient_tab_manager.dart';
 import '../models/patient_item.dart';
 import '../repositories/user_repository.dart';
 import '../repositories/patient_repository.dart';
-import '../services/data_service.dart';
 import 'patient_display.dart';
 
 class PatientFinder extends StatefulWidget {
   final VoidCallback? onDragStart;
-  const PatientFinder({Key? key, this.onDragStart}) : super(key: key);
+  final void Function(PatientItem) onOpenChart;
+  const PatientFinder({Key? key, this.onDragStart, required this.onOpenChart})
+      : super(key: key);
 
   @override
   _PatientFinderState createState() => _PatientFinderState();
@@ -78,9 +80,34 @@ class _PatientFinderState extends State<PatientFinder> {
 
   @override
   Widget build(BuildContext context) {
+    final titleBarColor = FluentTheme.of(context).micaBackgroundColor;
+    final titleBarHeight = 0.0;
+
     return ScaffoldPage(
       content: Column(
         children: [
+          Container(
+            //color: titleBarColor,
+            height: titleBarHeight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                // Padding(
+                //   padding: const EdgeInsets.all(8.0),
+                //   child: Text(
+                //     'Patient Finder',
+                //     style: TextStyle(
+                //       fontWeight: FontWeight.w500,
+                //       fontSize: 16,
+                //       color: FluentTheme.of(context).typography.body?.color ??
+                //           Colors.black,
+                //     ),
+                //   ),
+                // ),
+                // Add any other header elements you need here
+              ],
+            ),
+          ),
           Expanded(
             child: TabView(
               currentIndex: _currentIndex,
@@ -128,6 +155,7 @@ class _PatientFinderState extends State<PatientFinder> {
           return PatientDisplay(
             patient: _recentPatients[index],
             onDragStart: widget.onDragStart,
+            onOpenChart: widget.onOpenChart,
           );
         },
       ),
@@ -149,6 +177,7 @@ class _PatientFinderState extends State<PatientFinder> {
           return PatientDisplay(
             patient: _apptTodayPatients[index],
             onDragStart: widget.onDragStart,
+            onOpenChart: widget.onOpenChart,
           );
         },
       ),
@@ -185,6 +214,7 @@ class _PatientFinderState extends State<PatientFinder> {
                           return PatientDisplay(
                             patient: _searchResults[index],
                             onDragStart: widget.onDragStart,
+                            onOpenChart: widget.onOpenChart,
                           );
                         },
                       ),
