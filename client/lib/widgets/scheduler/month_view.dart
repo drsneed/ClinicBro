@@ -18,6 +18,7 @@ class MonthView extends StatefulWidget {
   final Function() onRefresh;
   final List<AppointmentItem> appointments;
   final OverlayManager overlayManager;
+  final Function(int) onEditAppointment;
   const MonthView({
     Key? key,
     required this.initialDate,
@@ -25,6 +26,7 @@ class MonthView extends StatefulWidget {
     required this.onRefresh,
     required this.appointments,
     required this.overlayManager,
+    required this.onEditAppointment,
     this.onDateSelected,
   }) : super(key: key);
 
@@ -215,6 +217,7 @@ class _MonthViewState extends State<MonthView> {
                               return AppointmentMonthView(
                                 appointment: dateAppointments[index],
                                 overlayManager: widget.overlayManager,
+                                onEditAppointment: widget.onEditAppointment,
                               );
                             },
                           ),

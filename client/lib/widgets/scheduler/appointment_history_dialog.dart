@@ -64,7 +64,7 @@ class _AppointmentHistoryDialogState extends State<AppointmentHistoryDialog> {
             itemBuilder: (context, index) {
               final appointment = appointments[index];
               return ListTile(
-                title: Text(appointment.title),
+                title: Text(appointment.title ?? ''),
                 subtitle: Text('Date: ${appointment.apptDate}'),
                 trailing: Text(
                     'From: ${appointment.apptFrom} - To: ${appointment.apptTo}'),

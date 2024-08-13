@@ -21,9 +21,9 @@ type Appointment struct {
 	UpdatedUserID       uint      `json:"updated_user_id"`
 
 	// Define associations
-	Patient           *Patient           `gorm:"foreignKey:PatientID"`
-	Provider          *User              `gorm:"foreignKey:ProviderID"`
-	AppointmentType   *AppointmentType   `gorm:"foreignKey:AppointmentTypeID"`
-	AppointmentStatus *AppointmentStatus `gorm:"foreignKey:AppointmentStatusID"`
-	Location          *Location          `gorm:"foreignKey:LocationID"`
+	Patient           *Patient           `gorm:"foreignKey:PatientID" json:"patient"`
+	Provider          *User              `gorm:"foreignKey:ProviderID" json:"provider"`
+	AppointmentType   *AppointmentType   `gorm:"foreignKey:AppointmentTypeID" json:"appointment_type"`
+	AppointmentStatus *AppointmentStatus `gorm:"foreignKey:AppointmentStatusID" json:"appointment_status"`
+	Location          *Location          `gorm:"foreignKey:LocationID" json:"location"`
 }

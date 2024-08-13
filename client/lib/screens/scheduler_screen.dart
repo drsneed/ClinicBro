@@ -3,6 +3,7 @@ import 'package:flutter/material.dart' as mat
     show Colors, FloatingActionButton, CircleBorder, CircularProgressIndicator;
 import '../models/appointment_item.dart';
 import '../repositories/appointment_repository.dart';
+import '../services/data_service.dart';
 import '../utils/logger.dart';
 import '../managers/overlay_manager.dart';
 import '../widgets/scheduler/navigation_panel.dart';
@@ -210,6 +211,8 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
                         onRefresh: _refreshAppointments,
                         appointments: _appointments,
                         overlayManager: _overlayManager,
+                        onEditAppointment:
+                            _onEditAppointment, // Pass the callback
                         // Additional parameters
                       ),
               ),
@@ -221,6 +224,15 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
         ),
       ],
     );
+  }
+
+  void _onEditAppointment(int appointmentId) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _overlayManager.showEditAppointmentDialog(
+            context, appointmentId, _refreshAppointments);
+      }
+    });
   }
 
   void _onPatientDragStart() {

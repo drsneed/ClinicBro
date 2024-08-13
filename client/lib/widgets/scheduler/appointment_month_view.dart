@@ -5,11 +5,12 @@ import '../../models/appointment_item.dart';
 class AppointmentMonthView extends StatelessWidget {
   final AppointmentItem appointment;
   final OverlayManager overlayManager;
-
+  final void Function(int) onEditAppointment;
   const AppointmentMonthView({
     super.key,
     required this.appointment,
     required this.overlayManager,
+    required this.onEditAppointment,
   });
 
   Color _getBackgroundColor(String colorString, BuildContext context) {
@@ -44,7 +45,7 @@ class AppointmentMonthView extends StatelessWidget {
         final Offset globalPosition =
             renderBox.localToGlobal(details.localPosition);
         overlayManager.showAppointmentDetailsPopup(
-            context, appointment, globalPosition);
+            context, appointment, globalPosition, onEditAppointment);
       },
       child: Container(
         constraints: BoxConstraints(

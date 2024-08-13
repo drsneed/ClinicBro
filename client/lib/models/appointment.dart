@@ -8,7 +8,7 @@ import 'user.dart';
 
 class Appointment {
   final int id;
-  String title;
+  String? title;
   bool isEvent;
   DateTime apptDate;
   TimeOfDay apptFrom;

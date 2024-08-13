@@ -15,7 +15,7 @@ class Scheduler extends StatefulWidget {
   final void Function() onRefresh;
   final List<AppointmentItem> appointments;
   final OverlayManager overlayManager;
-
+  final void Function(int) onEditAppointment;
   const Scheduler({
     super.key,
     required this.viewMode,
@@ -25,6 +25,7 @@ class Scheduler extends StatefulWidget {
     required this.onRefresh,
     required this.appointments,
     required this.overlayManager,
+    required this.onEditAppointment,
   });
 
   @override
@@ -82,6 +83,7 @@ class _SchedulerState extends State<Scheduler> {
           onPageChanged: _onPageChanged,
           appointments: widget.appointments,
           overlayManager: widget.overlayManager,
+          onEditAppointment: widget.onEditAppointment,
         );
       case '5-Day':
         return FiveDayView(
@@ -101,6 +103,7 @@ class _SchedulerState extends State<Scheduler> {
           onRefresh: widget.onRefresh,
           appointments: widget.appointments,
           overlayManager: widget.overlayManager,
+          onEditAppointment: widget.onEditAppointment,
         );
       default:
         return Container();

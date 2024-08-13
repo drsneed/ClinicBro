@@ -128,7 +128,9 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
           ),
         ),
       ],
-      color: const Color.fromARGB(255, 46, 45, 44),
+      color: mat.Theme.of(context).brightness == Brightness.dark
+          ? const Color.fromARGB(255, 46, 45, 44)
+          : Colors.white,
     );
 
     if (result == 'appointment_history') {
@@ -168,30 +170,28 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
           ),
         ),
         const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                patient?.fullName ?? 'No patient selected',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14, // Smaller size
-                ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              patient?.fullName ?? 'No patient selected',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14, // Smaller size
               ),
-              Text(
-                'DOB: $dob',
-                style: TextStyle(
-                  fontSize: 12, // Smaller size for date of birth
-                  color: patient?.active ?? false
-                      ? theme.inactiveColor
-                      : theme.inactiveColor.withOpacity(0.5),
-                ),
+            ),
+            Text(
+              'DOB: $dob',
+              style: TextStyle(
+                fontSize: 12, // Smaller size for date of birth
+                color: patient?.active ?? false
+                    ? theme.inactiveColor
+                    : theme.inactiveColor.withOpacity(0.5),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 12),
         IconButton(
           icon: Icon(FluentIcons.chevron_down),
           onPressed: _showPatientMenu,
@@ -204,11 +204,11 @@ class _CreateAppointmentDialogState extends State<CreateAppointmentDialog> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Create Appointment'),
-        const SizedBox(width: 60),
-        Expanded(
-          child: _buildPatientDropdown(), // Updated method
+        const Expanded(
+          child: Text('Create Appointment'),
         ),
+        const SizedBox(width: 12),
+        _buildPatientDropdown(),
       ],
     );
   }

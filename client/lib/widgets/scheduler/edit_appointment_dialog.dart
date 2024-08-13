@@ -1,21 +1,20 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as mat;
 import 'package:intl/intl.dart';
-import '../../models/appointment.dart';
 import '../../models/edit_appointment_data.dart';
+import '../../models/appointment.dart';
 import '../../models/location.dart';
 import '../../utils/popup_menu_utils.dart';
+import '../custom_time_picker.dart';
 import 'appointment_history_dialog.dart';
 
 class EditAppointmentDialog extends StatefulWidget {
   final EditAppointmentData? viewModel;
-  final DateTime date;
   final Function(Appointment) onSave;
 
   const EditAppointmentDialog({
     super.key,
     required this.viewModel,
-    required this.date,
     required this.onSave,
   });
 
@@ -36,23 +35,68 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
   void initState() {
     super.initState();
 
-    _appointment = widget.viewModel.app Appointment(
-      id: 0,
-      title: '',
-      isEvent: false,
-      patientId: widget.viewModel?.patient.id ?? 0,
-      providerId: widget.viewModel?.providers.first.id ?? 0,
-      appointmentTypeId: widget.viewModel?.appointmentTypes.first.id ?? 0,
-      appointmentStatusId: widget.viewModel?.appointmentStatuses.first.id ?? 0,
-      locationId: widget.viewModel?.locations.first.id ?? 0,
-      apptDate: widget.date,
-      apptFrom: mat.TimeOfDay.now(),
-      apptTo: mat.TimeOfDay.now(),
-      notes: '',
+    // Calculate the next 30-minute interval
+    final now = DateTime.now();
+    final nextInterval = _getNextHalfHourInterval(now);
+
+    // Set the appointment times
+    final apptFrom = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      nextInterval.hour,
+      nextInterval.minute,
     );
 
-    _selectedDate = widget.date;
+    final apptTo = apptFrom.add(const Duration(minutes: 30));
+    _appointment = widget.viewModel?.appointment ??
+        Appointment(
+          id: 0,
+          title: '',
+          isEvent: false,
+          patientId: 0,
+          providerId: 0,
+          appointmentTypeId: 0,
+          appointmentStatusId: 0,
+          locationId: 0,
+          apptDate: now,
+          apptFrom: mat.TimeOfDay(hour: apptFrom.hour, minute: apptFrom.minute),
+          apptTo: mat.TimeOfDay(hour: apptTo.hour, minute: apptTo.minute),
+          notes: '',
+        );
+
+    _selectedDate = _appointment.apptDate;
+    _selectedFrom = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      _appointment.apptFrom.hour,
+      _appointment.apptFrom.minute,
+    );
+    _selectedTo = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      _appointment.apptTo.hour,
+      _appointment.apptTo.minute,
+    );
+
     _notesController = TextEditingController(text: _appointment.notes);
+  }
+
+  // Helper function to get the next 30-minute interval
+  DateTime _getNextHalfHourInterval(DateTime dateTime) {
+    final minutes = dateTime.minute;
+    final nextIntervalMinutes = (minutes ~/ 30 + 1) * 30;
+
+    // If the next interval is in the next hour
+    if (nextIntervalMinutes >= 60) {
+      return DateTime(
+          dateTime.year, dateTime.month, dateTime.day, dateTime.hour + 1, 0);
+    }
+
+    return DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour,
+        nextIntervalMinutes);
   }
 
   @override
@@ -93,7 +137,9 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
           ),
         ),
       ],
-      color: const Color.fromARGB(255, 46, 45, 44),
+      color: mat.Theme.of(context).brightness == Brightness.dark
+          ? const Color.fromARGB(255, 46, 45, 44)
+          : Colors.white,
     );
 
     if (result == 'appointment_history') {
@@ -102,7 +148,8 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
   }
 
   void _showAppointmentHistoryDialog() {
-    final patientId = widget.viewModel?.patient.id ?? 0; // Get the patient ID
+    final patientId =
+        widget.viewModel?.appointment.patientId ?? 0; // Get the patient ID
 
     showDialog(
       context: context,
@@ -113,7 +160,7 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
   }
 
   Widget _buildPatientDropdown() {
-    final patient = widget.viewModel?.patient;
+    final patient = widget.viewModel?.appointment.patient;
     final theme = FluentTheme.of(context);
     final dateFormatter = DateFormat('yyyy-MM-dd');
     final dob = patient?.dateOfBirth != null
@@ -133,30 +180,28 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
           ),
         ),
         const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                patient?.fullName ?? 'No patient selected',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14, // Smaller size
-                ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              patient?.fullName ?? 'No patient selected',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14, // Smaller size
               ),
-              Text(
-                'DOB: $dob',
-                style: TextStyle(
-                  fontSize: 12, // Smaller size for date of birth
-                  color: patient?.active ?? false
-                      ? theme.inactiveColor
-                      : theme.inactiveColor.withOpacity(0.5),
-                ),
+            ),
+            Text(
+              'DOB: $dob',
+              style: TextStyle(
+                fontSize: 12, // Smaller size for date of birth
+                color: patient?.active ?? false
+                    ? theme.inactiveColor
+                    : theme.inactiveColor.withOpacity(0.5),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 12),
         IconButton(
           icon: Icon(FluentIcons.chevron_down),
           onPressed: _showPatientMenu,
@@ -169,11 +214,11 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Create Appointment'),
-        const SizedBox(width: 60),
-        Expanded(
-          child: _buildPatientDropdown(), // Updated method
+        const Expanded(
+          child: Text('Edit Appointment'),
         ),
+        const SizedBox(width: 12),
+        _buildPatientDropdown(),
       ],
     );
   }
@@ -406,7 +451,8 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: TimePicker(
+          child: CustomTimePicker(
+            showClearButton: false,
             selected: _selectedFrom,
             onChanged: (date) {
               setState(() {
@@ -432,8 +478,9 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
         ),
         const SizedBox(width: 8),
         Expanded(
-          child: TimePicker(
+          child: CustomTimePicker(
             selected: _selectedTo,
+            showClearButton: false,
             onChanged: (date) {
               setState(() {
                 _selectedTo = date;
@@ -523,9 +570,13 @@ class _EditAppointmentDialogState extends State<EditAppointmentDialog> {
   }
 
   String _getInitials(String fullName) {
-    List<String> names = fullName.split(",");
-    if (names.isEmpty) return "";
-    if (names.length == 1) return names[0].trim()[0].toUpperCase();
-    return (names[1].trim()[0] + names.first[0]).toUpperCase();
+    try {
+      List<String> names = fullName.split(",");
+      if (names.isEmpty) return "";
+      if (names.length == 1) return names[0].trim()[0].toUpperCase();
+      return (names[1].trim()[0] + names.first[0]).toUpperCase();
+    } catch (e) {
+      return 'WTF';
+    }
   }
 }

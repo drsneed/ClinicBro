@@ -8,13 +8,14 @@ class DayView extends StatelessWidget {
   final Function(int) onPageChanged;
   final List<AppointmentItem> appointments;
   final OverlayManager overlayManager;
-
+  final void Function(int) onEditAppointment;
   const DayView({
     Key? key,
     required this.pageController,
     required this.onPageChanged,
     required this.appointments,
     required this.overlayManager,
+    required this.onEditAppointment,
   }) : super(key: key);
 
   @override
@@ -106,6 +107,7 @@ class DayView extends StatelessWidget {
         child: AppointmentDayView(
           appointment: appt,
           overlayManager: overlayManager,
+          onEditAppointment: onEditAppointment,
         ),
       );
     }).toList();
