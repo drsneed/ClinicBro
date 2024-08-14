@@ -1,47 +1,20 @@
-class UserPreference {
+class UserPreferences {
+  final Map<String, String> preferences;
   final int userId;
-  final String preferenceKey;
-  final String preferenceValue;
-
-  UserPreference({
+  UserPreferences({
     required this.userId,
-    required this.preferenceKey,
-    required this.preferenceValue,
+    required this.preferences,
   });
 
-  factory UserPreference.fromJson(Map<String, dynamic> json) {
-    return UserPreference(
-      userId: json['user_id'],
-      preferenceKey: json['preference_key'],
-      preferenceValue: json['preference_value'],
+  factory UserPreferences.fromJson(int userId, Map<String, dynamic> json) {
+    // json is already a Map<String, dynamic> where the keys are the preference keys
+    return UserPreferences(
+      userId: userId,
+      preferences: Map<String, String>.from(json),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'user_id': userId,
-      'preference_key': preferenceKey,
-      'preference_value': preferenceValue,
-    };
-  }
-}
-
-class UserPreferences {
-  final List<UserPreference> preferences;
-
-  UserPreferences({
-    required this.preferences,
-  });
-
-  factory UserPreferences.fromJson(List<dynamic> json) {
-    List<UserPreference> preferences =
-        json.map((i) => UserPreference.fromJson(i)).toList();
-    return UserPreferences(
-      preferences: preferences,
-    );
-  }
-
-  List<dynamic> toJson() {
-    return preferences.map((i) => i.toJson()).toList();
+    return preferences;
   }
 }

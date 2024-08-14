@@ -17,8 +17,7 @@ import '../managers/patient_tab_manager.dart';
 import '../widgets/patient_finder.dart'; // Import the PatientFinder widget
 
 class HomeScreen extends StatefulWidget {
-  final Function(ThemeMode) setThemeMode;
-  const HomeScreen({Key? key, required this.setThemeMode}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
@@ -32,7 +31,7 @@ class _HomeScreenState extends State<HomeScreen> {
   String _currentPaneTitle = 'Home';
   late PatientTabManager _patientTabManager;
   bool _isFlyoutVisible = false;
-  static const String _patientChartsPaneTitle = 'Patient Charts';
+  static const String _patientChartsPaneTitle = 'Charting';
   @override
   void initState() {
     super.initState();
@@ -95,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTabSelected: (tabId) {
                         patientTabManager.selectTab(tabId);
                         setState(() {
-                          _currentIndex = 2; // Use index 2 for patient charts
+                          _currentIndex = 2; // Use index 2 for Charting
                           _currentPaneTitle = _patientChartsPaneTitle;
                         });
                       },
@@ -163,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   PaneItem(
                     icon: Icon(FluentIcons.settings),
                     title: Text('Settings'),
-                    body: SettingsScreen(setThemeMode: widget.setThemeMode),
+                    body: SettingsScreen(),
                   ),
                 ],
               ),

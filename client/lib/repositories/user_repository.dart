@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 import '../models/operating_schedule.dart';
 import '../models/patient_item.dart';
+import '../models/preference_map.dart';
 import '../models/user.dart';
 import '../models/user_preferences.dart';
 import '../services/data_service.dart';
@@ -143,8 +144,30 @@ class UserRepository {
     final response = await DataService().get('/user-preferences/$userId');
     if (response.statusCode == 200) {
       try {
-        List<dynamic> jsonResponse = jsonDecode(response.body);
-        return UserPreferences.fromJson(jsonResponse);
+        var jsonResponse = jsonDecode(response.body) as Map<String, dynamic>;
+        return UserPreferences.fromJson(userId, jsonResponse);
+      } catch (e) {
+        Logger().log(Level.SEVERE, e.toString());
+        return null;
+      }
+    } else {
+      return null;
+    }
+  }
+
+  Future<PreferenceMap?> getAllPreferences() async {
+    final response = await DataService().get('/user-preferences');
+    if (response.statusCode == 200) {
+      try {
+        // Decode the JSON response to a Map<String, dynamic>
+        final Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+
+        // Convert the Map<String, dynamic> to Preference (Map<String, List<String>>)
+        final PreferenceMap preferenceMap = jsonResponse.map(
+          (key, value) => MapEntry(key, List<String>.from(value)),
+        );
+
+        return preferenceMap;
       } catch (e) {
         Logger().log(Level.SEVERE, e.toString());
         return null;

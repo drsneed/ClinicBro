@@ -54,7 +54,7 @@ class AuthService {
     if (user != null) {
       _userManager.setCurrentUser(user);
       // Load user preferences
-      await _preferencesManager.loadPreferences(user.id);
+      await _preferencesManager.reloadUserPreferences(user.id);
     }
     return true;
   }

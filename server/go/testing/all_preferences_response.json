@@ -1,0 +1,12 @@
+{
+  "font_family": [
+    "Fira Sans",
+    "Aptos",
+    "Inter"
+  ],
+  "theme_mode": [
+    "system",
+    "light",
+    "dark"
+  ]
+}

@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:clinicbro/models/preference_map.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:image_picker/image_picker.dart';
 import '../managers/preferences_manager.dart';
@@ -38,14 +39,13 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   Uint8List? _cachedAvatarData; // Cached avatar data
   bool _loadedAvatar = false;
   OperatingSchedule? _currentOperatingSchedule;
-  late ThemeMode _currentThemeMode;
+
   final PreferencesManager _preferencesManager = PreferencesManager();
 
   @override
   void initState() {
     super.initState();
     _fetchLocations();
-    _currentThemeMode = _preferencesManager.themeMode;
   }
 
   Map<String, Map<String, DateTime?>> workHours = {
@@ -691,35 +691,98 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
   }
 
   Widget _buildUserPreferencesSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Theme Mode', style: FluentTheme.of(context).typography.bodyLarge),
-        SizedBox(height: 8),
-        ComboBox<ThemeMode>(
-          items: [
-            ComboBoxItem(value: ThemeMode.system, child: Text('System')),
-            ComboBoxItem(value: ThemeMode.light, child: Text('Light')),
-            ComboBoxItem(value: ThemeMode.dark, child: Text('Dark')),
-          ],
-          value: _currentThemeMode,
-          onChanged: (ThemeMode? mode) {
-            if (mode != null) {
-              setThemeMode(mode);
-            }
-          },
-        ),
-        // Add more user preference options here
-      ],
+    return FutureBuilder<PreferenceMap?>(
+      future: _preferencesManager.getAllPreferences(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          final preferences = snapshot.data!;
+
+          // Helper function to format the preference titles
+          String _formatTitle(String key) {
+            return key.replaceAll('_', ' ').toUpperCase().replaceFirstMapped(
+                RegExp(r'\b\w'), (match) => match.group(0)!.toUpperCase());
+          }
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: preferences.entries.map((entry) {
+              final key = entry.key;
+              final values = entry.value;
+
+              // Create the widget for each preference
+              return Padding(
+                padding: const EdgeInsets.all(8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      _formatTitle(key),
+                      style: FluentTheme.of(context).typography.bodyLarge,
+                    ),
+                    const SizedBox(width: 16),
+                    ComboBox<String>(
+                      items: values.map((value) {
+                        return ComboBoxItem<String>(
+                          value: value,
+                          child: Text(value),
+                        );
+                      }).toList(),
+                      value: _preferencesManager.getUserPreference(key) ?? '',
+                      onChanged: (String? selectedValue) {
+                        if (selectedValue != null) {
+                          // Update the preference, assuming you have a method to handle this
+                          _preferencesManager.updateUserPreference(
+                              key, selectedValue);
+                        }
+                      },
+                    ),
+                    SizedBox(height: 16),
+                  ],
+                ),
+              );
+            }).toList(),
+          );
+        } else {
+          return Text('No preferences found');
+        }
+      },
     );
   }
 
-  void setThemeMode(ThemeMode mode) async {
-    await _preferencesManager.setThemeMode(mode);
-    setState(() {
-      _currentThemeMode = mode;
-    });
-  }
+  // Widget _buildUserPreferencesSection() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text('Theme Mode', style: FluentTheme.of(context).typography.bodyLarge),
+  //       SizedBox(height: 8),
+  //       ComboBox<ThemeMode>(
+  //         items: [
+  //           ComboBoxItem(value: ThemeMode.system, child: Text('System')),
+  //           ComboBoxItem(value: ThemeMode.light, child: Text('Light')),
+  //           ComboBoxItem(value: ThemeMode.dark, child: Text('Dark')),
+  //         ],
+  //         value: _currentThemeMode,
+  //         onChanged: (ThemeMode? mode) {
+  //           if (mode != null) {
+  //             setThemeMode(mode);
+  //           }
+  //         },
+  //       ),
+  //       // Add more user preference options here
+  //     ],
+  //   );
+  // }
+
+  // void setThemeMode(ThemeMode mode) async {
+  //   await _preferencesManager.setThemeMode(mode);
+  //   setState(() {
+  //     _currentThemeMode = mode;
+  //   });
+  // }
 
   Widget _buildPersonalInformationSection() {
     return Column(

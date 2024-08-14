@@ -1,4 +1,7 @@
+import 'package:clinicbro/utils/theme_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../models/preference_map.dart';
 import '../models/user_preferences.dart';
 import '../repositories/user_repository.dart';
 
@@ -12,53 +15,58 @@ class PreferencesManager {
 
   final List<VoidCallback> _listeners = [];
 
-  Future<void> loadPreferences(int userId) async {
+  PreferenceMap? _allPreferences;
+
+  Future<void> reloadAllPreferences(int userId) async {
+    _allPreferences = await _userRepository.getAllPreferences();
+  }
+
+  Future<void> reloadUserPreferences(int userId) async {
     _userPreferences = await _userRepository.getUserPreferences(userId);
     _notifyListeners();
   }
 
-  ThemeMode get themeMode {
-    final themePreference = _userPreferences?.preferences.firstWhere(
-      (pref) => pref.preferenceKey == 'theme_mode',
-      orElse: () => UserPreference(
-        userId: 0,
-        preferenceKey: 'theme_mode',
-        preferenceValue: 'system',
-      ),
-    );
-    switch (themePreference?.preferenceValue) {
-      case 'light':
-        print('user prefers light');
-        return ThemeMode.light;
-      case 'dark':
-        print('user prefers dark');
-        return ThemeMode.dark;
-      default:
-        print('user prefers system');
-        return ThemeMode.system;
+  Future<void> updateUserPreference(
+      String preferenceKey, String preferenceValue) async {
+    if (_userPreferences != null) {
+      await _userRepository.updateUserPreference(
+        _userPreferences!.userId,
+        preferenceKey,
+        preferenceValue,
+      );
+      await reloadUserPreferences(_userPreferences!.userId);
     }
   }
 
-  Future<void> setThemeMode(ThemeMode mode) async {
-    if (_userPreferences != null) {
-      String themeModeString;
-      switch (mode) {
-        case ThemeMode.light:
-          themeModeString = 'light';
-          break;
-        case ThemeMode.dark:
-          themeModeString = 'dark';
-          break;
-        case ThemeMode.system:
-          themeModeString = 'system';
-          break;
-      }
-      await _userRepository.updateUserPreference(
-          _userPreferences!.preferences.first.userId,
-          'theme_mode',
-          themeModeString);
-      await loadPreferences(_userPreferences!.preferences.first.userId);
-    }
+  Future<PreferenceMap?> getAllPreferences() async {
+    _allPreferences ??= await _userRepository.getAllPreferences();
+    return _allPreferences;
+  }
+
+  String? getUserPreference(String preferenceKey) {
+    return _userPreferences!.preferences[preferenceKey];
+  }
+
+  Future<void> setUserPreference(
+      String preferenceKey, String preferenceValue) async {
+    await _userRepository.updateUserPreference(
+        _userPreferences!.userId, preferenceKey, preferenceValue);
+    await reloadUserPreferences(_userPreferences!.userId);
+  }
+
+  String _getPreferenceValue(String preferenceKey, String defaultValue) {
+    final preferenceValue = _userPreferences?.preferences[preferenceKey] ??
+        _allPreferences?[preferenceKey]?.first ??
+        defaultValue;
+    return preferenceValue;
+  }
+
+  ThemeMode get themeMode {
+    return stringToThemeMode(_getPreferenceValue('theme_mode', 'system'));
+  }
+
+  String get fontFamily {
+    return _getPreferenceValue('font_family', 'Fira Sans');
   }
 
   void addListener(VoidCallback listener) {
@@ -74,4 +82,10 @@ class PreferencesManager {
       listener();
     }
   }
+}
+
+class EditPreferencesModel {
+  ThemeMode themeMode;
+  String fontFamily;
+  EditPreferencesModel(this.themeMode, this.fontFamily);
 }

@@ -3,21 +3,73 @@ package handlers
 import (
 	"ClinicBro-Server/models"
 	"ClinicBro-Server/storage"
+	"encoding/json"
+	"io"
+	"log"
 	"net/http"
+	"os"
 	"strconv"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 )
 
-const (
-	defaultThemeKey   = "theme_mode"
-	defaultThemeValue = "system"
+var (
+	allPreferences map[string][]string
+	loadOnce       sync.Once
 )
+
+func loadPreferencesConfigFile() {
+	loadOnce.Do(func() {
+		file, err := os.Open("valid_preferences.json")
+		if err != nil {
+			log.Fatalf("Error opening valid preferences file: %v", err)
+		}
+		defer file.Close()
+
+		data, err := io.ReadAll(file)
+		if err != nil {
+			log.Fatalf("Error reading valid preferences file: %v", err)
+		}
+
+		if err := json.Unmarshal(data, &allPreferences); err != nil {
+			log.Fatalf("Error unmarshalling valid preferences: %v", err)
+		}
+	})
+}
+
+func GetAllPreferences(c *gin.Context) {
+	loadPreferencesConfigFile()
+	c.JSON(http.StatusOK, allPreferences)
+}
 
 func SetUserPreference(c *gin.Context) {
 	var pref models.UserPreference
 	if err := c.ShouldBindJSON(&pref); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	loadPreferencesConfigFile()
+
+	// Validate preference key
+	validValues, ok := allPreferences[pref.PreferenceKey]
+	if !ok {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid preference key"})
+		return
+	}
+
+	// Validate preference value
+	isValid := false
+	for _, value := range validValues {
+		if pref.PreferenceValue == value {
+			isValid = true
+			break
+		}
+	}
+
+	if !isValid {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid preference value"})
 		return
 	}
 
@@ -70,8 +122,11 @@ func GetUserPreferences(c *gin.Context) {
 
 	db := storage.GetTenantDB(c)
 	if db == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Database connection error"})
 		return
 	}
+
+	loadPreferencesConfigFile()
 
 	// Step 1: Fetch existing preferences for the user
 	var preferences []models.UserPreference
@@ -87,22 +142,35 @@ func GetUserPreferences(c *gin.Context) {
 		existingPreferences[p.PreferenceKey] = struct{}{}
 	}
 
-	// Check if default theme preference is missing
-	if _, exists := existingPreferences[defaultThemeKey]; !exists {
-		defaultPreference := models.UserPreference{
-			UserID:          userIDUint,
-			PreferenceKey:   defaultThemeKey,
-			PreferenceValue: defaultThemeValue,
+	for key, validValues := range allPreferences {
+		// Use the first valid value as the default value
+		if len(validValues) == 0 {
+			continue
 		}
-		if err := db.Create(&defaultPreference).Error; err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create default preference"})
-			return
+		defaultValue := validValues[0]
+
+		if _, exists := existingPreferences[key]; !exists {
+			defaultPreference := models.UserPreference{
+				UserID:          userIDUint,
+				PreferenceKey:   key,
+				PreferenceValue: defaultValue,
+			}
+			if err := db.Create(&defaultPreference).Error; err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not create default preference"})
+				return
+			}
+			preferences = append(preferences, defaultPreference)
 		}
-		preferences = append(preferences, defaultPreference)
 	}
 
-	// Step 3: Return the preferences
-	c.JSON(http.StatusOK, preferences)
+	// Step 3: Transform preferences into key-value format
+	preferenceMap := make(map[string]string)
+	for _, p := range preferences {
+		preferenceMap[p.PreferenceKey] = p.PreferenceValue
+	}
+
+	// Step 4: Return the transformed preferences
+	c.JSON(http.StatusOK, preferenceMap)
 }
 
 // User Preferences handlers

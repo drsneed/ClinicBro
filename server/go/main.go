@@ -160,6 +160,7 @@ func main() {
 		authTokenRouter.GET("/user-permissions/:user_id", handlers.GetUserPermissions)
 
 		// User Preferences routes
+		authTokenRouter.GET("/user-preferences", handlers.GetAllPreferences)
 		authTokenRouter.POST("/user-preferences", handlers.SetUserPreference)
 		authTokenRouter.GET("/user-preferences/:user_id", handlers.GetUserPreferences)
 		authTokenRouter.GET("/user-preferences/:user_id/:key", handlers.GetUserPreference)

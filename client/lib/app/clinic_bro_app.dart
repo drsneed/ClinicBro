@@ -31,39 +31,34 @@ class ClinicBroAppState extends State<ClinicBroApp> {
     setState(() {});
   }
 
-  Future<void> _loadPreferences() async {
-    if (_userManager.currentUser != null) {
-      await _preferencesManager.loadPreferences(_userManager.currentUser!.id);
-      setState(() {});
-    }
-  }
-
-  void setThemeMode(ThemeMode themeMode) async {
-    await _preferencesManager.setThemeMode(themeMode);
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
-    const fontFamily = 'Fira Sans';
+    print("font_family = ${_preferencesManager.fontFamily}");
     return FluentApp(
       debugShowCheckedModeBanner: false,
       title: 'ClinicBro',
       themeMode: _preferencesManager.themeMode,
-      // theme: FluentThemeData(
-      //   brightness: Brightness.light,
-      //   typography:
-      //       CustomTypography.getTypography(brightness: Brightness.light),
-      // ),
-      theme:
-          FluentThemeData(brightness: Brightness.light, fontFamily: fontFamily),
-      darkTheme:
-          FluentThemeData(brightness: Brightness.dark, fontFamily: fontFamily),
+      theme: FluentThemeData(
+        brightness: Brightness.light,
+        fontFamily: _preferencesManager.fontFamily,
+      ),
+      darkTheme: FluentThemeData(
+        brightness: Brightness.dark,
+        fontFamily: _preferencesManager.fontFamily,
+      ),
       initialRoute: '/',
       routes: {
-        '/': (context) => SignInScreen(),
-        '/home': (context) => HomeScreen(setThemeMode: setThemeMode),
+        '/': (context) => const SignInScreen(),
+        '/home': (context) => const HomeScreen(),
       },
     );
   }
 }
+
+
+// how to use custom typography:
+// theme: FluentThemeData(
+//   brightness: Brightness.light,
+//   typography:
+//       CustomTypography.getTypography(brightness: Brightness.light),
+// ),

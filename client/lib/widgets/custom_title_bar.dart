@@ -47,7 +47,7 @@ class CustomTitleBar extends StatelessWidget {
     bool showSelectedPatientChart = false;
     if (title != null && title is Text) {
       String titleText = (title as Text).data ?? '';
-      if (titleText == 'Patient Charts') {
+      if (titleText == 'Charting') {
         showSelectedPatientChart = true;
       }
     }
