@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"ClinicBro-Server/storage"
+	"log"
 	"net/http"
 	"strings"
 
@@ -67,7 +68,7 @@ func AuthMiddleware(secret string) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-
+		log.Printf("Got here :CONFETTI:")
 		// Add claims and db to the context
 		c.Set("claims", claims)
 		c.Set("db", db)

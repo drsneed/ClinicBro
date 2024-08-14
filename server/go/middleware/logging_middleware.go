@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"bytes"
-	"io/ioutil"
+	"io"
 	"log"
 
 	"github.com/gin-gonic/gin"
@@ -14,8 +14,8 @@ func LoggingMiddleware() gin.HandlerFunc {
 		// Log the request body
 		var requestBody []byte
 		if c.Request.Body != nil {
-			requestBody, _ = ioutil.ReadAll(c.Request.Body)
-			c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(requestBody))
+			requestBody, _ = io.ReadAll(c.Request.Body)
+			c.Request.Body = io.NopCloser(bytes.NewBuffer(requestBody))
 		}
 
 		log.Printf("Request Body: %s", string(requestBody))

@@ -3,6 +3,7 @@ package handlers
 import (
 	"ClinicBro-Server/models"
 	"ClinicBro-Server/storage"
+	"log"
 	"net/http"
 	"time"
 
@@ -29,13 +30,16 @@ func CreateAppointmentType(c *gin.Context) {
 }
 
 func GetAppointmentType(c *gin.Context) {
+	log.Printf("Got here :CONFETTI:")
 	id := c.Param("id")
+	log.Printf("GetAppointmentType: id = %s", id)
 	var db = storage.GetTenantDB(c)
 	if db == nil {
 		return
 	}
 	var appointmentType models.AppointmentType
 	if err := db.First(&appointmentType, id).Error; err != nil {
+		log.Printf("GetAppointmentType: err = %s", err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "Appointment type not found"})
 		return
 	}
@@ -57,6 +61,7 @@ func GetAllAppointmentTypes(c *gin.Context) {
 
 func UpdateAppointmentType(c *gin.Context) {
 	id := c.Param("id")
+	log.Printf("UpdateAppointmentType: id = %s", string(id))
 	var db = storage.GetTenantDB(c)
 	if db == nil {
 		return

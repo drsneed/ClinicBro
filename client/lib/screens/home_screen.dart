@@ -6,8 +6,8 @@ import '../models/patient_item.dart';
 import '../services/auth_service.dart';
 import '../widgets/themed_icon.dart';
 import '../widgets/title_bar_tab_control.dart';
+import 'data_configuration_screen.dart';
 import 'scheduler_screen.dart';
-import 'system_screen.dart';
 import 'account_settings_dialog.dart';
 import '../widgets/custom_title_bar.dart';
 import 'dart:io' show Platform;
@@ -161,9 +161,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   PaneItem(
-                    icon: Icon(FluentIcons.system),
-                    title: Text('System'),
-                    body: SystemScreen(),
+                    icon: const Icon(FluentIcons.data_management_settings),
+                    title: const Text('Data Management'),
+                    body: DataConfigurationScreen(),
                   ),
                 ],
               ),
@@ -276,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'Home',
         'Schedule',
         _patientChartsPaneTitle,
-        'System',
+        'Data Management',
       ][_currentIndex];
     });
   }

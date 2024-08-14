@@ -11,7 +11,7 @@ class AppointmentStatusRepository {
   Future<AppointmentStatus?> createAppointmentStatus(
       AppointmentStatus appointmentStatus) async {
     final response = await DataService().post(
-      '/appointment_statuses',
+      '/appointment-statuses',
       body: jsonEncode(appointmentStatus.toJson()),
     );
 
@@ -24,7 +24,7 @@ class AppointmentStatusRepository {
   }
 
   Future<AppointmentStatus?> getAppointmentStatus(int id) async {
-    final response = await DataService().get('/appointment_statuses/$id');
+    final response = await DataService().get('/appointment-statuses/$id');
     if (response.statusCode == 200) {
       return AppointmentStatus.fromJson(jsonDecode(response.body));
     } else {
@@ -36,7 +36,7 @@ class AppointmentStatusRepository {
   Future<AppointmentStatus?> updateAppointmentStatus(
       AppointmentStatus appointmentStatus) async {
     final response = await DataService().put(
-      '/appointment_statuses/${appointmentStatus.id}',
+      '/appointment-statuses/${appointmentStatus.id}',
       body: jsonEncode(appointmentStatus.toJson()),
     );
 
@@ -49,12 +49,12 @@ class AppointmentStatusRepository {
   }
 
   Future<bool> deleteAppointmentStatus(int id) async {
-    final response = await DataService().delete('/appointment_statuses/$id');
+    final response = await DataService().delete('/appointment-statuses/$id');
     return response.statusCode == 204;
   }
 
   Future<List<AppointmentStatus>> getAllAppointmentStatuses() async {
-    final response = await DataService().get('/appointment_statuses');
+    final response = await DataService().get('/appointment-statuses');
     if (response.statusCode == 200) {
       List<dynamic> appointmentStatusesJson = jsonDecode(response.body);
       return appointmentStatusesJson

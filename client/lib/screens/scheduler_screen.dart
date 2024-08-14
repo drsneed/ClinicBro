@@ -27,12 +27,12 @@ class _SchedulerScreenState extends State<SchedulerScreen> {
   String _viewMode = 'Month'; // Default view mode
   bool _isMultiple = false; // Default view type
   bool _showNavigation = false; // Default months navigation visibility
-  DateTime _centerDate = DateTime.now(); // Add this line
+  DateTime _centerDate = DateTime.now();
   List<AppointmentItem> _appointments = [];
   DateTime? _cachedStartDate;
   DateTime? _cachedEndDate;
   List<AppointmentItem> _cachedAppointments = [];
-  bool _isLoading = false; // Add this line
+  bool _isLoading = false;
 
   final _overlayManager = OverlayManager();
 
