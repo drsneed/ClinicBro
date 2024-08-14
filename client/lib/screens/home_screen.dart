@@ -7,7 +7,7 @@ import '../services/auth_service.dart';
 import '../widgets/themed_icon.dart';
 import '../widgets/title_bar_tab_control.dart';
 import 'scheduler_screen.dart';
-import 'settings_screen.dart';
+import 'system_screen.dart';
 import 'account_settings_dialog.dart';
 import '../widgets/custom_title_bar.dart';
 import 'dart:io' show Platform;
@@ -145,9 +145,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     body: SchedulerScreen(isMobile: isMobile),
                   ),
                   PaneItem(
+                    //icon: Icon(FluentIcons.clipboard_list),
                     icon: ThemedIcon(
                       svgPath: "assets/icon/clipboard.svg",
-                      size: 18.0,
+                      size: 17.0,
                     ),
                     title: const Text(_patientChartsPaneTitle),
                     body: Consumer<PatientTabManager>(
@@ -160,9 +161,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   PaneItem(
-                    icon: Icon(FluentIcons.settings),
-                    title: Text('Settings'),
-                    body: SettingsScreen(),
+                    icon: Icon(FluentIcons.system),
+                    title: Text('System'),
+                    body: SystemScreen(),
                   ),
                 ],
               ),
@@ -275,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'Home',
         'Schedule',
         _patientChartsPaneTitle,
-        'Settings',
+        'System',
       ][_currentIndex];
     });
   }

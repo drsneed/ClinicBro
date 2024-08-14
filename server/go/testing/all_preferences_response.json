@@ -2,7 +2,8 @@
   "font_family": [
     "Fira Sans",
     "Aptos",
-    "Inter"
+    "Inter",
+    "IBM Plex Sans"
   ],
   "theme_mode": [
     "system",

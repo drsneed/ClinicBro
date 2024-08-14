@@ -100,6 +100,9 @@ flutter:
     - family: Fira Sans
       fonts:
         - asset: assets/fonts/FiraSans.otf
+    - family: IBM Plex Sans
+      fonts:
+        - asset: assets/fonts/IBMPlexSans.ttf
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
 

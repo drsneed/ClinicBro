@@ -172,6 +172,9 @@ func main() {
 
 		// System Information
 		authTokenRouter.GET("/server-version", handlers.GetServerVersion)
+
+		// Lookup routes
+		authTokenRouter.GET("/lookup/appointment-types", handlers.LookupAppointmentTypes)
 	}
 
 	// Start the server

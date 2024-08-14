@@ -703,7 +703,7 @@ class _AccountSettingsDialogState extends State<AccountSettingsDialog> {
 
           // Helper function to format the preference titles
           String _formatTitle(String key) {
-            return key.replaceAll('_', ' ').toUpperCase().replaceFirstMapped(
+            return key.replaceAll('_', ' ').replaceAllMapped(
                 RegExp(r'\b\w'), (match) => match.group(0)!.toUpperCase());
           }
 
