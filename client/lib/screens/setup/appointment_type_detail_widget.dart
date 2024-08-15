@@ -1,24 +1,23 @@
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_colorpicker/flutter_colorpicker.dart'; // For the color picker
+import 'package:flutter/material.dart' show Material;
+import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart';
 
 import '../../models/appointment_type.dart';
 import '../../repositories/appointment_type_repository.dart';
 import 'base_detail_widget.dart';
 
-class AppointmentTypeDetail extends StatefulWidget {
+class AppointmentTypeDetail extends BaseDetailWidget {
   final AppointmentType appointmentType;
 
-  const AppointmentTypeDetail({
-    Key? key,
-    required this.appointmentType,
-  }) : super(key: key);
+  const AppointmentTypeDetail({super.key, required this.appointmentType});
 
   @override
-  _AppointmentTypeDetailState createState() => _AppointmentTypeDetailState();
+  BaseDetailWidgetState<BaseDetailWidget> createState() =>
+      _AppointmentTypeDetailState();
 }
 
-class _AppointmentTypeDetailState extends State<AppointmentTypeDetail>
-    implements BaseDetailWidget {
+class _AppointmentTypeDetailState
+    extends BaseDetailWidgetState<AppointmentTypeDetail> {
   final _formKey = GlobalKey<FormState>();
 
   late bool _active;
@@ -53,30 +52,32 @@ class _AppointmentTypeDetailState extends State<AppointmentTypeDetail>
   }
 
   void _showColorPicker() {
+    final colorNotifier = ValueNotifier<Color>(_color);
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return ContentDialog(
-          title: const Text('Pick a color'),
-          content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: _color,
-              onColorChanged: (color) {
-                setState(() {
-                  _color = color;
-                });
-              },
-              showLabel: true,
+        return Material(
+          child: ContentDialog(
+            title: const Text('Pick a color'),
+            content: Material(
+              child: ColorPicker(
+                color: _color,
+                onChanged: (value) => colorNotifier.value = value,
+                initialPicker: Picker.paletteHue,
+              ),
             ),
+            actions: <Widget>[
+              Button(
+                child: const Text('OK'),
+                onPressed: () {
+                  setState(() {
+                    _color = colorNotifier.value;
+                  });
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           ),
-          actions: <Widget>[
-            Button(
-              child: const Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
         );
       },
     );
@@ -98,6 +99,7 @@ class _AppointmentTypeDetailState extends State<AppointmentTypeDetail>
 
   @override
   Widget build(BuildContext context) {
+    final theme = FluentTheme.of(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: SingleChildScrollView(
@@ -117,44 +119,73 @@ class _AppointmentTypeDetailState extends State<AppointmentTypeDetail>
                 const SizedBox(width: 8),
                 Text(
                   _active ? 'Active' : 'Inactive',
-                  style: const TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: theme.typography.body?.color,
+                  ),
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 20), // Increased space between fields
             Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  const Text('Name',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Name',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
                   TextBox(
                     controller: _nameController,
                     placeholder: 'Enter name',
+                    style: TextStyle(color: theme.typography.bodyLarge!.color),
                   ),
                   const SizedBox(height: 16),
-                  const Text('Description',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  const Text(
+                    'Description',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
                   TextBox(
                     controller: _descriptionController,
                     placeholder: 'Enter description',
+                    style: TextStyle(color: theme.typography.bodyLarge!.color),
                   ),
                   const SizedBox(height: 16),
-                  const Text('Color',
-                      style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                  TextBox(
-                    controller: TextEditingController(
-                        text:
-                            '#${_color.value.toRadixString(16).toUpperCase()}'), // Display color as string
-                    placeholder: 'Pick a color',
-                    onTap: _showColorPicker,
-                    readOnly: true, // Make it read-only
+                  const Text(
+                    'Color',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: <Widget>[
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: _color,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(
+                          width: 16), // Space between color circle and value
+                      Expanded(
+                        child: TextBox(
+                          controller: TextEditingController(
+                              text:
+                                  '#${_color.value.toRadixString(16).toUpperCase().padLeft(8, '0')}'),
+                          placeholder: 'Pick a color',
+                          onTap: _showColorPicker,
+                          readOnly: true, // Make it read-only
+                          style: TextStyle(
+                              color: theme.typography.bodyLarge!.color),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20), // Space after the color field
                 ],
               ),
             ),
@@ -162,38 +193,5 @@ class _AppointmentTypeDetailState extends State<AppointmentTypeDetail>
         ),
       ),
     );
-  }
-
-  @override
-  StatelessElement createElement() {
-    // TODO: implement createElement
-    throw UnimplementedError();
-  }
-
-  @override
-  List<DiagnosticsNode> debugDescribeChildren() {
-    // TODO: implement debugDescribeChildren
-    throw UnimplementedError();
-  }
-
-  @override
-  // TODO: implement key
-  Key? get key => throw UnimplementedError();
-
-  @override
-  String toStringDeep(
-      {String prefixLineOne = '',
-      String? prefixOtherLines,
-      DiagnosticLevel minLevel = DiagnosticLevel.debug}) {
-    // TODO: implement toStringDeep
-    throw UnimplementedError();
-  }
-
-  @override
-  String toStringShallow(
-      {String joiner = ', ',
-      DiagnosticLevel minLevel = DiagnosticLevel.debug}) {
-    // TODO: implement toStringShallow
-    throw UnimplementedError();
   }
 }

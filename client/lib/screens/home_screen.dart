@@ -6,7 +6,7 @@ import '../models/patient_item.dart';
 import '../services/auth_service.dart';
 import '../widgets/themed_icon.dart';
 import '../widgets/title_bar_tab_control.dart';
-import 'data_configuration_screen.dart';
+import 'data_management_screen.dart';
 import 'scheduler_screen.dart';
 import 'account_settings_dialog.dart';
 import '../widgets/custom_title_bar.dart';
@@ -163,7 +163,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   PaneItem(
                     icon: const Icon(FluentIcons.data_management_settings),
                     title: const Text('Data Management'),
-                    body: DataConfigurationScreen(),
+                    body: const DataManagementScreen(),
                   ),
                 ],
               ),
