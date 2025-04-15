@@ -1,1 +1,0 @@
-<cb-window id="cb-window"></cb-window>

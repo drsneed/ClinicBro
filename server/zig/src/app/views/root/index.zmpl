@@ -1,1 +1,0 @@
-@partial root/content(name: .user_name)
